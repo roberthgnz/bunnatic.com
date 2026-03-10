@@ -138,11 +138,6 @@ export default function Pricing() {
                     >
                       {tier.cta}
                     </Link>
-                    {tier.secondaryCta && (
-                      <Link href="#" className="text-base font-semibold text-slate-500 hover:text-slate-700">
-                        {tier.secondaryCta}
-                      </Link>
-                    )}
                   </div>
 
                   <ul className="mt-10 space-y-5">

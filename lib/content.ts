@@ -334,7 +334,6 @@ export const content = {
           period: "/mes",
           description: "Para negocios con varias líneas de servicio o varias sedes.",
           cta: "Prueba 14 días",
-          secondaryCta: "Solicitar demo",
           features: [
             { title: "8 Webs activas", detail: "Control centralizado por marca o sede." },
             { title: "Ediciones ilimitadas", detail: "Flujo asistido con IA para equipos." },
@@ -352,7 +351,6 @@ export const content = {
           period: "/mes",
           description: "Para negocios en crecimiento que quieren operar con más autonomía.",
           cta: "Prueba 14 días",
-          secondaryCta: "Solicitar demo",
           features: [
             { title: "15 Webs activas", detail: "Gestión multi-sede y multi-marca." },
             { title: "Ediciones ilimitadas", detail: "Automatizaciones y flujos avanzados." },
@@ -759,7 +757,6 @@ export const content = {
           period: "/mes",
           description: "Per a negocis amb diverses línies de servei o diverses seus.",
           cta: "Prova 14 dies",
-          secondaryCta: "Sol·licitar demo",
           features: [
             { title: "8 Webs actives", detail: "Control centralitzat per marca o seu." },
             { title: "Edicions il·limitades", detail: "Flux assistit amb IA per equips." },
@@ -777,7 +774,6 @@ export const content = {
           period: "/mes",
           description: "Per a negocis en creixement que volen operar amb més autonomia.",
           cta: "Prova 14 dies",
-          secondaryCta: "Sol·licitar demo",
           features: [
             { title: "15 Webs actives", detail: "Gestió multi-seu i multi-marca." },
             { title: "Edicions il·limitades", detail: "Automatitzacions i fluxos avançats." },

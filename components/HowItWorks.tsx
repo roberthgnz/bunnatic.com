@@ -119,20 +119,20 @@ export default function HowItWorks() {
   };
 
   return (
-    <section className="relative bg-slate-50 py-24 sm:py-32 overflow-hidden">
+    <section className="relative overflow-hidden bg-slate-50 py-16 sm:py-24 lg:py-32">
       <div className="absolute inset-0 bg-grid-pattern opacity-50" />
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
             {t.howItWorks.title}
           </h2>
-          <p className="mt-4 text-lg leading-8 text-gray-600">
+          <p className="mt-3 text-base leading-7 text-gray-600 sm:mt-4 sm:text-lg sm:leading-8">
             {t.howItWorks.subtitle}
           </p>
         </div>
 
-        <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-          <dl className="grid max-w-xl grid-cols-1 gap-8 lg:max-w-none lg:grid-cols-3">
+        <div className="mx-auto mt-8 max-w-2xl sm:mt-14 lg:mt-20 lg:max-w-none">
+          <dl className="grid max-w-xl grid-cols-1 gap-4 sm:gap-6 lg:max-w-none lg:grid-cols-3 lg:gap-8">
             {steps.map((step, index) => (
               <motion.div
                 key={step.title}
@@ -154,10 +154,10 @@ export default function HowItWorks() {
                   className="rounded-3xl"
                 >
                   <Card className="flex flex-col rounded-3xl bg-white p-0 shadow-sm ring-1 ring-gray-200 transition-all hover:shadow-md">
-                    <CardContent className="p-8">
-                      <dt className="flex items-center gap-x-3 text-lg font-bold leading-7 text-gray-900">
+                    <CardContent className="p-5 sm:p-7 lg:p-8">
+                      <dt className="flex items-center gap-x-2.5 text-base font-bold leading-7 text-gray-900 sm:gap-x-3 sm:text-lg">
                         <span
-                          className={`flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-sm ${
+                          className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm text-white shadow-sm sm:h-10 sm:w-10 sm:text-base ${
                             stepAccent[index] ?? "bg-emerald-500"
                           }`}
                         >
@@ -165,7 +165,7 @@ export default function HowItWorks() {
                         </span>
                         {step.title}
                       </dt>
-                      <dd className="mt-4 flex flex-auto flex-col text-base leading-relaxed text-gray-600">
+                      <dd className="mt-3 flex flex-auto flex-col text-sm leading-relaxed text-gray-600 sm:mt-4 sm:text-base">
                         <motion.p
                           variants={revealText}
                           className="flex-auto"
@@ -173,17 +173,17 @@ export default function HowItWorks() {
                           {step.description}
                         </motion.p>
 
-                        <Card className="mt-8 border border-gray-100 bg-gray-50/50 p-6 shadow-inner">
+                        <Card className="mt-5 border border-gray-100 bg-gray-50/50 p-4 shadow-inner sm:mt-7 sm:p-5 lg:mt-8 lg:p-6">
                           {index === 0 && (
                             <motion.div
-                              className="space-y-4"
+                              className="space-y-3 sm:space-y-4"
                               variants={stepCardVariants}
                             >
                               <motion.div
                                 variants={subtleEmphasis}
-                                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-500 shadow-sm"
+                                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-xs text-gray-500 shadow-sm sm:px-4 sm:py-3 sm:text-sm"
                               >
-                                <Search className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                <Search className="h-3.5 w-3.5 text-gray-400 flex-shrink-0 sm:h-4 sm:w-4" />
                                 <span>{step.mockup?.input}</span>
                               </motion.div>
                               <motion.div
@@ -191,10 +191,10 @@ export default function HowItWorks() {
                                 className="overflow-hidden"
                               >
                                 <motion.div
-                                  className="flex items-center gap-2 px-2 text-sm font-medium text-gray-900"
+                                  className="flex items-center gap-2 px-1.5 text-xs font-medium text-gray-900 sm:px-2 sm:text-sm"
                                   variants={subtleEmphasis}
                                 >
-                                  <MapPin className="h-4 w-4 text-emerald-500" />
+                                  <MapPin className="h-3.5 w-3.5 text-emerald-500 sm:h-4 sm:w-4" />
                                   <span>{step.mockup?.result}</span>
                                 </motion.div>
                               </motion.div>
@@ -203,17 +203,17 @@ export default function HowItWorks() {
 
                           {index === 1 && (
                             <motion.div
-                              className="space-y-5"
+                              className="space-y-4 sm:space-y-5"
                               variants={stepCardVariants}
                             >
                               <motion.div
                                 variants={revealText}
-                                className="flex items-center gap-2 border-b border-gray-200 pb-3 text-sm font-semibold text-gray-900"
+                                className="flex items-center gap-2 border-b border-gray-200 pb-2.5 text-xs font-semibold text-gray-900 sm:pb-3 sm:text-sm"
                               >
-                                <Globe className="h-4 w-4 text-violet-500" />
+                                <Globe className="h-3.5 w-3.5 text-violet-500 sm:h-4 sm:w-4" />
                                 {step.mockup?.title}
                               </motion.div>
-                              <ul className="space-y-4 text-sm font-medium text-gray-600">
+                              <ul className="space-y-3 text-xs font-medium text-gray-600 sm:space-y-4 sm:text-sm">
                                 {step.mockup?.items?.map((item, i) => (
                                   i < 2 ? (
                                     <motion.li
@@ -222,7 +222,7 @@ export default function HowItWorks() {
                                       variants={listItemEmphasis}
                                       className="flex items-center gap-3"
                                     >
-                                      <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                                      <CheckCircle2 className="h-4 w-4 text-emerald-500 sm:h-5 sm:w-5" />
                                       <span>{item}</span>
                                     </motion.li>
                                   ) : (
@@ -232,7 +232,7 @@ export default function HowItWorks() {
                                       className="flex items-center gap-3 overflow-hidden"
                                     >
                                       <motion.div
-                                        className="h-4 w-4 ml-0.5 rounded-full border-2 border-gray-300 border-t-violet-500"
+                                        className="ml-0.5 h-3.5 w-3.5 rounded-full border-2 border-gray-300 border-t-violet-500 sm:h-4 sm:w-4"
                                         variants={{
                                           rest: { rotate: 0 },
                                           hover: {
@@ -263,14 +263,14 @@ export default function HowItWorks() {
 
                           {index === 2 && (
                             <motion.div
-                              className="space-y-5"
+                              className="space-y-4 sm:space-y-5"
                               variants={stepCardVariants}
                             >
                               <motion.div
                                 variants={checkBadge}
-                                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"
+                                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-700 sm:text-xs"
                               >
-                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                 {step.mockup?.tag}
                               </motion.div>
                               <motion.div
@@ -279,13 +279,13 @@ export default function HowItWorks() {
                               >
                                 <motion.div
                                   variants={subtleEmphasis}
-                                  className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100 origin-bottom-left"
+                                  className="origin-bottom-left rounded-xl bg-white p-3 shadow-sm ring-1 ring-gray-100 sm:p-4"
                                 >
-                                  <div className="flex items-start gap-3">
-                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 ring-1 ring-blue-100">
-                                      <MessageCircle className="h-5 w-5" />
+                                  <div className="flex items-start gap-2.5 sm:gap-3">
+                                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 ring-1 ring-blue-100 sm:h-10 sm:w-10">
+                                      <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                                     </div>
-                                    <p className="text-sm font-medium text-gray-700 leading-snug">
+                                    <p className="text-xs font-medium leading-snug text-gray-700 sm:text-sm">
                                       {step.mockup?.chat}
                                     </p>
                                   </div>

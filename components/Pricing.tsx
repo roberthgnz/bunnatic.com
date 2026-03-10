@@ -1,10 +1,11 @@
 "use client";
 
 import { content } from "@/lib/content";
-import { Check, CircleHelp } from "lucide-react";
+import { Check, ChevronDown, CircleHelp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useLanguage } from "./LanguageProvider";
@@ -62,22 +63,57 @@ export default function Pricing() {
   const { language } = useLanguage();
   const t = content[language];
   const [isAnnual, setIsAnnual] = useState(false);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const help = HELP_TEXT[language];
 
+  const renderInfoList = (
+    items: string[],
+    type: "addons" | "includes",
+    classNames = "mt-3 w-full space-y-2",
+  ) => (
+    <ul className={classNames}>
+      {items.map((item) => {
+        const helper = help[type] as Record<string, string>;
+
+        return (
+          <li key={item} className="flex items-center text-sm text-slate-600 sm:text-base">
+            <span>{item}</span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="ml-auto h-5 w-5 rounded-full text-slate-300 hover:text-slate-500"
+                  aria-label={item}
+                >
+                  <CircleHelp className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={8}>
+                {helper[item] ?? help.fallback}
+              </TooltipContent>
+            </Tooltip>
+          </li>
+        );
+      })}
+    </ul>
+  );
+
   return (
-    <section className="bg-[#f4f7fc] py-24 sm:py-28">
+    <section className="bg-[#f4f7fc] py-16 sm:py-24 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
-          <h2 className="text-4xl font-extrabold tracking-tight text-slate-800 sm:text-5xl">
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-800 sm:text-5xl">
             {t.pricing.title}
           </h2>
-          <p className="mt-4 text-xl text-slate-600">{t.pricing.subtitle}</p>
+          <p className="mt-3 text-base text-slate-600 sm:mt-4 sm:text-xl">{t.pricing.subtitle}</p>
 
           <Button
             type="button"
             onClick={() => setIsAnnual((prev) => !prev)}
-            variant="ghost"
-            className="mt-8 h-auto inline-flex items-center gap-3 px-0 text-base font-medium text-slate-700 hover:bg-transparent hover:text-slate-700"
+            variant="outline"
+            className="mt-6 inline-flex h-auto w-full items-center justify-between gap-2 rounded-2xl border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 sm:mt-8 sm:h-10 sm:w-auto sm:justify-center sm:gap-3 sm:rounded-full sm:px-4 sm:py-0 sm:text-sm"
             aria-pressed={isAnnual}
           >
             <span
@@ -91,31 +127,45 @@ export default function Pricing() {
                 }`}
               />
             </span>
-            <span>
+            <span className="text-right leading-tight sm:text-left sm:leading-none">
               {t.pricing.billingLabel},{" "}
               <span className="text-indigo-600">{t.pricing.saveLabel}</span>
             </span>
           </Button>
         </div>
 
-        <Card className="mt-14 rounded-3xl border border-slate-200 bg-white p-0">
+        <Card className="mt-10 overflow-hidden rounded-3xl border border-slate-200 bg-white p-0 sm:mt-14">
           <div className="grid grid-cols-1 divide-y divide-slate-200 xl:grid-cols-4 xl:divide-x xl:divide-y-0">
-            {t.pricing.tiers.map((tier) => (
-              <article key={tier.id} className="flex h-full flex-col">
-                <CardContent className="flex h-full flex-1 flex-col p-6 sm:p-8">
-                  <div>
-                    <h3 className="text-3xl font-extrabold text-slate-800">{tier.name}</h3>
-                    <p className="mt-3 max-w-xs text-lg text-slate-600">{tier.description}</p>
-                  </div>
+            {t.pricing.tiers.map((tier) => {
+              const isStarter = tier.id === "tier-starter";
 
-                  <div className="mt-8">
+              return (
+                <article
+                  key={tier.id}
+                  className={`relative flex h-full flex-col ${
+                    isStarter ? "bg-emerald-50/40" : ""
+                  }`}
+                >
+                  <CardContent className="flex h-full flex-1 flex-col p-5 sm:p-8">
+                    <div>
+                      <h3
+                        className={`text-2xl font-extrabold sm:text-3xl ${
+                          isStarter ? "text-emerald-800" : "text-slate-800"
+                        }`}
+                      >
+                        {tier.name}
+                      </h3>
+                      <p className="mt-2 max-w-xs text-base text-slate-600 sm:mt-3 sm:text-lg">{tier.description}</p>
+                    </div>
+
+                  <div className="mt-7 sm:mt-8">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-5xl font-extrabold tracking-tight text-slate-800">
+                      <span className="text-4xl font-extrabold tracking-tight text-slate-800 sm:text-5xl">
                         {isAnnual ? tier.priceYearly : tier.priceMonthly}
                       </span>
-                      <span className="text-2xl font-semibold text-slate-500">{tier.period}</span>
+                      <span className="text-xl font-semibold text-slate-500 sm:text-2xl">{tier.period}</span>
                     </div>
-                    <div className="mt-2 min-h-[44px] text-sm text-slate-500">
+                    <div className="mt-2 min-h-[44px] text-xs text-slate-500 sm:text-sm">
                       {isAnnual ? (
                         <div className="space-y-1">
                           <p>
@@ -132,80 +182,97 @@ export default function Pricing() {
                   </div>
 
                   <div className="mt-6 flex flex-wrap items-center gap-3">
-                    <Link
-                      href={`/signup?source=pricing&plan=${tier.id.replace("tier-", "")}`}
-                      className="rounded-full bg-indigo-600 px-5 py-2.5 text-base font-semibold text-white transition-colors hover:bg-indigo-500"
+                    <Button
+                      asChild
+                      className={`h-10 w-full rounded-full px-5 text-sm font-semibold sm:w-auto ${
+                        isStarter
+                          ? "bg-emerald-500 text-white hover:bg-emerald-400"
+                          : "bg-slate-900 text-white hover:bg-slate-800"
+                      }`}
                     >
-                      {tier.cta}
-                    </Link>
+                      <Link href={`/signup?source=pricing&plan=${tier.id.replace("tier-", "")}`}>
+                        {tier.cta}
+                      </Link>
+                    </Button>
                   </div>
 
-                  <ul className="mt-10 space-y-5">
+                  <ul className="mt-8 space-y-4 sm:mt-10 sm:space-y-5">
                     {tier.features.map((feature) => (
                       <li key={feature.title} className="flex items-start gap-3">
                         <Check className="mt-1 h-5 w-5 shrink-0 text-emerald-500" />
                         <div className="space-y-1">
-                          <p className="text-2xl font-extrabold text-slate-900">{feature.title}</p>
-                          <p className="text-base text-slate-500">{feature.detail}</p>
+                          <p className="text-lg font-extrabold text-slate-900 sm:text-2xl">{feature.title}</p>
+                          <p className="text-sm text-slate-500 sm:text-base">{feature.detail}</p>
                         </div>
                       </li>
                     ))}
                   </ul>
-                </CardContent>
+                  </CardContent>
 
-                <CardFooter className="flex flex-col items-start gap-6 rounded-none border-t border-slate-200 bg-slate-50 p-6 text-left sm:p-8">
-                  <h4 className="text-base font-semibold text-slate-700">{t.pricing.addonsTitle}</h4>
-                  <ul className="mt-3 w-full space-y-2">
-                    {tier.addons.map((item) => (
-                      <li key={item} className="flex items-center text-sm text-slate-600 sm:text-base">
-                        <span>{item}</span>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="ml-auto h-5 w-5 rounded-full text-slate-300 hover:text-slate-500"
-                              aria-label={item}
-                            >
-                              <CircleHelp className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" sideOffset={8}>
-                            {help.addons[item as keyof typeof help.addons] ?? help.fallback}
-                          </TooltipContent>
-                        </Tooltip>
-                      </li>
-                    ))}
-                  </ul>
+                  <CardFooter className="flex flex-col items-start gap-5 rounded-none border-t border-slate-200 bg-slate-50 p-5 text-left sm:gap-6 sm:p-8">
+                    <div className="hidden w-full sm:block">
+                      <h4 className="text-sm font-semibold text-slate-700 sm:text-base">{t.pricing.addonsTitle}</h4>
+                      {renderInfoList(tier.addons, "addons")}
 
-                  <h4 className="mt-7 text-base font-semibold text-slate-700">{t.pricing.includesTitle}</h4>
-                  <ul className="mt-3 w-full space-y-2">
-                    {tier.includes.map((item) => (
-                      <li key={item} className="flex items-center text-sm text-slate-600 sm:text-base">
-                        <span>{item}</span>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="ml-auto h-5 w-5 rounded-full text-slate-300 hover:text-slate-500"
-                              aria-label={item}
-                            >
-                              <CircleHelp className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" sideOffset={8}>
-                            {help.includes[item as keyof typeof help.includes] ?? help.fallback}
-                          </TooltipContent>
-                        </Tooltip>
-                      </li>
-                    ))}
-                  </ul>
-                </CardFooter>
-              </article>
-            ))}
+                      <h4 className="mt-6 text-sm font-semibold text-slate-700 sm:mt-7 sm:text-base">{t.pricing.includesTitle}</h4>
+                      {renderInfoList(tier.includes, "includes")}
+                    </div>
+
+                    <div className="w-full space-y-3 sm:hidden">
+                      <Collapsible
+                        open={Boolean(openSections[`${tier.id}-addons`])}
+                        onOpenChange={(open) =>
+                          setOpenSections((prev) => ({ ...prev, [`${tier.id}-addons`]: open }))
+                        }
+                      >
+                        <CollapsibleTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="flex h-10 w-full items-center justify-between rounded-xl border border-slate-200 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                          >
+                            <span>{t.pricing.addonsTitle}</span>
+                            <ChevronDown
+                              className={`h-4 w-4 transition-transform ${
+                                openSections[`${tier.id}-addons`] ? "rotate-180" : ""
+                              }`}
+                            />
+                          </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          {renderInfoList(tier.addons, "addons", "mt-2 w-full space-y-2")}
+                        </CollapsibleContent>
+                      </Collapsible>
+
+                      <Collapsible
+                        open={Boolean(openSections[`${tier.id}-includes`])}
+                        onOpenChange={(open) =>
+                          setOpenSections((prev) => ({ ...prev, [`${tier.id}-includes`]: open }))
+                        }
+                      >
+                        <CollapsibleTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="flex h-10 w-full items-center justify-between rounded-xl border border-slate-200 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                          >
+                            <span>{t.pricing.includesTitle}</span>
+                            <ChevronDown
+                              className={`h-4 w-4 transition-transform ${
+                                openSections[`${tier.id}-includes`] ? "rotate-180" : ""
+                              }`}
+                            />
+                          </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          {renderInfoList(tier.includes, "includes", "mt-2 w-full space-y-2")}
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </div>
+                  </CardFooter>
+                </article>
+              );
+            })}
           </div>
         </Card>
       </div>

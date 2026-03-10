@@ -66,7 +66,7 @@ export default function GeneracionIAPage() {
           planTitle: "Plan recomendado para captar clientes",
           planPrice: "19€/mes",
           planItems: [
-            "Edición ilimitada con IA",
+            "Edición visual con ayuda de IA para textos y ofertas",
             "Formulario de contacto y botón de WhatsApp",
             "SEO local y soporte prioritario",
           ],
@@ -136,7 +136,7 @@ export default function GeneracionIAPage() {
           planTitle: "Pla recomanat per captar clients",
           planPrice: "19€/mes",
           planItems: [
-            "Editor visual il·limitat amb IA",
+            "Editor visual il·limitat amb suport d'IA",
             "Formulari de contacte i botó de WhatsApp",
             "SEO local i suport prioritari",
           ],

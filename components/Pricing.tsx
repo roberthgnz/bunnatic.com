@@ -130,7 +130,7 @@ export default function Pricing() {
 
                   <div className="mt-6 flex flex-wrap items-center gap-3">
                     <Link
-                      href="#"
+                      href={`/signup?source=pricing&plan=${tier.id.replace("tier-", "")}`}
                       className="rounded-full bg-indigo-600 px-5 py-2.5 text-base font-semibold text-white transition-colors hover:bg-indigo-500"
                     >
                       {tier.cta}

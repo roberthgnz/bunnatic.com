@@ -10,7 +10,13 @@ dependencies:
     version: 1.44.0
   '@hookform/resolvers':
     specifier: ^5.2.1
-    version: 5.2.2
+    version: 5.2.2(react-hook-form@7.71.2)
+  accordion:
+    specifier: ^3.0.2
+    version: 3.0.2
+  add:
+    specifier: ^2.0.6
+    version: 2.0.6
   autoprefixer:
     specifier: ^10.4.21
     version: 10.4.27(postcss@8.5.8)
@@ -20,6 +26,9 @@ dependencies:
   clsx:
     specifier: ^2.1.1
     version: 2.1.1
+  dlx:
+    specifier: ^0.2.1
+    version: 0.2.1
   lucide-react:
     specifier: ^0.553.0
     version: 0.553.0(react@19.2.4)
@@ -32,6 +41,12 @@ dependencies:
   next-intl:
     specifier: ^4.8.3
     version: 4.8.3(next@15.5.12)(react@19.2.4)(typescript@5.9.3)
+  next-themes:
+    specifier: ^0.4.6
+    version: 0.4.6(react-dom@19.2.4)(react@19.2.4)
+  pnpm:
+    specifier: ^10.32.0
+    version: 10.32.0
   postcss:
     specifier: ^8.5.6
     version: 8.5.8
@@ -44,12 +59,21 @@ dependencies:
   react-dom:
     specifier: ^19.2.1
     version: 19.2.4(react@19.2.4)
+  react-hook-form:
+    specifier: ^7.71.2
+    version: 7.71.2(react@19.2.4)
   shadcn:
     specifier: ^4.0.2
     version: 4.0.2(@types/node@20.19.37)(typescript@5.9.3)
+  sonner:
+    specifier: ^2.0.7
+    version: 2.0.7(react-dom@19.2.4)(react@19.2.4)
   tailwind-merge:
     specifier: ^3.5.0
     version: 3.5.0
+  zod:
+    specifier: ^4.3.6
+    version: 4.3.6
 
 devDependencies:
   '@tailwindcss/postcss':
@@ -768,12 +792,13 @@ packages:
     dependencies:
       hono: 4.12.6
 
-  /@hookform/resolvers@5.2.2:
+  /@hookform/resolvers@5.2.2(react-hook-form@7.71.2):
     resolution: {integrity: sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA==}
     peerDependencies:
       react-hook-form: ^7.55.0
     dependencies:
       '@standard-schema/utils': 0.3.0
+      react-hook-form: 7.71.2(react@19.2.4)
     dev: false
 
   /@humanfs/core@0.19.1:
@@ -1316,11 +1341,12 @@ packages:
     resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
     dev: true
 
-  /@modelcontextprotocol/sdk@1.27.1:
+  /@modelcontextprotocol/sdk@1.27.1(zod@3.25.76):
     resolution: {integrity: sha512-sr6GbP+4edBwFndLbM60gf07z0FQ79gaExpnsjMGePXqFcSSb7t6iscpjk9DhFhwd+mTEQrzNafGP8/iGGFYaA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@cfworker/json-schema': ^4.1.1
+      zod: ^3.25 || ^4.0
     peerDependenciesMeta:
       '@cfworker/json-schema':
         optional: true
@@ -3822,6 +3848,10 @@ packages:
       mime-types: 3.0.2
       negotiator: 1.0.0
 
+  /accordion@3.0.2:
+    resolution: {integrity: sha512-jbQfFaw+57OBwPt7qSNHuW+RA8smmRwkWRS1Ozh6K/QxUspBgBV/LpdSzlY7vee8TomS6j3D33B9rIeH1qMwsA==}
+    dev: false
+
   /acorn-jsx@5.3.2(acorn@8.16.0):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
@@ -3842,6 +3872,10 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
     dev: true
+
+  /add@2.0.6:
+    resolution: {integrity: sha512-j5QzrmsokwWWp6kUcJQySpbG+xfOBqqKnup3OIk1pz+kB/80SLorZ9V8zHFLO92Lcd+hbvq8bT+zOGoPkmBV0Q==}
+    dev: false
 
   /agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
@@ -5063,6 +5097,12 @@ packages:
     resolution: {integrity: sha512-c68LpLbO+7kP/b1Hr1qs8/BJ09F5khZGTxqxZuhzxpmwJKOgRFHJWIb9/KmqnqHhLdO55aOxFH/EGBvUQbL/RQ==}
     dev: true
 
+  /dlx@0.2.1:
+    resolution: {integrity: sha512-oXRVvaKG942UX0HNIDr+Eykp6uGhcjkk719dGBYNqSagrwZ0l4ryA4iTh2n/l23MinmXISqzt4uVLSS2cUYm7A==}
+    dependencies:
+      underscore: 1.13.8
+    dev: false
+
   /doctrine@2.1.0:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
     engines: {node: '>=0.10.0'}
@@ -5984,7 +6024,7 @@ packages:
       '@google-cloud/cloud-sql-connector': 1.9.1
       '@google-cloud/pubsub': 5.3.0
       '@inquirer/prompts': 7.10.1(@types/node@20.19.37)
-      '@modelcontextprotocol/sdk': 1.27.1
+      '@modelcontextprotocol/sdk': 1.27.1(zod@3.25.76)
       abort-controller: 3.0.0
       ajv: 8.18.0
       ajv-formats: 3.0.1
@@ -8076,6 +8116,16 @@ packages:
       - '@swc/helpers'
     dev: false
 
+  /next-themes@0.4.6(react-dom@19.2.4)(react@19.2.4):
+    resolution: {integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==}
+    peerDependencies:
+      react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+    dev: false
+
   /next@15.5.12(react-dom@19.2.4)(react@19.2.4):
     resolution: {integrity: sha512-Fi/wQ4Etlrn60rz78bebG1i1SR20QxvV8tVp6iJspjLUSHcZoeUXCt+vmWoEcza85ElZzExK/jJ/F6SvtGktjA==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
@@ -8696,6 +8746,12 @@ packages:
     resolution: {integrity: sha512-wQ0b/W4Fr01qtpHlqSqspcj3EhBvimsdh0KlHhH8HRZnMsEa0ea2fTULOXOS9ccQr3om+GcGRk4e+isrZWV8qQ==}
     engines: {node: '>=16.20.0'}
 
+  /pnpm@10.32.0:
+    resolution: {integrity: sha512-myY0uz/tVgHDNjPy2SWT9QYnCjljuMUdKy1qgo2mFc5One6++WFMzrvBOsjTwPnJzM61g8achXhDb6R327INcA==}
+    engines: {node: '>=18.12'}
+    hasBin: true
+    dev: false
+
   /po-parser@2.1.1:
     resolution: {integrity: sha512-ECF4zHLbUItpUgE3OTtLKlPjeBN+fKEczj2zYjDfCGOzicNs0GK3Vg2IoAYwx7LH/XYw43fZQP6xnZ4TkNxSLQ==}
     dev: false
@@ -9059,6 +9115,15 @@ packages:
     dependencies:
       react: 19.2.4
       scheduler: 0.27.0
+    dev: false
+
+  /react-hook-form@7.71.2(react@19.2.4):
+    resolution: {integrity: sha512-1CHvcDYzuRUNOflt4MOq3ZM46AronNJtQ1S7tnX6YN4y72qhgiUItpacZUAQ0TyWYci3yz1X+rXaSxiuEm86PA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+    dependencies:
+      react: 19.2.4
     dev: false
 
   /react-is@16.13.1:
@@ -9496,7 +9561,7 @@ packages:
       '@babel/plugin-transform-typescript': 7.28.6(@babel/core@7.29.0)
       '@babel/preset-typescript': 7.28.5(@babel/core@7.29.0)
       '@dotenvx/dotenvx': 1.54.1
-      '@modelcontextprotocol/sdk': 1.27.1
+      '@modelcontextprotocol/sdk': 1.27.1(zod@3.25.76)
       '@types/validate-npm-package-name': 4.0.2
       browserslist: 4.28.1
       commander: 14.0.3
@@ -9656,6 +9721,16 @@ packages:
       ip-address: 10.1.0
       smart-buffer: 4.2.0
     dev: true
+
+  /sonner@2.0.7(react-dom@19.2.4)(react@19.2.4):
+    resolution: {integrity: sha512-W6ZN4p58k8aDKA4XPcx2hpIQXBRAgyiWVkYhT7CvK6D3iAu7xjvVyhQHg2/iaKJZ1XVJ4r7XuwGL+WGEK37i9w==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+    dev: false
 
   /sort-any@4.0.7:
     resolution: {integrity: sha512-UuZVEXClHW+bVa6ZBQ4biTWmLXMP7y6/jv5arfA0rKk7ZExy+5Zm19uekIqqDx6ZuvUMu7z5Ba9FfBi6FlGXPQ==}
@@ -10345,6 +10420,10 @@ packages:
       which-boxed-primitive: 1.1.1
     dev: true
 
+  /underscore@1.13.8:
+    resolution: {integrity: sha512-DXtD3ZtEQzc7M8m4cXotyHR+FAS18C64asBYY5vqZexfYryNNnDc02W4hKg3rdQuqOYas1jkseX0+nZXjTXnvQ==}
+    dev: false
+
   /undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
@@ -10899,4 +10978,3 @@ packages:
 
   /zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
-    dev: true

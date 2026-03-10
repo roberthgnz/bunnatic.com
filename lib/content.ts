@@ -4,11 +4,11 @@ export const content = {
       logo: "Nova Web",
       languages: "ES | CA",
       platformLabel: "Plataform",
-      coreFeaturesLabel: "Características core",
+      coreFeaturesLabel: "Características",
       coreFeatures: [
         { id: "generacion-ia", label: "Generación con IA" },
         { id: "seo-local", label: "SEO local" },
-        { id: "edicion-asistida", label: "Editor visual con IA" }
+        { id: "edicion-asistida", label: "Edición visual + IA" }
       ],
       cta: "Crear mi web gratis →",
     },
@@ -19,7 +19,7 @@ export const content = {
       titleLine3: "La tienes lista en 5 minutos.",
       subtitle: "La IA crea tu web usando los datos de tu negocio. Gratis para empezar.",
       cta: "Crear mi web gratis →",
-      trustText: "No tarjeta de crédito · No técnicos · Cancela cuando quieras",
+      trustText: "Sin tarjeta · Sin técnicos · Cancela cuando quieras",
     },
     ticker: {
       businesses: [
@@ -40,8 +40,7 @@ export const content = {
           description: "El nombre de tu negocio y la IA lo encontrará en Google. Tus datos se rellenan solos.",
           mockup: {
             input: "Peluquería Rosa – Madrid",
-            result: "Peluquería Rosa · Calle Gran Vía, 42",
-            button: "✓ Estos son mis datos en Google"
+            result: "Peluquería Rosa · Calle Gran Vía, 42"
           }
         },
         {
@@ -49,11 +48,11 @@ export const content = {
           title: "La IA crea tu web",
           description: "En menos de 5 minutos, la IA diseña una web completa con tus textos, servicios y fotos.",
           mockup: {
-            title: "Crea tu web...",
+            title: "Crea tu web",
             items: [
-              "Textos generados ✓",
-              "Servicios añadidos ✓",
-              "Imágenes cargadas... loading"
+              "Textos generados",
+              "Servicios añadidos",
+              "Cargando Imágenes..."
             ]
           }
         },
@@ -62,7 +61,7 @@ export const content = {
           title: "Publícala y recibe clientes",
           description: "Tu web aparece en Google para tus clientes locales y los contactos llegarán directamente.",
           mockup: {
-            tag: "Web publicada ✓",
+            tag: "Web publicada",
             chat: "Hola, ¿tienen cita disponible para el sábado?"
           }
         }
@@ -95,7 +94,7 @@ export const content = {
       },
       {
         id: "edicion-asistida",
-        title: "Editor visual con IA",
+          title: "Edición visual con ayuda de IA",
         description: "Edita tu web con un editor visual intuitivo y usa la IA para recibir recomendaciones de contenido.",
         icon: "MessageSquare",
         benefits: [
@@ -430,11 +429,11 @@ export const content = {
       logo: "Nova Web",
       languages: "ES | CA",
       platformLabel: "Plataform",
-      coreFeaturesLabel: "Característiques core",
+      coreFeaturesLabel: "Característiques",
       coreFeatures: [
         { id: "generacion-ia", label: "Generació amb IA" },
         { id: "seo-local", label: "SEO local" },
-        { id: "edicion-asistida", label: "Editor visual amb IA" }
+        { id: "edicion-asistida", label: "Edició visual + IA" }
       ],
       cta: "Crear la meva web gratis →",
     },
@@ -445,7 +444,7 @@ export const content = {
       titleLine3: "La tens llesta en 5 minuts.",
       subtitle: "La IA crea la teva web utilitzant les dades del teu negoci. Gratis per començar.",
       cta: "Crear la meva web gratis →",
-      trustText: "Sense targeta de crèdit · Sense tècnics · Cancel·la quan vulguis",
+      trustText: "Sense targeta · Sense tècnics · Cancel·la quan vulguis",
     },
     ticker: {
       businesses: [
@@ -466,8 +465,7 @@ export const content = {
           description: "El nom del teu negoci i la IA el trobarà a Google. Les teves dades s'omplen soles.",
           mockup: {
             input: "Perruqueria Rosa – Barcelona",
-            result: "Perruqueria Rosa · Carrer Gran Via, 42",
-            button: "✓ Aquestes són les meves dades a Google"
+            result: "Perruqueria Rosa · Carrer Gran Via, 42"
           }
         },
         {
@@ -475,11 +473,11 @@ export const content = {
           title: "La IA crea la teva web",
           description: "En menys de 5 minuts, la IA dissenya una web completa amb els teus textos, serveis i fotos.",
           mockup: {
-            title: "Crea la teva web...",
+            title: "Crea la teva web",
             items: [
-              "Textos generats ✓",
-              "Serveis afegits ✓",
-              "Imatges carregades... loading"
+              "Textos generats",
+              "Serveis afegits",
+              "Imatges carregades..."
             ]
           }
         },
@@ -488,7 +486,7 @@ export const content = {
           title: "Publica-la i rep clients",
           description: "La teva web apareix a Google per als teus clients locals i els contactes arribaran directament.",
           mockup: {
-            tag: "Web publicada ✓",
+            tag: "Web publicada",
             chat: "Hola, teniu cita disponible per dissabte?"
           }
         }
@@ -521,7 +519,7 @@ export const content = {
       },
       {
         id: "edicion-asistida",
-        title: "Editor visual amb IA",
+        title: "Edició visual amb ajuda de IA",
         description: "Edita la teva web amb un editor visual intuïtiu i usa la IA per rebre recomanacions de contingut.",
         icon: "MessageSquare",
         benefits: [

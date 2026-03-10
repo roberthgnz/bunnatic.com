@@ -23,7 +23,7 @@ export default function AlternativeWordpressPage() {
           novaCardTitle: "Con Nova Web",
           novaItems: [
             "Configuración inicial en minutos y sin curva técnica.",
-            "Editor visual con recomendaciones de IA para cambios comerciales al instante.",
+            "Editor visual con recomendaciones de IA para mejorar textos y secciones comerciales al instante.",
             "Infraestructura lista sin mantenimiento complejo.",
           ],
           switchTitle: "Migrar sin fricción operativa",
@@ -85,7 +85,7 @@ export default function AlternativeWordpressPage() {
           novaCardTitle: "Amb Nova Web",
           novaItems: [
             "Configuració inicial en minuts i sense corba tècnica.",
-            "Editor visual amb recomanacions d'IA per a canvis comercials a l'instant.",
+            "Editor visual amb recomanacions d'IA per millorar textos i seccions comercials a l'instant.",
             "Infraestructura llesta sense manteniment complex.",
           ],
           switchTitle: "Migrar sense fricció operativa",

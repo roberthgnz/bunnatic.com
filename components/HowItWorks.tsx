@@ -68,13 +68,6 @@ export default function HowItWorks() {
                           <MapPin className="h-4 w-4 text-emerald-500" />
                           {step.mockup?.result}
                         </motion.div>
-                        <motion.button
-                          animate={{ scale: [1, 1, 0.95, 1, 1] }}
-                          transition={{ duration: 5, repeat: Infinity, times: [0, 0.4, 0.45, 0.5, 1] }}
-                          className="w-full rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-600"
-                        >
-                          {step.mockup?.button}
-                        </motion.button>
                       </div>
                     )}
 

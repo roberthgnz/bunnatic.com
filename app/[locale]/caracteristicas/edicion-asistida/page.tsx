@@ -8,7 +8,7 @@ export default function EdicionAsistidaPage() {
       copy={{
         es: {
           badge: "Edita en segundos, sin depender de nadie",
-          title: "Editor visual con IA para vender más cada semana",
+          title: "Editor visual para vender más cada semana",
           subtitle:
             "Actualiza horarios, servicios y promociones con el editor visual para que tu web siempre esté alineada con lo que estás vendiendo hoy.",
           urgencyText: "Web desactualizada = clientes que dudan y no contactan.",
@@ -66,7 +66,7 @@ export default function EdicionAsistidaPage() {
           planTitle: "Plan recomendado para edición continua",
           planPrice: "19€/mes",
           planItems: [
-            "Editor visual con apoyo de IA ilimitado",
+            "Editor visual con recomendaciones de IA ilimitadas",
             "Bloques y textos optimizados para conversión",
             "Soporte prioritario cuando lo necesites",
           ],
@@ -78,7 +78,7 @@ export default function EdicionAsistidaPage() {
         },
         ca: {
           badge: "Edita en segons, sense dependre de ningú",
-          title: "Editor visual amb IA per vendre més cada setmana",
+          title: "Editor visual per vendre més cada setmana",
           subtitle:
             "Actualitza horaris, serveis i promocions amb l'editor visual perquè la teva web sempre estigui alineada amb el que vens avui.",
           urgencyText: "Web desactualitzada = clients que dubten i no contacten.",
@@ -136,7 +136,7 @@ export default function EdicionAsistidaPage() {
           planTitle: "Pla recomanat per edició contínua",
           planPrice: "19€/mes",
           planItems: [
-            "Editor visual amb suport d'IA il·limitat",
+            "Editor visual amb recomanacions d'IA il·limitades",
             "Blocs i textos optimitzats per conversió",
             "Suport prioritari quan el necessitis",
           ],

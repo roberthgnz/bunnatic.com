@@ -60,7 +60,7 @@ export default function AlternativeSquarespacePage() {
           planPrice: "19€/mes",
           planItems: [
             "Estructura CRO lista para publicar",
-            "Editor visual con recomendaciones de IA y soporte prioritario",
+            "Editor visual con recomendaciones de IA para mejorar conversión y soporte prioritario",
             "SEO local integrado",
           ],
           finalTitle: "Convierte diseño en resultados de negocio",
@@ -122,7 +122,7 @@ export default function AlternativeSquarespacePage() {
           planPrice: "19€/mes",
           planItems: [
             "Estructura CRO llesta per publicar",
-            "Editor visual amb recomanacions d'IA i suport prioritari",
+            "Editor visual amb recomanacions d'IA per millorar la conversió i suport prioritari",
             "SEO local integrat",
           ],
           finalTitle: "Converteix disseny en resultats de negoci",

@@ -35,7 +35,15 @@ const createPageContent = {
       aboutUs: "Sobre nosotros",
       aboutUsText: "Basado en las excelentes reseñas de nuestros clientes ({rating} estrellas), nos enorgullece ofrecer el mejor servicio en {city}.",
       contactInfo: "Información de contacto",
+      website: "Web",
+      schedule: "Horario",
+      openNow: "Abierto ahora",
+      closedNow: "Cerrado ahora",
+      priceLevel: "Nivel de precio",
+      servicesTitle: "Servicios",
+      servicesSubtitle: "Información detectada automáticamente desde Google.",
       whatClientsSay: "Lo que dicen nuestros clientes",
+      minimalistNote: "Esta es una versión minimalista de tu web. La versión final puede incluir más secciones, diseño avanzado, SEO técnico y automatizaciones.",
       publishedTitle: "¡Tu web está publicada!",
       publishedSubtitle: "El sitio web para {name} ya está online y listo para recibir clientes.",
       visitsToday: "Visitas Hoy",
@@ -74,7 +82,15 @@ const createPageContent = {
       aboutUs: "Sobre nosaltres",
       aboutUsText: "Basat en les excel·lents ressenyes dels nostres clients ({rating} estrelles), ens enorgulleix oferir el millor servei a {city}.",
       contactInfo: "Informació de contacte",
+      website: "Web",
+      schedule: "Horari",
+      openNow: "Obert ara",
+      closedNow: "Tancat ara",
+      priceLevel: "Nivell de preu",
+      servicesTitle: "Serveis",
+      servicesSubtitle: "Informació detectada automàticament des de Google.",
       whatClientsSay: "El que diuen els nostres clients",
+      minimalistNote: "Aquesta és una versió minimalista del teu web. La versió final pot incloure més seccions, disseny avançat, SEO tècnic i automatitzacions.",
       publishedTitle: "La teva web està publicada!",
       publishedSubtitle: "El lloc web per a {name} ja està online i llest per rebre clients.",
       visitsToday: "Visites Avui",
@@ -96,6 +112,125 @@ export default function CreateWebPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<any>(null);
   const [placeDetails, setPlaceDetails] = useState<any>(null);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+
+  const typeLabels = {
+    es: {
+      restaurant: "Restaurante",
+      cafe: "Cafetería",
+      bar: "Bar",
+      bakery: "Panadería",
+      meal_takeaway: "Comida para llevar",
+      beauty_salon: "Centro de estética",
+      hair_care: "Peluquería",
+      dentist: "Clínica dental",
+      doctor: "Centro médico",
+      veterinary_care: "Clínica veterinaria",
+      pharmacy: "Farmacia",
+      gym: "Gimnasio",
+      real_estate_agency: "Inmobiliaria",
+      car_repair: "Taller mecánico",
+      locksmith: "Cerrajería",
+      electrician: "Electricista",
+      plumber: "Fontanería",
+      roofing_contractor: "Reformas y cubiertas",
+      moving_company: "Mudanzas",
+      furniture_store: "Tienda de muebles",
+      clothing_store: "Tienda de ropa",
+      shoe_store: "Zapatería",
+      electronics_store: "Tienda de electrónica",
+      lodging: "Alojamiento",
+    },
+    ca: {
+      restaurant: "Restaurant",
+      cafe: "Cafeteria",
+      bar: "Bar",
+      bakery: "Forn",
+      meal_takeaway: "Menjar per emportar",
+      beauty_salon: "Centre d'estètica",
+      hair_care: "Perruqueria",
+      dentist: "Clínica dental",
+      doctor: "Centre mèdic",
+      veterinary_care: "Clínica veterinària",
+      pharmacy: "Farmàcia",
+      gym: "Gimnàs",
+      real_estate_agency: "Immobiliària",
+      car_repair: "Taller mecànic",
+      locksmith: "Serralleria",
+      electrician: "Electricista",
+      plumber: "Fontaneria",
+      roofing_contractor: "Reformes i cobertes",
+      moving_company: "Mudances",
+      furniture_store: "Botiga de mobles",
+      clothing_store: "Botiga de roba",
+      shoe_store: "Sabateria",
+      electronics_store: "Botiga d'electrònica",
+      lodging: "Allotjament",
+    },
+  } as const;
+
+  const serviceFlagLabels = {
+    es: {
+      delivery: "Entrega a domicilio",
+      takeout: "Recogida en local",
+      dine_in: "Consumo en local",
+      reservable: "Reservas disponibles",
+      serves_breakfast: "Desayunos",
+      serves_lunch: "Comidas",
+      serves_dinner: "Cenas",
+      serves_vegetarian_food: "Opciones vegetarianas",
+      wheelchair_accessible_entrance: "Acceso adaptado",
+    },
+    ca: {
+      delivery: "Lliurament a domicili",
+      takeout: "Recollida al local",
+      dine_in: "Consum al local",
+      reservable: "Reserves disponibles",
+      serves_breakfast: "Esmorzars",
+      serves_lunch: "Dinars",
+      serves_dinner: "Sopars",
+      serves_vegetarian_food: "Opcions vegetarianes",
+      wheelchair_accessible_entrance: "Accés adaptat",
+    },
+  } as const;
+
+  const normalizeTypeLabel = (rawType: string) => {
+    const fromDictionary = typeLabels[language][rawType as keyof (typeof typeLabels)[typeof language]];
+    if (fromDictionary) return fromDictionary;
+    return rawType
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  };
+
+  const servicesFromFlags = Object.entries(serviceFlagLabels[language])
+    .filter(([flagKey]) => Boolean(placeDetails?.[flagKey]))
+    .map(([, label]) => label);
+
+  const ignoredTypes = new Set([
+    "point_of_interest",
+    "establishment",
+    "food",
+    "store",
+    "health",
+    "locality",
+    "political",
+    "premise",
+    "subpremise",
+  ]);
+
+  const servicesFromTypes = (placeDetails?.types || [])
+    .filter((rawType: string) => !ignoredTypes.has(rawType))
+    .map((rawType: string) => normalizeTypeLabel(rawType));
+
+  const detectedServices = Array.from(new Set([...servicesFromFlags, ...servicesFromTypes])).slice(0, 8);
+  const hasDetectedServices = detectedServices.length > 0;
+  const priceLevelValue = typeof placeDetails?.price_level === "number" ? "€".repeat(placeDetails.price_level) : null;
+  const openNow = placeDetails?.opening_hours?.open_now;
+  const aboutText =
+    placeDetails?.editorial_summary?.overview ||
+    t.crear.aboutUsText
+      .replace("{rating}", placeDetails?.rating || "")
+      .replace("{city}", placeDetails?.formatted_address?.split(",")?.[1]?.trim() || (language === "es" ? "la ciudad" : "la ciutat"));
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,7 +238,7 @@ export default function CreateWebPage() {
 
     setIsSearching(true);
     try {
-      const res = await fetch(`/api/places/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/places/search?q=${encodeURIComponent(query)}&lang=${language}`);
       const data = await res.json();
       if (data.results) {
         setPlaces(data.results);
@@ -118,20 +253,41 @@ export default function CreateWebPage() {
   const handleSelectPlace = async (place: any) => {
     setSelectedPlace(place);
     setStep("analyzing");
+    setPlaceDetails(null);
+    setAnalysisProgress(0);
+
+    const analysisDurationMs = 3000;
+    const analysisStart = Date.now();
+    const progressInterval = window.setInterval(() => {
+      const elapsed = Date.now() - analysisStart;
+      const progress = Math.min(95, Math.round((elapsed / analysisDurationMs) * 100));
+      setAnalysisProgress(progress);
+    }, 120);
+
+    const analysisPromise = new Promise<void>((resolve) => {
+      window.setTimeout(() => {
+        setAnalysisProgress(100);
+        resolve();
+      }, analysisDurationMs);
+    });
 
     try {
-      const res = await fetch(`/api/places/details?place_id=${place.place_id}`);
-      const data = await res.json();
-      if (data.result) {
+      const detailsPromise = (async () => {
+        const res = await fetch(`/api/places/details?place_id=${place.place_id}&lang=${language}`);
+        const data = await res.json();
+        if (!data.result) {
+          throw new Error("Place details not found");
+        }
         setPlaceDetails(data.result);
-      }
-      // Simulate AI analysis time
-      setTimeout(() => {
-        setStep("preview");
-      }, 3000);
+      })();
+
+      await Promise.all([analysisPromise, detailsPromise]);
+      setStep("preview");
     } catch (error) {
       console.error("Error fetching place details:", error);
       setStep("search"); // Revert on error
+    } finally {
+      window.clearInterval(progressInterval);
     }
   };
 
@@ -244,24 +400,34 @@ export default function CreateWebPage() {
               <p className="mt-4 text-lg text-gray-600 max-w-md">
                 {t.crear.analyzingSubtitle}
               </p>
+
+              <div className="mt-8 w-full max-w-md">
+                <div className="mb-2 text-right text-sm font-medium text-gray-600">{analysisProgress}%</div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                  <div
+                    className="h-full rounded-full bg-emerald-500 transition-all duration-200"
+                    style={{ width: `${analysisProgress}%` }}
+                  />
+                </div>
+              </div>
               
               <div className="mt-10 w-full max-w-sm space-y-4 text-left">
                 <div className="flex items-center gap-3 text-emerald-600 font-medium">
-                  <CheckCircle2 className="h-5 w-5" />
+                  {analysisProgress >= 20 ? <CheckCircle2 className="h-5 w-5" /> : <Loader2 className="h-5 w-5 animate-spin" />}
                   <span>{t.crear.step1}</span>
                 </div>
                 <motion.div 
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
                   className="flex items-center gap-3 text-emerald-600 font-medium"
                 >
-                  <CheckCircle2 className="h-5 w-5" />
+                  {analysisProgress >= 55 ? <CheckCircle2 className="h-5 w-5" /> : <Loader2 className="h-5 w-5 animate-spin" />}
                   <span>{t.crear.step2}</span>
                 </motion.div>
                 <motion.div 
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}
                   className="flex items-center gap-3 text-emerald-600 font-medium"
                 >
-                  <CheckCircle2 className="h-5 w-5" />
+                  {analysisProgress >= 90 ? <CheckCircle2 className="h-5 w-5" /> : <Loader2 className="h-5 w-5 animate-spin" />}
                   <span>{t.crear.step3}</span>
                 </motion.div>
               </div>
@@ -300,7 +466,13 @@ export default function CreateWebPage() {
                       <div className="flex items-center gap-3 text-gray-600">
                         <Star className="h-5 w-5 flex-shrink-0 text-amber-500 fill-amber-500" />
                         <span className="text-sm font-medium text-gray-900">{placeDetails.rating}</span>
-                        <span className="text-sm">({placeDetails.reviews?.length || 0} {t.crear.reviewsAnalyzed})</span>
+                        <span className="text-sm">({placeDetails.user_ratings_total || placeDetails.reviews?.length || 0} {t.crear.reviewsAnalyzed})</span>
+                      </div>
+                    )}
+                    {priceLevelValue && (
+                      <div className="flex items-center gap-3 text-gray-600">
+                        <span className="text-sm text-gray-400">{t.crear.priceLevel}:</span>
+                        <span className="text-sm font-medium text-gray-900">{priceLevelValue}</span>
                       </div>
                     )}
                   </div>
@@ -322,6 +494,9 @@ export default function CreateWebPage() {
 
               {/* Preview Area */}
               <div className="lg:col-span-2">
+                <div className="mb-3 px-1 text-xs text-slate-500">
+                  {t.crear.minimalistNote}
+                </div>
                 <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl">
                   {/* Browser Chrome */}
                   <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-4 py-3">
@@ -359,7 +534,7 @@ export default function CreateWebPage() {
                         <div>
                           <h3 className="text-2xl font-bold text-gray-900">{t.crear.aboutUs}</h3>
                           <p className="mt-4 text-gray-600 leading-relaxed">
-                            {t.crear.aboutUsText.replace('{rating}', placeDetails.rating).replace('{city}', placeDetails.formatted_address.split(',')[1] || 'la ciudad')}
+                            {aboutText}
                           </p>
                         </div>
                         <div className="rounded-2xl bg-slate-50 p-6">
@@ -369,24 +544,66 @@ export default function CreateWebPage() {
                             {placeDetails.formatted_phone_number && (
                               <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-emerald-500" /> {placeDetails.formatted_phone_number}</p>
                             )}
+                            {placeDetails.website && (
+                              <p className="flex items-center gap-2">
+                                <Globe className="h-4 w-4 text-emerald-500" />
+                                <a
+                                  href={placeDetails.website}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-emerald-700 underline decoration-emerald-300 underline-offset-2"
+                                >
+                                  {t.crear.website}
+                                </a>
+                              </p>
+                            )}
+                            {typeof openNow === "boolean" && (
+                              <p className="flex items-center gap-2">
+                                <CheckCircle2 className={`h-4 w-4 ${openNow ? "text-emerald-500" : "text-gray-400"}`} />
+                                {t.crear.schedule}: {openNow ? t.crear.openNow : t.crear.closedNow}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
                     </div>
+
+                    {/* Services Section */}
+                    {hasDetectedServices && (
+                      <div className="px-8 py-14 border-t border-gray-100">
+                        <div className="mx-auto max-w-4xl">
+                          <h3 className="text-2xl font-bold text-gray-900 text-center">{t.crear.servicesTitle}</h3>
+                          <p className="mt-2 text-center text-sm text-gray-500">{t.crear.servicesSubtitle}</p>
+                          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                            {detectedServices.map((serviceName) => (
+                              <div key={serviceName} className="rounded-2xl border border-gray-200 bg-white px-4 py-3">
+                                <p className="flex items-center gap-2 text-sm font-medium text-gray-800">
+                                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                  {serviceName}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     
                     {/* Reviews Section */}
-                    {placeDetails.reviews && placeDetails.reviews.length > 0 && (
+                    {placeDetails.reviews?.some((review: any) => typeof review?.text === "string" && review.text.trim().length > 0) && (
                       <div className="bg-gray-50 px-8 py-16">
                         <h3 className="text-2xl font-bold text-gray-900 text-center mb-10">{t.crear.whatClientsSay}</h3>
                         <div className="grid gap-6 sm:grid-cols-2">
-                          {placeDetails.reviews.slice(0, 2).map((review: any, idx: number) => (
+                          {placeDetails.reviews
+                            .filter((review: any) => typeof review?.text === "string" && review.text.trim().length > 0)
+                            .slice(0, 2)
+                            .map((review: any, idx: number) => (
                             <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                               <div className="flex items-center gap-1 mb-3">
                                 {[...Array(review.rating)].map((_, i) => (
                                   <Star key={i} className="h-4 w-4 fill-amber-500 text-amber-500" />
                                 ))}
                               </div>
-                              <p className="text-gray-600 text-sm italic">&quot;{review.text.substring(0, 150)}...&quot;</p>
+                              <p className="text-gray-600 text-sm italic whitespace-pre-line">&quot;{review.text}&quot;</p>
                               <p className="mt-4 text-sm font-bold text-gray-900">- {review.author_name}</p>
                             </div>
                           ))}

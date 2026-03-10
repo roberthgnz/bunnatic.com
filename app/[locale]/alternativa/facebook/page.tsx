@@ -59,7 +59,7 @@ export default function AlternativeFacebookPage() {
           planTitle: "Plan recomendado para captación estable",
           planPrice: "19€/mes",
           planItems: [
-            "Editor visual con apoyo de IA ilimitado",
+            "Editor visual con recomendaciones de IA ilimitadas",
             "Botón de WhatsApp y formulario integrado",
             "SEO local y soporte prioritario",
           ],
@@ -121,7 +121,7 @@ export default function AlternativeFacebookPage() {
           planTitle: "Pla recomanat per captació estable",
           planPrice: "19€/mes",
           planItems: [
-            "Editor visual amb suport d'IA il·limitat",
+            "Editor visual amb recomanacions d'IA il·limitades",
             "Botó de WhatsApp i formulari integrat",
             "SEO local i suport prioritari",
           ],

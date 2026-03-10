@@ -2,6 +2,12 @@ import type { MetadataRoute } from "next";
 import { businessLandingEntries } from "@/lib/businessLandingData";
 import { content } from "@/lib/content";
 import { routing } from "@/i18n/routing";
+import {
+  getAlternativeSlug,
+  getFeatureSlug,
+  getLegalSlug,
+  type Locale,
+} from "@/lib/pageSlugs";
 
 const DEFAULT_BASE_URL = "http://localhost:3000";
 
@@ -51,36 +57,56 @@ function toAbsoluteUrl(pathname: string, locale: string, baseUrl: string) {
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const locales = routing.locales;
+  const locales = [...routing.locales] as Locale[];
+
+  const pathGroups: Array<Record<Locale, string>> = [];
 
   const basePaths = ["/", "/crear", "/signin", "/signup"];
+  basePaths.forEach((path) => {
+    pathGroups.push({ es: path, ca: path });
+  });
 
-  const featurePaths = content.es.features.map(
-    (feature) => `/caracteristicas/${feature.id}`
-  );
-  const alternativePaths = content.es.competitors.map(
-    (competitor) => `/alternativa/${competitor.id}`
-  );
-  const businessPaths = businessLandingEntries.map(
-    (entry) => `/negocio/${entry.slug}`
-  );
+  const legalIds = ["aviso-legal", "politica-privacidad", "politica-cookies"];
+  legalIds.forEach((legalId) => {
+    pathGroups.push({
+      es: `/${getLegalSlug(legalId, "es")}`,
+      ca: `/${getLegalSlug(legalId, "ca")}`,
+    });
+  });
 
-  const allPaths = Array.from(
-    new Set([...basePaths, ...featurePaths, ...alternativePaths, ...businessPaths])
-  );
+  content.es.features.forEach((feature) => {
+    pathGroups.push({
+      es: `/caracteristicas/${getFeatureSlug(feature.id, "es")}`,
+      ca: `/caracteristicas/${getFeatureSlug(feature.id, "ca")}`,
+    });
+  });
+
+  content.es.competitors.forEach((competitor) => {
+    pathGroups.push({
+      es: `/alternativa/${getAlternativeSlug(competitor.id, "es")}`,
+      ca: `/alternativa/${getAlternativeSlug(competitor.id, "ca")}`,
+    });
+  });
+
+  businessLandingEntries.forEach((entry) => {
+    pathGroups.push({
+      es: `/negocio/${entry.slugs.es}`,
+      ca: `/negocio/${entry.slugs.ca}`,
+    });
+  });
 
   const baseUrl = getBaseUrl();
   const lastModified = new Date();
 
-  return allPaths.flatMap((pathname) =>
+  return pathGroups.flatMap((pathsByLocale) =>
     locales.map((locale) => ({
-      url: toAbsoluteUrl(pathname, locale, baseUrl),
+      url: toAbsoluteUrl(pathsByLocale[locale], locale, baseUrl),
       lastModified,
       alternates: {
         languages: Object.fromEntries(
           locales.map((targetLocale) => [
             targetLocale,
-            toAbsoluteUrl(pathname, targetLocale, baseUrl),
+            toAbsoluteUrl(pathsByLocale[targetLocale], targetLocale, baseUrl),
           ])
         ),
       },

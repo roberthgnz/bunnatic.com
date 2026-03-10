@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import FeatureLanding from "../_components/FeatureLanding";
+import { getFeatureSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type FeaturePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: FeaturePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title:
+      safeLocale === "ca"
+        ? "Generació amb IA per crear la teva web | Wibloz"
+        : "Generación con IA para crear tu web | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Genera una web completa amb IA en minuts i comença a captar clients locals."
+        : "Genera una web completa con IA en minutos y empieza a captar clientes locales.",
+    esPath: `/caracteristicas/${getFeatureSlug("generacion-ia", "es")}`,
+    caPath: `/caracteristicas/${getFeatureSlug("generacion-ia", "ca")}`,
+  });
+}
 
 export default function GeneracionIAPage() {
   return (

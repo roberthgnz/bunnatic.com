@@ -35,11 +35,12 @@ type BusinessCopy = {
 
 export type BusinessLandingEntry = {
   legacySlug: string;
+  slugs: Record<Locale, string>;
   slug: string;
   copy: Record<Locale, BusinessCopy>;
 };
 
-const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, "slug">> = [
+const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, "slug" | "slugs">> = [
   {
     legacySlug: "dentistas",
     copy: {
@@ -77,7 +78,7 @@ const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, "slug">> = [
         finalTitle: "Convierte búsquedas en pacientes reales",
         finalSubtitle: "Regístrate y activa tu web dental enfocada a captación.",
         ctaPrimary: "Crear cuenta gratis",
-        ctaSecondary: "Probar demo ahora",
+        ctaSecondary: "Ver en acción",
       },
       ca: {
         badge: "Més primeres visites i tractaments tancats",
@@ -154,7 +155,7 @@ const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, "slug">> = [
         finalTitle: "Haz crecer tus reservas desde la web",
         finalSubtitle: "Regístrate y publica una página pensada para vender tratamientos.",
         ctaPrimary: "Crear cuenta gratis",
-        ctaSecondary: "Probar demo ahora",
+        ctaSecondary: "Ver en acción",
       },
       ca: {
         badge: "Més tractaments reservats",
@@ -462,7 +463,7 @@ const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, "slug">> = [
         finalTitle: "Convierte tu web en máquina de captación",
         finalSubtitle: "Regístrate y empieza a generar leads más cualificados.",
         ctaPrimary: "Crear cuenta gratis",
-        ctaSecondary: "Probar demo ahora",
+        ctaSecondary: "Ver en acción",
       },
       ca: {
         badge: "Capta compradors i propietaris amb millor filtre",
@@ -539,7 +540,7 @@ const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, "slug">> = [
         finalTitle: "Llena agenda con una web que sí convierte",
         finalSubtitle: "Crea tu cuenta y empieza a captar citas desde hoy.",
         ctaPrimary: "Crear cuenta gratis",
-        ctaSecondary: "Probar demo ahora",
+        ctaSecondary: "Ver en acción",
       },
       ca: {
         badge: "Capta més cites sense dependre d'Instagram",
@@ -824,17 +825,38 @@ export function slugifyBusinessTitle(title: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export const businessLandingEntries: BusinessLandingEntry[] = rawBusinessLandingEntries.map((entry) => ({
-  ...entry,
-  slug: slugifyBusinessTitle(entry.copy.es.title),
-}));
+export const businessLandingEntries: BusinessLandingEntry[] = rawBusinessLandingEntries.map((entry) => {
+  const slugs: Record<Locale, string> = {
+    es: slugifyBusinessTitle(entry.copy.es.title),
+    ca: slugifyBusinessTitle(entry.copy.ca.title),
+  };
+
+  return {
+    ...entry,
+    slugs,
+    slug: slugs.es,
+  };
+});
+
+export const legacyBusinessSlugToSlugs = Object.fromEntries(
+  businessLandingEntries.map(({ legacySlug, slugs }) => [legacySlug, slugs])
+) as Record<string, Record<Locale, string>>;
 
 export const legacyBusinessSlugToSlug = Object.fromEntries(
-  businessLandingEntries.map(({ legacySlug, slug }) => [legacySlug, slug])
+  businessLandingEntries.map(({ legacySlug, slugs }) => [legacySlug, slugs.es])
 );
 
 export const businessLandingEntriesBySlug = businessLandingEntries;
 
 export function getBusinessLandingBySlug(slug: string): BusinessLandingEntry | undefined {
-  return businessLandingEntries.find((entry) => entry.slug === slug);
+  return businessLandingEntries.find(
+    (entry) => entry.slugs.es === slug || entry.slugs.ca === slug || entry.legacySlug === slug
+  );
+}
+
+export function getBusinessSlugByLocale(
+  entry: BusinessLandingEntry,
+  locale: Locale
+): string {
+  return entry.slugs[locale];
 }

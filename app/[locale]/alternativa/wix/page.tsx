@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import AlternativeLanding from "../_components/AlternativeLanding";
+import { getAlternativeSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type AlternativePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: AlternativePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title:
+      safeLocale === "ca"
+        ? "Alternativa a Wix per publicar més ràpid | Wibloz"
+        : "Alternativa a Wix para publicar más rápido | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Deixa de construir des de zero i activa una web que converteix en minuts."
+        : "Deja de construir desde cero y activa una web que convierte en minutos.",
+    esPath: `/alternativa/${getAlternativeSlug("wix", "es")}`,
+    caPath: `/alternativa/${getAlternativeSlug("wix", "ca")}`,
+  });
+}
 
 export default function AlternativeWixPage() {
   return (

@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import AlternativeLanding from "../_components/AlternativeLanding";
+import { getAlternativeSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type AlternativePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: AlternativePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title:
+      safeLocale === "ca"
+        ? "Alternativa a Instagram per convertir seguidors | Wibloz"
+        : "Alternativa a Instagram para convertir seguidores | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Converteix trànsit social en clients amb una web dissenyada per captar contactes."
+        : "Convierte tráfico social en clientes con una web diseñada para captar contactos.",
+    esPath: `/alternativa/${getAlternativeSlug("instagram", "es")}`,
+    caPath: `/alternativa/${getAlternativeSlug("instagram", "ca")}`,
+  });
+}
 
 export default function AlternativeInstagramPage() {
   return (

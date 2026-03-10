@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import AlternativeLanding from "../_components/AlternativeLanding";
+import { getAlternativeSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type AlternativePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: AlternativePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title:
+      safeLocale === "ca"
+        ? "Alternativa a Facebook Pages per captar clients | Wibloz"
+        : "Alternativa a Facebook Pages para captar clientes | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Passa de dependre de l'algoritme a convertir visites en contactes amb una web pròpia."
+        : "Pasa de depender del algoritmo a convertir visitas en contactos con una web propia.",
+    esPath: `/alternativa/${getAlternativeSlug("facebook", "es")}`,
+    caPath: `/alternativa/${getAlternativeSlug("facebook", "ca")}`,
+  });
+}
 
 export default function AlternativeFacebookPage() {
   return (

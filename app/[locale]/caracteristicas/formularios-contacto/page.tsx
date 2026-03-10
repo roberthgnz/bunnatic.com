@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import FeatureLanding from "../_components/FeatureLanding";
+import { getFeatureSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type FeaturePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: FeaturePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title:
+      safeLocale === "ca"
+        ? "Formularis de contacte per captar clients | Wibloz"
+        : "Formularios de contacto para captar clientes | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Converteix visites en oportunitats amb formularis, WhatsApp i crides a l'acció optimitzades."
+        : "Convierte visitas en oportunidades con formularios, WhatsApp y llamadas a la acción optimizadas.",
+    esPath: `/caracteristicas/${getFeatureSlug("formularios-contacto", "es")}`,
+    caPath: `/caracteristicas/${getFeatureSlug("formularios-contacto", "ca")}`,
+  });
+}
 
 export default function FormulariosContactoPage() {
   return (

@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import FeatureLanding from "../_components/FeatureLanding";
+import { getFeatureSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type FeaturePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: FeaturePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title:
+      safeLocale === "ca"
+        ? "Edició visual assistida amb IA | Wibloz"
+        : "Edición visual asistida con IA | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Edita la teva web en segons i mantén promocions, horaris i serveis sempre actualitzats."
+        : "Edita tu web en segundos y mantén promociones, horarios y servicios siempre actualizados.",
+    esPath: `/caracteristicas/${getFeatureSlug("edicion-asistida", "es")}`,
+    caPath: `/caracteristicas/${getFeatureSlug("edicion-asistida", "ca")}`,
+  });
+}
 
 export default function EdicionAsistidaPage() {
   return (

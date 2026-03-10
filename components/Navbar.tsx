@@ -10,23 +10,49 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, Zap } from "lucide-react";
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useLanguage } from "./LanguageProvider";
+import { getFeatureSlug } from "@/lib/pageSlugs";
 
-export default function Navbar() {
+type NavbarProps = {
+  useDemoCta?: boolean;
+};
+
+export default function Navbar({ useDemoCta = false }: NavbarProps) {
   const { language, setLanguage } = useLanguage();
   const t = content[language];
+  const pathname = usePathname() ?? "/";
+  const searchParams = useSearchParams();
+  const paramsText = searchParams.toString();
+
+  const segments = pathname.split("/").filter(Boolean);
+  const locale = segments[0];
+  const hasLocale = locale === "es" || locale === "ca";
+  const isCreatePage = hasLocale ? segments[1] === "crear" : segments[0] === "crear";
+  const targetPath = hasLocale ? `/${locale}/crear` : "/crear";
+  const homePath = hasLocale ? `/${locale}` : "/";
+  const signupPath = hasLocale ? `/${locale}/signup` : "/signup";
+  const source = `${pathname}${paramsText ? `?${paramsText}` : ""}`;
+  const demoHref = `${targetPath}?source=${encodeURIComponent(source)}`;
+  const signupFromCreateHref = `${signupPath}?redirect=${encodeURIComponent(targetPath)}`;
+  const ctaHref = useDemoCta ? demoHref : isCreatePage ? signupFromCreateHref : "/crear";
+  const ctaText = useDemoCta
+    ? language === "ca"
+      ? "Provar demo ara"
+      : "Ver en acción"
+    : t.navbar.cta;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-xl transition-all">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2">
+        <Link href={homePath} className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
             <Zap className="h-5 w-5 fill-emerald-600 text-emerald-600" />
           </div>
           <span className="text-xl font-bold tracking-tight text-gray-900">
             {t.navbar.logo}
           </span>
-        </div>
+        </Link>
         <div className="flex items-center gap-3 sm:gap-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -44,7 +70,7 @@ export default function Navbar() {
               {t.navbar.coreFeatures.map((feature) => (
                 <DropdownMenuItem key={feature.id} asChild>
                   <Link
-                    href={`/caracteristicas/${feature.id}`}
+                    href={`/caracteristicas/${getFeatureSlug(feature.id, language)}`}
                     className="block rounded-lg px-2 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900"
                   >
                     {feature.label}
@@ -73,10 +99,10 @@ export default function Navbar() {
             </Button>
           </div>
           <Link
-            href="/crear"
+            href={ctaHref}
             className="rounded-full bg-gray-900 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm transition-all hover:scale-105 hover:bg-gray-800 hover:shadow-md"
           >
-            {t.navbar.cta}
+            {ctaText}
           </Link>
         </div>
       </div>

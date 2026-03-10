@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/components/LanguageProvider";
+import DemoLinkButton from "@/components/DemoLinkButton";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 import {
   ArrowRight,
   Building2,
@@ -10,7 +12,6 @@ import {
   Clock3,
   MessageSquareQuote,
   ShieldCheck,
-  Zap,
 } from "lucide-react";
 
 type Locale = "es" | "ca";
@@ -61,30 +62,7 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:h-16 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100 sm:h-8 sm:w-8">
-              <Zap className="h-4 w-4 fill-emerald-600 text-emerald-600 sm:h-5 sm:w-5" />
-            </div>
-            <span className="text-lg font-bold tracking-tight sm:text-xl">Wibloz</span>
-          </Link>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              href="/crear"
-              className="hidden rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 sm:inline-flex"
-            >
-              {t.ctaSecondary}
-            </Link>
-            <Link
-              href={signupHref}
-              className="inline-flex items-center gap-1.5 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-gray-800 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm sm:hover:scale-105"
-            >
-              {t.ctaPrimary}
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar useDemoCta />
 
       <section className="relative overflow-hidden px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-16 lg:px-8 lg:pb-20 lg:pt-24">
         <div className="absolute inset-0 bg-grid-pattern opacity-60" />
@@ -108,12 +86,10 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
                 {t.ctaPrimary}
                 <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
               </Link>
-              <Link
-                href="/crear"
+              <DemoLinkButton
+                label={locale === "es" ? "Ver en acción" : "Provar demo ara"}
                 className="inline-flex w-full items-center justify-center rounded-full border border-gray-300 px-5 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50 sm:w-auto sm:px-6 sm:text-base"
-              >
-                {locale === "es" ? "Probar demo ahora" : "Provar demo"}
-              </Link>
+              />
             </div>
             <p className="mt-4 text-xs font-medium text-gray-500 sm:mt-5 sm:text-sm">{t.trustLine}</p>
           </div>
@@ -199,12 +175,10 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
               {t.ctaPrimary}
               <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
             </Link>
-            <Link
-              href="/crear"
+            <DemoLinkButton
+              label={t.ctaSecondary}
               className="inline-flex w-full items-center justify-center rounded-full border border-gray-300 px-6 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-white sm:w-auto sm:text-base"
-            >
-              {t.ctaSecondary}
-            </Link>
+            />
           </div>
         </div>
       </section>

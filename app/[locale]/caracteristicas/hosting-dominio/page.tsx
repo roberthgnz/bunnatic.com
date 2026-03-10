@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import FeatureLanding from "../_components/FeatureLanding";
+import { getFeatureSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type FeaturePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: FeaturePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title:
+      safeLocale === "ca"
+        ? "Hosting i domini inclosos | Wibloz"
+        : "Hosting y dominio incluidos | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Publica la teva web amb infraestructura segura, ràpida i preparada per captar clients."
+        : "Publica tu web con infraestructura segura, rápida y preparada para captar clientes.",
+    esPath: `/caracteristicas/${getFeatureSlug("hosting-dominio", "es")}`,
+    caPath: `/caracteristicas/${getFeatureSlug("hosting-dominio", "ca")}`,
+  });
+}
 
 export default function HostingDominioPage() {
   return (

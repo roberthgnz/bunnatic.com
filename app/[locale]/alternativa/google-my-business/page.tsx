@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import AlternativeLanding from "../_components/AlternativeLanding";
+import { getAlternativeSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type AlternativePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: AlternativePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title:
+      safeLocale === "ca"
+        ? "Alternativa a dependre només de Google My Business | Wibloz"
+        : "Alternativa a depender solo de Google My Business | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Combina visibilitat a Google Maps amb una web que converteix en contactes i vendes."
+        : "Combina visibilidad en Google Maps con una web que convierte en contactos y ventas.",
+    esPath: `/alternativa/${getAlternativeSlug("google-my-business", "es")}`,
+    caPath: `/alternativa/${getAlternativeSlug("google-my-business", "ca")}`,
+  });
+}
 
 export default function AlternativeGoogleMyBusinessPage() {
   return (

@@ -2,18 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Zap, ArrowLeft, Search, MapPin, Star, Phone, Globe, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
+import { Zap, Search, MapPin, Star, Phone, Globe, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/LanguageProvider";
 
 const createPageContent = {
   es: {
-    navbar: {
-      logo: "Wibloz",
-    },
     crear: {
-      back: "Volver",
       title: "Encuentra tu negocio",
       subtitle: "Extraemos tu información pública y creamos una web lista para publicar en segundos.",
       searchPlaceholder: "Ej: Pizzería Napoli, Madrid",
@@ -56,11 +53,7 @@ const createPageContent = {
     },
   },
   ca: {
-    navbar: {
-      logo: "Wibloz",
-    },
     crear: {
-      back: "Tornar",
       title: "Troba el teu negoci",
       subtitle: "Connectem amb Google My Business per extreure la teva informació i crear la teva web en segons.",
       searchPlaceholder: "Ex: Pizzeria Napoli, Barcelona",
@@ -295,20 +288,7 @@ export default function CreateWebPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 font-sans text-gray-900">
-      <nav className="border-b border-gray-200 bg-white sticky top-0 z-50">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
-              <Zap className="h-5 w-5 fill-emerald-600 text-emerald-600" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-gray-900">{t.navbar.logo}</span>
-          </div>
-          <Link href="/" className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900">
-            <ArrowLeft className="h-4 w-4" />
-            {t.crear.back}
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         <AnimatePresence mode="wait">

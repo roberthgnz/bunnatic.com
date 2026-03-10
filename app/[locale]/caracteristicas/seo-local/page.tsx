@@ -1,4 +1,27 @@
+import type { Metadata } from "next";
 import FeatureLanding from "../_components/FeatureLanding";
+import { getFeatureSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type FeaturePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: FeaturePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title: safeLocale === "ca" ? "SEO local per negocis | Wibloz" : "SEO local para negocios | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Millora la teva visibilitat local a Google i converteix cerques en contactes."
+        : "Mejora tu visibilidad local en Google y convierte búsquedas en contactos.",
+    esPath: `/caracteristicas/${getFeatureSlug("seo-local", "es")}`,
+    caPath: `/caracteristicas/${getFeatureSlug("seo-local", "ca")}`,
+  });
+}
 
 export default function SeoLocalPage() {
   return (

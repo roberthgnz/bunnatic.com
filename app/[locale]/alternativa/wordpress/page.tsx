@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import AlternativeLanding from "../_components/AlternativeLanding";
+import { getAlternativeSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type AlternativePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: AlternativePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title:
+      safeLocale === "ca"
+        ? "Alternativa a WordPress sense complexitat tècnica | Wibloz"
+        : "Alternativa a WordPress sin complejidad técnica | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Publica i edita la teva web sense plugins ni manteniment tècnic constant."
+        : "Publica y edita tu web sin plugins ni mantenimiento técnico constante.",
+    esPath: `/alternativa/${getAlternativeSlug("wordpress", "es")}`,
+    caPath: `/alternativa/${getAlternativeSlug("wordpress", "ca")}`,
+  });
+}
 
 export default function AlternativeWordpressPage() {
   return (

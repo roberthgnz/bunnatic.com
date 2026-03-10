@@ -1,0 +1,40 @@
+import type { Metadata } from "next";
+import LegalPage from "@/components/legal/LegalPage";
+import { legalContent, type LegalLocale } from "@/lib/legalContent";
+import { getLegalSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata } from "@/lib/seo";
+import { notFound } from "next/navigation";
+
+type LegalRouteProps = {
+  params: Promise<{ locale: string }>;
+};
+
+function isLegalLocale(locale: string): locale is LegalLocale {
+  return locale === "es" || locale === "ca";
+}
+
+export async function generateMetadata({ params }: LegalRouteProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: LegalLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title: `${legalContent[safeLocale]["aviso-legal"].title} | Wibloz`,
+    description:
+      safeLocale === "ca"
+        ? "Consulta l'avís legal de Wibloz i les condicions d'ús del lloc web."
+        : "Consulta el aviso legal de Wibloz y las condiciones de uso del sitio web.",
+    esPath: `/${getLegalSlug("aviso-legal", "es")}`,
+    caPath: `/${getLegalSlug("aviso-legal", "ca")}`,
+  });
+}
+
+export default async function AvisoLegalPage({ params }: LegalRouteProps) {
+  const { locale } = await params;
+
+  if (!isLegalLocale(locale)) {
+    notFound();
+  }
+
+  return <LegalPage locale={locale} pageKey="aviso-legal" />;
+}

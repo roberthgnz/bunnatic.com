@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import AlternativeLanding from "../_components/AlternativeLanding";
+import { getAlternativeSlug } from "@/lib/pageSlugs";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+
+type AlternativePageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: AlternativePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title:
+      safeLocale === "ca"
+        ? "Alternativa a Squarespace per negocis locals | Wibloz"
+        : "Alternativa a Squarespace para negocios locales | Wibloz",
+    description:
+      safeLocale === "ca"
+        ? "Una web enfocada a conversió i captació, no només a disseny visual."
+        : "Una web enfocada a conversión y captación, no solo a diseño visual.",
+    esPath: `/alternativa/${getAlternativeSlug("squarespace", "es")}`,
+    caPath: `/alternativa/${getAlternativeSlug("squarespace", "ca")}`,
+  });
+}
 
 export default function AlternativeSquarespacePage() {
   return (

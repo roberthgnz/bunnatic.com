@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Ticker from "@/components/Ticker";
@@ -8,13 +9,47 @@ import AIDemo from "@/components/AIDemo";
 import FAQ from "@/components/FAQ";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
+import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
 
 type HomePageProps = {
+  params: Promise<{
+    locale: string;
+  }>;
   searchParams?: Promise<{
     alternative?: string;
     alternativeId?: string;
   }>;
 };
+
+export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+
+  const metadataByLocale = {
+    es: {
+      title: "Wibloz | Crea tu web con IA para captar clientes locales",
+      description:
+        "Crea una web profesional con IA en minutos. Optimizada para SEO local, formularios y WhatsApp para convertir visitas en clientes.",
+    },
+    ca: {
+      title: "Wibloz | Crea la teva web amb IA per captar clients locals",
+      description:
+        "Crea una web professional amb IA en minuts. Optimitzada per SEO local, formularis i WhatsApp per convertir visites en clients.",
+    },
+  } as const;
+
+  return buildPageMetadata({
+    locale: safeLocale,
+    title: metadataByLocale[safeLocale].title,
+    description: metadataByLocale[safeLocale].description,
+    esPath: "/",
+    caPath: "/",
+    keywords:
+      safeLocale === "ca"
+        ? ["crear web amb IA", "seo local", "web per negocis locals", "captació de clients"]
+        : ["crear web con IA", "seo local", "web para negocios locales", "captación de clientes"],
+  });
+}
 
 export default async function Home({ searchParams }: HomePageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};

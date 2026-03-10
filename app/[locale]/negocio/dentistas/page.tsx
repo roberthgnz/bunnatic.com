@@ -35,7 +35,7 @@ export default function NegocioDentistasPage() {
           finalTitle: "Convierte búsquedas en pacientes reales",
           finalSubtitle: "Regístrate y activa tu web dental enfocada a captación.",
           ctaPrimary: "Crear cuenta gratis",
-          ctaSecondary: "Probar demo ahora",
+          ctaSecondary: "Ver en acción",
         },
         ca: {
           badge: "Més primeres visites i tractaments tancats",

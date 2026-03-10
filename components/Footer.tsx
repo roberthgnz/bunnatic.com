@@ -2,12 +2,25 @@
 
 import { content } from "@/lib/content";
 import { Zap } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useLanguage } from "./LanguageProvider";
+import { getAlternativeSlug, getFeatureSlug, getLegalSlug } from "@/lib/pageSlugs";
 
 export default function Footer() {
   const { language } = useLanguage();
   const t = content[language];
+  const legalLinks =
+    language === "es"
+      ? [
+          { label: "Aviso legal", href: `/${getLegalSlug("aviso-legal", "es")}` },
+          { label: "Política de privacidad", href: `/${getLegalSlug("politica-privacidad", "es")}` },
+          { label: "Política de cookies", href: `/${getLegalSlug("politica-cookies", "es")}` },
+        ]
+      : [
+          { label: "Avís legal", href: `/${getLegalSlug("aviso-legal", "ca")}` },
+          { label: "Política de privacitat", href: `/${getLegalSlug("politica-privacidad", "ca")}` },
+          { label: "Política de cookies", href: `/${getLegalSlug("politica-cookies", "ca")}` },
+        ];
 
   return (
     <footer className="bg-[#0a0a0a] py-16 border-t border-white/5">
@@ -32,7 +45,7 @@ export default function Footer() {
             <ul className="flex flex-col gap-4 text-sm font-medium text-gray-400">
               {t.features?.map((feature) => (
                 <li key={feature.id}>
-                  <Link href={`/caracteristicas/${feature.id}`} className="hover:text-white transition-colors">
+                  <Link href={`/caracteristicas/${getFeatureSlug(feature.id, language)}`} className="hover:text-white transition-colors">
                     {feature.title}
                   </Link>
                 </li>
@@ -45,7 +58,7 @@ export default function Footer() {
             <ul className="flex flex-col gap-4 text-sm font-medium text-gray-400">
               {t.competitors?.map((competitor) => (
                 <li key={competitor.id}>
-                  <Link href={`/alternativa/${competitor.id}`} className="hover:text-white transition-colors">
+                  <Link href={`/alternativa/${getAlternativeSlug(competitor.id, language)}`} className="hover:text-white transition-colors">
                     {language === 'es' ? `Alternativa a ${competitor.name}` : `Alternativa a ${competitor.name}`}
                   </Link>
                 </li>
@@ -56,10 +69,10 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-bold text-white mb-6 uppercase tracking-wider">Legal</h3>
             <ul className="flex flex-col gap-4 text-sm font-medium text-gray-400">
-              {t.footer.links.map((link) => (
-                <li key={link}>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    {link}
+              {legalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="hover:text-white transition-colors">
+                    {link.label}
                   </Link>
                 </li>
               ))}

@@ -9,7 +9,16 @@ import FAQ from "@/components/FAQ";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
 
-export default function Home() {
+type HomePageProps = {
+  searchParams?: {
+    alternative?: string;
+    alternativeId?: string;
+  };
+};
+
+export default function Home({ searchParams = {} }: HomePageProps) {
+  const comparisonAlternative = searchParams.alternative ?? searchParams.alternativeId;
+
   return (
     <main className="min-h-screen bg-white font-sans text-gray-900 selection:bg-emerald-200 selection:text-emerald-900">
       <Navbar />
@@ -17,7 +26,7 @@ export default function Home() {
       <Ticker />
       <HowItWorks />
       <Pricing />
-      <Comparison />
+      <Comparison alternativeId={comparisonAlternative} />
       <AIDemo />
       <FAQ />
       <FinalCTA />

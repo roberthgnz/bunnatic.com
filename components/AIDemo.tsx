@@ -4,6 +4,7 @@ import { content } from "@/lib/content";
 import { motion } from "motion/react";
 import { Bot, User, Sparkles } from "lucide-react";
 import { useLanguage } from "./LanguageProvider";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function AIDemo() {
   const { language } = useLanguage();
@@ -18,12 +19,12 @@ export default function AIDemo() {
             {t.aiDemo.title}
           </h2>
 
-          <div className="mt-16 mx-auto max-w-2xl rounded-[2.5rem] bg-white/60 p-4 shadow-2xl ring-1 ring-gray-900/5 backdrop-blur-xl sm:p-8 relative">
+          <Card className="mt-16 mx-auto max-w-2xl rounded-[2.5rem] bg-white/60 p-0 px-4 py-4 shadow-2xl ring-1 ring-gray-900/5 backdrop-blur-xl sm:p-8">
             {/* Decorative elements */}
             <div className="absolute -left-12 -top-12 h-40 w-40 rounded-full bg-purple-200/50 blur-3xl" />
             <div className="absolute -right-12 -bottom-12 h-40 w-40 rounded-full bg-emerald-200/50 blur-3xl" />
             
-            <div className="relative flex flex-col gap-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+            <CardContent className="relative flex flex-col gap-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
               {/* Chat Header */}
               <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
@@ -85,8 +86,8 @@ export default function AIDemo() {
                   </motion.div>
                 ))}
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           <p className="mt-12 text-center text-base font-medium text-gray-500">
             {t.aiDemo.caption}

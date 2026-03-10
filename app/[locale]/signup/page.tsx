@@ -7,6 +7,7 @@ import { useLanguage } from "@/components/LanguageProvider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 import { createSignupSchema, type SignupFormValues } from "@/lib/validations/signup";
 import { cn } from "@/lib/utils";
 
@@ -33,19 +34,11 @@ const signUpContent = {
       passwordHint: "Mínimo 8 caracteres con mayúscula, minúscula y número.",
       signupButton: "Crear cuenta y continuar",
       signupButtonLoading: "Creando cuenta...",
-      flowTitle: "Resumen de alta",
-      flowDescription: "Tras registrarte, te redirigiremos automáticamente a:",
-      destinationDefault: "Asistente para crear tu web",
-      selectedPlan: "Plan seleccionado",
-      sourceLabel: "Origen",
       securityNote: "Tus datos viajan cifrados y se procesan de forma segura.",
       trust1: "Acceso seguro",
       trust2: "Validación en tiempo real",
       trust3: "Configuración guiada",
       stepBadge: "Registro",
-      sideNoteTitle: "Información",
-      sideNote1: "No pedimos tarjeta de crédito en este paso.",
-      sideNote2: "Podrás completar la configuración después del acceso.",
       validation: {
         nameRequired: "El nombre es obligatorio.",
         nameMin: "El nombre debe tener al menos 2 caracteres.",
@@ -82,19 +75,11 @@ const signUpContent = {
       passwordHint: "Mínim 8 caràcters amb majúscula, minúscula i número.",
       signupButton: "Crear compte i continuar",
       signupButtonLoading: "Creant compte...",
-      flowTitle: "Resum d'alta",
-      flowDescription: "Després del registre, et redirigirem automàticament a:",
-      destinationDefault: "Assistent per crear la teva web",
-      selectedPlan: "Pla seleccionat",
-      sourceLabel: "Origen",
       securityNote: "Les teves dades viatgen xifrades i es processen de forma segura.",
       trust1: "Accés segur",
       trust2: "Validació en temps real",
       trust3: "Configuració guiada",
       stepBadge: "Registre",
-      sideNoteTitle: "Informació",
-      sideNote1: "No demanem targeta de crèdit en aquest pas.",
-      sideNote2: "Podràs completar la configuració després de l'accés.",
       validation: {
         nameRequired: "El nom és obligatori.",
         nameMin: "El nom ha de tenir almenys 2 caràcters.",
@@ -221,7 +206,7 @@ export default function SignUpPage() {
       </nav>
 
       <div className="flex-1 px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="mx-auto grid w-full max-w-2xl gap-6">
           <div className="space-y-8 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
             <div className="text-center lg:text-left">
               <span className="inline-flex items-center rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-100">
@@ -293,14 +278,16 @@ export default function SignUpPage() {
                       aria-invalid={Boolean(errors.password)}
                       aria-describedby="password-help password-error"
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-500 hover:text-gray-700"
                       aria-label={showPassword ? t.signup.hidePassword : t.signup.showPassword}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
+                    </Button>
                   </div>
                   <p id="password-help" className="text-xs text-gray-500">{t.signup.passwordHint}</p>
                   <div className="grid gap-1 sm:grid-cols-2">
@@ -330,7 +317,8 @@ export default function SignUpPage() {
               })}
 
               <div>
-                <button
+                <Button
+                  variant="default"
                   type="submit"
                   disabled={!isValid || isSubmitting}
                   className={cn(
@@ -342,7 +330,7 @@ export default function SignUpPage() {
                 >
                   {isSubmitting ? t.signup.signupButtonLoading : t.signup.signupButton}
                   <ArrowRight className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
 
               <div className="flex flex-wrap gap-3 text-xs text-gray-600">
@@ -362,42 +350,6 @@ export default function SignUpPage() {
             </form>
           </div>
 
-          <aside className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{t.signup.flowTitle}</p>
-              <p className="mt-2 text-sm text-slate-600">{t.signup.flowDescription}</p>
-            </div>
-
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <p className="font-mono text-sm text-slate-800 break-all">{flow.destination}</p>
-              <p className="mt-2 text-xs text-slate-500">
-                {flow.safeTargetPath === "/crear" ? t.signup.destinationDefault : flow.safeTargetPath}
-              </p>
-            </div>
-
-            <div className="space-y-2 text-sm">
-              {flow.plan ? (
-                <p className="rounded-lg border border-slate-200 bg-white px-3 py-2">
-                  <span className="text-slate-500">{t.signup.selectedPlan}: </span>
-                  <span className="font-semibold text-slate-900">{flow.plan}</span>
-                </p>
-              ) : null}
-              {flow.source ? (
-                <p className="rounded-lg border border-slate-200 bg-white px-3 py-2">
-                  <span className="text-slate-500">{t.signup.sourceLabel}: </span>
-                  <span className="font-semibold text-slate-900">{flow.source}</span>
-                </p>
-              ) : null}
-            </div>
-
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">{t.signup.sideNoteTitle}</p>
-              <ul className="mt-2 space-y-1.5 text-sm text-slate-600">
-                <li>{t.signup.sideNote1}</li>
-                <li>{t.signup.sideNote2}</li>
-              </ul>
-            </div>
-          </aside>
         </div>
       </div>
     </main>

@@ -4,7 +4,9 @@ import { content } from "@/lib/content";
 import { Check, CircleHelp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useLanguage } from "./LanguageProvider";
 
 const HELP_TEXT = {
@@ -71,10 +73,11 @@ export default function Pricing() {
           </h2>
           <p className="mt-4 text-xl text-slate-600">{t.pricing.subtitle}</p>
 
-          <button
+          <Button
             type="button"
             onClick={() => setIsAnnual((prev) => !prev)}
-            className="mt-8 inline-flex items-center gap-3 text-base font-medium text-slate-700"
+            variant="ghost"
+            className="mt-8 h-auto inline-flex items-center gap-3 px-0 text-base font-medium text-slate-700 hover:bg-transparent hover:text-slate-700"
             aria-pressed={isAnnual}
           >
             <span
@@ -92,14 +95,14 @@ export default function Pricing() {
               {t.pricing.billingLabel},{" "}
               <span className="text-indigo-600">{t.pricing.saveLabel}</span>
             </span>
-          </button>
+          </Button>
         </div>
 
-        <div className="mt-14 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <Card className="mt-14 rounded-3xl border border-slate-200 bg-white p-0">
           <div className="grid grid-cols-1 divide-y divide-slate-200 xl:grid-cols-4 xl:divide-x xl:divide-y-0">
             {t.pricing.tiers.map((tier) => (
               <article key={tier.id} className="flex h-full flex-col">
-                <div className="flex h-full flex-col p-6 sm:p-8">
+                <CardContent className="flex h-full flex-1 flex-col p-6 sm:p-8">
                   <div>
                     <h3 className="text-3xl font-extrabold text-slate-800">{tier.name}</h3>
                     <p className="mt-3 max-w-xs text-lg text-slate-600">{tier.description}</p>
@@ -153,23 +156,25 @@ export default function Pricing() {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </CardContent>
 
-                <div className="mt-auto border-t border-slate-200 bg-slate-50 p-6 sm:p-8">
-                  <h4 className="text-lg font-bold text-slate-700">{t.pricing.addonsTitle}</h4>
-                  <ul className="mt-3 space-y-2">
+                <CardFooter className="flex flex-col items-start gap-6 rounded-none border-t border-slate-200 bg-slate-50 p-6 text-left sm:p-8">
+                  <h4 className="text-base font-semibold text-slate-700">{t.pricing.addonsTitle}</h4>
+                  <ul className="mt-3 w-full space-y-2">
                     {tier.addons.map((item) => (
-                      <li key={item} className="flex items-center text-2xl text-slate-600">
+                      <li key={item} className="flex items-center text-sm text-slate-600 sm:text-base">
                         <span>{item}</span>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button
+                            <Button
                               type="button"
-                              className="ml-auto inline-flex h-5 w-5 items-center justify-center rounded-full text-slate-300 transition-colors hover:text-slate-500"
+                              variant="ghost"
+                              size="icon"
+                              className="ml-auto h-5 w-5 rounded-full text-slate-300 hover:text-slate-500"
                               aria-label={item}
                             >
                               <CircleHelp className="h-4 w-4" />
-                            </button>
+                            </Button>
                           </TooltipTrigger>
                           <TooltipContent side="top" sideOffset={8}>
                             {help.addons[item as keyof typeof help.addons] ?? help.fallback}
@@ -179,20 +184,22 @@ export default function Pricing() {
                     ))}
                   </ul>
 
-                  <h4 className="mt-7 text-lg font-bold text-slate-700">{t.pricing.includesTitle}</h4>
-                  <ul className="mt-3 space-y-2">
+                  <h4 className="mt-7 text-base font-semibold text-slate-700">{t.pricing.includesTitle}</h4>
+                  <ul className="mt-3 w-full space-y-2">
                     {tier.includes.map((item) => (
-                      <li key={item} className="flex items-center text-2xl text-slate-600">
+                      <li key={item} className="flex items-center text-sm text-slate-600 sm:text-base">
                         <span>{item}</span>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button
+                            <Button
                               type="button"
-                              className="ml-auto inline-flex h-5 w-5 items-center justify-center rounded-full text-slate-300 transition-colors hover:text-slate-500"
+                              variant="ghost"
+                              size="icon"
+                              className="ml-auto h-5 w-5 rounded-full text-slate-300 hover:text-slate-500"
                               aria-label={item}
                             >
                               <CircleHelp className="h-4 w-4" />
-                            </button>
+                            </Button>
                           </TooltipTrigger>
                           <TooltipContent side="top" sideOffset={8}>
                             {help.includes[item as keyof typeof help.includes] ?? help.fallback}
@@ -201,11 +208,11 @@ export default function Pricing() {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </CardFooter>
               </article>
             ))}
           </div>
-        </div>
+        </Card>
       </div>
     </section>
   );

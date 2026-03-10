@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Zap, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/LanguageProvider";
 
 const signInContent = {
@@ -123,12 +124,13 @@ export default function SignInPage() {
             </div>
 
             <div>
-              <button
+              <Button
+                variant="default"
                 type="submit"
                 className="group relative flex w-full justify-center rounded-full bg-gray-900 px-4 py-3 text-sm font-bold text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
               >
                 {t.signin.loginButton}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

@@ -4,12 +4,63 @@ import { content } from "@/lib/content";
 import { Check, CircleHelp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLanguage } from "./LanguageProvider";
+
+const HELP_TEXT = {
+  es: {
+    addons: {
+      "Sección extra 3€/mes": "Añade una sección adicional a tu web actual, ideal para servicios nuevos o promociones.",
+      "Usuario extra 4€/mes": "Invita a otra persona de tu equipo para editar contenido con su propio acceso.",
+      "Web extra 5€/mes": "Crea una web adicional para otra sede, marca o línea de negocio.",
+      "Web extra 4€/mes": "Precio reducido por web adicional cuando ya estás en un plan de mayor capacidad.",
+    },
+    includes: {
+      "Dominio incluido": "Incluye conexión y configuración básica de dominio para publicar sin pasos técnicos.",
+      "SSL seguro": "Tu web se publica con HTTPS para proteger datos y mejorar la confianza de clientes.",
+      "Analítica básica": "Métricas esenciales de visitas y páginas más vistas para medir resultados.",
+      "Todo Esencial": "Incluye todas las funciones del plan Esencial.",
+      "SEO local": "Optimización para aparecer mejor en búsquedas de tu zona y en Google Maps.",
+      "Soporte prioritario": "Atención más rápida para incidencias o dudas de configuración.",
+      "Todo Impulso": "Incluye todas las funciones del plan Impulso.",
+      "Reportes personalizados": "Informes adaptados a tu negocio con los indicadores que más te importan.",
+      "Calendario compartido": "Organiza cambios y publicaciones con visibilidad para todo el equipo.",
+      "Todo Equipo": "Incluye todas las funciones del plan Equipo.",
+      "Analítica avanzada": "Panel con mayor detalle para entender conversión, rendimiento y evolución.",
+      "Soporte dedicado": "Canal de soporte más cercano para acompañamiento continuo.",
+    },
+    fallback: "Información adicional de esta funcionalidad.",
+  },
+  ca: {
+    addons: {
+      "Secció extra 3€/mes": "Afegeix una secció addicional a la teva web, ideal per nous serveis o promocions.",
+      "Usuari extra 4€/mes": "Convida una altra persona del teu equip per editar contingut amb el seu propi accés.",
+      "Web extra 5€/mes": "Crea una web addicional per a una altra seu, marca o línia de negoci.",
+      "Web extra 4€/mes": "Preu reduit per web addicional quan ja ets en un pla amb més capacitat.",
+    },
+    includes: {
+      "Domini inclòs": "Inclou connexió i configuració bàsica de domini per publicar sense passos tècnics.",
+      "SSL segur": "La teva web es publica amb HTTPS per protegir dades i millorar la confiança dels clients.",
+      "Analítica bàsica": "Mètriques essencials de visites i pàgines més vistes per mesurar resultats.",
+      "Tot Essencial": "Inclou totes les funcions del pla Essencial.",
+      "SEO local": "Optimització per aparèixer millor en cerques de la teva zona i a Google Maps.",
+      "Suport prioritari": "Atenció més ràpida per incidències o dubtes de configuració.",
+      "Tot Impuls": "Inclou totes les funcions del pla Impuls.",
+      "Informes personalitzats": "Informes adaptats al teu negoci amb els indicadors que més t'importen.",
+      "Calendari compartit": "Organitza canvis i publicacions amb visibilitat per a tot l'equip.",
+      "Tot Equip": "Inclou totes les funcions del pla Equip.",
+      "Analítica avançada": "Panell amb més detall per entendre conversió, rendiment i evolució.",
+      "Suport dedicat": "Canal de suport més proper per acompanyament continu.",
+    },
+    fallback: "Informació addicional d'aquesta funcionalitat.",
+  },
+} as const;
 
 export default function Pricing() {
   const { language } = useLanguage();
   const t = content[language];
   const [isAnnual, setIsAnnual] = useState(false);
+  const help = HELP_TEXT[language];
 
   return (
     <section className="bg-[#f4f7fc] py-24 sm:py-28">
@@ -99,7 +150,6 @@ export default function Pricing() {
                           <p className="text-2xl font-extrabold text-slate-900">{feature.title}</p>
                           <p className="text-base text-slate-500">{feature.detail}</p>
                         </div>
-                        <CircleHelp className="ml-auto mt-1 h-4 w-4 shrink-0 text-slate-300" />
                       </li>
                     ))}
                   </ul>
@@ -111,7 +161,20 @@ export default function Pricing() {
                     {tier.addons.map((item) => (
                       <li key={item} className="flex items-center text-2xl text-slate-600">
                         <span>{item}</span>
-                        <CircleHelp className="ml-auto h-4 w-4 text-slate-300" />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              type="button"
+                              className="ml-auto inline-flex h-5 w-5 items-center justify-center rounded-full text-slate-300 transition-colors hover:text-slate-500"
+                              aria-label={item}
+                            >
+                              <CircleHelp className="h-4 w-4" />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" sideOffset={8}>
+                            {help.addons[item as keyof typeof help.addons] ?? help.fallback}
+                          </TooltipContent>
+                        </Tooltip>
                       </li>
                     ))}
                   </ul>
@@ -121,7 +184,20 @@ export default function Pricing() {
                     {tier.includes.map((item) => (
                       <li key={item} className="flex items-center text-2xl text-slate-600">
                         <span>{item}</span>
-                        <CircleHelp className="ml-auto h-4 w-4 text-slate-300" />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              type="button"
+                              className="ml-auto inline-flex h-5 w-5 items-center justify-center rounded-full text-slate-300 transition-colors hover:text-slate-500"
+                              aria-label={item}
+                            >
+                              <CircleHelp className="h-4 w-4" />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" sideOffset={8}>
+                            {help.includes[item as keyof typeof help.includes] ?? help.fallback}
+                          </TooltipContent>
+                        </Tooltip>
                       </li>
                     ))}
                   </ul>

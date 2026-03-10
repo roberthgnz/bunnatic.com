@@ -41,7 +41,7 @@ export default function GeneracionIAPage() {
           objections: [
             {
               q: "¿Y si no me gusta el texto generado?",
-              a: "Puedes regenerarlo y ajustarlo por chat en segundos hasta que encaje con tu negocio.",
+              a: "Puedes regenerarlo y ajustarlo en el editor visual en segundos hasta que encaje con tu negocio.",
             },
             {
               q: "¿Necesito saber diseño o código?",
@@ -111,7 +111,7 @@ export default function GeneracionIAPage() {
           objections: [
             {
               q: "I si no m'agrada el text generat?",
-              a: "El pots regenerar i ajustar per xat en segons fins que encaixi amb el teu negoci.",
+              a: "El pots regenerar i ajustar a l'editor visual en segons fins que encaixi amb el teu negoci.",
             },
             {
               q: "Necessito saber disseny o codi?",
@@ -136,7 +136,7 @@ export default function GeneracionIAPage() {
           planTitle: "Pla recomanat per captar clients",
           planPrice: "19€/mes",
           planItems: [
-            "Edició il·limitada amb IA",
+            "Editor visual il·limitat amb IA",
             "Formulari de contacte i botó de WhatsApp",
             "SEO local i suport prioritari",
           ],

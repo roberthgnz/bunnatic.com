@@ -8,9 +8,9 @@ export default function EdicionAsistidaPage() {
       copy={{
         es: {
           badge: "Edita en segundos, sin depender de nadie",
-          title: "Edición asistida por IA para vender más cada semana",
+          title: "Editor visual con IA para vender más cada semana",
           subtitle:
-            "Actualiza horarios, servicios y promociones por chat para que tu web siempre esté alineada con lo que estás vendiendo hoy.",
+            "Actualiza horarios, servicios y promociones con el editor visual para que tu web siempre esté alineada con lo que estás vendiendo hoy.",
           urgencyText: "Web desactualizada = clientes que dudan y no contactan.",
           trustLine: "Cambios inmediatos, sin tickets técnicos y sin romper el diseño.",
           outcomesTitle: "Ventajas de negocio inmediatas",
@@ -22,12 +22,12 @@ export default function EdicionAsistidaPage() {
           processTitle: "Cómo funciona en el día a día",
           process: [
             {
-              title: "Pides el cambio por chat",
+              title: "Actualizas con el editor visual",
               description:
-                "Escribes como en WhatsApp lo que quieres modificar en la web.",
+                "Editas bloques, textos e imágenes directamente en un flujo visual muy simple.",
             },
             {
-              title: "La IA aplica y optimiza",
+              title: "La IA recomienda y optimiza",
               description:
                 "Actualiza texto y estructura manteniendo una redacción enfocada a venta.",
             },
@@ -58,7 +58,7 @@ export default function EdicionAsistidaPage() {
             },
             {
               quote:
-                "La opción por chat nos quitó el cuello de botella del técnico externo.",
+                "El editor visual nos quitó el cuello de botella del técnico externo.",
               author: "Iván T.",
               role: "Centro deportivo",
             },
@@ -66,7 +66,7 @@ export default function EdicionAsistidaPage() {
           planTitle: "Plan recomendado para edición continua",
           planPrice: "19€/mes",
           planItems: [
-            "Edición con IA ilimitada",
+            "Editor visual con apoyo de IA ilimitado",
             "Bloques y textos optimizados para conversión",
             "Soporte prioritario cuando lo necesites",
           ],
@@ -74,13 +74,13 @@ export default function EdicionAsistidaPage() {
           finalSubtitle:
             "Regístrate ahora y mantén tu web vendiendo todos los días, no solo cuando te da tiempo.",
           ctaPrimary: "Crear cuenta ahora",
-          ctaSecondary: "Probar editor IA",
+          ctaSecondary: "Probar editor visual",
         },
         ca: {
           badge: "Edita en segons, sense dependre de ningú",
-          title: "Edició assistida per IA per vendre més cada setmana",
+          title: "Editor visual amb IA per vendre més cada setmana",
           subtitle:
-            "Actualitza horaris, serveis i promocions per xat perquè la teva web sempre estigui alineada amb el que vens avui.",
+            "Actualitza horaris, serveis i promocions amb l'editor visual perquè la teva web sempre estigui alineada amb el que vens avui.",
           urgencyText: "Web desactualitzada = clients que dubten i no contacten.",
           trustLine: "Canvis immediats, sense tickets tècnics i sense trencar el disseny.",
           outcomesTitle: "Avantatges de negoci immediates",
@@ -92,12 +92,12 @@ export default function EdicionAsistidaPage() {
           processTitle: "Com funciona al dia a dia",
           process: [
             {
-              title: "Demanes el canvi per xat",
+              title: "Actualitzes amb l'editor visual",
               description:
-                "Escrius com a WhatsApp el que vols modificar a la web.",
+                "Edits blocs, textos i imatges directament en un flux visual molt simple.",
             },
             {
-              title: "La IA aplica i optimitza",
+              title: "La IA recomana i optimitza",
               description:
                 "Actualitza text i estructura mantenint redacció enfocada a venda.",
             },
@@ -128,7 +128,7 @@ export default function EdicionAsistidaPage() {
             },
             {
               quote:
-                "L'opció per xat ens va treure el coll d'ampolla del tècnic extern.",
+                "L'editor visual ens va treure el coll d'ampolla del tècnic extern.",
               author: "Iván T.",
               role: "Centre esportiu",
             },
@@ -136,7 +136,7 @@ export default function EdicionAsistidaPage() {
           planTitle: "Pla recomanat per edició contínua",
           planPrice: "19€/mes",
           planItems: [
-            "Edició amb IA il·limitada",
+            "Editor visual amb suport d'IA il·limitat",
             "Blocs i textos optimitzats per conversió",
             "Suport prioritari quan el necessitis",
           ],
@@ -144,7 +144,7 @@ export default function EdicionAsistidaPage() {
           finalSubtitle:
             "Registra't ara i mantén la teva web venent cada dia, no només quan tens temps.",
           ctaPrimary: "Crear compte ara",
-          ctaSecondary: "Provar editor IA",
+          ctaSecondary: "Provar editor visual",
         },
       }}
     />

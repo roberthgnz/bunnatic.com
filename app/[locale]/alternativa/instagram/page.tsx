@@ -61,7 +61,7 @@ export default function AlternativeInstagramPage() {
           planItems: [
             "Diseño web optimizado para móvil",
             "Formularios y CTAs de alta visibilidad",
-            "Edición IA para actualizar campañas rápido",
+            "Editor visual para actualizar campañas rápido",
           ],
           finalTitle: "Haz que cada visita desde Instagram cuente",
           finalSubtitle:
@@ -123,7 +123,7 @@ export default function AlternativeInstagramPage() {
           planItems: [
             "Disseny web optimitzat per mòbil",
             "Formularis i CTAs d'alta visibilitat",
-            "Edició IA per actualitzar campanyes ràpid",
+            "Editor visual per actualitzar campanyes ràpid",
           ],
           finalTitle: "Fes que cada visita des d'Instagram compti",
           finalSubtitle:

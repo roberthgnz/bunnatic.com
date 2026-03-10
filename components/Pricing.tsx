@@ -1,106 +1,133 @@
 "use client";
 
 import { content } from "@/lib/content";
-import { motion } from "motion/react";
-import { Check, ShieldCheck } from "lucide-react";
+import { Check, CircleHelp } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { useLanguage } from "./LanguageProvider";
 
 export default function Pricing() {
   const { language } = useLanguage();
   const t = content[language];
+  const [isAnnual, setIsAnnual] = useState(false);
 
   return (
-    <section className="relative overflow-hidden bg-[#0a0a0a] py-24 sm:py-32">
-      <div className="absolute inset-0 bg-grid-pattern-dark opacity-20" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-20 bg-emerald-500 blur-[150px] rounded-full pointer-events-none" />
-
-      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl">
+    <section className="bg-[#f4f7fc] py-24 sm:py-28">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          <h2 className="text-4xl font-extrabold tracking-tight text-slate-800 sm:text-5xl">
             {t.pricing.title}
           </h2>
-          <p className="mt-6 text-lg leading-8 text-gray-400">
-            {t.pricing.subtitle}
-          </p>
-        </div>
+          <p className="mt-4 text-xl text-slate-600">{t.pricing.subtitle}</p>
 
-        <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 gap-y-6 sm:mt-20 lg:max-w-none lg:grid-cols-3 lg:gap-x-8">
-          {t.pricing.tiers.map((tier, index) => (
-            <motion.div
-              key={tier.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`relative flex flex-col rounded-[2.5rem] p-8 sm:p-10 shadow-2xl backdrop-blur-xl ${
-                tier.mostPopular
-                  ? "bg-white/10 ring-2 ring-emerald-500"
-                  : "bg-white/5 ring-1 ring-white/10"
+          <button
+            type="button"
+            onClick={() => setIsAnnual((prev) => !prev)}
+            className="mt-8 inline-flex items-center gap-3 text-base font-medium text-slate-700"
+            aria-pressed={isAnnual}
+          >
+            <span
+              className={`inline-flex h-7 w-12 shrink-0 items-center rounded-full p-1 transition-colors ${
+                isAnnual ? "bg-indigo-600" : "bg-slate-200"
               }`}
             >
-              {tier.mostPopular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center rounded-full bg-emerald-500 px-4 py-1 text-xs font-semibold text-white shadow-sm">
-                    Recomendado
-                  </span>
-                </div>
-              )}
-              
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold text-white">{tier.name}</h3>
-                <p className="mt-2 text-sm text-gray-400">{tier.description}</p>
-              </div>
-
-              <div className="flex items-baseline gap-x-2">
-                <span className="text-5xl font-extrabold tracking-tight text-white">
-                  {tier.price}
-                </span>
-                <span className="text-base font-semibold leading-6 text-gray-400">
-                  {tier.period}
-                </span>
-              </div>
-              
-              <div className="my-8 h-px w-full bg-white/10" />
-              
-              <ul
-                role="list"
-                className="flex-1 space-y-4 text-sm leading-6 text-gray-300"
-              >
-                {tier.features.map((feature) => (
-                  <li key={feature} className="flex gap-x-3">
-                    <Check
-                      className="h-6 w-5 flex-none text-emerald-400"
-                      aria-hidden="true"
-                    />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <Link
-                href="#"
-                className={`mt-8 block w-full rounded-full px-4 py-3.5 text-center text-sm font-bold shadow-sm transition-all hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                  tier.mostPopular
-                    ? "bg-emerald-500 text-white hover:bg-emerald-400 focus-visible:outline-emerald-500"
-                    : "bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white"
+              <span
+                className={`h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
+                  isAnnual ? "translate-x-5" : "translate-x-0"
                 }`}
-              >
-                {tier.cta}
-              </Link>
-            </motion.div>
-          ))}
+              />
+            </span>
+            <span>
+              {t.pricing.billingLabel},{" "}
+              <span className="text-indigo-600">{t.pricing.saveLabel}</span>
+            </span>
+          </button>
         </div>
 
-        <div className="mt-16 flex flex-col items-center justify-center gap-4">
-          <div className="flex items-center justify-center gap-2 text-sm font-medium text-gray-300">
-            <ShieldCheck className="h-5 w-5 text-emerald-400" />
-            🛡 Garantía de satisfacción de 14 días
-          </div>
-          <div className="flex justify-center gap-6 opacity-40 grayscale">
-            <span className="text-sm font-bold text-gray-300">VISA</span>
-            <span className="text-sm font-bold text-gray-300">Mastercard</span>
-            <span className="text-sm font-bold text-gray-300">SEPA</span>
+        <div className="mt-14 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="grid grid-cols-1 divide-y divide-slate-200 xl:grid-cols-4 xl:divide-x xl:divide-y-0">
+            {t.pricing.tiers.map((tier) => (
+              <article key={tier.id} className="flex h-full flex-col">
+                <div className="flex h-full flex-col p-6 sm:p-8">
+                  <div>
+                    <h3 className="text-3xl font-extrabold text-slate-800">{tier.name}</h3>
+                    <p className="mt-3 max-w-xs text-lg text-slate-600">{tier.description}</p>
+                  </div>
+
+                  <div className="mt-8">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-5xl font-extrabold tracking-tight text-slate-800">
+                        {isAnnual ? tier.priceYearly : tier.priceMonthly}
+                      </span>
+                      <span className="text-2xl font-semibold text-slate-500">{tier.period}</span>
+                    </div>
+                    <div className="mt-2 min-h-[44px] text-sm text-slate-500">
+                      {isAnnual ? (
+                        <div className="space-y-1">
+                          <p>
+                            {t.pricing.previousPriceLabel}:{" "}
+                            <span className="line-through">{tier.priceMonthly}{tier.period}</span>
+                          </p>
+                          <p>
+                            {t.pricing.billedAnnuallyLabel}:{" "}
+                            <span className="font-semibold text-slate-700">{tier.annualTotal}</span>
+                          </p>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <Link
+                      href="#"
+                      className="rounded-full bg-indigo-600 px-5 py-2.5 text-base font-semibold text-white transition-colors hover:bg-indigo-500"
+                    >
+                      {tier.cta}
+                    </Link>
+                    {tier.secondaryCta && (
+                      <Link href="#" className="text-base font-semibold text-slate-500 hover:text-slate-700">
+                        {tier.secondaryCta}
+                      </Link>
+                    )}
+                  </div>
+
+                  <ul className="mt-10 space-y-5">
+                    {tier.features.map((feature) => (
+                      <li key={feature.title} className="flex items-start gap-3">
+                        <Check className="mt-1 h-5 w-5 shrink-0 text-emerald-500" />
+                        <div className="space-y-1">
+                          <p className="text-2xl font-extrabold text-slate-900">{feature.title}</p>
+                          <p className="text-base text-slate-500">{feature.detail}</p>
+                        </div>
+                        <CircleHelp className="ml-auto mt-1 h-4 w-4 shrink-0 text-slate-300" />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mt-auto border-t border-slate-200 bg-slate-50 p-6 sm:p-8">
+                  <h4 className="text-lg font-bold text-slate-700">{t.pricing.addonsTitle}</h4>
+                  <ul className="mt-3 space-y-2">
+                    {tier.addons.map((item) => (
+                      <li key={item} className="flex items-center text-2xl text-slate-600">
+                        <span>{item}</span>
+                        <CircleHelp className="ml-auto h-4 w-4 text-slate-300" />
+                      </li>
+                    ))}
+                  </ul>
+
+                  <h4 className="mt-7 text-lg font-bold text-slate-700">{t.pricing.includesTitle}</h4>
+                  <ul className="mt-3 space-y-2">
+                    {tier.includes.map((item) => (
+                      <li key={item} className="flex items-center text-2xl text-slate-600">
+                        <span>{item}</span>
+                        <CircleHelp className="ml-auto h-4 w-4 text-slate-300" />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </div>

@@ -8,12 +8,39 @@ import { useLanguage } from "./LanguageProvider";
 const slugify = (text: string) => {
   return text
     .toLowerCase()
-    .replace(/[🍽🍕💆🌿🏋🐾🦷📸🏠⚖]/g, "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+};
+
+const slugMap: Record<string, string> = {
+  peluquerias: "peluquerias",
+  restaurantes: "restaurantes",
+  gimnasios: "gimnasios",
+  farmacias: "farmacias",
+  esteticas: "esteticas",
+  veterinarios: "veterinarios",
+  dentistas: "dentistas",
+  fotografos: "fotografos",
+  inmobiliarias: "inmobiliarias",
+  talleres: "talleres",
+  perruqueries: "peluquerias",
+  restaurants: "restaurantes",
+  gimnasos: "gimnasios",
+  farmacies: "farmacias",
+  estetiques: "esteticas",
+  veterinaris: "veterinarios",
+  dentistes: "dentistas",
+  fotografs: "fotografos",
+  immobiliaries: "inmobiliarias",
+  tallers: "talleres",
+};
+
+const getBusinessSlug = (business: string) => {
+  const normalized = slugify(business);
+  return slugMap[normalized] ?? normalized;
 };
 
 export default function Ticker() {
@@ -41,7 +68,7 @@ export default function Ticker() {
               (business, index) => (
                 <Link
                   key={index}
-                  href={`/negocio/${slugify(business)}`}
+                  href={`/negocio/${getBusinessSlug(business)}`}
                   className="flex-shrink-0 hover:text-white transition-colors"
                   onMouseEnter={() => setIsPaused(true)}
                   onMouseLeave={() => setIsPaused(false)}

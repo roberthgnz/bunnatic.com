@@ -3,6 +3,13 @@ export const content = {
     navbar: {
       logo: "Nova Web",
       languages: "ES | CA",
+      platformLabel: "Plataform",
+      coreFeaturesLabel: "Características core",
+      coreFeatures: [
+        { id: "generacion-ia", label: "Generación con IA" },
+        { id: "seo-local", label: "SEO local" },
+        { id: "edicion-asistida", label: "Editor visual con IA" }
+      ],
       cta: "Crear mi web gratis →",
     },
     hero: {
@@ -16,9 +23,9 @@ export const content = {
     },
     ticker: {
       businesses: [
-        "🍽 Peluquerías", "🍕 Restaurantes", "💆 Gimnasios", "🌿 Farmacias", 
-        "🏋 Estéticas", "🐾 Veterinarios", "🦷 Dentistas", "📸 Fotógrafos", 
-        "🏠 Inmobiliarias", "⚖ Talleres"
+        "💇 Peluquerías", "🍽 Restaurantes", "🏋 Gimnasios", "💊 Farmacias",
+        "💅 Estéticas", "🐶 Veterinarios", "🦷 Dentistas", "📷 Fotógrafos",
+        "🏘 Inmobiliarias", "🔧 Talleres"
       ],
       text1: "Más de 1,200 negocios ya tienen su web con novaweb",
       text2: "Hostal El Pueblo · Carlos R Apuntería · Anni R Veterinaria · Jose · Librería · Joana · Ofimac · Loli D Ofimac",
@@ -88,8 +95,8 @@ export const content = {
       },
       {
         id: "edicion-asistida",
-        title: "Edición Asistida por IA",
-        description: "Modifica tu web chateando. Si sabes enviar un WhatsApp, sabes editar tu web.",
+        title: "Editor visual con IA",
+        description: "Edita tu web con un editor visual intuitivo y usa la IA para recibir recomendaciones de contenido.",
         icon: "MessageSquare",
         benefits: [
           "Cambios en tiempo real",
@@ -219,7 +226,7 @@ export const content = {
               "Lista en 5 minutos con IA",
               "Cero mantenimiento técnico",
               "Seguridad y hosting incluidos",
-              "Edición fácil chateando"
+              "Editor visual fácil de usar"
             ]
           }
         }
@@ -276,58 +283,84 @@ export const content = {
       }
     ],
     pricing: {
-      title: "Planes pensados para tu negocio",
-      subtitle: "Empieza gratis. Escala cuando lo necesites. Sin permanencia.",
+      title: "Precios",
+      subtitle: "Simple, flexible y asequible para negocios de cualquier tamaño.",
+      billingLabel: "Facturación anual",
+      saveLabel: "ahorra hasta un 22%",
+      billedAnnuallyLabel: "Facturado anualmente",
+      previousPriceLabel: "Antes",
+      addonsTitle: "Complementos",
+      includesTitle: "También incluye",
       tiers: [
         {
-          name: "Básico",
-          id: "tier-basic",
-          price: "9€",
+          name: "Esencial",
+          id: "tier-starter",
+          priceMonthly: "9€",
+          priceYearly: "7€",
+          annualTotal: "84€/año",
           period: "/mes",
-          description: "Perfecto para tener presencia online básica.",
+          description: "Para publicar de forma puntual y validar tu presencia local.",
+          cta: "Prueba 14 días",
           features: [
-            "Web generada con IA",
-            "Dominio .es o .com incluido",
-            "Hosting seguro (SSL)",
-            "Diseño responsive",
-            "Soporte por email"
+            { title: "1 Web activa", detail: "Hasta 10 secciones en la web." },
+            { title: "15 ediciones/mes", detail: "Incluye cambios de texto e imagen." },
+            { title: "1 usuario", detail: "Acceso para propietario del negocio." }
           ],
-          cta: "Empezar gratis",
-          mostPopular: false,
+          addons: ["Sección extra 3€/mes", "Usuario extra 4€/mes"],
+          includes: ["Dominio incluido", "SSL seguro", "Analítica básica"]
         },
         {
-          name: "Profesional",
+          name: "Impulso",
           id: "tier-pro",
-          price: "19€",
+          priceMonthly: "15€",
+          priceYearly: "12€",
+          annualTotal: "144€/año",
           period: "/mes",
-          description: "Ideal para captar clientes de forma activa.",
+          description: "Para equipos pequeños que publican y mejoran su web cada semana.",
+          cta: "Prueba 14 días",
           features: [
-            "Todo lo del plan Básico",
-            "Edición con IA ilimitada",
-            "Formulario de contacto",
-            "Botón de WhatsApp",
-            "Optimización SEO Local",
-            "Soporte prioritario"
+            { title: "3 Webs activas", detail: "Hasta 15 secciones por cada web." },
+            { title: "Ediciones ilimitadas", detail: "Asistente de contenido IA sin límites mensuales." },
+            { title: "3 usuarios", detail: "Colabora con tu equipo de marketing." }
           ],
-          cta: "Empezar gratis",
-          mostPopular: true,
+          addons: ["Sección extra 3€/mes", "Usuario extra 4€/mes"],
+          includes: ["Todo Esencial", "SEO local", "Soporte prioritario"]
         },
         {
-          name: "Avanzado",
-          id: "tier-advanced",
-          price: "39€",
+          name: "Equipo",
+          id: "tier-agency",
+          priceMonthly: "29€",
+          priceYearly: "24€",
+          annualTotal: "288€/año",
           period: "/mes",
-          description: "Para negocios que quieren dominar su zona.",
+          description: "Para negocios con varias líneas de servicio o varias sedes.",
+          cta: "Prueba 14 días",
+          secondaryCta: "Solicitar demo",
           features: [
-            "Todo lo del plan Profesional",
-            "Blog generado con IA",
-            "Sistema de reservas",
-            "Múltiples idiomas",
-            "Analítica avanzada",
-            "Asesor SEO dedicado"
+            { title: "8 Webs activas", detail: "Control centralizado por marca o sede." },
+            { title: "Ediciones ilimitadas", detail: "Flujo asistido con IA para equipos." },
+            { title: "8 usuarios", detail: "Permisos por rol y revisiones internas." }
           ],
-          cta: "Contactar ventas",
-          mostPopular: false,
+          addons: ["Web extra 5€/mes", "Usuario extra 4€/mes"],
+          includes: ["Todo Impulso", "Reportes personalizados", "Calendario compartido"]
+        },
+        {
+          name: "Expansión",
+          id: "tier-scale",
+          priceMonthly: "49€",
+          priceYearly: "39€",
+          annualTotal: "468€/año",
+          period: "/mes",
+          description: "Para negocios en crecimiento que quieren operar con más autonomía.",
+          cta: "Prueba 14 días",
+          secondaryCta: "Solicitar demo",
+          features: [
+            { title: "15 Webs activas", detail: "Gestión multi-sede y multi-marca." },
+            { title: "Ediciones ilimitadas", detail: "Automatizaciones y flujos avanzados." },
+            { title: "15 usuarios", detail: "Gobernanza y auditoría de cambios." }
+          ],
+          addons: ["Web extra 4€/mes", "Usuario extra 3€/mes"],
+          includes: ["Todo Equipo", "Analítica avanzada", "Soporte dedicado"]
         }
       ]
     },
@@ -356,18 +389,18 @@ export const content = {
       caption: "Facebook es útil. (¡úsalo!) pero lo que convierte visitas en clientes."
     },
     aiDemo: {
-      title: "¿Necesitas cambiar el horario? Le dices a la\nIA qué cambiar. En 10 segundos está hecho.",
-      assistantName: "Asistente IA",
+      title: "¿Necesitas mejorar un texto o una oferta?\nLa IA te recomienda cambios para aplicarlos en tu editor visual.",
+      assistantName: "Asistente de contenido IA",
       onlineStatus: "En línea",
       chat: [
-        { type: "user", text: "Cambia los domingos de julio estaremos siempre cerrado" },
-        { type: "system", text: "Cambiando los domingos de julio →" },
-        { type: "user", text: "Añade: El nuevo Título Martín / 195€ – 120 min a la web" },
-        { type: "system", text: "Añade el dato que genera la IA →" },
-        { type: "user", text: "Añade el teléfono a 662 501 226" },
-        { type: "system", text: "Cambia el teléfono a 662 501 226 →" }
+        { type: "user", text: "Quiero destacar la promo de julio en portada" },
+        { type: "system", text: "Recomendación: añade un bloque de oferta con CTA a WhatsApp." },
+        { type: "user", text: "¿Qué titular me recomiendas para convertir más?" },
+        { type: "system", text: "Propuesta: \"Promo de julio: reserva hoy y ahorra un 20%\"." },
+        { type: "user", text: "¿Dónde lo coloco en la página?" },
+        { type: "system", text: "Sugerencia: justo debajo del bloque de servicios para aumentar clics." }
       ],
-      caption: "No necesitas saber de webs. Si sabes mandar un WhatsApp, sabes 'actualizar' tu web."
+      caption: "Editas tu web con un editor visual y usas la IA para optimizar textos, ofertas y estructura."
     },
     faq: {
       title: "Preguntas frecuentes",
@@ -390,70 +423,19 @@ export const content = {
       logo: "Nova Web",
       links: ["Aviso legal", "Política de privacidad", "Política de cookies"],
       copyright: "© 2025 novaweb.es · Hecho con ♥ en Barcelona"
-    },
-    crear: {
-      back: "Volver",
-      title: "Encuentra tu negocio",
-      subtitle: "Conectamos con Google My Business para extraer tu información y crear tu web en segundos.",
-      searchPlaceholder: "Ej: Pizzería Napoli, Madrid",
-      searchButton: "Buscar",
-      resultsTitle: "Resultados de Google",
-      analyzingTitle: "La IA está analizando tu negocio...",
-      analyzingSubtitle: "Extrayendo información de Google, leyendo reseñas y generando textos optimizados para SEO.",
-      step1: "Conectando con Google My Business",
-      step2: "Extrayendo dirección y horarios",
-      step3: "Generando diseño y textos persuasivos",
-      extractedData: "Datos Extraídos",
-      reviewsAnalyzed: "reseñas analizadas",
-      allCorrect: "¿Todo correcto?",
-      generatedProposal: "Hemos generado una propuesta de diseño basada en tu perfil de Google.",
-      publishNow: "Publicar mi web ahora",
-      searchAnother: "Buscar otro negocio",
-      heroSubtitle: "El mejor servicio de {type} en tu zona.",
-      heroFallback: "Tu negocio, ahora con una presencia online profesional.",
-      contactNow: "Contactar ahora",
-      aboutUs: "Sobre nosotros",
-      aboutUsText: "Basado en las excelentes reseñas de nuestros clientes ({rating} estrellas), nos enorgullece ofrecer el mejor servicio en {city}.",
-      contactInfo: "Información de contacto",
-      whatClientsSay: "Lo que dicen nuestros clientes",
-      publishedTitle: "¡Tu web está publicada!",
-      publishedSubtitle: "El sitio web para {name} ya está online y listo para recibir clientes.",
-      visitsToday: "Visitas Hoy",
-      contacts: "Contactos",
-      seoStatus: "Estado SEO",
-      optimized: "Optimizado",
-      goToDashboard: "Ir al Panel de Control",
-      createAnother: "Crear otra web"
-    },
-    signin: {
-      title: "Inicia sesión",
-      newAccountText: "crea una cuenta nueva",
-      or: "O",
-      emailLabel: "Correo electrónico",
-      passwordLabel: "Contraseña",
-      rememberMe: "Recordarme",
-      forgotPassword: "¿Olvidaste tu contraseña?",
-      loginButton: "Entrar"
-    },
-    signup: {
-      title: "Crea tu cuenta",
-      existingAccountText: "inicia sesión si ya tienes una",
-      or: "O",
-      nameLabel: "Nombre completo",
-      emailLabel: "Correo electrónico",
-      passwordLabel: "Contraseña",
-      signupButton: "Registrarse y empezar"
-    },
-    notFound: {
-      title: "Página no encontrada",
-      description: "Lo sentimos, no hemos podido encontrar la página que estás buscando.",
-      back: "Volver al inicio"
     }
   },
   ca: {
     navbar: {
       logo: "Nova Web",
       languages: "ES | CA",
+      platformLabel: "Plataform",
+      coreFeaturesLabel: "Característiques core",
+      coreFeatures: [
+        { id: "generacion-ia", label: "Generació amb IA" },
+        { id: "seo-local", label: "SEO local" },
+        { id: "edicion-asistida", label: "Editor visual amb IA" }
+      ],
       cta: "Crear la meva web gratis →",
     },
     hero: {
@@ -467,9 +449,9 @@ export const content = {
     },
     ticker: {
       businesses: [
-        "🍽 Perruqueries", "🍕 Restaurants", "💆 Gimnasos", "🌿 Farmàcies", 
-        "🏋 Estètiques", "🐾 Veterinaris", "🦷 Dentistes", "📸 Fotògrafs", 
-        "🏠 Immobiliàries", "⚖ Tallers"
+        "💇 Perruqueries", "🍽 Restaurants", "🏋 Gimnasos", "💊 Farmàcies",
+        "💅 Estètiques", "🐶 Veterinaris", "🦷 Dentistes", "📷 Fotògrafs",
+        "🏘 Immobiliàries", "🔧 Tallers"
       ],
       text1: "Més de 1.200 negocis ja tenen la seva web amb novaweb",
       text2: "Hostal El Poble · Carles R Apunteria · Anni R Veterinària · Josep · Llibreria · Joana · Ofimac · Loli D Ofimac",
@@ -539,8 +521,8 @@ export const content = {
       },
       {
         id: "edicion-asistida",
-        title: "Edició Assistida per IA",
-        description: "Modifica la teva web xatejant. Si saps enviar un WhatsApp, saps editar la teva web.",
+        title: "Editor visual amb IA",
+        description: "Edita la teva web amb un editor visual intuïtiu i usa la IA per rebre recomanacions de contingut.",
         icon: "MessageSquare",
         benefits: [
           "Canvis en temps real",
@@ -670,7 +652,7 @@ export const content = {
               "Llesta en 5 minuts amb IA",
               "Zero manteniment tècnic",
               "Seguretat i hosting inclosos",
-              "Edició fàcil xatejant"
+              "Editor visual fàcil d'usar"
             ]
           }
         }
@@ -727,58 +709,84 @@ export const content = {
       }
     ],
     pricing: {
-      title: "Plans pensats per al teu negoci",
-      subtitle: "Comença gratis. Escala quan ho necessitis. Sense permanència.",
+      title: "Preus",
+      subtitle: "Simple, flexible i assequible per a negocis de qualsevol mida.",
+      billingLabel: "Facturació anual",
+      saveLabel: "estalvia fins a un 22%",
+      billedAnnuallyLabel: "Facturat anualment",
+      previousPriceLabel: "Abans",
+      addonsTitle: "Complements",
+      includesTitle: "També inclou",
       tiers: [
         {
-          name: "Bàsic",
-          id: "tier-basic",
-          price: "9€",
+          name: "Essencial",
+          id: "tier-starter",
+          priceMonthly: "9€",
+          priceYearly: "7€",
+          annualTotal: "84€/any",
           period: "/mes",
-          description: "Perfecte per tenir presència online bàsica.",
+          description: "Per publicar de manera puntual i validar la teva presencia local.",
+          cta: "Prova 14 dies",
           features: [
-            "Web generada amb IA",
-            "Domini .es o .com inclòs",
-            "Hàsting segur (SSL)",
-            "Disseny responsive",
-            "Suport per email"
+            { title: "1 Web activa", detail: "Fins a 10 seccions a la web." },
+            { title: "15 edicions/mes", detail: "Inclou canvis de text i imatge." },
+            { title: "1 usuari", detail: "Accés per al propietari del negoci." }
           ],
-          cta: "Començar gratis",
-          mostPopular: false,
+          addons: ["Secció extra 3€/mes", "Usuari extra 4€/mes"],
+          includes: ["Domini inclòs", "SSL segur", "Analítica bàsica"]
         },
         {
-          name: "Professional",
+          name: "Impuls",
           id: "tier-pro",
-          price: "19€",
+          priceMonthly: "15€",
+          priceYearly: "12€",
+          annualTotal: "144€/any",
           period: "/mes",
-          description: "Ideal per captar clients de forma activa.",
+          description: "Per a equips petits que publiquen i milloren la web cada setmana.",
+          cta: "Prova 14 dies",
           features: [
-            "Tot el del pla Bàsic",
-            "Edició amb IA il·limitada",
-            "Formulari de contacte",
-            "Botó de WhatsApp",
-            "Optimització SEO Local",
-            "Suport prioritari"
+            { title: "3 Webs actives", detail: "Fins a 15 seccions per cada web." },
+            { title: "Edicions il·limitades", detail: "Assistent de contingut IA sense límits mensuals." },
+            { title: "3 usuaris", detail: "Col·labora amb l'equip de màrqueting." }
           ],
-          cta: "Començar gratis",
-          mostPopular: true,
+          addons: ["Secció extra 3€/mes", "Usuari extra 4€/mes"],
+          includes: ["Tot Essencial", "SEO local", "Suport prioritari"]
         },
         {
-          name: "Avançat",
-          id: "tier-advanced",
-          price: "39€",
+          name: "Equip",
+          id: "tier-agency",
+          priceMonthly: "29€",
+          priceYearly: "24€",
+          annualTotal: "288€/any",
           period: "/mes",
-          description: "Per a negocis que volen dominar la seva zona.",
+          description: "Per a negocis amb diverses línies de servei o diverses seus.",
+          cta: "Prova 14 dies",
+          secondaryCta: "Sol·licitar demo",
           features: [
-            "Tot el del pla Professional",
-            "Blog generat amb IA",
-            "Sistema de reserves",
-            "Múltiples idiomes",
-            "Analítica avançada",
-            "Assessor SEO dedicat"
+            { title: "8 Webs actives", detail: "Control centralitzat per marca o seu." },
+            { title: "Edicions il·limitades", detail: "Flux assistit amb IA per equips." },
+            { title: "8 usuaris", detail: "Permisos per rol i revisions internes." }
           ],
-          cta: "Contactar vendes",
-          mostPopular: false,
+          addons: ["Web extra 5€/mes", "Usuari extra 4€/mes"],
+          includes: ["Tot Impuls", "Informes personalitzats", "Calendari compartit"]
+        },
+        {
+          name: "Expansió",
+          id: "tier-scale",
+          priceMonthly: "49€",
+          priceYearly: "39€",
+          annualTotal: "468€/any",
+          period: "/mes",
+          description: "Per a negocis en creixement que volen operar amb més autonomia.",
+          cta: "Prova 14 dies",
+          secondaryCta: "Sol·licitar demo",
+          features: [
+            { title: "15 Webs actives", detail: "Gestió multi-seu i multi-marca." },
+            { title: "Edicions il·limitades", detail: "Automatitzacions i fluxos avançats." },
+            { title: "15 usuaris", detail: "Governança i auditoria de canvis." }
+          ],
+          addons: ["Web extra 4€/mes", "Usuari extra 3€/mes"],
+          includes: ["Tot Equip", "Analítica avançada", "Suport dedicat"]
         }
       ]
     },
@@ -807,18 +815,18 @@ export const content = {
       caption: "Facebook és útil. (fes-lo servir!) però el que converteix visites en clients és una web."
     },
     aiDemo: {
-      title: "Necessites canviar l'horari? Li dius a la\nIA què canviar. En 10 segons està fet.",
-      assistantName: "Assistent IA",
+      title: "Necessites millorar un text o una oferta?\nLa IA et recomana canvis per aplicar-los al teu editor visual.",
+      assistantName: "Assistent de contingut IA",
       onlineStatus: "En línia",
       chat: [
-        { type: "user", text: "Canvia els diumenges de juliol estarem sempre tancat" },
-        { type: "system", text: "Canviant els diumenges de juliol →" },
-        { type: "user", text: "Afegeix: El nou Títol Martín / 195€ – 120 min a la web" },
-        { type: "system", text: "Afegeix la dada que genera la IA →" },
-        { type: "user", text: "Afegeix el telèfon a 662 501 226" },
-        { type: "system", text: "Canvia el telèfon a 662 501 226 →" }
+        { type: "user", text: "Vull destacar la promo de juliol a portada" },
+        { type: "system", text: "Recomanació: afegeix un bloc d'oferta amb CTA a WhatsApp." },
+        { type: "user", text: "Quin titular em recomanes per convertir més?" },
+        { type: "system", text: "Proposta: \"Promo de juliol: reserva avui i estalvia un 20%\"." },
+        { type: "user", text: "On ho col·loco a la pàgina?" },
+        { type: "system", text: "Suggeriment: just sota el bloc de serveis per augmentar clics." }
       ],
-      caption: "No necessites saber de webs. Si saps enviar un WhatsApp, saps 'actualitzar' la teva web."
+      caption: "Edits la teva web amb un editor visual i uses la IA per optimitzar textos, ofertes i estructura."
     },
     faq: {
       title: "Preguntes freqüents",
@@ -841,64 +849,6 @@ export const content = {
       logo: "Nova Web",
       links: ["Avís legal", "Política de privacitat", "Política de cookies"],
       copyright: "© 2025 novaweb.es · Fet amb ♥ a Barcelona"
-    },
-    crear: {
-      back: "Tornar",
-      title: "Troba el teu negoci",
-      subtitle: "Connectem amb Google My Business per extreure la teva informació i crear la teva web en segons.",
-      searchPlaceholder: "Ex: Pizzeria Napoli, Barcelona",
-      searchButton: "Cercar",
-      resultsTitle: "Resultats de Google",
-      analyzingTitle: "La IA està analitzant el teu negoci...",
-      analyzingSubtitle: "Extraient informació de Google, llegint ressenyes i generant textos optimitzats per a SEO.",
-      step1: "Connectant amb Google My Business",
-      step2: "Extraient adreça i horaris",
-      step3: "Generant disseny i textos persuasius",
-      extractedData: "Dades Extretes",
-      reviewsAnalyzed: "ressenyes analitzades",
-      allCorrect: "Tot correcte?",
-      generatedProposal: "Hem generat una proposta de disseny basada en el teu perfil de Google.",
-      publishNow: "Publicar la meva web ara",
-      searchAnother: "Buscar un altre negoci",
-      heroSubtitle: "El millor servei de {type} a la teva zona.",
-      heroFallback: "El teu negoci, ara amb una presència online professional.",
-      contactNow: "Contactar ara",
-      aboutUs: "Sobre nosaltres",
-      aboutUsText: "Basat en les excel·lents ressenyes dels nostres clients ({rating} estrelles), ens enorgulleix oferir el millor servei a {city}.",
-      contactInfo: "Informació de contacte",
-      whatClientsSay: "El que diuen els nostres clients",
-      publishedTitle: "La teva web està publicada!",
-      publishedSubtitle: "El lloc web per a {name} ja està online i llest per rebre clients.",
-      visitsToday: "Visites Avui",
-      contacts: "Contactes",
-      seoStatus: "Estat SEO",
-      optimized: "Optimitzat",
-      goToDashboard: "Anar al Tauler de Control",
-      createAnother: "Crear una altra web"
-    },
-    signin: {
-      title: "Inicia sessió",
-      newAccountText: "crea un compte nou",
-      or: "O",
-      emailLabel: "Correu electrònic",
-      passwordLabel: "Contrasenya",
-      rememberMe: "Recorda'm",
-      forgotPassword: "Has oblidat la teva contrasenya?",
-      loginButton: "Entrar"
-    },
-    signup: {
-      title: "Crea el teu compte",
-      existingAccountText: "inicia sessió si ja en tens una",
-      or: "O",
-      nameLabel: "Nom complet",
-      emailLabel: "Correu electrònic",
-      passwordLabel: "Contrasenya",
-      signupButton: "Registrar-se i començar"
-    },
-    notFound: {
-      title: "Pàgina no trobada",
-      description: "Ho sentim, no hem pogut trobar la pàgina que estàs buscant.",
-      back: "Tornar a l'inici"
     }
   }
 };

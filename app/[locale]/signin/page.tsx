@@ -3,11 +3,49 @@
 import Link from "next/link";
 import { Zap, ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/components/LanguageProvider";
-import { content } from "@/lib/content";
+
+const signInContent = {
+  es: {
+    navbar: {
+      logo: "Nova Web",
+    },
+    crear: {
+      back: "Volver",
+    },
+    signin: {
+      title: "Inicia sesión",
+      newAccountText: "crea una cuenta nueva",
+      or: "O",
+      emailLabel: "Correo electrónico",
+      passwordLabel: "Contraseña",
+      rememberMe: "Recordarme",
+      forgotPassword: "¿Olvidaste tu contraseña?",
+      loginButton: "Entrar",
+    },
+  },
+  ca: {
+    navbar: {
+      logo: "Nova Web",
+    },
+    crear: {
+      back: "Tornar",
+    },
+    signin: {
+      title: "Inicia sessió",
+      newAccountText: "crea un compte nou",
+      or: "O",
+      emailLabel: "Correu electrònic",
+      passwordLabel: "Contrasenya",
+      rememberMe: "Recorda'm",
+      forgotPassword: "Has oblidat la teva contrasenya?",
+      loginButton: "Entrar",
+    },
+  },
+} as const;
 
 export default function SignInPage() {
   const { language } = useLanguage();
-  const t = content[language];
+  const t = signInContent[language];
 
   return (
     <main className="min-h-screen bg-slate-50 font-sans text-gray-900 flex flex-col">

@@ -24,7 +24,7 @@ export default function AlternativeWixPage() {
           novaItems: [
             "La IA genera textos y estructura orientados a conversión.",
             "Publicas rápido sin curva de diseño ni maquetación.",
-            "Actualizas promociones y servicios por chat en segundos.",
+            "Actualizas promociones y servicios con el editor visual en segundos.",
           ],
           switchTitle: "Cómo acelerar tu salida a mercado",
           switchSteps: [
@@ -60,7 +60,7 @@ export default function AlternativeWixPage() {
           planPrice: "19€/mes",
           planItems: [
             "Generación IA de textos y estructura",
-            "Edición por chat sin fricción",
+            "Editor visual sin fricción",
             "Captación integrada y SEO local",
           ],
           finalTitle: "Publica antes, vende antes",
@@ -86,7 +86,7 @@ export default function AlternativeWixPage() {
           novaItems: [
             "La IA genera textos i estructura orientats a conversió.",
             "Publiques ràpid sense corba de disseny ni maquetació.",
-            "Actualitzes promocions i serveis per xat en segons.",
+            "Actualitzes promocions i serveis amb l'editor visual en segons.",
           ],
           switchTitle: "Com accelerar la teva sortida a mercat",
           switchSteps: [
@@ -122,7 +122,7 @@ export default function AlternativeWixPage() {
           planPrice: "19€/mes",
           planItems: [
             "Generació IA de textos i estructura",
-            "Edició per xat sense fricció",
+            "Editor visual sense fricció",
             "Captació integrada i SEO local",
           ],
           finalTitle: "Publica abans, ven abans",

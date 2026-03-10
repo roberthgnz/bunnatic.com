@@ -23,7 +23,7 @@ export default function AlternativeSquarespacePage() {
           novaCardTitle: "Con Nova Web",
           novaItems: [
             "Estructura centrada en convertir visitas en contactos.",
-            "Edición simple por chat para mover campañas rápido.",
+            "Editor visual simple para mover campañas rápido.",
             "Modelo pensado para negocio local y servicios recurrentes.",
           ],
           switchTitle: "Enfoque práctico para crecer",
@@ -60,7 +60,7 @@ export default function AlternativeSquarespacePage() {
           planPrice: "19€/mes",
           planItems: [
             "Estructura CRO lista para publicar",
-            "Edición con IA y soporte prioritario",
+            "Editor visual con recomendaciones de IA y soporte prioritario",
             "SEO local integrado",
           ],
           finalTitle: "Convierte diseño en resultados de negocio",
@@ -85,7 +85,7 @@ export default function AlternativeSquarespacePage() {
           novaCardTitle: "Amb Nova Web",
           novaItems: [
             "Estructura centrada a convertir visites en contactes.",
-            "Edició simple per xat per moure campanyes ràpid.",
+            "Editor visual simple per moure campanyes ràpid.",
             "Model pensat per negoci local i serveis recurrents.",
           ],
           switchTitle: "Enfocament pràctic per créixer",
@@ -122,7 +122,7 @@ export default function AlternativeSquarespacePage() {
           planPrice: "19€/mes",
           planItems: [
             "Estructura CRO llesta per publicar",
-            "Edició amb IA i suport prioritari",
+            "Editor visual amb recomanacions d'IA i suport prioritari",
             "SEO local integrat",
           ],
           finalTitle: "Converteix disseny en resultats de negoci",

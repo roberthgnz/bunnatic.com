@@ -5,11 +5,91 @@ import Link from "next/link";
 import { Zap, ArrowLeft, Search, MapPin, Star, Phone, Globe, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useLanguage } from "@/components/LanguageProvider";
-import { content } from "@/lib/content";
+
+const createPageContent = {
+  es: {
+    navbar: {
+      logo: "Nova Web",
+    },
+    crear: {
+      back: "Volver",
+      title: "Encuentra tu negocio",
+      subtitle: "Conectamos con Google My Business para extraer tu información y crear tu web en segundos.",
+      searchPlaceholder: "Ej: Pizzería Napoli, Madrid",
+      searchButton: "Buscar",
+      resultsTitle: "Resultados de Google",
+      analyzingTitle: "La IA está analizando tu negocio...",
+      analyzingSubtitle: "Extrayendo información de Google, leyendo reseñas y generando textos optimizados para SEO.",
+      step1: "Conectando con Google My Business",
+      step2: "Extrayendo dirección y horarios",
+      step3: "Generando diseño y textos persuasivos",
+      extractedData: "Datos Extraídos",
+      reviewsAnalyzed: "reseñas analizadas",
+      allCorrect: "¿Todo correcto?",
+      generatedProposal: "Hemos generado una propuesta de diseño basada en tu perfil de Google.",
+      publishNow: "Publicar mi web ahora",
+      searchAnother: "Buscar otro negocio",
+      heroSubtitle: "El mejor servicio de {type} en tu zona.",
+      heroFallback: "Tu negocio, ahora con una presencia online profesional.",
+      contactNow: "Contactar ahora",
+      aboutUs: "Sobre nosotros",
+      aboutUsText: "Basado en las excelentes reseñas de nuestros clientes ({rating} estrellas), nos enorgullece ofrecer el mejor servicio en {city}.",
+      contactInfo: "Información de contacto",
+      whatClientsSay: "Lo que dicen nuestros clientes",
+      publishedTitle: "¡Tu web está publicada!",
+      publishedSubtitle: "El sitio web para {name} ya está online y listo para recibir clientes.",
+      visitsToday: "Visitas Hoy",
+      contacts: "Contactos",
+      seoStatus: "Estado SEO",
+      optimized: "Optimizado",
+      goToDashboard: "Ir al Panel de Control",
+      createAnother: "Crear otra web",
+    },
+  },
+  ca: {
+    navbar: {
+      logo: "Nova Web",
+    },
+    crear: {
+      back: "Tornar",
+      title: "Troba el teu negoci",
+      subtitle: "Connectem amb Google My Business per extreure la teva informació i crear la teva web en segons.",
+      searchPlaceholder: "Ex: Pizzeria Napoli, Barcelona",
+      searchButton: "Cercar",
+      resultsTitle: "Resultats de Google",
+      analyzingTitle: "La IA està analitzant el teu negoci...",
+      analyzingSubtitle: "Extraient informació de Google, llegint ressenyes i generant textos optimitzats per a SEO.",
+      step1: "Connectant amb Google My Business",
+      step2: "Extraient adreça i horaris",
+      step3: "Generant disseny i textos persuasius",
+      extractedData: "Dades Extretes",
+      reviewsAnalyzed: "ressenyes analitzades",
+      allCorrect: "Tot correcte?",
+      generatedProposal: "Hem generat una proposta de disseny basada en el teu perfil de Google.",
+      publishNow: "Publicar la meva web ara",
+      searchAnother: "Buscar un altre negoci",
+      heroSubtitle: "El millor servei de {type} a la teva zona.",
+      heroFallback: "El teu negoci, ara amb una presència online professional.",
+      contactNow: "Contactar ara",
+      aboutUs: "Sobre nosaltres",
+      aboutUsText: "Basat en les excel·lents ressenyes dels nostres clients ({rating} estrelles), ens enorgulleix oferir el millor servei a {city}.",
+      contactInfo: "Informació de contacte",
+      whatClientsSay: "El que diuen els nostres clients",
+      publishedTitle: "La teva web està publicada!",
+      publishedSubtitle: "El lloc web per a {name} ja està online i llest per rebre clients.",
+      visitsToday: "Visites Avui",
+      contacts: "Contactes",
+      seoStatus: "Estat SEO",
+      optimized: "Optimitzat",
+      goToDashboard: "Anar al Tauler de Control",
+      createAnother: "Crear una altra web",
+    },
+  },
+} as const;
 
 export default function CreateWebPage() {
   const { language } = useLanguage();
-  const t = content[language];
+  const t = createPageContent[language];
   const [step, setStep] = useState<"search" | "analyzing" | "preview" | "dashboard">("search");
   const [query, setQuery] = useState("");
   const [places, setPlaces] = useState<any[]>([]);

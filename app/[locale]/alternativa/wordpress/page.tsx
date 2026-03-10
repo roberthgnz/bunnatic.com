@@ -23,7 +23,7 @@ export default function AlternativeWordpressPage() {
           novaCardTitle: "Con Nova Web",
           novaItems: [
             "Configuración inicial en minutos y sin curva técnica.",
-            "Edición por chat con IA para cambios comerciales al instante.",
+            "Editor visual con recomendaciones de IA para cambios comerciales al instante.",
             "Infraestructura lista sin mantenimiento complejo.",
           ],
           switchTitle: "Migrar sin fricción operativa",
@@ -59,7 +59,7 @@ export default function AlternativeWordpressPage() {
           planTitle: "Plan recomendado para migrar de WordPress",
           planPrice: "19€/mes",
           planItems: [
-            "Edición IA ilimitada y simple",
+            "Editor visual ilimitado y simple",
             "SEO local y estructura orientada a lead",
             "Hosting seguro incluido",
           ],
@@ -85,7 +85,7 @@ export default function AlternativeWordpressPage() {
           novaCardTitle: "Amb Nova Web",
           novaItems: [
             "Configuració inicial en minuts i sense corba tècnica.",
-            "Edició per xat amb IA per canvis comercials a l'instant.",
+            "Editor visual amb recomanacions d'IA per a canvis comercials a l'instant.",
             "Infraestructura llesta sense manteniment complex.",
           ],
           switchTitle: "Migrar sense fricció operativa",
@@ -121,7 +121,7 @@ export default function AlternativeWordpressPage() {
           planTitle: "Pla recomanat per migrar de WordPress",
           planPrice: "19€/mes",
           planItems: [
-            "Edició IA il·limitada i simple",
+            "Editor visual il·limitat i simple",
             "SEO local i estructura orientada a lead",
             "Hosting segur inclòs",
           ],

@@ -3,11 +3,47 @@
 import Link from "next/link";
 import { Zap, ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/components/LanguageProvider";
-import { content } from "@/lib/content";
+
+const signUpContent = {
+  es: {
+    navbar: {
+      logo: "Nova Web",
+    },
+    crear: {
+      back: "Volver",
+    },
+    signup: {
+      title: "Crea tu cuenta",
+      existingAccountText: "inicia sesión si ya tienes una",
+      or: "O",
+      nameLabel: "Nombre completo",
+      emailLabel: "Correo electrónico",
+      passwordLabel: "Contraseña",
+      signupButton: "Registrarse y empezar",
+    },
+  },
+  ca: {
+    navbar: {
+      logo: "Nova Web",
+    },
+    crear: {
+      back: "Tornar",
+    },
+    signup: {
+      title: "Crea el teu compte",
+      existingAccountText: "inicia sessió si ja en tens una",
+      or: "O",
+      nameLabel: "Nom complet",
+      emailLabel: "Correu electrònic",
+      passwordLabel: "Contrasenya",
+      signupButton: "Registrar-se i començar",
+    },
+  },
+} as const;
 
 export default function SignUpPage() {
   const { language } = useLanguage();
-  const t = content[language];
+  const t = signUpContent[language];
 
   return (
     <main className="min-h-screen bg-slate-50 font-sans text-gray-900 flex flex-col">

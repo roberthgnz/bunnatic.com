@@ -35,7 +35,7 @@ export default function NegocioInmobiliariasPage() {
           finalTitle: "Convierte tu web en máquina de captación",
           finalSubtitle: "Regístrate y empieza a generar leads más cualificados.",
           ctaPrimary: "Crear cuenta gratis",
-          ctaSecondary: "Probar demo",
+          ctaSecondary: "Probar demo ahora",
         },
         ca: {
           badge: "Capta compradors i propietaris amb millor filtre",

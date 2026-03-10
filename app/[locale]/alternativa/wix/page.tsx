@@ -12,7 +12,7 @@ export default function AlternativeWixPage() {
             "Con Wix sueles invertir tiempo montando bloques y copiando textos. Con Wibloz partes de una propuesta completa pensada para captar clientes.",
           urgencyText: "Si tardas en publicar, también tardas en generar oportunidades.",
           ctaPrimary: "Crear cuenta gratis",
-          ctaSecondary: "Probar demo ahora",
+          ctaSecondary: "Probar demo",
           trustLine: "IA + estructura comercial para pasar de idea a web operativa en minutos.",
           competitorCardTitle: "Con Wix",
           competitorItems: [

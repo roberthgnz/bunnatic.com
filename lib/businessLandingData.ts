@@ -77,7 +77,7 @@ const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, "slug">> = [
         finalTitle: "Convierte búsquedas en pacientes reales",
         finalSubtitle: "Regístrate y activa tu web dental enfocada a captación.",
         ctaPrimary: "Crear cuenta gratis",
-        ctaSecondary: "Probar demo",
+        ctaSecondary: "Probar demo ahora",
       },
       ca: {
         badge: "Més primeres visites i tractaments tancats",
@@ -154,7 +154,7 @@ const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, "slug">> = [
         finalTitle: "Haz crecer tus reservas desde la web",
         finalSubtitle: "Regístrate y publica una página pensada para vender tratamientos.",
         ctaPrimary: "Crear cuenta gratis",
-        ctaSecondary: "Probar demo",
+        ctaSecondary: "Probar demo ahora",
       },
       ca: {
         badge: "Més tractaments reservats",
@@ -462,7 +462,7 @@ const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, "slug">> = [
         finalTitle: "Convierte tu web en máquina de captación",
         finalSubtitle: "Regístrate y empieza a generar leads más cualificados.",
         ctaPrimary: "Crear cuenta gratis",
-        ctaSecondary: "Probar demo",
+        ctaSecondary: "Probar demo ahora",
       },
       ca: {
         badge: "Capta compradors i propietaris amb millor filtre",
@@ -539,7 +539,7 @@ const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, "slug">> = [
         finalTitle: "Llena agenda con una web que sí convierte",
         finalSubtitle: "Crea tu cuenta y empieza a captar citas desde hoy.",
         ctaPrimary: "Crear cuenta gratis",
-        ctaSecondary: "Probar demo",
+        ctaSecondary: "Probar demo ahora",
       },
       ca: {
         badge: "Capta més cites sense dependre d'Instagram",

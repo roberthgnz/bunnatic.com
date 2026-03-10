@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/components/LanguageProvider";
+import Footer from "@/components/Footer";
 import {
   ArrowRight,
   Building2,
@@ -108,10 +109,10 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
                 <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
               </Link>
               <Link
-                href={planHref}
+                href="/crear"
                 className="inline-flex w-full items-center justify-center rounded-full border border-gray-300 px-5 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50 sm:w-auto sm:px-6 sm:text-base"
               >
-                {locale === "es" ? "Ver plan recomendado" : "Veure pla recomanat"}
+                {locale === "es" ? "Probar demo ahora" : "Provar demo"}
               </Link>
             </div>
             <p className="mt-4 text-xs font-medium text-gray-500 sm:mt-5 sm:text-sm">{t.trustLine}</p>
@@ -207,6 +208,8 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
           </div>
         </div>
       </section>
+
+      <Footer />
     </main>
   );
 }

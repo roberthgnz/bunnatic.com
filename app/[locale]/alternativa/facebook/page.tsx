@@ -12,7 +12,7 @@ export default function AlternativeFacebookPage() {
             "Facebook sirve para comunidad, pero no para controlar tu captación. Con una web propia conviertes búsquedas en contactos y ventas.",
           urgencyText: "Cada cambio del algoritmo puede recortar tu alcance sin aviso.",
           ctaPrimary: "Crear cuenta gratis",
-          ctaSecondary: "Probar demo ahora",
+          ctaSecondary: "Probar demo",
           trustLine: "Web propia + SEO local + CTAs directos para transformar visitas en registros.",
           competitorCardTitle: "Solo con Facebook Pages",
           competitorItems: [

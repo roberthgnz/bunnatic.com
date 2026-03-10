@@ -35,7 +35,7 @@ export default function NegocioEsteticasPage() {
           finalTitle: "Haz crecer tus reservas desde la web",
           finalSubtitle: "Regístrate y publica una página pensada para vender tratamientos.",
           ctaPrimary: "Crear cuenta gratis",
-          ctaSecondary: "Probar demo",
+          ctaSecondary: "Probar demo ahora",
         },
         ca: {
           badge: "Més tractaments reservats",

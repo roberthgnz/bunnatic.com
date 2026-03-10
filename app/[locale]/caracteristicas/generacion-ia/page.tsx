@@ -74,7 +74,7 @@ export default function GeneracionIAPage() {
           finalSubtitle:
             "Crea tu cuenta, genera tu web y empieza a captar registros sin depender de terceros.",
           ctaPrimary: "Crear cuenta gratis",
-          ctaSecondary: "Probar demo ahora",
+          ctaSecondary: "Probar demo",
         },
         ca: {
           badge: "La teva web pot estar activa avui",

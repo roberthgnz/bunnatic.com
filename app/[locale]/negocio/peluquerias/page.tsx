@@ -35,7 +35,7 @@ export default function NegocioPeluqueriasPage() {
           finalTitle: "Llena agenda con una web que sí convierte",
           finalSubtitle: "Crea tu cuenta y empieza a captar citas desde hoy.",
           ctaPrimary: "Crear cuenta gratis",
-          ctaSecondary: "Probar demo",
+          ctaSecondary: "Probar demo ahora",
         },
         ca: {
           badge: "Capta més cites sense dependre d'Instagram",

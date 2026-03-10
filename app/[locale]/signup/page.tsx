@@ -14,14 +14,14 @@ import { cn } from "@/lib/utils";
 const signUpContent = {
   es: {
     navbar: {
-      logo: "Nova Web",
+      logo: "Wibloz",
     },
     crear: {
       back: "Volver",
     },
     signup: {
       title: "Crear cuenta",
-      subtitle: "Introduce tus datos para acceder al panel de Nova Web.",
+      subtitle: "Introduce tus datos para acceder al panel de Wibloz.",
       existingAccountText: "Iniciar sesión",
       or: "¿Ya tienes cuenta?",
       nameLabel: "Nombre completo",
@@ -55,14 +55,14 @@ const signUpContent = {
   },
   ca: {
     navbar: {
-      logo: "Nova Web",
+      logo: "Wibloz",
     },
     crear: {
       back: "Tornar",
     },
     signup: {
       title: "Crear compte",
-      subtitle: "Introdueix les teves dades per accedir al panell de Nova Web.",
+      subtitle: "Introdueix les teves dades per accedir al panell de Wibloz.",
       existingAccountText: "Iniciar sessió",
       or: "Ja tens compte?",
       nameLabel: "Nom complet",

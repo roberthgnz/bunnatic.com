@@ -9,7 +9,7 @@ export default function AlternativeWixPage() {
           badge: "Evita empezar desde cero",
           title: "La alternativa a Wix para lanzar más rápido y convertir mejor",
           subtitle:
-            "Con Wix sueles invertir tiempo montando bloques y copiando textos. Con Nova Web partes de una propuesta completa pensada para captar clientes.",
+            "Con Wix sueles invertir tiempo montando bloques y copiando textos. Con Wibloz partes de una propuesta completa pensada para captar clientes.",
           urgencyText: "Si tardas en publicar, también tardas en generar oportunidades.",
           ctaPrimary: "Crear cuenta gratis",
           ctaSecondary: "Probar demo ahora",
@@ -20,7 +20,7 @@ export default function AlternativeWixPage() {
             "La calidad del copy depende de tu tiempo y experiencia.",
             "Más fricción para iterar rápido en campañas.",
           ],
-          novaCardTitle: "Con Nova Web",
+          novaCardTitle: "Con Wibloz",
           novaItems: [
             "La IA genera textos y estructura orientados a conversión.",
             "Publicas rápido sin curva de diseño ni maquetación.",
@@ -71,7 +71,7 @@ export default function AlternativeWixPage() {
           badge: "Evita començar des de zero",
           title: "L'alternativa a Wix per llançar més ràpid i convertir millor",
           subtitle:
-            "Amb Wix sovint inverteixes temps muntant blocs i copiant textos. Amb Nova Web parteixes d'una proposta completa pensada per captar clients.",
+            "Amb Wix sovint inverteixes temps muntant blocs i copiant textos. Amb Wibloz parteixes d'una proposta completa pensada per captar clients.",
           urgencyText: "Si trigues a publicar, també trigues a generar oportunitats.",
           ctaPrimary: "Crear compte gratis",
           ctaSecondary: "Provar demo ara",
@@ -82,7 +82,7 @@ export default function AlternativeWixPage() {
             "La qualitat del copy depèn del teu temps i experiència.",
             "Més fricció per iterar ràpid en campanyes.",
           ],
-          novaCardTitle: "Amb Nova Web",
+          novaCardTitle: "Amb Wibloz",
           novaItems: [
             "La IA genera textos i estructura orientats a conversió.",
             "Publiques ràpid sense corba de disseny ni maquetació.",

@@ -20,7 +20,7 @@ export default function AlternativeFacebookPage() {
             "El cliente se distrae con contenido de terceros.",
             "Información crítica difícil de estructurar para convertir.",
           ],
-          novaCardTitle: "Con Nova Web",
+          novaCardTitle: "Con Wibloz",
           novaItems: [
             "Tu canal es tuyo, sin depender de reglas de una red social.",
             "Página enfocada a llamada, WhatsApp o formulario de contacto.",
@@ -82,7 +82,7 @@ export default function AlternativeFacebookPage() {
             "El client es distreu amb contingut de tercers.",
             "Informació crítica difícil d'estructurar per convertir.",
           ],
-          novaCardTitle: "Amb Nova Web",
+          novaCardTitle: "Amb Wibloz",
           novaItems: [
             "El teu canal és teu, sense dependre de regles d'una xarxa social.",
             "Pàgina enfocada a trucada, WhatsApp o formulari de contacte.",

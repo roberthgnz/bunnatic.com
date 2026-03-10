@@ -20,7 +20,7 @@ export default function AlternativeGoogleMyBusinessPage() {
             "La competencia aparece alrededor de tu ficha.",
             "Poca capacidad de captación con formulario propio.",
           ],
-          novaCardTitle: "Con Nova Web + Google",
+          novaCardTitle: "Con Wibloz + Google",
           novaItems: [
             "Controlas tu narrativa comercial y propuesta de valor.",
             "Conduces el tráfico de la ficha a una landing de conversión.",
@@ -82,7 +82,7 @@ export default function AlternativeGoogleMyBusinessPage() {
             "La competència apareix al voltant de la teva fitxa.",
             "Poca capacitat de captació amb formulari propi.",
           ],
-          novaCardTitle: "Amb Nova Web + Google",
+          novaCardTitle: "Amb Wibloz + Google",
           novaItems: [
             "Controles la teva narrativa comercial i proposta de valor.",
             "Condueixes el trànsit de la fitxa a una landing de conversió.",

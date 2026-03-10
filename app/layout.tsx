@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
-  title: 'Nova Web - Crea tu web con IA',
+  title: 'Wibloz - Crea tu web con IA',
   description:
     'La IA crea tu web usando los datos de tu negocio. Gratis para empezar.',
 };

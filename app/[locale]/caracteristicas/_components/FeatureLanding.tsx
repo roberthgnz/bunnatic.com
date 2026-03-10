@@ -87,7 +87,7 @@ export default function FeatureLanding({ slug, icon, copy }: FeatureLandingProps
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
               <Zap className="h-5 w-5 fill-emerald-600 text-emerald-600" />
             </div>
-            <span className="text-xl font-bold tracking-tight">Nova Web</span>
+            <span className="text-xl font-bold tracking-tight">Wibloz</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link

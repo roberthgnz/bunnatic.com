@@ -10,14 +10,16 @@ import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
 
 type HomePageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     alternative?: string;
     alternativeId?: string;
-  };
+  }>;
 };
 
-export default function Home({ searchParams = {} }: HomePageProps) {
-  const comparisonAlternative = searchParams.alternative ?? searchParams.alternativeId;
+export default async function Home({ searchParams }: HomePageProps) {
+  const resolvedSearchParams = (await searchParams) ?? {};
+  const comparisonAlternative =
+    resolvedSearchParams.alternative ?? resolvedSearchParams.alternativeId;
 
   return (
     <main className="min-h-screen bg-white font-sans text-gray-900 selection:bg-emerald-200 selection:text-emerald-900">

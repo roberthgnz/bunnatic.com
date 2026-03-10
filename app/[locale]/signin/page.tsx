@@ -8,7 +8,7 @@ import { useLanguage } from "@/components/LanguageProvider";
 const signInContent = {
   es: {
     navbar: {
-      logo: "Nova Web",
+      logo: "Wibloz",
     },
     crear: {
       back: "Volver",
@@ -26,7 +26,7 @@ const signInContent = {
   },
   ca: {
     navbar: {
-      logo: "Nova Web",
+      logo: "Wibloz",
     },
     crear: {
       back: "Tornar",

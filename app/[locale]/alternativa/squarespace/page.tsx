@@ -9,7 +9,7 @@ export default function AlternativeSquarespacePage() {
           badge: "Diseño útil para vender, no solo para verse bonito",
           title: "La alternativa a Squarespace para negocios locales",
           subtitle:
-            "Squarespace puede verse bien, pero Nova Web está pensada para rendimiento comercial: mensajes claros, captación y facilidad de edición diaria.",
+            "Squarespace puede verse bien, pero Wibloz está pensada para rendimiento comercial: mensajes claros, captación y facilidad de edición diaria.",
           urgencyText: "Una web bonita sin conversión no impacta en caja.",
           ctaPrimary: "Crear cuenta gratis",
           ctaSecondary: "Ver cómo funciona",
@@ -20,7 +20,7 @@ export default function AlternativeSquarespacePage() {
             "Curva de aprendizaje para que quede realmente optimizado.",
             "Tiempo invertido en diseño en lugar de estrategia comercial.",
           ],
-          novaCardTitle: "Con Nova Web",
+          novaCardTitle: "Con Wibloz",
           novaItems: [
             "Estructura centrada en convertir visitas en contactos.",
             "Editor visual simple para mover campañas rápido.",
@@ -71,7 +71,7 @@ export default function AlternativeSquarespacePage() {
           badge: "Disseny útil per vendre, no només per quedar bonic",
           title: "L'alternativa a Squarespace per negocis locals",
           subtitle:
-            "Squarespace pot veure's bé, però Nova Web està pensada per rendiment comercial: missatges clars, captació i facilitat d'edició diària.",
+            "Squarespace pot veure's bé, però Wibloz està pensada per rendiment comercial: missatges clars, captació i facilitat d'edició diària.",
           urgencyText: "Una web bonica sense conversió no impacta a caixa.",
           ctaPrimary: "Crear compte gratis",
           ctaSecondary: "Veure com funciona",
@@ -82,7 +82,7 @@ export default function AlternativeSquarespacePage() {
             "Corba d'aprenentatge perquè quedi realment optimitzat.",
             "Temps invertit en disseny en lloc d'estratègia comercial.",
           ],
-          novaCardTitle: "Amb Nova Web",
+          novaCardTitle: "Amb Wibloz",
           novaItems: [
             "Estructura centrada a convertir visites en contactes.",
             "Editor visual simple per moure campanyes ràpid.",

@@ -12,18 +12,22 @@ const slugify = (text: string) => {
   return text
     .toLowerCase()
     .replace(/[🍽🍕💆🌿🏋🐾🦷📸🏠⚖]/g, "") // Remove emojis
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .trim()
-    .replace(/\s+/g, "-");
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 };
 
 export default function NegocioPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const { language } = useLanguage();
   const t = content[language];
+  const normalizedSlug = slugify(slug);
   
   // Find the business based on slug
   const business = t.ticker.businesses.find(
-    (b) => slugify(b) === slug
+    (b) => slugify(b) === normalizedSlug
   );
 
   if (!business) {

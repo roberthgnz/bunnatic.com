@@ -14,7 +14,7 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useLanguage } from "./LanguageProvider";
 import { getFeatureSlug } from "@/lib/pageSlugs";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { logout } from "@/lib/supabase/actions";
 import { toast } from "sonner";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
@@ -23,7 +23,15 @@ type NavbarProps = {
   useDemoCta?: boolean;
 };
 
-export default function Navbar({ useDemoCta = false }: NavbarProps) {
+export default function Navbar(props: NavbarProps) {
+  return (
+    <Suspense fallback={<div className="h-16 w-full border-b border-gray-100 bg-white/80" />}>
+      <NavbarContent {...props} />
+    </Suspense>
+  );
+}
+
+function NavbarContent({ useDemoCta = false }: NavbarProps) {
   const { language, setLanguage } = useLanguage();
   const t = content[language];
   const pathname = usePathname() ?? "/";

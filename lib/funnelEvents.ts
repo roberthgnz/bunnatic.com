@@ -1,3 +1,5 @@
+import {hasAnalyticsConsent} from '@/lib/cookieConsent';
+
 export type FunnelEventName =
   | "landing_cta_click"
   | "crear_search_submitted"
@@ -13,7 +15,7 @@ type FunnelPayload = Record<string, string | number | boolean | null | undefined
 
 declare global {
   interface Window {
-    dataLayer?: Array<Record<string, unknown>>;
+    ga?: (...args: unknown[]) => void;
   }
 }
 
@@ -24,7 +26,15 @@ export function trackFunnelEvent(event: FunnelEventName, payload: FunnelPayload 
 
   const data = { event, ...payload };
   window.dispatchEvent(new CustomEvent("funnel:event", { detail: data }));
-  if (Array.isArray(window.dataLayer)) {
-    window.dataLayer.push(data);
+
+  if (hasAnalyticsConsent() && typeof window.ga === "function") {
+    const eventValue =
+      typeof payload.value === "number"
+        ? payload.value
+        : typeof payload.revenue === "number"
+          ? payload.revenue
+          : undefined;
+
+    window.ga("send", "event", "funnel", event, JSON.stringify(payload), eventValue);
   }
 }

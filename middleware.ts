@@ -19,6 +19,20 @@ import {routing} from './i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
+function copyResponseCookies(source: NextResponse, target: NextResponse) {
+  source.cookies.getAll().forEach(cookie => {
+    target.cookies.set(cookie.name, cookie.value, {
+      domain: cookie.domain,
+      path: cookie.path,
+      expires: cookie.expires,
+      maxAge: cookie.maxAge,
+      httpOnly: cookie.httpOnly,
+      sameSite: cookie.sameSite,
+      secure: cookie.secure,
+    });
+  });
+}
+
 function getLocaleFromPath(pathname: string): Locale {
   if (pathname === '/ca' || pathname.startsWith('/ca/')) {
     return 'ca';
@@ -125,10 +139,7 @@ export default async function middleware(request: NextRequest) {
     const url = new URL(request.url);
     url.pathname = redirectPath;
     const response = NextResponse.redirect(url);
-    // Copy cookies from supabaseResponse to the redirect response
-    supabaseResponse.cookies.getAll().forEach(cookie => {
-      response.cookies.set(cookie.name, cookie.value, cookie.options);
-    });
+    copyResponseCookies(supabaseResponse, response);
     return response;
   }
 
@@ -137,19 +148,13 @@ export default async function middleware(request: NextRequest) {
     const url = new URL(request.url);
     url.pathname = rewritePath;
     const response = NextResponse.rewrite(url);
-    // Copy cookies from supabaseResponse to the rewrite response
-    supabaseResponse.cookies.getAll().forEach(cookie => {
-      response.cookies.set(cookie.name, cookie.value, cookie.options);
-    });
+    copyResponseCookies(supabaseResponse, response);
     return response;
   }
 
   // Handle intl middleware
   const response = intlMiddleware(request);
-  // Copy cookies from supabaseResponse to the intl response
-  supabaseResponse.cookies.getAll().forEach(cookie => {
-    response.cookies.set(cookie.name, cookie.value, cookie.options);
-  });
+  copyResponseCookies(supabaseResponse, response);
   return response;
 }
 

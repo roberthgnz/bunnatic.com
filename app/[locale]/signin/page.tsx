@@ -7,7 +7,7 @@ import { useLanguage } from "@/components/LanguageProvider";
 import { login } from "@/lib/supabase/actions";
 import { toast } from "sonner";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 
 const signInContent = {
   es: {
@@ -49,6 +49,14 @@ const signInContent = {
 } as const;
 
 export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+      <SignInContent />
+    </Suspense>
+  );
+}
+
+function SignInContent() {
   const { language } = useLanguage();
   const t = signInContent[language];
   const router = useRouter();

@@ -13,6 +13,8 @@ export default function HowItWorks() {
     (a, b) => Number(a.number) - Number(b.number),
   );
   const stepAccent = ["bg-emerald-500", "bg-violet-500", "bg-blue-500"];
+  const easeOut = [0.16, 1, 0.3, 1] as const;
+  const easeInOut = [0.4, 0, 0.2, 1] as const;
 
   const stepCardVariants = {
     rest: {
@@ -33,7 +35,7 @@ export default function HowItWorks() {
     hover: {
       opacity: 1,
       scale: 1.01,
-      transition: { duration: 0.25, ease: "easeOut" },
+      transition: { duration: 0.25, ease: easeOut },
     },
   };
 
@@ -42,7 +44,7 @@ export default function HowItWorks() {
     hover: {
       opacity: 1,
       scale: 1.01,
-      transition: { duration: 0.3, ease: "easeOut" },
+      transition: { duration: 0.3, ease: easeOut },
     },
   };
 
@@ -56,7 +58,7 @@ export default function HowItWorks() {
       opacity: 1,
       maxHeight: "48px",
       marginTop: "12px",
-      transition: { duration: 0.35, ease: "easeOut" },
+      transition: { duration: 0.35, ease: easeOut },
     },
   };
 
@@ -67,7 +69,7 @@ export default function HowItWorks() {
       transition: {
         delay: index * 0.08,
         duration: 0.3,
-        ease: "easeOut",
+        ease: easeOut,
       },
     }),
   };
@@ -82,7 +84,7 @@ export default function HowItWorks() {
       opacity: 1,
       maxHeight: "44px",
       marginTop: "16px",
-      transition: { duration: 0.35, ease: "easeOut" },
+      transition: { duration: 0.35, ease: easeOut },
     },
   };
 
@@ -96,7 +98,7 @@ export default function HowItWorks() {
       opacity: 1,
       maxHeight: "130px",
       marginTop: "12px",
-      transition: { duration: 0.35, ease: "easeOut" },
+      transition: { duration: 0.35, ease: easeOut },
     },
   };
 
@@ -105,7 +107,7 @@ export default function HowItWorks() {
     hover: {
       scaleX: 1,
       transformOrigin: "left",
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: { duration: 0.5, ease: easeOut },
     },
   };
 
@@ -114,7 +116,7 @@ export default function HowItWorks() {
     hover: {
       scale: [1, 1.05, 1],
       opacity: [1, 0.95, 1],
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: { duration: 0.5, ease: easeOut },
     },
   };
 
@@ -142,7 +144,7 @@ export default function HowItWorks() {
                 transition={{
                   duration: 0.45,
                   delay: index * 0.12,
-                  ease: "easeOut",
+                  ease: easeOut,
                 }}
                 className="overflow-hidden rounded-3xl"
               >
@@ -239,7 +241,7 @@ export default function HowItWorks() {
                                             rotate: [0, 180, 360],
                                             transition: {
                                               duration: 1,
-                                              ease: "easeInOut",
+                                              ease: easeInOut,
                                             },
                                           },
                                         }}

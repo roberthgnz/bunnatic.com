@@ -2,6 +2,7 @@ import {NextIntlClientProvider, hasLocale} from 'next-intl';
 import {setRequestLocale} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {LanguageProvider} from '@/components/LanguageProvider';
+import {CookieConsent} from '@/components/CookieConsent';
 import {routing} from '@/i18n/routing';
 
 export function generateStaticParams() {
@@ -25,7 +26,10 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale}>
-      <LanguageProvider>{children}</LanguageProvider>
+      <LanguageProvider>
+        {children}
+        <CookieConsent />
+      </LanguageProvider>
     </NextIntlClientProvider>
   );
 }

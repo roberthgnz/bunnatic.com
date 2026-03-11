@@ -6,10 +6,18 @@ import { useLanguage } from "@/components/LanguageProvider";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { Suspense, useEffect, useMemo } from "react";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
 
 export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+      <CheckoutContent />
+    </Suspense>
+  );
+}
+
+function CheckoutContent() {
   const { language } = useLanguage();
   const searchParams = useSearchParams();
   const pathname = usePathname() ?? "/";

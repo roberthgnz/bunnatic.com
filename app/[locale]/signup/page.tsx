@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, CircleCheck, Eye, EyeOff, MapPin, Sparkles, Zap } from "lucide-react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { createSignupSchema, type SignupFormValues } from "@/lib/validations/signup";
@@ -110,6 +110,14 @@ function normalizeInternalPath(path: string) {
 }
 
 export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+      <SignUpContent />
+    </Suspense>
+  );
+}
+
+function SignUpContent() {
   const { language } = useLanguage();
   const t = signUpContent[language];
   const router = useRouter();

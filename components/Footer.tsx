@@ -5,6 +5,7 @@ import { Zap } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useLanguage } from "./LanguageProvider";
 import { getAlternativeSlug, getFeatureSlug, getLegalSlug } from "@/lib/pageSlugs";
+import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
 
 export default function Footer() {
   const { language } = useLanguage();
@@ -84,6 +85,7 @@ export default function Footer() {
           <div className="text-sm font-medium text-gray-500">
             {t.footer.copyright}
           </div>
+          <CookiePreferencesButton />
         </div>
       </div>
     </footer>

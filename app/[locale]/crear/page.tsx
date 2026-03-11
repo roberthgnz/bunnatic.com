@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import { Zap, Search, MapPin, Star, Phone, Globe, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -100,6 +100,14 @@ const createPageContent = {
 } as const;
 
 export default function CreateWebPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <CreateWebContent />
+    </Suspense>
+  );
+}
+
+function CreateWebContent() {
   const { language } = useLanguage();
   const pageSearchParams = useSearchParams();
   const t = createPageContent[language];

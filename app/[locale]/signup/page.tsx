@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
 
 import { createClient } from "@/lib/supabase/client";
+import { routing } from "@/i18n/routing";
 
 const GoogleLogo = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
@@ -148,9 +149,8 @@ function SignUpContent() {
   const [showPassword, setShowPassword] = useState(false);
 
   const localePrefix = useMemo(() => {
-    const locale = pathname.split("/")[1];
-    return locale ? `/${locale}` : "";
-  }, [pathname]);
+    return language === routing.defaultLocale ? "" : `/${language}`;
+  }, [language]);
   const homeHref = localePrefix || "/";
 
   const flow = useMemo(() => {
@@ -183,12 +183,12 @@ function SignUpContent() {
 
     const serialized = targetQuery.toString();
     const targetWithQuery = `${safeTargetPath}${serialized ? `?${serialized}` : ""}`;
-    const destination = targetWithQuery.startsWith(`/${pathname.split("/")[1]}/`)
+    const destination = targetWithQuery.startsWith(`/${language}/`)
       ? targetWithQuery
       : `${localePrefix}${targetWithQuery}`;
 
     return { destination, safeTargetPath, plan, source };
-  }, [localePrefix, pathname, searchParams]);
+  }, [localePrefix, language, searchParams]);
 
   const signinHref = useMemo(() => {
     const params = new URLSearchParams(searchParams.toString());

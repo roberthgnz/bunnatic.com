@@ -6,6 +6,9 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  // Track cookies to ensure they persist across multiple setAll calls if Supabase splits them
+  const cookiesToSetOnResponse: { name: string; value: string; options: any }[] = []
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -15,11 +18,19 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
+          // Accumulate cookies
+          cookiesToSet.forEach((cookie) => {
+            cookiesToSetOnResponse.push(cookie)
+          })
+
           cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          
           supabaseResponse = NextResponse.next({
             request,
           })
-          cookiesToSet.forEach(({ name, value, options }) =>
+          
+          // Apply ALL accumulated cookies
+          cookiesToSetOnResponse.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
         },

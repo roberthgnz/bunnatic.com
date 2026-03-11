@@ -8,11 +8,35 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { createSignupSchema, type SignupFormValues } from "@/lib/validations/signup";
 import { cn } from "@/lib/utils";
 import { signup } from "@/lib/supabase/actions";
 import { toast } from "sonner";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
+
+import { createClient } from "@/lib/supabase/client";
+
+const GoogleLogo = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+    <path
+      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+      fill="#4285F4"
+    />
+    <path
+      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+      fill="#34A853"
+    />
+    <path
+      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+      fill="#FBBC05"
+    />
+    <path
+      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+      fill="#EA4335"
+    />
+  </svg>
+);
 
 const signUpContent = {
   es: {
@@ -24,7 +48,7 @@ const signUpContent = {
     },
     signup: {
       title: "Crear cuenta",
-      subtitle: "Introduce tus datos para acceder al panel de Bunnatic.",
+      subtitle: "Empieza a gestionar tu negocio online.",
       existingAccountText: "Iniciar sesión",
       or: "¿Ya tienes cuenta?",
       nameLabel: "Nombre completo",
@@ -32,27 +56,26 @@ const signUpContent = {
       passwordLabel: "Contraseña",
       showPassword: "Mostrar contraseña",
       hidePassword: "Ocultar contraseña",
-      nameHint: "Nombre y apellidos del titular de la cuenta.",
-      emailHint: "Usaremos este correo para acceso y notificaciones clave.",
-      passwordHint: "Mínimo 8 caracteres con mayúscula, minúscula y número.",
-      signupButton: "Crear cuenta y continuar",
-      signupButtonLoading: "Creando cuenta...",
-      securityNote: "Tus datos viajan cifrados y se procesan de forma segura.",
-      trust1: "Acceso seguro",
-      trust2: "Validación en tiempo real",
-      trust3: "Configuración guiada",
+      nameHint: "Tu nombre real.",
+      emailHint: "Para notificaciones importantes.",
+      passwordHint: "8+ caracteres, mayúscula y número.",
+      signupButton: "Crear cuenta",
+      signupButtonLoading: "Creando...",
+      securityNote: "Datos seguros y cifrados.",
       stepBadge: "Registro",
+      socialGoogle: "Continuar con Google",
+      orDivider: "O regístrate con correo",
       validation: {
-        nameRequired: "El nombre es obligatorio.",
-        nameMin: "El nombre debe tener al menos 2 caracteres.",
-        nameMax: "El nombre no puede superar 80 caracteres.",
-        emailRequired: "El correo es obligatorio.",
-        emailInvalid: "Introduce un correo válido.",
-        passwordRequired: "La contraseña es obligatoria.",
-        passwordMin: "Debe tener al menos 8 caracteres.",
-        passwordUppercase: "Incluye al menos una mayúscula.",
-        passwordLowercase: "Incluye al menos una minúscula.",
-        passwordNumber: "Incluye al menos un número.",
+        nameRequired: "Requerido",
+        nameMin: "Mínimo 2 caracteres",
+        nameMax: "Máximo 80 caracteres",
+        emailRequired: "Requerido",
+        emailInvalid: "Correo inválido",
+        passwordRequired: "Requerida",
+        passwordMin: "Mínimo 8 caracteres",
+        passwordUppercase: "Falta mayúscula",
+        passwordLowercase: "Falta minúscula",
+        passwordNumber: "Falta número",
       },
     },
   },
@@ -65,7 +88,7 @@ const signUpContent = {
     },
     signup: {
       title: "Crear compte",
-      subtitle: "Introdueix les teves dades per accedir al panell de Bunnatic.",
+      subtitle: "Comença a gestionar el teu negoci online.",
       existingAccountText: "Iniciar sessió",
       or: "Ja tens compte?",
       nameLabel: "Nom complet",
@@ -73,27 +96,26 @@ const signUpContent = {
       passwordLabel: "Contrasenya",
       showPassword: "Mostra la contrasenya",
       hidePassword: "Amaga la contrasenya",
-      nameHint: "Nom i cognoms del titular del compte.",
-      emailHint: "Farem servir aquest correu per accés i notificacions clau.",
-      passwordHint: "Mínim 8 caràcters amb majúscula, minúscula i número.",
-      signupButton: "Crear compte i continuar",
-      signupButtonLoading: "Creant compte...",
-      securityNote: "Les teves dades viatgen xifrades i es processen de forma segura.",
-      trust1: "Accés segur",
-      trust2: "Validació en temps real",
-      trust3: "Configuració guiada",
+      nameHint: "El teu nom real.",
+      emailHint: "Per notificacions importants.",
+      passwordHint: "8+ caràcters, majúscula i número.",
+      signupButton: "Crear compte",
+      signupButtonLoading: "Creant...",
+      securityNote: "Dades segures i xifrades.",
       stepBadge: "Registre",
+      socialGoogle: "Continua amb Google",
+      orDivider: "O registra't amb correu",
       validation: {
-        nameRequired: "El nom és obligatori.",
-        nameMin: "El nom ha de tenir almenys 2 caràcters.",
-        nameMax: "El nom no pot superar 80 caràcters.",
-        emailRequired: "El correu és obligatori.",
-        emailInvalid: "Introdueix un correu vàlid.",
-        passwordRequired: "La contrasenya és obligatòria.",
-        passwordMin: "Ha de tenir almenys 8 caràcters.",
-        passwordUppercase: "Inclou almenys una majúscula.",
-        passwordLowercase: "Inclou almenys una minúscula.",
-        passwordNumber: "Inclou almenys un número.",
+        nameRequired: "Requerit",
+        nameMin: "Mínim 2 caràcters",
+        nameMax: "Màxim 80 caràcters",
+        emailRequired: "Requerit",
+        emailInvalid: "Correu invàlid",
+        passwordRequired: "Requerida",
+        passwordMin: "Mínim 8 caràcters",
+        passwordUppercase: "Falta majúscula",
+        passwordLowercase: "Falta minúscula",
+        passwordNumber: "Falta número",
       },
     },
   },
@@ -229,168 +251,193 @@ function SignUpContent() {
     }
   }
 
+  const handleSocialLogin = async () => {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(flow.destination)}`,
+      },
+    });
+
+    if (error) {
+      toast.error(error.message);
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-slate-100 font-sans text-gray-900 flex flex-col">
-      <nav className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href={homeHref} className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
-              <Zap className="h-5 w-5 fill-emerald-600 text-emerald-600" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-gray-900">{t.navbar.logo}</span>
-          </Link>
-          <Link href={homeHref} className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900">
-            <ArrowLeft className="h-4 w-4" />
-            {t.crear.back}
-          </Link>
-        </div>
-      </nav>
+    <main className="min-h-screen bg-slate-50 font-sans text-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <Link href={homeHref} className="flex items-center justify-center gap-2 mb-6">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 shadow-sm">
+            <Zap className="h-6 w-6 fill-emerald-600 text-emerald-600" />
+          </div>
+          <span className="text-2xl font-bold tracking-tight text-gray-900">{t.navbar.logo}</span>
+        </Link>
+        
+        <h2 className="mt-2 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+          {t.signup.title}
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600 max-w-sm mx-auto">
+          {t.signup.subtitle}
+        </p>
+      </div>
 
-      <div className="flex-1 px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto grid w-full max-w-2xl gap-6">
-          <div className="space-y-8 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            <div className="text-center lg:text-left">
-              <span className="inline-flex items-center rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-100">
-                {t.signup.stepBadge}
-              </span>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight text-gray-900">
-                {t.signup.title}
-              </h2>
-              <p className="mt-2 text-sm text-gray-600">{t.signup.subtitle}</p>
-              <p className="mt-2 text-sm text-gray-600">
-                {t.signup.or}{" "}
-                <Link href={signinHref} className="font-medium text-emerald-600 hover:text-emerald-500">
-                  {t.signup.existingAccountText}
-                </Link>
-              </p>
-            </div>
-
-            <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label htmlFor="name" className="text-sm font-medium text-gray-800">{t.signup.nameLabel}</label>
-                  <input
-                    id="name"
-                    type="text"
-                    autoComplete="name"
-                    {...register("name")}
-                    className={cn(
-                      "block w-full rounded-xl border px-3 py-3 text-gray-900 placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40 sm:text-sm",
-                      errors.name ? "border-rose-400 bg-rose-50/40" : "border-gray-300 bg-white"
-                    )}
-                    placeholder={t.signup.nameLabel}
-                    aria-invalid={Boolean(errors.name)}
-                    aria-describedby="name-help name-error"
-                  />
-                  <p id="name-help" className="text-xs text-gray-500">{t.signup.nameHint}</p>
-                  {errors.name ? <p id="name-error" className="text-xs font-medium text-rose-600">{errors.name.message}</p> : null}
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="email-address" className="text-sm font-medium text-gray-800">{t.signup.emailLabel}</label>
-                  <input
-                    id="email-address"
-                    type="email"
-                    autoComplete="email"
-                    {...register("email")}
-                    className={cn(
-                      "block w-full rounded-xl border px-3 py-3 text-gray-900 placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40 sm:text-sm",
-                      errors.email ? "border-rose-400 bg-rose-50/40" : "border-gray-300 bg-white"
-                    )}
-                    placeholder={t.signup.emailLabel}
-                    aria-invalid={Boolean(errors.email)}
-                    aria-describedby="email-help email-error"
-                  />
-                  <p id="email-help" className="text-xs text-gray-500">{t.signup.emailHint}</p>
-                  {errors.email ? <p id="email-error" className="text-xs font-medium text-rose-600">{errors.email.message}</p> : null}
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="password" className="text-sm font-medium text-gray-800">{t.signup.passwordLabel}</label>
-                  <div className="relative">
-                    <input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      autoComplete="new-password"
-                      {...register("password")}
-                      className={cn(
-                        "block w-full rounded-xl border px-3 py-3 pr-11 text-gray-900 placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40 sm:text-sm",
-                        errors.password ? "border-rose-400 bg-rose-50/40" : "border-gray-300 bg-white"
-                      )}
-                      placeholder={t.signup.passwordLabel}
-                      aria-invalid={Boolean(errors.password)}
-                      aria-describedby="password-help password-error"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-500 hover:text-gray-700"
-                      aria-label={showPassword ? t.signup.hidePassword : t.signup.showPassword}
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                  <p id="password-help" className="text-xs text-gray-500">{t.signup.passwordHint}</p>
-                  <div className="grid gap-1 sm:grid-cols-2">
-                    {passwordChecks.map((rule) => (
-                      <p
-                        key={rule.label}
-                        className={cn("text-xs", rule.valid ? "text-emerald-700" : "text-gray-500")}
-                      >
-                        {rule.valid ? "✓" : "○"} {rule.label}
-                      </p>
-                    ))}
-                  </div>
-                  {errors.password ? <p id="password-error" className="text-xs font-medium text-rose-600">{errors.password.message}</p> : null}
-                </div>
-              </div>
-
-              <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600 ring-1 ring-slate-200">
-                {t.signup.securityNote}
-              </div>
-
-              {CONTEXT_KEYS.map((key) => {
-                const value = searchParams.get(key);
-                if (!value) {
-                  return null;
-                }
-                return <input key={key} type="hidden" name={key} value={value} />;
-              })}
-
-              <div>
-                <Button
-                  variant="default"
-                  type="submit"
-                  disabled={!isValid || isSubmitting}
-                  className={cn(
-                    "group relative flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-bold text-white transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2",
-                    !isValid || isSubmitting
-                      ? "cursor-not-allowed bg-emerald-300"
-                      : "bg-emerald-500 hover:bg-emerald-400"
-                  )}
-                >
-                  {isSubmitting ? t.signup.signupButtonLoading : t.signup.signupButton}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="flex flex-wrap gap-3 text-xs text-gray-600">
-                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 ring-1 ring-emerald-100">
-                  <CircleCheck className="h-3.5 w-3.5 text-emerald-600" />
-                  {t.signup.trust1}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 ring-1 ring-emerald-100">
-                  <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
-                  {t.signup.trust2}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 ring-1 ring-emerald-100">
-                  <MapPin className="h-3.5 w-3.5 text-emerald-600" />
-                  {t.signup.trust3}
-                </span>
-              </div>
-            </form>
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[420px]">
+        <div className="bg-white px-6 py-8 shadow-xl shadow-slate-200/40 sm:rounded-3xl sm:px-10 border border-slate-100">
+          
+          <div className="mb-8">
+            <Button
+              variant="outline"
+              type="button"
+              className="w-full h-12 gap-3 text-base font-medium text-slate-700 hover:bg-slate-50 border-slate-200 rounded-xl transition-all hover:border-slate-300"
+              onClick={handleSocialLogin}
+            >
+              <GoogleLogo />
+              {t.signup.socialGoogle}
+            </Button>
           </div>
 
+          <div className="relative mb-8">
+            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+              <div className="w-full border-t border-slate-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-3 text-slate-400 font-medium tracking-wide">
+                {t.signup.orDivider}
+              </span>
+            </div>
+          </div>
+
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="text-sm font-medium text-gray-900 ml-1">{t.signup.nameLabel}</label>
+                <Input
+                  id="name"
+                  type="text"
+                  autoComplete="name"
+                  {...register("name")}
+                  className={cn(
+                    "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 transition-all focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
+                    errors.name ? "border-rose-300 focus:border-rose-300 focus:ring-rose-500/20" : "focus:border-emerald-500"
+                  )}
+                  placeholder={t.signup.nameLabel}
+                  aria-invalid={Boolean(errors.name)}
+                />
+                {errors.name ? <p className="text-xs font-medium text-rose-600 ml-1">{errors.name.message}</p> : null}
+              </div>
+              
+              <div className="space-y-1.5">
+                <label htmlFor="email-address" className="text-sm font-medium text-gray-900 ml-1">{t.signup.emailLabel}</label>
+                <Input
+                  id="email-address"
+                  type="email"
+                  autoComplete="email"
+                  {...register("email")}
+                  className={cn(
+                    "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 transition-all focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
+                    errors.email ? "border-rose-300 focus:border-rose-300 focus:ring-rose-500/20" : "focus:border-emerald-500"
+                  )}
+                  placeholder={t.signup.emailLabel}
+                  aria-invalid={Boolean(errors.email)}
+                />
+                {errors.email ? <p className="text-xs font-medium text-rose-600 ml-1">{errors.email.message}</p> : null}
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="password" className="text-sm font-medium text-gray-900 ml-1">{t.signup.passwordLabel}</label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    {...register("password")}
+                    className={cn(
+                      "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 pr-11 transition-all focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
+                      errors.password ? "border-rose-300 focus:border-rose-300 focus:ring-rose-500/20" : "focus:border-emerald-500"
+                    )}
+                    placeholder={t.signup.passwordLabel}
+                    aria-invalid={Boolean(errors.password)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600 hover:bg-transparent"
+                    aria-label={showPassword ? t.signup.hidePassword : t.signup.showPassword}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+                
+                <div className="grid gap-x-4 gap-y-1 grid-cols-2 pt-1 px-1">
+                  {passwordChecks.map((rule) => (
+                    <div
+                      key={rule.label}
+                      className={cn(
+                        "flex items-center gap-1.5 text-[10px] transition-colors duration-200",
+                        rule.valid ? "text-emerald-600 font-medium" : "text-gray-400"
+                      )}
+                    >
+                      <div className={cn(
+                        "h-1 w-1 rounded-full transition-all duration-200",
+                        rule.valid ? "bg-emerald-500" : "bg-gray-300"
+                      )} />
+                      {rule.label}
+                    </div>
+                  ))}
+                </div>
+                {errors.password ? <p className="text-xs font-medium text-rose-600 ml-1">{errors.password.message}</p> : null}
+              </div>
+            </div>
+
+            {CONTEXT_KEYS.map((key) => {
+              const value = searchParams.get(key);
+              if (!value) {
+                return null;
+              }
+              return <input key={key} type="hidden" name={key} value={value} />;
+            })}
+
+            <div className="pt-2">
+              <Button
+                variant="default"
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                className={cn(
+                  "group relative flex w-full h-12 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:-translate-y-0.5",
+                  !isValid || isSubmitting
+                    ? "cursor-not-allowed bg-emerald-300 shadow-none hover:translate-y-0"
+                    : "bg-emerald-500 hover:bg-emerald-400"
+                )}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    {t.signup.signupButtonLoading}
+                  </div>
+                ) : (
+                  <>
+                    {t.signup.signupButton}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            <p className="text-center text-xs text-slate-500 mt-4">
+              {t.signup.securityNote}
+            </p>
+          </form>
+
+          <p className="mt-8 text-center text-sm text-gray-500">
+            {t.signup.or}{" "}
+            <Link href={signinHref} className="font-semibold text-emerald-600 hover:text-emerald-500 hover:underline underline-offset-4">
+              {t.signup.existingAccountText}
+            </Link>
+          </p>
         </div>
       </div>
     </main>

@@ -376,39 +376,39 @@ function CreateWebContent() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={t.crear.searchPlaceholder}
-                    className="w-full rounded-full border-2 border-gray-200 py-4 pl-12 pr-20 text-lg focus:border-emerald-500 focus:outline-none focus:ring-0 shadow-sm transition-colors"
+                    className="w-full rounded-full border-2 border-gray-200 py-3 sm:py-4 pl-10 sm:pl-12 pr-14 sm:pr-20 text-base sm:text-lg focus:border-emerald-500 focus:outline-none focus:ring-0 shadow-sm transition-colors"
                   />
                   <Button
                     type="submit"
                     variant="default"
                     disabled={isSearching || !query.trim()}
                     aria-label={t.crear.searchButton}
-                    className="absolute right-2 h-12 w-12 rounded-full bg-gray-900 p-0 text-white transition-all hover:scale-105 hover:bg-gray-800 disabled:opacity-50"
+                    className="absolute right-2 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gray-900 p-0 text-white transition-all hover:scale-105 hover:bg-gray-800 disabled:opacity-50"
                   >
-                    {isSearching ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
+                    {isSearching ? <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" /> : <Search className="h-4 w-4 sm:h-5 sm:w-5" />}
                   </Button>
                 </div>
               </form>
 
               {places.length > 0 && (
-                <div className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-gray-200">
-                  <h3 className="mb-4 px-4 text-sm font-bold uppercase tracking-wider text-gray-500">
+                <div className="rounded-3xl bg-white p-3 sm:p-4 shadow-sm ring-1 ring-gray-200">
+                  <h3 className="mb-3 sm:mb-4 px-2 sm:px-4 text-xs sm:text-sm font-bold uppercase tracking-wider text-gray-500">
                     {t.crear.resultsTitle}
                   </h3>
                   <div className="space-y-2">
                     {places.map((place) => (
                       <button
                         type="button"
-                        className="flex w-full items-start gap-4 rounded-2xl p-4 text-left transition-colors hover:bg-gray-50 focus:bg-emerald-50 focus:outline-none"
+                        className="flex w-full items-start gap-3 sm:gap-4 rounded-2xl p-3 sm:p-4 text-left transition-colors hover:bg-gray-50 focus:bg-emerald-50 focus:outline-none active:bg-gray-100"
                         key={place.place_id}
                         onClick={() => handleSelectPlace(place)}
                       >
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                          <MapPin className="h-6 w-6" />
+                        <div className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                          <MapPin className="h-5 w-5 sm:h-6 sm:w-6" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h4 className="break-words text-lg font-bold leading-tight text-gray-900">{place.name}</h4>
-                          <p className="mt-1 break-words text-sm text-gray-500">{place.formatted_address}</p>
+                          <h4 className="break-words text-base sm:text-lg font-bold leading-tight text-gray-900">{place.name}</h4>
+                          <p className="mt-1 break-words text-xs sm:text-sm text-gray-500">{place.formatted_address}</p>
                           {place.rating && (
                             <div className="mt-2 flex flex-wrap items-center gap-1 text-sm font-medium text-amber-600">
                               <Star className="h-4 w-4 flex-shrink-0 fill-amber-500 text-amber-500" />
@@ -433,14 +433,14 @@ function CreateWebContent() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.05 }}
-              className="flex flex-col items-center justify-center py-20 text-center"
+              className="flex flex-col items-center justify-center py-10 sm:py-20 text-center px-4"
             >
-              <div className="relative flex h-32 w-32 items-center justify-center">
+              <div className="relative flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center">
                 <div className="absolute inset-0 animate-ping rounded-full bg-emerald-200 opacity-20" />
                 <div className="absolute inset-4 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
-                <Zap className="h-10 w-10 text-emerald-600" />
+                <Zap className="h-8 w-8 sm:h-10 sm:w-10 text-emerald-600" />
               </div>
-              <h2 className="mt-8 text-3xl font-extrabold text-gray-900">
+              <h2 className="mt-6 sm:mt-8 text-2xl sm:text-3xl font-extrabold text-gray-900">
                 {t.crear.analyzingTitle}
               </h2>
               <p className="mt-4 text-lg text-gray-600 max-w-md">
@@ -488,9 +488,9 @@ function CreateWebContent() {
               className="grid gap-8 lg:grid-cols-3"
             >
               {/* Sidebar / Info extracted */}
-              <div className="space-y-6 lg:col-span-1">
-                <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-                  <div className="mb-6 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-emerald-600">
+              <div className="space-y-4 sm:space-y-6 lg:col-span-1">
+                <div className="rounded-3xl bg-white p-4 sm:p-6 shadow-sm ring-1 ring-gray-200">
+                  <div className="mb-4 sm:mb-6 flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-600">
                     <CheckCircle2 className="h-5 w-5" />
                     {t.crear.extractedData}
                   </div>
@@ -563,38 +563,40 @@ function CreateWebContent() {
 
               {/* Preview Area */}
               <div className="lg:col-span-2">
-                <div className="mb-3 px-1 text-xs text-slate-500">
+                <div className="mb-2 sm:mb-3 px-1 text-xs text-slate-500">
                   {t.crear.minimalistNote}
                 </div>
-                <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl">
+                <div className="overflow-hidden rounded-2xl sm:rounded-3xl border border-gray-200 bg-white shadow-xl">
                   {/* Browser Chrome */}
-                  <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-4 py-3">
+                  <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-3 py-2 sm:px-4 sm:py-3">
                     <div className="flex gap-1.5">
-                      <div className="h-3 w-3 rounded-full bg-red-400" />
-                      <div className="h-3 w-3 rounded-full bg-amber-400" />
-                      <div className="h-3 w-3 rounded-full bg-emerald-400" />
+                      <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-400" />
+                      <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-amber-400" />
+                      <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-emerald-400" />
                     </div>
-                    <div className="ml-4 flex-1 rounded-md bg-white px-3 py-1 text-xs text-gray-400 shadow-sm flex items-center gap-2">
-                      <Globe className="h-3 w-3" />
-                      {placeDetails.name.toLowerCase().replace(/\s+/g, '')}.bunnatic.com
+                    <div className="ml-2 sm:ml-4 flex-1 rounded-md bg-white px-2 py-1 sm:px-3 text-[10px] sm:text-xs text-gray-400 shadow-sm flex items-center gap-2 truncate">
+                      <Globe className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">
+                        {placeDetails.name.toLowerCase().replace(/\s+/g, '')}.bunnatic.com
+                      </span>
                     </div>
                   </div>
                   
                   {/* Generated Site Preview */}
-                  <div className="h-[600px] overflow-y-auto bg-white">
+                  <div className="h-[500px] sm:h-[600px] overflow-y-auto bg-white overscroll-contain">
                     {/* Hero Section */}
-                    <div className="relative bg-slate-900 px-8 py-20 text-center text-white">
+                    <div className="relative bg-slate-900 px-4 py-12 sm:px-8 sm:py-20 text-center text-white">
                       <div className="absolute inset-0 opacity-20 bg-[url('https://picsum.photos/seed/business/1200/800')] bg-cover bg-center" />
                       <div className="absolute inset-0 bg-slate-900/60" />
                       <div className="relative z-10">
-                        <h1 className="text-4xl font-extrabold sm:text-5xl">{placeDetails.name}</h1>
-                        <p className="mt-4 text-lg text-gray-300 max-w-xl mx-auto">
+                        <h1 className="text-3xl sm:text-4xl font-extrabold lg:text-5xl">{placeDetails.name}</h1>
+                        <p className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-300 max-w-xl mx-auto">
                           {placeDetails.types?.[0] ? t.crear.heroSubtitle.replace('{type}', placeDetails.types[0].replace(/_/g, ' ')) : t.crear.heroFallback}
                         </p>
                         <Button
                           type="button"
                           variant="default"
-                          className="mt-8 rounded-full bg-emerald-500 px-8 py-3 font-bold text-white"
+                          className="mt-6 sm:mt-8 rounded-full bg-emerald-500 px-6 py-2 sm:px-8 sm:py-3 text-sm sm:text-base font-bold text-white"
                         >
                           {t.crear.contactNow}
                         </Button>
@@ -602,16 +604,16 @@ function CreateWebContent() {
                     </div>
 
                     {/* Info Section */}
-                    <div className="px-8 py-16">
+                    <div className="px-4 py-10 sm:px-8 sm:py-16">
                       <div className="grid gap-8 sm:grid-cols-2">
                         <div>
-                          <h3 className="text-2xl font-bold text-gray-900">{t.crear.aboutUs}</h3>
-                          <p className="mt-4 text-gray-600 leading-relaxed">
+                          <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{t.crear.aboutUs}</h3>
+                          <p className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600 leading-relaxed">
                             {aboutText}
                           </p>
                         </div>
-                        <div className="rounded-2xl bg-slate-50 p-6">
-                          <h4 className="font-bold text-gray-900 mb-4">{t.crear.contactInfo}</h4>
+                        <div className="rounded-2xl bg-slate-50 p-4 sm:p-6">
+                          <h4 className="font-bold text-gray-900 mb-3 sm:mb-4">{t.crear.contactInfo}</h4>
                           <div className="space-y-3 text-sm text-gray-600">
                             <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-emerald-500" /> {placeDetails.formatted_address}</p>
                             {placeDetails.formatted_phone_number && (
@@ -643,15 +645,15 @@ function CreateWebContent() {
 
                     {/* Services Section */}
                     {hasDetectedServices && (
-                      <div className="px-8 py-14 border-t border-gray-100">
+                      <div className="px-4 py-10 sm:px-8 sm:py-14 border-t border-gray-100">
                         <div className="mx-auto max-w-4xl">
-                          <h3 className="text-2xl font-bold text-gray-900 text-center">{t.crear.servicesTitle}</h3>
+                          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 text-center">{t.crear.servicesTitle}</h3>
                           <p className="mt-2 text-center text-sm text-gray-500">{t.crear.servicesSubtitle}</p>
-                          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                          <div className="mt-6 sm:mt-8 grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
                             {detectedServices.map((serviceName) => (
                               <div key={serviceName} className="rounded-2xl border border-gray-200 bg-white px-4 py-3">
                                 <p className="flex items-center gap-2 text-sm font-medium text-gray-800">
-                                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-500" />
                                   {serviceName}
                                 </p>
                               </div>
@@ -663,14 +665,14 @@ function CreateWebContent() {
                     
                     {/* Reviews Section */}
                     {placeDetails.reviews?.some((review: any) => typeof review?.text === "string" && review.text.trim().length > 0) && (
-                      <div className="bg-gray-50 px-8 py-16">
-                        <h3 className="text-2xl font-bold text-gray-900 text-center mb-10">{t.crear.whatClientsSay}</h3>
-                        <div className="grid gap-6 sm:grid-cols-2">
+                      <div className="bg-gray-50 px-4 py-10 sm:px-8 sm:py-16">
+                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 text-center mb-6 sm:mb-10">{t.crear.whatClientsSay}</h3>
+                        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
                           {placeDetails.reviews
                             .filter((review: any) => typeof review?.text === "string" && review.text.trim().length > 0)
                             .slice(0, 2)
                             .map((review: any, idx: number) => (
-                            <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div key={idx} className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
                               <div className="flex items-center gap-1 mb-3">
                                 {[...Array(review.rating)].map((_, i) => (
                                   <Star key={i} className="h-4 w-4 fill-amber-500 text-amber-500" />
@@ -696,44 +698,44 @@ function CreateWebContent() {
               animate={{ opacity: 1, scale: 1 }}
               className="mx-auto max-w-4xl"
             >
-              <div className="rounded-3xl bg-white p-8 sm:p-12 shadow-xl ring-1 ring-gray-200 text-center">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 mb-6">
-                  <CheckCircle2 className="h-10 w-10 text-emerald-600" />
+              <div className="rounded-3xl bg-white p-6 sm:p-12 shadow-xl ring-1 ring-gray-200 text-center">
+                <div className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-emerald-100 mb-6">
+                  <CheckCircle2 className="h-8 w-8 sm:h-10 sm:w-10 text-emerald-600" />
                 </div>
-                <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">{t.crear.publishedTitle}</h2>
-                <p className="mt-4 text-lg text-gray-600">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 lg:text-4xl">{t.crear.publishedTitle}</h2>
+                <p className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-600">
                   {t.crear.publishedSubtitle.replace('{name}', placeDetails.name)}
                 </p>
                 
-                <div className="mt-8 flex items-center justify-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                  <Globe className="h-6 w-6 text-gray-400" />
-                  <a href="#" className="text-lg sm:text-xl font-medium text-emerald-600 hover:underline">
+                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                  <Globe className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400" />
+                  <a href="#" className="text-base sm:text-xl font-medium text-emerald-600 hover:underline break-all">
                     {placeDetails.name.toLowerCase().replace(/\s+/g, '')}.bunnatic.com
                   </a>
                 </div>
 
-                <div className="mt-12 grid gap-6 sm:grid-cols-3 text-left">
-                  <div className="rounded-2xl bg-slate-50 p-6 border border-gray-100">
-                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t.crear.visitsToday}</h3>
-                    <p className="mt-2 text-3xl font-extrabold text-gray-900">0</p>
+                <div className="mt-8 sm:mt-12 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-3 text-left">
+                  <div className="rounded-2xl bg-slate-50 p-5 sm:p-6 border border-gray-100">
+                    <h3 className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider">{t.crear.visitsToday}</h3>
+                    <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-gray-900">0</p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-6 border border-gray-100">
-                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t.crear.contacts}</h3>
-                    <p className="mt-2 text-3xl font-extrabold text-gray-900">0</p>
+                  <div className="rounded-2xl bg-slate-50 p-5 sm:p-6 border border-gray-100">
+                    <h3 className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider">{t.crear.contacts}</h3>
+                    <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-gray-900">0</p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-6 border border-gray-100">
-                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t.crear.seoStatus}</h3>
+                  <div className="rounded-2xl bg-slate-50 p-5 sm:p-6 border border-gray-100">
+                    <h3 className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider">{t.crear.seoStatus}</h3>
                     <p className="mt-2 text-lg font-bold text-emerald-600 flex items-center gap-2">
                       <CheckCircle2 className="h-5 w-5" /> {t.crear.optimized}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Button
                     type="button"
                     variant="default"
-                    className="w-full sm:w-auto rounded-full bg-gray-900 px-8 py-4 text-sm font-bold text-white transition-colors hover:bg-gray-800"
+                    className="w-full sm:w-auto rounded-full bg-gray-900 px-8 py-3 sm:py-4 text-sm font-bold text-white transition-colors hover:bg-gray-800"
                   >
                     {t.crear.goToDashboard}
                   </Button>
@@ -741,7 +743,7 @@ function CreateWebContent() {
                     type="button"
                     onClick={() => setStep("search")}
                     variant="outline"
-                    className="w-full sm:w-auto rounded-full bg-white border border-gray-200 px-8 py-4 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50"
+                    className="w-full sm:w-auto rounded-full bg-white border border-gray-200 px-8 py-3 sm:py-4 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50"
                   >
                     {t.crear.createAnother}
                   </Button>

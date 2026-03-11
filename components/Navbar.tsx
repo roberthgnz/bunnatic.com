@@ -91,7 +91,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
             <Zap className="h-5 w-5 fill-emerald-600 text-emerald-600" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-gray-900">
+          <span className="hidden text-xl font-bold tracking-tight text-gray-900 sm:block">
             {t.navbar.logo}
           </span>
         </Link>

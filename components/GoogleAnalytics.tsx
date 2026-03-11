@@ -108,8 +108,6 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
 
     if (isGa4) {
       ensureGtagStub();
-      window.gtag?.('js', new Date());
-      window.gtag?.('config', trackingId, {send_page_view: false});
       initializedRef.current = true;
       return;
     } else {
@@ -152,15 +150,32 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
     window.ga('send', 'pageview');
   }, [isGa4, pathname, scriptLoaded, searchParams]);
 
+  if (isGa4) {
+    return (
+      <>
+        <Script id="google-analytics-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = window.gtag || function(){window.dataLayer.push(arguments);};
+            window.gtag('js', new Date());
+            window.gtag('config', ${JSON.stringify(trackingId)}, { send_page_view: false });
+          `}
+        </Script>
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(trackingId)}`}
+          onLoad={() => setScriptLoaded(true)}
+        />
+      </>
+    );
+  }
+
   return (
     <Script
       id="google-analytics"
       strategy="afterInteractive"
-      src={
-        isGa4
-          ? `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(trackingId)}`
-          : 'https://www.google-analytics.com/analytics.js'
-      }
+      src="https://www.google-analytics.com/analytics.js"
       onLoad={() => setScriptLoaded(true)}
     />
   );

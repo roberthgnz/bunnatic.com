@@ -534,6 +534,7 @@ export async function inviteTeamMember(businessId: string, email: string, role: 
   // OR I will perform a migration update in the next step.
   // Let's do the migration update properly.
   
+  if (error) return { error: error.message }
   return { success: true }
 }
 

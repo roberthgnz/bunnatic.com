@@ -27,9 +27,27 @@ export async function POST(req: Request) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
+    const subscriptionId =
+      typeof session.subscription === 'string'
+        ? session.subscription
+        : session.subscription?.id;
+
+    if (!subscriptionId) {
+      return new NextResponse('Subscription ID is missing in checkout session', {
+        status: 400,
+      });
+    }
+
     const subscription = await stripe.subscriptions.retrieve(
-      session.subscription as string
+      subscriptionId
     );
+    const firstSubscriptionItem = subscription.items.data[0];
+
+    if (!firstSubscriptionItem?.current_period_end) {
+      return new NextResponse('Subscription period end is missing', {
+        status: 400,
+      });
+    }
 
     if (!session?.metadata?.userId) {
       return new NextResponse('User ID is missing in session metadata', {
@@ -42,9 +60,9 @@ export async function POST(req: Request) {
       .update({
         stripe_subscription_id: subscription.id,
         stripe_customer_id: subscription.customer as string,
-        stripe_price_id: subscription.items.data[0].price.id,
+        stripe_price_id: firstSubscriptionItem.price.id,
         stripe_current_period_end: new Date(
-          subscription.current_period_end * 1000
+          firstSubscriptionItem.current_period_end * 1000
         ).toISOString(),
       })
       .eq('id', session.metadata.userId);
@@ -52,16 +70,34 @@ export async function POST(req: Request) {
 
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object as Stripe.Invoice;
+    const subscriptionId =
+      typeof invoice.parent?.subscription_details?.subscription === 'string'
+        ? invoice.parent.subscription_details.subscription
+        : invoice.parent?.subscription_details?.subscription?.id;
+
+    if (!subscriptionId) {
+      return new NextResponse('Subscription ID is missing in invoice', {
+        status: 400,
+      });
+    }
+
     const subscription = await stripe.subscriptions.retrieve(
-      invoice.subscription as string
+      subscriptionId
     );
+    const firstSubscriptionItem = subscription.items.data[0];
+
+    if (!firstSubscriptionItem?.current_period_end) {
+      return new NextResponse('Subscription period end is missing', {
+        status: 400,
+      });
+    }
 
     await supabaseAdmin
       .from('profiles')
       .update({
-        stripe_price_id: subscription.items.data[0].price.id,
+        stripe_price_id: firstSubscriptionItem.price.id,
         stripe_current_period_end: new Date(
-          subscription.current_period_end * 1000
+          firstSubscriptionItem.current_period_end * 1000
         ).toISOString(),
       })
       .eq('stripe_subscription_id', subscription.id);

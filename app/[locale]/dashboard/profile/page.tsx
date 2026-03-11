@@ -1,7 +1,6 @@
 import { getProfile, updateProfile } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { toast } from 'sonner'
 import { UserCircle } from 'lucide-react'
 
 export default async function ProfilePage({
@@ -37,6 +36,11 @@ export default async function ProfilePage({
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
+  async function handleProfileUpdate(formData: FormData) {
+    'use server'
+    await updateProfile(formData)
+  }
+
   return (
     <div className="max-w-2xl p-4 sm:p-8">
       <div className="mb-8">
@@ -64,7 +68,7 @@ export default async function ProfilePage({
             </div>
           </div>
 
-          <form action={updateProfile} className="space-y-4">
+          <form action={handleProfileUpdate} className="space-y-4">
             <div className="grid gap-2">
               <label htmlFor="fullName" className="text-sm font-medium">
                 {t.fullName}

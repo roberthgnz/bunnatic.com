@@ -56,7 +56,7 @@ export default function ServicesManager({
       toast.error(res.error)
     } else {
       toast.success('Servicio añadido')
-      (event.target as HTMLFormElement).reset()
+      event.currentTarget.reset()
       router.refresh()
     }
     setLoading(false)

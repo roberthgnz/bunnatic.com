@@ -6,7 +6,6 @@ import { Zap, Search, MapPin, Star, Phone, Globe, CheckCircle2, Loader2, ArrowRi
 import { motion, AnimatePresence } from "motion/react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import CreateHowItWorks from "@/components/create/CreateHowItWorks";
 import { useLanguage } from "@/components/LanguageProvider";
 import { useSearchParams } from "next/navigation";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
@@ -55,14 +54,6 @@ const createPageContent = {
       createAnother: "Crear otra web",
       noResultsTitle: "No encontramos coincidencias",
       noResultsSubtitle: "Prueba con el nombre exacto del negocio y la ciudad para mejorar los resultados.",
-      howToTitle: "How to crear tu web en 3 pasos",
-      howToSubtitle: "Así se verá el flujo después de seleccionar tu negocio.",
-      howToStep1: "Buscar y seleccionar tu negocio",
-      howToStep2: "La IA analiza datos y reseñas",
-      howToStep3: "Publicas tu web en minutos",
-      howToBadge: "Flujo guiado",
-      howToTime: "Menos de 2 min",
-      howToCta: "Empieza escribiendo el nombre del negocio arriba",
     },
   },
   ca: {
@@ -108,14 +99,6 @@ const createPageContent = {
       createAnother: "Crear una altra web",
       noResultsTitle: "No hem trobat coincidències",
       noResultsSubtitle: "Prova amb el nom exacte del negoci i la ciutat per millorar els resultats.",
-      howToTitle: "How to crear el teu web en 3 passos",
-      howToSubtitle: "Així es veurà el flux després de seleccionar el teu negoci.",
-      howToStep1: "Cerca i selecciona el teu negoci",
-      howToStep2: "La IA analitza dades i ressenyes",
-      howToStep3: "Publiques el teu web en minuts",
-      howToBadge: "Flux guiat",
-      howToTime: "Menys de 2 min",
-      howToCta: "Comença escrivint el nom del negoci a dalt",
     },
   },
 } as const;
@@ -294,7 +277,6 @@ function CreateWebContent() {
   }
   const signupHref = `/${language}/signup?${signupParams.toString()}`;
   const showNoResults = hasSearched && !isSearching && query.trim().length > 0 && places.length === 0;
-  const showHowTo = !isSearching && places.length === 0;
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -466,15 +448,86 @@ function CreateWebContent() {
 
               {showNoResults && (
                 <div className="mt-6 space-y-4">
-                  <div className="rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-slate-50 p-5 sm:p-6">
-                    <h3 className="text-base sm:text-lg font-bold text-gray-900">{t.crear.noResultsTitle}</h3>
+                  <div className="rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-orange-50 p-6 sm:p-8">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900">{t.crear.noResultsTitle}</h3>
                     <p className="mt-2 text-sm sm:text-base text-gray-600">{t.crear.noResultsSubtitle}</p>
+                    <div className="mt-6 pt-6 border-t border-amber-100">
+                      <p className="text-sm font-semibold text-gray-900 mb-3">¿Prefieres que te ayudemos personalmente?</p>
+                      <Button
+                        asChild
+                        variant="default"
+                        className="w-full sm:w-auto rounded-full bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+                      >
+                        <Link href={signupHref}>
+                          Crear mi web con ayuda →
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
 
-              {showHowTo && (
-                <CreateHowItWorks copy={t.crear} query={query} />
+              {!hasSearched && !isSearching && (
+                <div className="mt-12 space-y-8">
+                  {/* Social Proof */}
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1 mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Más de 1,200 negocios ya tienen su web con nosotros
+                    </p>
+                  </div>
+
+                  {/* Quick Benefits */}
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 text-center">
+                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 mb-4">
+                        <Zap className="h-6 w-6 text-emerald-600" />
+                      </div>
+                      <h3 className="font-bold text-gray-900 mb-2">Rápido</h3>
+                      <p className="text-sm text-gray-600">Tu web lista en menos de 2 minutos</p>
+                    </div>
+                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 text-center">
+                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 mb-4">
+                        <Search className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <h3 className="font-bold text-gray-900 mb-2">SEO Optimizado</h3>
+                      <p className="text-sm text-gray-600">Aparece en Google desde el día 1</p>
+                    </div>
+                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 text-center">
+                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 mb-4">
+                        <Phone className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <h3 className="font-bold text-gray-900 mb-2">Más Clientes</h3>
+                      <p className="text-sm text-gray-600">Formularios y llamadas directas</p>
+                    </div>
+                  </div>
+
+                  {/* CTA alternativo */}
+                  <div className="rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8 sm:p-10 text-center text-white shadow-xl">
+                    <h3 className="text-2xl sm:text-3xl font-bold mb-3">
+                      ¿No encuentras tu negocio en Google?
+                    </h3>
+                    <p className="text-gray-300 mb-6 max-w-xl mx-auto">
+                      No hay problema. Podemos crear tu web desde cero con toda la información que necesites.
+                    </p>
+                    <Button
+                      asChild
+                      variant="default"
+                      className="rounded-full bg-emerald-500 px-8 py-4 text-base font-bold text-white hover:bg-emerald-400"
+                    >
+                      <Link href={signupHref}>
+                        Crear mi web ahora →
+                      </Link>
+                    </Button>
+                    <p className="mt-4 text-sm text-gray-400">
+                      Sin compromiso • Cancela cuando quieras
+                    </p>
+                  </div>
+                </div>
               )}
             </motion.div>
           )}

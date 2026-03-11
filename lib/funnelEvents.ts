@@ -16,6 +16,7 @@ type FunnelPayload = Record<string, string | number | boolean | null | undefined
 declare global {
   interface Window {
     ga?: (...args: unknown[]) => void;
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
@@ -27,7 +28,16 @@ export function trackFunnelEvent(event: FunnelEventName, payload: FunnelPayload 
   const data = { event, ...payload };
   window.dispatchEvent(new CustomEvent("funnel:event", { detail: data }));
 
-  if (hasAnalyticsConsent() && typeof window.ga === "function") {
+  if (!hasAnalyticsConsent()) {
+    return;
+  }
+
+  if (typeof window.gtag === "function") {
+    window.gtag("event", event, payload);
+    return;
+  }
+
+  if (typeof window.ga === "function") {
     const eventValue =
       typeof payload.value === "number"
         ? payload.value

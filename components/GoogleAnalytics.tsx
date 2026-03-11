@@ -8,6 +8,8 @@ import {COOKIE_CONSENT_EVENT, hasAnalyticsConsent} from '@/lib/cookieConsent';
 declare global {
   interface Window {
     ga?: (...args: unknown[]) => void;
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
   }
 }
 
@@ -29,15 +31,34 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
   const initializedRef = useRef(false);
   const [hasConsent, setHasConsent] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const isGa4 = trackingId.startsWith('G-');
+
+  const ensureGtagStub = () => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.dataLayer = window.dataLayer ?? [];
+
+    if (typeof window.gtag !== 'function') {
+      window.gtag = (...args: unknown[]) => {
+        window.dataLayer?.push(args);
+      };
+    }
+  };
 
   useEffect(() => {
     const syncConsent = () => {
       const consentGranted = hasAnalyticsConsent();
       setHasConsent(consentGranted);
 
-      if (!consentGranted && typeof window !== 'undefined') {
+      if (typeof window !== 'undefined') {
         const windowFlags = window as unknown as Record<string, unknown>;
-        windowFlags[`ga-disable-${trackingId}`] = true;
+        windowFlags[`ga-disable-${trackingId}`] = !consentGranted;
+
+        if (consentGranted) {
+          ensureGtagStub();
+        }
       }
     };
 
@@ -50,7 +71,7 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
   }, [trackingId]);
 
   useEffect(() => {
-    if (!hasConsent || !scriptLoaded || typeof window === 'undefined' || typeof window.ga !== 'function') {
+    if (!hasConsent || !scriptLoaded || typeof window === 'undefined') {
       return;
     }
 
@@ -60,16 +81,27 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
 
     const windowFlags = window as unknown as Record<string, unknown>;
     windowFlags[`ga-disable-${trackingId}`] = false;
-    window.ga('create', trackingId, 'auto');
+
+    if (isGa4) {
+      ensureGtagStub();
+      window.gtag?.('js', new Date());
+      window.gtag?.('config', trackingId, {send_page_view: false});
+    } else {
+      if (typeof window.ga !== 'function') {
+        return;
+      }
+
+      window.ga('create', trackingId, 'auto');
+    }
+
     initializedRef.current = true;
-  }, [hasConsent, scriptLoaded, trackingId]);
+  }, [hasConsent, isGa4, scriptLoaded, trackingId]);
 
   useEffect(() => {
     if (
       !hasConsent ||
       !initializedRef.current ||
-      typeof window === 'undefined' ||
-      typeof window.ga !== 'function'
+      typeof window === 'undefined'
     ) {
       return;
     }
@@ -77,9 +109,18 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
     const query = searchParams.toString();
     const page = query ? `${pathname}?${query}` : pathname;
 
+    if (isGa4) {
+      window.gtag?.('event', 'page_view', {page_path: page});
+      return;
+    }
+
+    if (typeof window.ga !== 'function') {
+      return;
+    }
+
     window.ga('set', 'page', page);
     window.ga('send', 'pageview');
-  }, [hasConsent, pathname, searchParams]);
+  }, [hasConsent, isGa4, pathname, searchParams]);
 
   if (!hasConsent) {
     return null;
@@ -89,7 +130,11 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
     <Script
       id="google-analytics"
       strategy="afterInteractive"
-      src="https://www.google-analytics.com/analytics.js"
+      src={
+        isGa4
+          ? `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(trackingId)}`
+          : 'https://www.google-analytics.com/analytics.js'
+      }
       onLoad={() => setScriptLoaded(true)}
     />
   );

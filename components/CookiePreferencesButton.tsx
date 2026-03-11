@@ -3,6 +3,7 @@
 import {Button} from '@/components/ui/button';
 import {useLanguage} from '@/components/LanguageProvider';
 import {openCookiePreferences} from '@/lib/cookieConsent';
+import {Cookie} from 'lucide-react';
 
 export function CookiePreferencesButton() {
   const {language} = useLanguage();
@@ -14,7 +15,8 @@ export function CookiePreferencesButton() {
       className="h-auto px-0 text-sm font-medium text-gray-400 hover:bg-transparent hover:text-white"
       onClick={() => openCookiePreferences()}
     >
-      {language === 'ca' ? 'Configurar cookies' : 'Configurar cookies'}
+      <Cookie className="mr-2 h-4 w-4" />
+      {language === 'ca' ? 'Preferències de cookies' : 'Preferencias de cookies'}
     </Button>
   );
 }

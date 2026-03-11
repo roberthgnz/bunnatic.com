@@ -4,6 +4,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {Link} from '@/i18n/navigation';
 import {useLanguage} from '@/components/LanguageProvider';
 import {Button} from '@/components/ui/button';
+import {Cookie, Shield} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -25,45 +26,47 @@ import {getLegalSlug} from '@/lib/pageSlugs';
 const copy = {
   es: {
     badge: 'Cookies',
-    title: 'Tu privacidad primero',
+    title: 'Cookies y privacidad',
     description:
-      'Usamos cookies técnicas para que la web funcione y cookies analíticas solo si las aceptas. Puedes cambiar tu decisión en cualquier momento.',
-    accept: 'Aceptar analíticas',
-    reject: 'Rechazar',
+      'Usamos cookies tecnicas para el funcionamiento del sitio. Las cookies se activan solo con tu consentimiento.',
+    policy: 'Politica de cookies',
+    acceptAll: 'Aceptar cookies',
+    rejectAll: 'Rechazar cookies',
     configure: 'Configurar',
-    policy: 'Política de cookies',
     preferencesTitle: 'Preferencias de cookies',
     preferencesDescription:
-      'Las cookies técnicas son necesarias para el funcionamiento básico del sitio. Las analíticas son opcionales y se activan solo con tu consentimiento.',
-    necessaryTitle: 'Cookies técnicas',
-    necessaryDescription: 'Siempre activas. Mantienen seguridad, sesión y funciones básicas.',
-    necessaryEnabled: 'Siempre activas',
-    analyticsTitle: 'Cookies analíticas',
-    analyticsDescription: 'Miden uso y rendimiento para mejorar el producto. Proveedor: Google Analytics.',
-    analyticsEnabled: 'Activadas',
-    analyticsDisabled: 'Desactivadas',
-    saveSelection: 'Guardar selección',
+      'Puedes activar o desactivar cookies. Las cookies tecnicas son obligatorias.',
+    technicalTitle: 'Cookies tecnicas',
+    technicalDescription: 'Necesarias para seguridad, sesion y funciones basicas.',
+    technicalState: 'Siempre activas',
+    analyticsTitle: 'Cookies',
+    analyticsDescription: 'Miden uso y rendimiento para mejorar el producto.',
+    analyticsProvider: 'Proveedor: Google Analytics',
+    analyticsOn: 'Activadas',
+    analyticsOff: 'Desactivadas',
+    save: 'Guardar preferencias',
   },
   ca: {
     badge: 'Cookies',
-    title: 'La teva privacitat primer',
+    title: 'Cookies i privacitat',
     description:
-      'Fem servir cookies tècniques perquè el web funcioni i cookies analítiques només si les acceptes. Pots canviar la decisió quan vulguis.',
-    accept: 'Acceptar analítiques',
-    reject: 'Rebutjar',
+      'Fem servir cookies tecniques per al funcionament del lloc. Les cookies nomes s activen amb el teu consentiment.',
+    policy: 'Politica de cookies',
+    acceptAll: 'Acceptar cookies',
+    rejectAll: 'Rebutjar cookies',
     configure: 'Configurar',
-    policy: 'Política de cookies',
-    preferencesTitle: 'Preferències de cookies',
+    preferencesTitle: 'Preferencies de cookies',
     preferencesDescription:
-      'Les cookies tècniques són necessàries per al funcionament bàsic del lloc. Les analítiques són opcionals i només s\'activen amb el teu consentiment.',
-    necessaryTitle: 'Cookies tècniques',
-    necessaryDescription: 'Sempre actives. Mantenen seguretat, sessió i funcions bàsiques.',
-    necessaryEnabled: 'Sempre actives',
-    analyticsTitle: 'Cookies analítiques',
-    analyticsDescription: 'Mesuren ús i rendiment per millorar el producte. Proveïdor: Google Analytics.',
-    analyticsEnabled: 'Activades',
-    analyticsDisabled: 'Desactivades',
-    saveSelection: 'Desar selecció',
+      'Pots activar o desactivar cookies. Les cookies tecniques son obligatories.',
+    technicalTitle: 'Cookies tecniques',
+    technicalDescription: 'Necessaries per seguretat, sessio i funcions basiques.',
+    technicalState: 'Sempre actives',
+    analyticsTitle: 'Cookies',
+    analyticsDescription: 'Mesuren us i rendiment per millorar el producte.',
+    analyticsProvider: 'Proveidor: Google Analytics',
+    analyticsOn: 'Activades',
+    analyticsOff: 'Desactivades',
+    save: 'Desar preferencies',
   },
 } as const;
 
@@ -74,10 +77,8 @@ export function CookieConsent() {
   const [hasDecision, setHasDecision] = useState(true);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const policyHref = useMemo(
-    () => `/${getLegalSlug('politica-cookies', language)}`,
-    [language],
-  );
+
+  const policyHref = useMemo(() => `/${getLegalSlug('politica-cookies', language)}`, [language]);
 
   useEffect(() => {
     const syncFromCookie = () => {
@@ -87,9 +88,7 @@ export function CookieConsent() {
       setIsMounted(true);
     };
 
-    const openPreferences = () => {
-      setIsDialogOpen(true);
-    };
+    const openPreferences = () => setIsDialogOpen(true);
 
     syncFromCookie();
     window.addEventListener(COOKIE_CONSENT_EVENT, syncFromCookie);
@@ -101,9 +100,7 @@ export function CookieConsent() {
     };
   }, []);
 
-  if (!isMounted) {
-    return null;
-  }
+  if (!isMounted) return null;
 
   const handleAccept = () => {
     saveCookieConsent(true);
@@ -115,51 +112,54 @@ export function CookieConsent() {
     setIsDialogOpen(false);
   };
 
-  const showBanner = !hasDecision;
+  const handleSave = () => {
+    saveCookieConsent(analyticsEnabled);
+    setIsDialogOpen(false);
+  };
 
   return (
     <>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-xl border-white/10 bg-[#101113] text-white">
-          <DialogHeader>
-            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-400">
+        <DialogContent className="w-[min(640px,calc(100%-1rem))] max-h-[85vh] overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 p-0 text-white sm:max-w-none shadow-2xl">
+          <DialogHeader className="border-b border-slate-800 p-6 sm:p-8">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-emerald-300">
+              <Cookie className="h-4 w-4" />
               {t.badge}
             </div>
-            <DialogTitle className="text-xl">{t.preferencesTitle}</DialogTitle>
-            <DialogDescription className="text-sm text-gray-300">
+            <DialogTitle className="text-xl font-semibold leading-tight">{t.preferencesTitle}</DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed text-slate-300 break-words mt-2">
               {t.preferencesDescription}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-medium text-white">{t.necessaryTitle}</p>
-                  <p className="mt-1 text-sm text-gray-300">{t.necessaryDescription}</p>
-                </div>
-                <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-300">
-                  {t.necessaryEnabled}
-                </span>
+          <div className="min-w-0 space-y-4 overflow-y-auto p-6 sm:p-8">
+            <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-white">{t.technicalTitle}</p>
+                <p className="mt-1.5 break-words text-sm text-slate-300 leading-relaxed">{t.technicalDescription}</p>
               </div>
-            </div>
+              <p className="mt-4 inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">
+                {t.technicalState}
+              </p>
+            </section>
 
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-medium text-white">{t.analyticsTitle}</p>
-                  <p className="mt-1 text-sm text-gray-300">{t.analyticsDescription}</p>
+            <section className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+              <div className="flex min-w-0 items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-white">{t.analyticsTitle}</p>
+                  <p className="mt-1.5 break-words text-sm text-slate-300 leading-relaxed">{t.analyticsDescription}</p>
+                  <p className="mt-1.5 break-words text-xs text-slate-400">{t.analyticsProvider}</p>
                 </div>
                 <button
                   type="button"
                   role="switch"
                   aria-checked={analyticsEnabled}
-                  onClick={() => setAnalyticsEnabled((current) => !current)}
+                  onClick={() => setAnalyticsEnabled((value) => !value)}
                   className={cn(
-                    'relative inline-flex h-7 w-12 items-center rounded-full border transition-colors',
+                    'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60',
                     analyticsEnabled
-                      ? 'border-emerald-400/60 bg-emerald-500/30'
-                      : 'border-white/10 bg-white/10',
+                      ? 'border-emerald-300/60 bg-emerald-400/30'
+                      : 'border-slate-600 bg-slate-800',
                   )}
                 >
                   <span
@@ -171,75 +171,73 @@ export function CookieConsent() {
                   <span className="sr-only">{t.analyticsTitle}</span>
                 </button>
               </div>
-              <p className="mt-3 text-xs font-medium text-gray-400">
-                {analyticsEnabled ? t.analyticsEnabled : t.analyticsDisabled}
+              <p className="mt-4 text-xs font-medium text-slate-400">
+                {analyticsEnabled ? t.analyticsOn : t.analyticsOff}
               </p>
-            </div>
+            </section>
           </div>
 
-          <DialogFooter className="bg-transparent p-0 pt-2">
+          <DialogFooter className="border-t border-slate-800 bg-slate-950 p-6 sm:p-8 mx-0 mb-0">
             <Button
               type="button"
               variant="outline"
-              className="border-white/15 bg-transparent text-white hover:bg-white/10"
+              className="border-slate-600 bg-transparent text-white hover:bg-slate-800"
               onClick={handleReject}
             >
-              {t.reject}
+              {t.rejectAll}
             </Button>
             <Button
               type="button"
               variant="outline"
-              className="border-white/15 bg-transparent text-white hover:bg-white/10"
-              onClick={() => {
-                saveCookieConsent(analyticsEnabled);
-                setIsDialogOpen(false);
-              }}
+              className="border-slate-600 bg-transparent text-white hover:bg-slate-800"
+              onClick={handleSave}
             >
-              {t.saveSelection}
+              {t.save}
             </Button>
-            <Button type="button" className="bg-emerald-500 text-black hover:bg-emerald-400" onClick={handleAccept}>
-              {t.accept}
+            <Button type="button" className="bg-emerald-400 text-slate-950 hover:bg-emerald-300" onClick={handleAccept}>
+              {t.acceptAll}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {showBanner ? (
-        <section className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#0c0d0f]/95 px-4 py-4 text-white shadow-2xl backdrop-blur">
-          <div className="mx-auto flex max-w-6xl flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
-              <div className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-400">
-                {t.badge}
-              </div>
-              <h2 className="mt-2 text-lg font-semibold">{t.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-gray-300">
-                {t.description}{' '}
-                <Link href={policyHref} className="underline underline-offset-4 hover:text-white">
+      {!hasDecision ? (
+        <section className="fixed inset-x-0 bottom-0 z-50 p-3 sm:p-4">
+          <div className="mx-auto max-w-5xl rounded-xl border border-slate-700 bg-slate-950/80 p-4 text-white shadow-2xl backdrop-blur-md transition-all duration-500 animate-in slide-in-from-bottom-4 fade-in">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div className="min-w-0 max-w-3xl">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-emerald-300">
+                  <Shield className="h-4 w-4" />
+                  {t.badge}
+                </div>
+                <h2 className="mt-1 text-base font-semibold">{t.title}</h2>
+                <p className="mt-2 break-words text-sm leading-6 text-slate-300">{t.description}</p>
+                <Link href={policyHref} className="mt-2 inline-block text-sm underline underline-offset-4 text-slate-400 hover:text-emerald-300 transition-colors">
                   {t.policy}
                 </Link>
-              </p>
-            </div>
+              </div>
 
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Button
-                type="button"
-                variant="outline"
-                className="border-white/15 bg-transparent text-white hover:bg-white/10"
-                onClick={handleReject}
-              >
-                {t.reject}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="border-white/15 bg-transparent text-white hover:bg-white/10"
-                onClick={() => openCookiePreferences()}
-              >
-                {t.configure}
-              </Button>
-              <Button type="button" className="bg-emerald-500 text-black hover:bg-emerald-400" onClick={handleAccept}>
-                {t.accept}
-              </Button>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="border-slate-600 bg-transparent text-white hover:bg-slate-800"
+                  onClick={handleReject}
+                >
+                  {t.rejectAll}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="border-slate-600 bg-transparent text-white hover:bg-slate-800"
+                  onClick={() => openCookiePreferences()}
+                >
+                  {t.configure}
+                </Button>
+                <Button type="button" className="bg-emerald-400 text-slate-950 hover:bg-emerald-300" onClick={handleAccept}>
+                  {t.acceptAll}
+                </Button>
+              </div>
             </div>
           </div>
         </section>

@@ -12,7 +12,7 @@ import { useMemo, useState } from "react";
 const signInContent = {
   es: {
     navbar: {
-      logo: "Wibloz",
+      logo: "Bunnatic",
     },
     crear: {
       back: "Volver",
@@ -30,7 +30,7 @@ const signInContent = {
   },
   ca: {
     navbar: {
-      logo: "Wibloz",
+      logo: "Bunnatic",
     },
     crear: {
       back: "Tornar",

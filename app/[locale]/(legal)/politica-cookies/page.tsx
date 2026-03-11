@@ -19,11 +19,11 @@ export async function generateMetadata({ params }: LegalRouteProps): Promise<Met
 
   return buildPageMetadata({
     locale: safeLocale,
-    title: `${legalContent[safeLocale]["politica-cookies"].title} | Wibloz`,
+    title: `${legalContent[safeLocale]["politica-cookies"].title} | Bunnatic`,
     description:
       safeLocale === "ca"
-        ? "Revisa la política de cookies de Wibloz i com pots gestionar el teu consentiment."
-        : "Revisa la política de cookies de Wibloz y cómo puedes gestionar tu consentimiento.",
+        ? "Revisa la política de cookies de Bunnatic i com pots gestionar el teu consentiment."
+        : "Revisa la política de cookies de Bunnatic y cómo puedes gestionar tu consentimiento.",
     esPath: `/${getLegalSlug("politica-cookies", "es")}`,
     caPath: `/${getLegalSlug("politica-cookies", "ca")}`,
   });

@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: AlternativePageProps): Promis
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Alternativa a dependre només de Google My Business | Wibloz"
-        : "Alternativa a depender solo de Google My Business | Wibloz",
+        ? "Alternativa a dependre només de Google My Business | Bunnatic"
+        : "Alternativa a depender solo de Google My Business | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Combina visibilitat a Google Maps amb una web que converteix en contactes i vendes."
@@ -46,7 +46,7 @@ export default function AlternativeGoogleMyBusinessPage() {
             "La competencia aparece alrededor de tu ficha.",
             "Poca capacidad de captación con formulario propio.",
           ],
-          novaCardTitle: "Con Wibloz + Google",
+          novaCardTitle: "Con Bunnatic + Google",
           novaItems: [
             "Controlas tu narrativa comercial y propuesta de valor.",
             "Conduces el tráfico de la ficha a una landing de conversión.",
@@ -108,7 +108,7 @@ export default function AlternativeGoogleMyBusinessPage() {
             "La competència apareix al voltant de la teva fitxa.",
             "Poca capacitat de captació amb formulari propi.",
           ],
-          novaCardTitle: "Amb Wibloz + Google",
+          novaCardTitle: "Amb Bunnatic + Google",
           novaItems: [
             "Controles la teva narrativa comercial i proposta de valor.",
             "Condueixes el trànsit de la fitxa a una landing de conversió.",

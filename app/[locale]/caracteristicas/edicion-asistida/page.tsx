@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: FeaturePageProps): Promise<Me
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Edició visual assistida amb IA | Wibloz"
-        : "Edición visual asistida con IA | Wibloz",
+        ? "Edició visual assistida amb IA | Bunnatic"
+        : "Edición visual asistida con IA | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Edita la teva web en segons i mantén promocions, horaris i serveis sempre actualitzats."

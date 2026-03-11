@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: FeaturePageProps): Promise<Me
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Generació amb IA per crear la teva web | Wibloz"
-        : "Generación con IA para crear tu web | Wibloz",
+        ? "Generació amb IA per crear la teva web | Bunnatic"
+        : "Generación con IA para crear tu web | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Genera una web completa amb IA en minuts i comença a captar clients locals."

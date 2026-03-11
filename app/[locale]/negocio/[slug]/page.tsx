@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: BusinessParams): Promise<Meta
   if (!entry) {
     return buildPageMetadata({
       locale: safeLocale,
-      title: safeLocale === "ca" ? "Web per negocis locals | Wibloz" : "Web para negocios locales | Wibloz",
+      title: safeLocale === "ca" ? "Web per negocis locals | Bunnatic" : "Web para negocios locales | Bunnatic",
       description:
         safeLocale === "ca"
           ? "Crea una web optimitzada per captar clients locals."
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: BusinessParams): Promise<Meta
 
   return buildPageMetadata({
     locale: safeLocale,
-    title: `${localizedCopy.title} | Wibloz`,
+    title: `${localizedCopy.title} | Bunnatic`,
     description: localizedCopy.subtitle,
     esPath: `/negocio/${getBusinessSlugByLocale(entry, "es")}`,
     caPath: `/negocio/${getBusinessSlugByLocale(entry, "ca")}`,

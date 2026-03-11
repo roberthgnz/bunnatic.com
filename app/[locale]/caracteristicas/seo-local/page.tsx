@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: FeaturePageProps): Promise<Me
 
   return buildPageMetadata({
     locale: safeLocale,
-    title: safeLocale === "ca" ? "SEO local per negocis | Wibloz" : "SEO local para negocios | Wibloz",
+    title: safeLocale === "ca" ? "SEO local per negocis | Bunnatic" : "SEO local para negocios | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Millora la teva visibilitat local a Google i converteix cerques en contactes."

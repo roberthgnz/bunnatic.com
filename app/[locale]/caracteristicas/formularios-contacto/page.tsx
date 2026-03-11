@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: FeaturePageProps): Promise<Me
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Formularis de contacte per captar clients | Wibloz"
-        : "Formularios de contacto para captar clientes | Wibloz",
+        ? "Formularis de contacte per captar clients | Bunnatic"
+        : "Formularios de contacto para captar clientes | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Converteix visites en oportunitats amb formularis, WhatsApp i crides a l'acció optimitzades."

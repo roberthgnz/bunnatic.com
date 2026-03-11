@@ -14,8 +14,8 @@ export async function generateMetadata({ params }: CreateLayoutProps): Promise<M
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Crear web amb IA | Wibloz"
-        : "Crear web con IA | Wibloz",
+        ? "Crear web amb IA | Bunnatic"
+        : "Crear web con IA | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Troba el teu negoci a Google i publica una web professional en minuts amb IA."

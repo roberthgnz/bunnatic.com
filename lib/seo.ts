@@ -88,7 +88,7 @@ export function buildPageMetadata({
       title,
       description,
       url: canonicalUrl,
-      siteName: "Wibloz",
+      siteName: "Bunnatic",
       locale: locale === "ca" ? "ca_ES" : "es_ES",
       type: "website",
     },

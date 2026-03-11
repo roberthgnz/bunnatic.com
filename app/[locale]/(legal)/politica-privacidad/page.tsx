@@ -19,11 +19,11 @@ export async function generateMetadata({ params }: LegalRouteProps): Promise<Met
 
   return buildPageMetadata({
     locale: safeLocale,
-    title: `${legalContent[safeLocale]["politica-privacidad"].title} | Wibloz`,
+    title: `${legalContent[safeLocale]["politica-privacidad"].title} | Bunnatic`,
     description:
       safeLocale === "ca"
-        ? "Coneix com Wibloz tracta les teves dades personals i els teus drets de privacitat."
-        : "Conoce cómo Wibloz trata tus datos personales y tus derechos de privacidad.",
+        ? "Coneix com Bunnatic tracta les teves dades personals i els teus drets de privacitat."
+        : "Conoce cómo Bunnatic trata tus datos personales y tus derechos de privacidad.",
     esPath: `/${getLegalSlug("politica-privacidad", "es")}`,
     caPath: `/${getLegalSlug("politica-privacidad", "ca")}`,
   });

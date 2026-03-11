@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: AlternativePageProps): Promis
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Alternativa a Wix per publicar més ràpid | Wibloz"
-        : "Alternativa a Wix para publicar más rápido | Wibloz",
+        ? "Alternativa a Wix per publicar més ràpid | Bunnatic"
+        : "Alternativa a Wix para publicar más rápido | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Deixa de construir des de zero i activa una web que converteix en minuts."
@@ -35,7 +35,7 @@ export default function AlternativeWixPage() {
           badge: "Evita empezar desde cero",
           title: "La alternativa a Wix para lanzar más rápido y convertir mejor",
           subtitle:
-            "Con Wix sueles invertir tiempo montando bloques y copiando textos. Con Wibloz partes de una propuesta completa pensada para captar clientes.",
+            "Con Wix sueles invertir tiempo montando bloques y copiando textos. Con Bunnatic partes de una propuesta completa pensada para captar clientes.",
           urgencyText: "Si tardas en publicar, también tardas en generar oportunidades.",
           ctaPrimary: "Crear cuenta gratis",
           ctaSecondary: "Probar demo",
@@ -46,7 +46,7 @@ export default function AlternativeWixPage() {
             "La calidad del copy depende de tu tiempo y experiencia.",
             "Más fricción para iterar rápido en campañas.",
           ],
-          novaCardTitle: "Con Wibloz",
+          novaCardTitle: "Con Bunnatic",
           novaItems: [
             "La IA genera textos y estructura orientados a conversión.",
             "Publicas rápido sin curva de diseño ni maquetación.",
@@ -97,7 +97,7 @@ export default function AlternativeWixPage() {
           badge: "Evita començar des de zero",
           title: "L'alternativa a Wix per llançar més ràpid i convertir millor",
           subtitle:
-            "Amb Wix sovint inverteixes temps muntant blocs i copiant textos. Amb Wibloz parteixes d'una proposta completa pensada per captar clients.",
+            "Amb Wix sovint inverteixes temps muntant blocs i copiant textos. Amb Bunnatic parteixes d'una proposta completa pensada per captar clients.",
           urgencyText: "Si trigues a publicar, també trigues a generar oportunitats.",
           ctaPrimary: "Crear compte gratis",
           ctaSecondary: "Provar demo ara",
@@ -108,7 +108,7 @@ export default function AlternativeWixPage() {
             "La qualitat del copy depèn del teu temps i experiència.",
             "Més fricció per iterar ràpid en campanyes.",
           ],
-          novaCardTitle: "Amb Wibloz",
+          novaCardTitle: "Amb Bunnatic",
           novaItems: [
             "La IA genera textos i estructura orientats a conversió.",
             "Publiques ràpid sense corba de disseny ni maquetació.",

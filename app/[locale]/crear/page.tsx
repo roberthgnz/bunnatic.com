@@ -568,7 +568,7 @@ export default function CreateWebPage() {
                     </div>
                     <div className="ml-4 flex-1 rounded-md bg-white px-3 py-1 text-xs text-gray-400 shadow-sm flex items-center gap-2">
                       <Globe className="h-3 w-3" />
-                      {placeDetails.name.toLowerCase().replace(/\s+/g, '')}.wibloz.com
+                      {placeDetails.name.toLowerCase().replace(/\s+/g, '')}.bunnatic.com
                     </div>
                   </div>
                   
@@ -700,7 +700,7 @@ export default function CreateWebPage() {
                 <div className="mt-8 flex items-center justify-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
                   <Globe className="h-6 w-6 text-gray-400" />
                   <a href="#" className="text-lg sm:text-xl font-medium text-emerald-600 hover:underline">
-                    {placeDetails.name.toLowerCase().replace(/\s+/g, '')}.wibloz.com
+                    {placeDetails.name.toLowerCase().replace(/\s+/g, '')}.bunnatic.com
                   </a>
                 </div>
 

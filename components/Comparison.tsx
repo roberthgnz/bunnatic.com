@@ -69,7 +69,7 @@ export default function Comparison({ alternativeId }: ComparisonProps) {
   }, [competitors, selectedCompetitorId]);
 
   const comparatorLabel = language === "ca" ? "Només amb" : "Con solo";
-  const versusLabel = "Wibloz";
+  const versusLabel = "Bunnatic";
   const contextualCaption = (platformName: string) =>
     language === "ca"
       ? `${platformName} ajuda, però la teva web és la que converteix visites en clients.`

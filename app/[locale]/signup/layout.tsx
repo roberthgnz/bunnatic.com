@@ -12,11 +12,11 @@ export async function generateMetadata({ params }: SignUpLayoutProps): Promise<M
 
   return buildPageMetadata({
     locale: safeLocale,
-    title: safeLocale === "ca" ? "Crear compte | Wibloz" : "Crear cuenta | Wibloz",
+    title: safeLocale === "ca" ? "Crear compte | Bunnatic" : "Crear cuenta | Bunnatic",
     description:
       safeLocale === "ca"
-        ? "Crea el teu compte de Wibloz i activa una web preparada per captar clients locals."
-        : "Crea tu cuenta de Wibloz y activa una web preparada para captar clientes locales.",
+        ? "Crea el teu compte de Bunnatic i activa una web preparada per captar clients locals."
+        : "Crea tu cuenta de Bunnatic y activa una web preparada para captar clientes locales.",
     esPath: "/signup",
     caPath: "/signup",
     noindex: true,

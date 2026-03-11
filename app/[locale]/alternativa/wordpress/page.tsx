@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: AlternativePageProps): Promis
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Alternativa a WordPress sense complexitat tècnica | Wibloz"
-        : "Alternativa a WordPress sin complejidad técnica | Wibloz",
+        ? "Alternativa a WordPress sense complexitat tècnica | Bunnatic"
+        : "Alternativa a WordPress sin complejidad técnica | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Publica i edita la teva web sense plugins ni manteniment tècnic constant."
@@ -46,7 +46,7 @@ export default function AlternativeWordpressPage() {
             "Riesgo técnico si algo rompe tras una actualización.",
             "Necesidad de proveedor externo para cambios rápidos.",
           ],
-          novaCardTitle: "Con Wibloz",
+          novaCardTitle: "Con Bunnatic",
           novaItems: [
             "Configuración inicial en minutos y sin curva técnica.",
             "Editor visual con recomendaciones de IA para mejorar textos y secciones comerciales al instante.",
@@ -108,7 +108,7 @@ export default function AlternativeWordpressPage() {
             "Risc tècnic si alguna cosa es trenca després d'actualitzar.",
             "Necessitat de proveïdor extern per canvis ràpids.",
           ],
-          novaCardTitle: "Amb Wibloz",
+          novaCardTitle: "Amb Bunnatic",
           novaItems: [
             "Configuració inicial en minuts i sense corba tècnica.",
             "Editor visual amb recomanacions d'IA per millorar textos i seccions comercials a l'instant.",

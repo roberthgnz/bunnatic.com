@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: AlternativePageProps): Promis
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Alternativa a Instagram per convertir seguidors | Wibloz"
-        : "Alternativa a Instagram para convertir seguidores | Wibloz",
+        ? "Alternativa a Instagram per convertir seguidors | Bunnatic"
+        : "Alternativa a Instagram para convertir seguidores | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Converteix trànsit social en clients amb una web dissenyada per captar contactes."
@@ -46,7 +46,7 @@ export default function AlternativeInstagramPage() {
             "Limitación de enlaces y recorrido de usuario corto.",
             "Difícil transmitir propuesta completa de valor.",
           ],
-          novaCardTitle: "Con Wibloz",
+          novaCardTitle: "Con Bunnatic",
           novaItems: [
             "Página estructurada por servicios, beneficios y precios.",
             "CTAs visibles para reserva, llamada o solicitud de presupuesto.",
@@ -108,7 +108,7 @@ export default function AlternativeInstagramPage() {
             "Limitació d'enllaços i recorregut d'usuari curt.",
             "Difícil transmetre proposta completa de valor.",
           ],
-          novaCardTitle: "Amb Wibloz",
+          novaCardTitle: "Amb Bunnatic",
           novaItems: [
             "Pàgina estructurada per serveis, beneficis i preus.",
             "CTAs visibles per reserva, trucada o sol·licitud de pressupost.",

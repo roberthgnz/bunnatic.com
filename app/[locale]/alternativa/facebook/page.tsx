@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: AlternativePageProps): Promis
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Alternativa a Facebook Pages per captar clients | Wibloz"
-        : "Alternativa a Facebook Pages para captar clientes | Wibloz",
+        ? "Alternativa a Facebook Pages per captar clients | Bunnatic"
+        : "Alternativa a Facebook Pages para captar clientes | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Passa de dependre de l'algoritme a convertir visites en contactes amb una web pròpia."
@@ -46,7 +46,7 @@ export default function AlternativeFacebookPage() {
             "El cliente se distrae con contenido de terceros.",
             "Información crítica difícil de estructurar para convertir.",
           ],
-          novaCardTitle: "Con Wibloz",
+          novaCardTitle: "Con Bunnatic",
           novaItems: [
             "Tu canal es tuyo, sin depender de reglas de una red social.",
             "Página enfocada a llamada, WhatsApp o formulario de contacto.",
@@ -108,7 +108,7 @@ export default function AlternativeFacebookPage() {
             "El client es distreu amb contingut de tercers.",
             "Informació crítica difícil d'estructurar per convertir.",
           ],
-          novaCardTitle: "Amb Wibloz",
+          novaCardTitle: "Amb Bunnatic",
           novaItems: [
             "El teu canal és teu, sense dependre de regles d'una xarxa social.",
             "Pàgina enfocada a trucada, WhatsApp o formulari de contacte.",

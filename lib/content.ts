@@ -1,7 +1,7 @@
 export const content = {
   es: {
     navbar: {
-      logo: "Wibloz",
+      logo: "Bunnatic",
       languages: "ES | CA",
       platformLabel: "Plataform",
       coreFeaturesLabel: "Características",
@@ -145,7 +145,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Con Wibloz",
+            title: "Con Bunnatic",
             items: [
               "Eres dueño de tu presencia online",
               "SEO local para aparecer en Google",
@@ -170,7 +170,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Con Wibloz",
+            title: "Con Bunnatic",
             items: [
               "Toda tu información estructurada y clara",
               "Formularios de contacto directos",
@@ -195,7 +195,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Con Wibloz (+ Google)",
+            title: "Con Bunnatic (+ Google)",
             items: [
               "Muestras tu propuesta de valor completa",
               "Diseño que transmite confianza y profesionalidad",
@@ -220,7 +220,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Con Wibloz",
+            title: "Con Bunnatic",
             items: [
               "Lista en 5 minutos con IA",
               "Cero mantenimiento técnico",
@@ -233,7 +233,7 @@ export const content = {
       {
         id: "wix",
         name: "Wix",
-        description: "Wix te hace empezar desde cero con plantillas genéricas. Wibloz genera tu web con IA usando los datos reales de tu negocio.",
+        description: "Wix te hace empezar desde cero con plantillas genéricas. Bunnatic genera tu web con IA usando los datos reales de tu negocio.",
         comparison: {
           competitor: {
             title: "Con Wix",
@@ -245,7 +245,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Con Wibloz",
+            title: "Con Bunnatic",
             items: [
               "La IA escribe los textos por ti",
               "Diseño automático optimizado",
@@ -258,7 +258,7 @@ export const content = {
       {
         id: "squarespace",
         name: "Squarespace",
-        description: "Squarespace es bonito pero caro y pensado para diseñadores. Wibloz está pensado para dueños de negocios locales.",
+        description: "Squarespace es bonito pero caro y pensado para diseñadores. Bunnatic está pensado para dueños de negocios locales.",
         comparison: {
           competitor: {
             title: "Con Squarespace",
@@ -270,7 +270,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Con Wibloz",
+            title: "Con Bunnatic",
             items: [
               "Precio accesible para negocios locales",
               "Enfocado en conseguir clientes",
@@ -407,7 +407,7 @@ export const content = {
         { q: "¿Mi web aparecerá en Google?", a: "Sí, todas nuestras webs están optimizadas para SEO y aparecerán en los resultados de búsqueda." },
         { q: "¿Puedo usar mi propio dominio (.com)?", a: "Sí, puedes conectar tu propio dominio personalizado fácilmente." },
         { q: "¿Qué pasa si no me gusta cómo queda?", a: "Puedes regenerar el diseño tantas veces como quieras hasta que estés satisfecho." },
-        { q: "¿Funciona para mi tipo de negocio?", a: "Wibloz está diseñado para adaptarse a cualquier tipo de negocio local, desde restaurantes hasta clínicas." }
+        { q: "¿Funciona para mi tipo de negocio?", a: "Bunnatic está diseñado para adaptarse a cualquier tipo de negocio local, desde restaurantes hasta clínicas." }
       ]
     },
     finalCta: {
@@ -417,14 +417,14 @@ export const content = {
       trustText: "Sin tarjeta · Sin técnicos · Cancela cuando quieras"
     },
     footer: {
-      logo: "Wibloz",
+      logo: "Bunnatic",
       links: ["Aviso legal", "Política de privacidad", "Política de cookies"],
-      copyright: "© 2025 wibloz.com · Hecho con ♥ en Barcelona"
+      copyright: "© 2025 bunnatic.com · Hecho con ♥ en Barcelona"
     }
   },
   ca: {
     navbar: {
-      logo: "Wibloz",
+      logo: "Bunnatic",
       languages: "ES | CA",
       platformLabel: "Plataform",
       coreFeaturesLabel: "Característiques",
@@ -568,7 +568,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Amb Wibloz",
+            title: "Amb Bunnatic",
             items: [
               "Ets propietari de la teva presència online",
               "SEO local per aparèixer a Google",
@@ -593,7 +593,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Amb Wibloz",
+            title: "Amb Bunnatic",
             items: [
               "Tota la teva informació estructurada i clara",
               "Formularis de contacte directes",
@@ -618,7 +618,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Amb Wibloz (+ Google)",
+            title: "Amb Bunnatic (+ Google)",
             items: [
               "Mostres la teva proposta de valor completa",
               "Disseny que transmet confiança i professionalitat",
@@ -643,7 +643,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Amb Wibloz",
+            title: "Amb Bunnatic",
             items: [
               "Llesta en 5 minuts amb IA",
               "Zero manteniment tècnic",
@@ -656,7 +656,7 @@ export const content = {
       {
         id: "wix",
         name: "Wix",
-        description: "Wix et fa començar des de zero amb plantilles genèriques. Wibloz genera la teva web amb IA utilitzant les dades reals del teu negoci.",
+        description: "Wix et fa començar des de zero amb plantilles genèriques. Bunnatic genera la teva web amb IA utilitzant les dades reals del teu negoci.",
         comparison: {
           competitor: {
             title: "Amb Wix",
@@ -668,7 +668,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Amb Wibloz",
+            title: "Amb Bunnatic",
             items: [
               "La IA escriu els textos per tu",
               "Disseny automàtic optimitzat",
@@ -681,7 +681,7 @@ export const content = {
       {
         id: "squarespace",
         name: "Squarespace",
-        description: "Squarespace és bonic però car i pensat per a dissenyadors. Wibloz està pensat per a propietaris de negocis locals.",
+        description: "Squarespace és bonic però car i pensat per a dissenyadors. Bunnatic està pensat per a propietaris de negocis locals.",
         comparison: {
           competitor: {
             title: "Amb Squarespace",
@@ -693,7 +693,7 @@ export const content = {
             ]
           },
           novaweb: {
-            title: "Amb Wibloz",
+            title: "Amb Bunnatic",
             items: [
               "Preu accessible per a negocis locals",
               "Enfocat a aconseguir clients",
@@ -830,7 +830,7 @@ export const content = {
         { q: "La meva web apareixerà a Google?", a: "Sí, totes les nostres webs estan optimitzades per a SEO i apareixeran als resultats de cerca." },
         { q: "Puc utilitzar el meu propi domini (.com)?", a: "Sí, pots connectar el teu propi domini personalitzat fàcilment." },
         { q: "Què passa si no m'agrada com queda?", a: "Pots regenerar el disseny tantes vegades com vulguis fins que estiguis satisfet." },
-        { q: "Funciona per al meu tipus de negoci?", a: "Wibloz està dissenyat per adaptar-se a qualsevol tipus de negoci local, des de restaurants fins a clíniques." }
+        { q: "Funciona per al meu tipus de negoci?", a: "Bunnatic està dissenyat per adaptar-se a qualsevol tipus de negoci local, des de restaurants fins a clíniques." }
       ]
     },
     finalCta: {
@@ -840,9 +840,9 @@ export const content = {
       trustText: "Sense targeta · Sense tècnics · Cancel·la quan vulguis"
     },
     footer: {
-      logo: "Wibloz",
+      logo: "Bunnatic",
       links: ["Avís legal", "Política de privacitat", "Política de cookies"],
-      copyright: "© 2025 wibloz.com · Fet amb ♥ a Barcelona"
+      copyright: "© 2025 bunnatic.com · Fet amb ♥ a Barcelona"
     }
   }
 };

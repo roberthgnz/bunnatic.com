@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: FeaturePageProps): Promise<Me
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Hosting i domini inclosos | Wibloz"
-        : "Hosting y dominio incluidos | Wibloz",
+        ? "Hosting i domini inclosos | Bunnatic"
+        : "Hosting y dominio incluidos | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Publica la teva web amb infraestructura segura, ràpida i preparada per captar clients."

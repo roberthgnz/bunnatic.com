@@ -27,12 +27,12 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 
   const metadataByLocale = {
     es: {
-      title: "Wibloz | Crea tu web con IA para captar clientes locales",
+      title: "Bunnatic | Crea tu web con IA para captar clientes locales",
       description:
         "Crea una web profesional con IA en minutos. Optimizada para SEO local, formularios y WhatsApp para convertir visitas en clientes.",
     },
     ca: {
-      title: "Wibloz | Crea la teva web amb IA per captar clients locals",
+      title: "Bunnatic | Crea la teva web amb IA per captar clients locals",
       description:
         "Crea una web professional amb IA en minuts. Optimitzada per SEO local, formularis i WhatsApp per convertir visites en clients.",
     },

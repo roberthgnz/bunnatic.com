@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: AlternativePageProps): Promis
     locale: safeLocale,
     title:
       safeLocale === "ca"
-        ? "Alternativa a Squarespace per negocis locals | Wibloz"
-        : "Alternativa a Squarespace para negocios locales | Wibloz",
+        ? "Alternativa a Squarespace per negocis locals | Bunnatic"
+        : "Alternativa a Squarespace para negocios locales | Bunnatic",
     description:
       safeLocale === "ca"
         ? "Una web enfocada a conversió i captació, no només a disseny visual."
@@ -35,7 +35,7 @@ export default function AlternativeSquarespacePage() {
           badge: "Diseño útil para vender, no solo para verse bonito",
           title: "La alternativa a Squarespace para negocios locales",
           subtitle:
-            "Squarespace puede verse bien, pero Wibloz está pensada para rendimiento comercial: mensajes claros, captación y facilidad de edición diaria.",
+            "Squarespace puede verse bien, pero Bunnatic está pensada para rendimiento comercial: mensajes claros, captación y facilidad de edición diaria.",
           urgencyText: "Una web bonita sin conversión no impacta en caja.",
           ctaPrimary: "Crear cuenta gratis",
           ctaSecondary: "Ver cómo funciona",
@@ -46,7 +46,7 @@ export default function AlternativeSquarespacePage() {
             "Curva de aprendizaje para que quede realmente optimizado.",
             "Tiempo invertido en diseño en lugar de estrategia comercial.",
           ],
-          novaCardTitle: "Con Wibloz",
+          novaCardTitle: "Con Bunnatic",
           novaItems: [
             "Estructura centrada en convertir visitas en contactos.",
             "Editor visual simple para mover campañas rápido.",
@@ -97,7 +97,7 @@ export default function AlternativeSquarespacePage() {
           badge: "Disseny útil per vendre, no només per quedar bonic",
           title: "L'alternativa a Squarespace per negocis locals",
           subtitle:
-            "Squarespace pot veure's bé, però Wibloz està pensada per rendiment comercial: missatges clars, captació i facilitat d'edició diària.",
+            "Squarespace pot veure's bé, però Bunnatic està pensada per rendiment comercial: missatges clars, captació i facilitat d'edició diària.",
           urgencyText: "Una web bonica sense conversió no impacta a caixa.",
           ctaPrimary: "Crear compte gratis",
           ctaSecondary: "Veure com funciona",
@@ -108,7 +108,7 @@ export default function AlternativeSquarespacePage() {
             "Corba d'aprenentatge perquè quedi realment optimitzat.",
             "Temps invertit en disseny en lloc d'estratègia comercial.",
           ],
-          novaCardTitle: "Amb Wibloz",
+          novaCardTitle: "Amb Bunnatic",
           novaItems: [
             "Estructura centrada a convertir visites en contactes.",
             "Editor visual simple per moure campanyes ràpid.",

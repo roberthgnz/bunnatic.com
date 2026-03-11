@@ -22,14 +22,14 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
       lastUpdatedLabel: "Última actualización",
       lastUpdatedDate: "10 de marzo de 2026",
       intro:
-        "Este sitio web pertenece a Wibloz y regula el acceso y uso de nuestra plataforma para crear páginas web con ayuda de inteligencia artificial.",
+        "Este sitio web pertenece a Bunnatic y regula el acceso y uso de nuestra plataforma para crear páginas web con ayuda de inteligencia artificial.",
       sections: [
         {
           title: "1. Titular del sitio",
           paragraphs: [
-            "Titular: Wibloz.",
-            "Sitio web: wibloz.com.",
-            "Contacto general: hola@wibloz.com.",
+            "Titular: Bunnatic.",
+            "Sitio web: bunnatic.com.",
+            "Contacto general: hola@bunnatic.com.",
           ],
         },
         {
@@ -42,27 +42,27 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
           title: "3. Condiciones de uso",
           paragraphs: [
             "El usuario se compromete a utilizar el sitio de forma lícita, diligente y respetuosa con la normativa vigente.",
-            "Queda prohibido usar los servicios para actividades fraudulentas, suplantación de identidad o cualquier uso que pueda dañar a terceros o a Wibloz.",
+            "Queda prohibido usar los servicios para actividades fraudulentas, suplantación de identidad o cualquier uso que pueda dañar a terceros o a Bunnatic.",
           ],
         },
         {
           title: "4. Propiedad intelectual e industrial",
           paragraphs: [
-            "Los textos, diseños, logotipos, código, interfaces, imágenes y demás elementos del sitio son titularidad de Wibloz o de terceros autorizados.",
+            "Los textos, diseños, logotipos, código, interfaces, imágenes y demás elementos del sitio son titularidad de Bunnatic o de terceros autorizados.",
             "No se permite su reproducción, distribución o transformación sin autorización previa y expresa.",
           ],
         },
         {
           title: "5. Responsabilidad",
           paragraphs: [
-            "Wibloz trabaja para mantener el servicio actualizado y disponible, pero no garantiza la ausencia total de interrupciones o errores técnicos.",
+            "Bunnatic trabaja para mantener el servicio actualizado y disponible, pero no garantiza la ausencia total de interrupciones o errores técnicos.",
             "El usuario es responsable del uso que haga de la información publicada y de los contenidos que cree o publique mediante la plataforma.",
           ],
         },
         {
           title: "6. Enlaces externos",
           paragraphs: [
-            "Este sitio puede incluir enlaces a servicios de terceros. Wibloz no controla ni asume responsabilidad sobre sus contenidos, políticas o disponibilidad.",
+            "Este sitio puede incluir enlaces a servicios de terceros. Bunnatic no controla ni asume responsabilidad sobre sus contenidos, políticas o disponibilidad.",
           ],
         },
         {
@@ -79,11 +79,11 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
       lastUpdatedLabel: "Última actualización",
       lastUpdatedDate: "10 de marzo de 2026",
       intro:
-        "En Wibloz tratamos los datos personales de forma transparente y conforme al Reglamento (UE) 2016/679 (RGPD) y la normativa aplicable.",
+        "En Bunnatic tratamos los datos personales de forma transparente y conforme al Reglamento (UE) 2016/679 (RGPD) y la normativa aplicable.",
       sections: [
         {
           title: "1. Datos que tratamos",
-          paragraphs: ["Podemos tratar los siguientes datos cuando usas Wibloz:"],
+          paragraphs: ["Podemos tratar los siguientes datos cuando usas Bunnatic:"],
           bullets: [
             "Datos de registro: nombre, correo electrónico y credenciales de acceso.",
             "Datos de negocio: nombre comercial, dirección, teléfono, horarios, categoría y contenido que el usuario aporte o confirme.",
@@ -122,7 +122,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
         {
           title: "6. Derechos del usuario",
           paragraphs: [
-            "Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando una solicitud a privacidad@wibloz.com.",
+            "Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando una solicitud a privacidad@bunnatic.com.",
             "Si consideras que tus derechos no se han atendido correctamente, puedes presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD).",
           ],
         },
@@ -139,7 +139,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
       lastUpdatedLabel: "Última actualización",
       lastUpdatedDate: "10 de marzo de 2026",
       intro:
-        "Esta política explica qué son las cookies, qué tipos usa Wibloz y cómo puedes gestionarlas.",
+        "Esta política explica qué son las cookies, qué tipos usa Bunnatic y cómo puedes gestionarlas.",
       sections: [
         {
           title: "1. Qué son las cookies",
@@ -149,7 +149,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
         },
         {
           title: "2. Tipos de cookies que utilizamos",
-          paragraphs: ["En Wibloz podemos utilizar:"],
+          paragraphs: ["En Bunnatic podemos utilizar:"],
           bullets: [
             "Cookies técnicas: necesarias para el funcionamiento básico del sitio y el acceso seguro.",
             "Cookies de preferencias: guardan opciones como idioma o ajustes de interfaz.",
@@ -178,7 +178,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
         {
           title: "6. Contacto",
           paragraphs: [
-            "Si tienes dudas sobre esta política, puedes escribir a privacidad@wibloz.com.",
+            "Si tienes dudas sobre esta política, puedes escribir a privacidad@bunnatic.com.",
           ],
         },
       ],
@@ -190,14 +190,14 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
       lastUpdatedLabel: "Última actualització",
       lastUpdatedDate: "10 de març de 2026",
       intro:
-        "Aquest lloc web pertany a Wibloz i regula l'accés i ús de la nostra plataforma per crear pàgines web amb ajuda d'intel·ligència artificial.",
+        "Aquest lloc web pertany a Bunnatic i regula l'accés i ús de la nostra plataforma per crear pàgines web amb ajuda d'intel·ligència artificial.",
       sections: [
         {
           title: "1. Titular del lloc",
           paragraphs: [
-            "Titular: Wibloz.",
-            "Lloc web: wibloz.com.",
-            "Contacte general: hola@wibloz.com.",
+            "Titular: Bunnatic.",
+            "Lloc web: bunnatic.com.",
+            "Contacte general: hola@bunnatic.com.",
           ],
         },
         {
@@ -210,27 +210,27 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
           title: "3. Condicions d'ús",
           paragraphs: [
             "L'usuari es compromet a utilitzar el lloc de forma lícita, diligent i respectuosa amb la normativa vigent.",
-            "Queda prohibit utilitzar els serveis per a activitats fraudulentes, suplantació d'identitat o qualsevol ús que pugui perjudicar tercers o Wibloz.",
+            "Queda prohibit utilitzar els serveis per a activitats fraudulentes, suplantació d'identitat o qualsevol ús que pugui perjudicar tercers o Bunnatic.",
           ],
         },
         {
           title: "4. Propietat intel·lectual i industrial",
           paragraphs: [
-            "Els textos, dissenys, logotips, codi, interfícies, imatges i la resta d'elements del lloc són titularitat de Wibloz o de tercers autoritzats.",
+            "Els textos, dissenys, logotips, codi, interfícies, imatges i la resta d'elements del lloc són titularitat de Bunnatic o de tercers autoritzats.",
             "No es permet la reproducció, distribució o transformació sense autorització prèvia i expressa.",
           ],
         },
         {
           title: "5. Responsabilitat",
           paragraphs: [
-            "Wibloz treballa per mantenir el servei actualitzat i disponible, però no garanteix l'absència total d'interrupcions o errors tècnics.",
+            "Bunnatic treballa per mantenir el servei actualitzat i disponible, però no garanteix l'absència total d'interrupcions o errors tècnics.",
             "L'usuari és responsable de l'ús que faci de la informació publicada i dels continguts que creï o publiqui mitjançant la plataforma.",
           ],
         },
         {
           title: "6. Enllaços externs",
           paragraphs: [
-            "Aquest lloc pot incloure enllaços a serveis de tercers. Wibloz no controla ni assumeix responsabilitat sobre els seus continguts, polítiques o disponibilitat.",
+            "Aquest lloc pot incloure enllaços a serveis de tercers. Bunnatic no controla ni assumeix responsabilitat sobre els seus continguts, polítiques o disponibilitat.",
           ],
         },
         {
@@ -247,11 +247,11 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
       lastUpdatedLabel: "Última actualització",
       lastUpdatedDate: "10 de març de 2026",
       intro:
-        "A Wibloz tractem les dades personals de manera transparent i d'acord amb el Reglament (UE) 2016/679 (RGPD) i la normativa aplicable.",
+        "A Bunnatic tractem les dades personals de manera transparent i d'acord amb el Reglament (UE) 2016/679 (RGPD) i la normativa aplicable.",
       sections: [
         {
           title: "1. Dades que tractem",
-          paragraphs: ["Podem tractar les dades següents quan utilitzes Wibloz:"],
+          paragraphs: ["Podem tractar les dades següents quan utilitzes Bunnatic:"],
           bullets: [
             "Dades de registre: nom, correu electrònic i credencials d'accés.",
             "Dades del negoci: nom comercial, adreça, telèfon, horaris, categoria i contingut que l'usuari aporti o confirmi.",
@@ -290,7 +290,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
         {
           title: "6. Drets de l'usuari",
           paragraphs: [
-            "Pots exercir els teus drets d'accés, rectificació, supressió, oposició, limitació i portabilitat enviant una sol·licitud a privacitat@wibloz.com.",
+            "Pots exercir els teus drets d'accés, rectificació, supressió, oposició, limitació i portabilitat enviant una sol·licitud a privacitat@bunnatic.com.",
             "Si consideres que els teus drets no s'han atès correctament, pots presentar una reclamació davant l'Agència Espanyola de Protecció de Dades (AEPD).",
           ],
         },
@@ -307,7 +307,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
       lastUpdatedLabel: "Última actualització",
       lastUpdatedDate: "10 de març de 2026",
       intro:
-        "Aquesta política explica què són les cookies, quins tipus utilitza Wibloz i com les pots gestionar.",
+        "Aquesta política explica què són les cookies, quins tipus utilitza Bunnatic i com les pots gestionar.",
       sections: [
         {
           title: "1. Què són les cookies",
@@ -317,7 +317,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
         },
         {
           title: "2. Tipus de cookies que utilitzem",
-          paragraphs: ["A Wibloz podem utilitzar:"],
+          paragraphs: ["A Bunnatic podem utilitzar:"],
           bullets: [
             "Cookies tècniques: necessàries per al funcionament bàsic del lloc i l'accés segur.",
             "Cookies de preferències: guarden opcions com idioma o ajustos d'interfície.",
@@ -346,7 +346,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
         {
           title: "6. Contacte",
           paragraphs: [
-            "Si tens dubtes sobre aquesta política, pots escriure a privacitat@wibloz.com.",
+            "Si tens dubtes sobre aquesta política, pots escriure a privacitat@bunnatic.com.",
           ],
         },
       ],

@@ -17,14 +17,14 @@ import { trackFunnelEvent } from "@/lib/funnelEvents";
 const signUpContent = {
   es: {
     navbar: {
-      logo: "Wibloz",
+      logo: "Bunnatic",
     },
     crear: {
       back: "Volver",
     },
     signup: {
       title: "Crear cuenta",
-      subtitle: "Introduce tus datos para acceder al panel de Wibloz.",
+      subtitle: "Introduce tus datos para acceder al panel de Bunnatic.",
       existingAccountText: "Iniciar sesión",
       or: "¿Ya tienes cuenta?",
       nameLabel: "Nombre completo",
@@ -58,14 +58,14 @@ const signUpContent = {
   },
   ca: {
     navbar: {
-      logo: "Wibloz",
+      logo: "Bunnatic",
     },
     crear: {
       back: "Tornar",
     },
     signup: {
       title: "Crear compte",
-      subtitle: "Introdueix les teves dades per accedir al panell de Wibloz.",
+      subtitle: "Introdueix les teves dades per accedir al panell de Bunnatic.",
       existingAccountText: "Iniciar sessió",
       or: "Ja tens compte?",
       nameLabel: "Nom complet",

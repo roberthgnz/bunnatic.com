@@ -78,8 +78,9 @@ export default function FeatureLanding({ slug, icon, copy }: FeatureLandingProps
   const locale: Locale = language === "ca" ? "ca" : "es";
   const t = copy[locale];
   const IconComponent = iconMap[icon] ?? Sparkles;
-  const signupHref = `/signup?source=feature-${slug}`;
-  const planHref = `/signup?plan=pro&source=feature-${slug}`;
+  const localePrefix = `/${locale}`;
+  const signupHref = `${localePrefix}/signup?redirect=/checkout&source=feature-${slug}`;
+  const planHref = `${localePrefix}/signup?redirect=/checkout&plan=pro&source=feature-${slug}`;
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
@@ -101,17 +102,16 @@ export default function FeatureLanding({ slug, icon, copy }: FeatureLandingProps
             <p className="mt-3 text-xs font-semibold text-gray-500 sm:mt-4 sm:text-sm">{t.urgencyText}</p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href={signupHref}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-bold text-white shadow-[0_10px_35px_-15px_rgba(16,185,129,0.7)] transition-all hover:bg-emerald-400 sm:w-auto sm:text-base sm:hover:scale-105"
-              >
-                {t.ctaPrimary}
-                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Link>
               <DemoLinkButton
-                label={locale === "es" ? "Ver en acción" : "Provar demo ara"}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 px-6 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50 sm:w-auto sm:text-base"
+                label={locale === "es" ? "Probar demo gratis" : "Provar demo gratuïta"}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-bold text-white shadow-[0_10px_35px_-15px_rgba(16,185,129,0.7)] transition-all hover:bg-emerald-400 sm:w-auto sm:text-base sm:hover:scale-105"
               />
+              <Link
+                href={`${localePrefix}/#pricing`}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 px-6 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50 sm:w-auto sm:text-base"
+              >
+                {locale === "es" ? "Ver precios" : "Veure preus"}
+              </Link>
             </div>
 
             <p className="mt-4 text-xs font-medium text-gray-500 sm:mt-5 sm:text-sm">{t.trustLine}</p>

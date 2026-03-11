@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Zap, Search, MapPin, Star, Phone, Globe, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/LanguageProvider";
+import { useSearchParams } from "next/navigation";
+import { trackFunnelEvent } from "@/lib/funnelEvents";
 
 const createPageContent = {
   es: {
@@ -99,6 +101,7 @@ const createPageContent = {
 
 export default function CreateWebPage() {
   const { language } = useLanguage();
+  const pageSearchParams = useSearchParams();
   const t = createPageContent[language];
   const [step, setStep] = useState<"search" | "analyzing" | "preview" | "dashboard">("search");
   const [query, setQuery] = useState("");
@@ -107,6 +110,7 @@ export default function CreateWebPage() {
   const [selectedPlace, setSelectedPlace] = useState<any>(null);
   const [placeDetails, setPlaceDetails] = useState<any>(null);
   const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [draftId, setDraftId] = useState<string | null>(null);
 
   const typeLabels = {
     es: {
@@ -220,16 +224,50 @@ export default function CreateWebPage() {
   const hasDetectedServices = detectedServices.length > 0;
   const priceLevelValue = typeof placeDetails?.price_level === "number" ? "€".repeat(placeDetails.price_level) : null;
   const openNow = placeDetails?.opening_hours?.open_now;
+  const sourceValue = useMemo(() => {
+    const qs = pageSearchParams.toString();
+    return `/${language}/crear${qs ? `?${qs}` : ""}`;
+  }, [language, pageSearchParams]);
+  const planSuggested = useMemo(() => {
+    if (!placeDetails?.price_level) {
+      return "starter";
+    }
+    if (placeDetails.price_level >= 4) {
+      return "agency";
+    }
+    if (placeDetails.price_level >= 2) {
+      return "pro";
+    }
+    return "starter";
+  }, [placeDetails]);
+  const sector = (placeDetails?.types?.[0] as string | undefined) ?? "";
   const aboutText =
     placeDetails?.editorial_summary?.overview ||
     t.crear.aboutUsText
       .replace("{rating}", placeDetails?.rating || "")
       .replace("{city}", placeDetails?.formatted_address?.split(",")?.[1]?.trim() || (language === "es" ? "la ciudad" : "la ciutat"));
-  const signupHref = `/${language}/signup?redirect=/crear`;
+  const signupParams = new URLSearchParams();
+  signupParams.set("redirect", "/checkout");
+  signupParams.set("source", sourceValue);
+  signupParams.set("planSuggested", planSuggested);
+  if (sector) {
+    signupParams.set("sector", sector);
+  }
+  if (draftId) {
+    signupParams.set("draftId", draftId);
+  }
+  for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]) {
+    const value = pageSearchParams.get(key);
+    if (value) {
+      signupParams.set(key, value);
+    }
+  }
+  const signupHref = `/${language}/signup?${signupParams.toString()}`;
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
+    trackFunnelEvent("crear_search_submitted", { locale: language, has_source: Boolean(pageSearchParams.get("source")) });
 
     setIsSearching(true);
     try {
@@ -246,6 +284,8 @@ export default function CreateWebPage() {
   };
 
   const handleSelectPlace = async (place: any) => {
+    const nextDraftId = `${place.place_id}-${Date.now()}`;
+    setDraftId(nextDraftId);
     setSelectedPlace(place);
     setStep("analyzing");
     setPlaceDetails(null);
@@ -274,10 +314,21 @@ export default function CreateWebPage() {
           throw new Error("Place details not found");
         }
         setPlaceDetails(data.result);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(`draft:${nextDraftId}`, JSON.stringify({
+            draftId: nextDraftId,
+            placeId: place.place_id,
+            name: data.result?.name ?? place.name,
+            sector: data.result?.types?.[0] ?? "",
+            source: sourceValue,
+            updatedAt: Date.now(),
+          }));
+        }
       })();
 
       await Promise.all([analysisPromise, detailsPromise]);
       setStep("preview");
+      trackFunnelEvent("crear_preview_generated", { locale: language, draft_id: nextDraftId });
     } catch (error) {
       console.error("Error fetching place details:", error);
       setStep("search"); // Revert on error
@@ -477,7 +528,18 @@ export default function CreateWebPage() {
                       variant="default"
                       className="h-12 w-full rounded-full bg-emerald-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-400"
                     >
-                      <Link href={signupHref}>{t.crear.publishNow}</Link>
+                      <Link
+                        href={signupHref}
+                        onClick={() =>
+                          trackFunnelEvent("crear_publish_clicked", {
+                            locale: language,
+                            draft_id: draftId ?? "",
+                            plan_suggested: planSuggested,
+                          })
+                        }
+                      >
+                        {t.crear.publishNow}
+                      </Link>
                     </Button>
                     <Button
                       type="button"

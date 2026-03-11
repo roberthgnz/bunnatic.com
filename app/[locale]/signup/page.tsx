@@ -5,11 +5,14 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, CircleCheck, Eye, EyeOff, MapPin, Sparkles, Zap } from "lucide-react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { createSignupSchema, type SignupFormValues } from "@/lib/validations/signup";
 import { cn } from "@/lib/utils";
+import { signup } from "@/lib/supabase/actions";
+import { toast } from "sonner";
+import { trackFunnelEvent } from "@/lib/funnelEvents";
 
 const signUpContent = {
   es: {
@@ -97,7 +100,7 @@ const signUpContent = {
 } as const;
 
 const REDIRECT_KEYS = new Set(["redirect", "next", "returnTo", "to"]);
-const CONTEXT_KEYS = ["plan", "source", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;
+const CONTEXT_KEYS = ["plan", "planSuggested", "source", "draftId", "sector", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;
 
 function normalizeInternalPath(path: string) {
   if (!path || !path.startsWith("/") || path.startsWith("//")) {
@@ -118,6 +121,7 @@ export default function SignUpPage() {
     const locale = pathname.split("/")[1];
     return locale ? `/${locale}` : "";
   }, [pathname]);
+  const homeHref = localePrefix || "/";
 
   const flow = useMemo(() => {
     const redirectRaw =
@@ -140,14 +144,18 @@ export default function SignUpPage() {
       }
     }
 
+    const plan = searchParams.get("plan") ?? searchParams.get("planSuggested");
+    const source = searchParams.get("source");
+
+    if (safeTargetPath === "/checkout" && plan && !targetQuery.has("plan")) {
+      targetQuery.set("plan", plan);
+    }
+
     const serialized = targetQuery.toString();
     const targetWithQuery = `${safeTargetPath}${serialized ? `?${serialized}` : ""}`;
     const destination = targetWithQuery.startsWith(`/${pathname.split("/")[1]}/`)
       ? targetWithQuery
       : `${localePrefix}${targetWithQuery}`;
-
-    const plan = searchParams.get("plan");
-    const source = searchParams.get("source");
 
     return { destination, safeTargetPath, plan, source };
   }, [localePrefix, pathname, searchParams]);
@@ -184,21 +192,46 @@ export default function SignUpPage() {
     { label: t.signup.validation.passwordNumber, valid: /[0-9]/.test(passwordValue) },
   ];
 
-  function onSubmit() {
-    router.push(flow.destination);
+  useEffect(() => {
+    trackFunnelEvent("signup_started", {
+      locale: language,
+      source: flow.source ?? "",
+      plan: flow.plan ?? "",
+      has_draft: Boolean(searchParams.get("draftId")),
+    });
+  }, [flow.plan, flow.source, language, searchParams]);
+
+  async function onSubmit(data: SignupFormValues) {
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+    formData.append("name", data.name);
+
+    const result = await signup(formData);
+
+    if (result?.error) {
+      toast.error(result.error);
+    } else {
+      trackFunnelEvent("signup_completed", {
+        locale: language,
+        source: flow.source ?? "",
+        plan: flow.plan ?? "",
+      });
+      router.push(flow.destination);
+    }
   }
 
   return (
     <main className="min-h-screen bg-slate-100 font-sans text-gray-900 flex flex-col">
       <nav className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href={homeHref} className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
               <Zap className="h-5 w-5 fill-emerald-600 text-emerald-600" />
             </div>
             <span className="text-xl font-bold tracking-tight text-gray-900">{t.navbar.logo}</span>
           </Link>
-          <Link href="/" className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900">
+          <Link href={homeHref} className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" />
             {t.crear.back}
           </Link>

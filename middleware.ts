@@ -1,5 +1,6 @@
 import createMiddleware from 'next-intl/middleware';
 import {NextRequest, NextResponse} from 'next/server';
+import { updateSession } from '@/lib/supabase/middleware';
 import {
   getBusinessLandingBySlug,
   getBusinessSlugByLocale,
@@ -113,26 +114,46 @@ function getLocalizedStaticRewritePath(pathname: string) {
   return `${localePrefix}/${fsSlug}`;
 }
 
-export default function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
+  // First, update the Supabase session
+  const supabaseResponse = await updateSession(request);
+
   const {pathname} = new URL(request.url);
   const redirectPath = getCanonicalBusinessRedirectPath(pathname);
 
   if (redirectPath) {
     const url = new URL(request.url);
     url.pathname = redirectPath;
-    return NextResponse.redirect(url);
+    const response = NextResponse.redirect(url);
+    // Copy cookies from supabaseResponse to the redirect response
+    supabaseResponse.cookies.getAll().forEach(cookie => {
+      response.cookies.set(cookie.name, cookie.value, cookie.options);
+    });
+    return response;
   }
 
   const rewritePath = getLocalizedStaticRewritePath(pathname);
   if (rewritePath) {
     const url = new URL(request.url);
     url.pathname = rewritePath;
-    return NextResponse.rewrite(url);
+    const response = NextResponse.rewrite(url);
+    // Copy cookies from supabaseResponse to the rewrite response
+    supabaseResponse.cookies.getAll().forEach(cookie => {
+      response.cookies.set(cookie.name, cookie.value, cookie.options);
+    });
+    return response;
   }
 
-  return intlMiddleware(request);
+  // Handle intl middleware
+  const response = intlMiddleware(request);
+  // Copy cookies from supabaseResponse to the intl response
+  supabaseResponse.cookies.getAll().forEach(cookie => {
+    response.cookies.set(cookie.name, cookie.value, cookie.options);
+  });
+  return response;
 }
 
 export const config = {
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
+

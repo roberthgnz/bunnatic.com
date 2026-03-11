@@ -8,11 +8,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Zap } from "lucide-react";
+import { ChevronDown, Zap, LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useLanguage } from "./LanguageProvider";
 import { getFeatureSlug } from "@/lib/pageSlugs";
+import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
+import { logout } from "@/lib/supabase/actions";
+import { toast } from "sonner";
+import { trackFunnelEvent } from "@/lib/funnelEvents";
 
 type NavbarProps = {
   useDemoCta?: boolean;
@@ -23,19 +28,48 @@ export default function Navbar({ useDemoCta = false }: NavbarProps) {
   const t = content[language];
   const pathname = usePathname() ?? "/";
   const searchParams = useSearchParams();
+  const router = useRouter();
   const paramsText = searchParams.toString();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleLogout() {
+    await logout();
+    toast.success("Has cerrado sesión");
+    router.refresh();
+  }
 
   const segments = pathname.split("/").filter(Boolean);
   const locale = segments[0];
   const hasLocale = locale === "es" || locale === "ca";
   const isCreatePage = hasLocale ? segments[1] === "crear" : segments[0] === "crear";
   const targetPath = hasLocale ? `/${locale}/crear` : "/crear";
+  const checkoutPath = hasLocale ? `/${locale}/checkout` : "/checkout";
   const homePath = hasLocale ? `/${locale}` : "/";
   const signupPath = hasLocale ? `/${locale}/signup` : "/signup";
   const source = `${pathname}${paramsText ? `?${paramsText}` : ""}`;
   const demoHref = `${targetPath}?source=${encodeURIComponent(source)}`;
-  const signupFromCreateHref = `${signupPath}?redirect=${encodeURIComponent(targetPath)}`;
-  const ctaHref = useDemoCta ? demoHref : isCreatePage ? signupFromCreateHref : "/crear";
+  const signupParams = new URLSearchParams(paramsText);
+  signupParams.set("redirect", checkoutPath);
+  if (!signupParams.get("source")) {
+    signupParams.set("source", source);
+  }
+  const signupFromCreateHref = `${signupPath}?${signupParams.toString()}`;
+  const ctaHref = useDemoCta ? demoHref : isCreatePage ? signupFromCreateHref : targetPath;
   const ctaText = useDemoCta
     ? language === "ca"
       ? "Provar demo ara"
@@ -70,7 +104,7 @@ export default function Navbar({ useDemoCta = false }: NavbarProps) {
               {t.navbar.coreFeatures.map((feature) => (
                 <DropdownMenuItem key={feature.id} asChild>
                   <Link
-                    href={`/caracteristicas/${getFeatureSlug(feature.id, language)}`}
+                    href={`${hasLocale ? `/${locale}` : ""}/caracteristicas/${getFeatureSlug(feature.id, language)}`}
                     className="block rounded-lg px-2 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900"
                   >
                     {feature.label}
@@ -98,12 +132,32 @@ export default function Navbar({ useDemoCta = false }: NavbarProps) {
               CA
             </Button>
           </div>
-          <Link
-            href={ctaHref}
-            className="rounded-full bg-gray-900 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm transition-all hover:scale-105 hover:bg-gray-800 hover:shadow-md"
-          >
-            {ctaText}
-          </Link>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <User className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="text-xs text-gray-500 disabled">
+                  {user.email}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Cerrar sesión
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link
+              href={ctaHref}
+              onClick={() => trackFunnelEvent("landing_cta_click", { placement: "navbar", locale: language })}
+              className="rounded-full bg-gray-900 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm transition-all hover:scale-105 hover:bg-gray-800 hover:shadow-md"
+            >
+              {ctaText}
+            </Link>
+          )}
         </div>
       </div>
     </nav>

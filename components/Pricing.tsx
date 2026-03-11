@@ -4,6 +4,7 @@ import { content } from "@/lib/content";
 import { Check, ChevronDown, CircleHelp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -64,6 +65,10 @@ export default function Pricing() {
   const t = content[language];
   const [isAnnual, setIsAnnual] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  const pathname = usePathname() ?? "/";
+  const locale = pathname.split("/").filter(Boolean)[0];
+  const hasLocale = locale === "es" || locale === "ca";
+  const signupBase = hasLocale ? `/${locale}/signup` : "/signup";
   const help = HELP_TEXT[language];
 
   const renderInfoList = (
@@ -101,7 +106,7 @@ export default function Pricing() {
   );
 
   return (
-    <section className="bg-[#f4f7fc] py-16 sm:py-24 lg:py-28">
+    <section id="pricing" className="bg-[#f4f7fc] py-16 sm:py-24 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <h2 className="text-3xl font-extrabold tracking-tight text-slate-800 sm:text-5xl">
@@ -135,8 +140,8 @@ export default function Pricing() {
         </div>
 
         <Card className="mt-10 overflow-hidden rounded-3xl border border-slate-200 bg-white p-0 sm:mt-14">
-          <div className="grid grid-cols-1 divide-y divide-slate-200 xl:grid-cols-4 xl:divide-x xl:divide-y-0">
-            {t.pricing.tiers.map((tier) => {
+          <div className="grid grid-cols-1 divide-y divide-slate-200 xl:grid-cols-3 xl:divide-x xl:divide-y-0">
+            {t.pricing.tiers.slice(0, 3).map((tier) => {
               const isStarter = tier.id === "tier-starter";
 
               return (
@@ -190,7 +195,7 @@ export default function Pricing() {
                           : "bg-slate-900 text-white hover:bg-slate-800"
                       }`}
                     >
-                      <Link href={`/signup?source=pricing&plan=${tier.id.replace("tier-", "")}`}>
+                      <Link href={`${signupBase}?redirect=/checkout&source=pricing&plan=${tier.id.replace("tier-", "")}`}>
                         {tier.cta}
                       </Link>
                     </Button>

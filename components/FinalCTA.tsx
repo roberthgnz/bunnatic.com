@@ -5,10 +5,16 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useLanguage } from "./LanguageProvider";
+import { usePathname } from "next/navigation";
+import { trackFunnelEvent } from "@/lib/funnelEvents";
 
 export default function FinalCTA() {
   const { language } = useLanguage();
   const t = content[language];
+  const pathname = usePathname() ?? "/";
+  const locale = pathname.split("/").filter(Boolean)[0];
+  const hasLocale = locale === "es" || locale === "ca";
+  const targetPath = hasLocale ? `/${locale}/crear` : "/crear";
 
   return (
     <section className="relative overflow-hidden bg-[#0a0a0a] py-24 sm:py-32">
@@ -43,7 +49,8 @@ export default function FinalCTA() {
             className="mt-12 flex flex-col items-center justify-center gap-6"
           >
             <Link
-              href="/signup"
+              href={targetPath}
+              onClick={() => trackFunnelEvent("landing_cta_click", { placement: "final_cta", locale: language })}
               className="group flex items-center gap-2 rounded-full bg-emerald-500 px-8 py-4 text-lg font-bold text-white shadow-[0_0_40px_-10px_rgba(16,185,129,0.5)] transition-all hover:scale-105 hover:bg-emerald-400"
             >
               {t.finalCta.cta.replace(" →", "")}

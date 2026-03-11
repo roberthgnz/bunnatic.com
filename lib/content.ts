@@ -10,7 +10,7 @@ export const content = {
         { id: "seo-local", label: "SEO local" },
         { id: "edicion-asistida", label: "Edición visual + IA" }
       ],
-      cta: "Crear mi web gratis →",
+      cta: "Probar demo gratis →",
     },
     hero: {
       badge: "✦ Más de 1,000 negocios ya confían en nosotros",
@@ -18,7 +18,7 @@ export const content = {
       titleLine2: "web profesional.",
       titleLine3: "La tienes lista en 5 minutos.",
       subtitle: "La IA crea tu web usando los datos de tu negocio. Gratis para empezar.",
-      cta: "Crear mi web gratis →",
+      cta: "Probar demo gratis →",
       trustText: "Sin tarjeta · Sin técnicos · Cancela cuando quieras",
     },
     ticker: {
@@ -413,7 +413,7 @@ export const content = {
     finalCta: {
       title: "Tu web profesional te espera.",
       subtitle: "Créala ahora, gratis.",
-      cta: "Empezar gratis →",
+      cta: "Probar demo gratis →",
       trustText: "Sin tarjeta · Sin técnicos · Cancela cuando quieras"
     },
     footer: {
@@ -433,7 +433,7 @@ export const content = {
         { id: "seo-local", label: "SEO local" },
         { id: "edicion-asistida", label: "Edició visual + IA" }
       ],
-      cta: "Crear la meva web gratis →",
+      cta: "Provar demo gratuïta →",
     },
     hero: {
       badge: "✦ Més de 1.000 negocis ja confien en nosaltres",
@@ -441,7 +441,7 @@ export const content = {
       titleLine2: "web professional.",
       titleLine3: "La tens llesta en 5 minuts.",
       subtitle: "La IA crea la teva web utilitzant les dades del teu negoci. Gratis per començar.",
-      cta: "Crear la meva web gratis →",
+      cta: "Provar demo gratuïta →",
       trustText: "Sense targeta · Sense tècnics · Cancel·la quan vulguis",
     },
     ticker: {
@@ -836,7 +836,7 @@ export const content = {
     finalCta: {
       title: "La teva web professional t'espera.",
       subtitle: "Crea-la ara, gratis.",
-      cta: "Començar gratis →",
+      cta: "Provar demo gratuïta →",
       trustText: "Sense targeta · Sense tècnics · Cancel·la quan vulguis"
     },
     footer: {

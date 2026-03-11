@@ -29,7 +29,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
           paragraphs: [
             "Titular: Bunnatic.",
             "Sitio web: bunnatic.com.",
-            "Contacto general: hola@bunnatic.com.",
+            "Contacto general: hello@bunnatic.com.",
           ],
         },
         {
@@ -122,7 +122,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
         {
           title: "6. Derechos del usuario",
           paragraphs: [
-            "Puedes ejercer tus derechos de acceso, rectificacion, supresion, oposicion, limitacion y portabilidad enviando una solicitud a privacidad@bunnatic.com.",
+            "Puedes ejercer tus derechos de acceso, rectificacion, supresion, oposicion, limitacion y portabilidad enviando una solicitud a privacy@bunnatic.com.",
             "Si consideras que tus derechos no se han atendido correctamente, puedes presentar una reclamacion ante la Agencia Española de Proteccion de Datos (AEPD).",
           ],
         },
@@ -188,7 +188,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
         {
           title: "7. Mas informacion y contacto",
           paragraphs: [
-            "Si tienes dudas sobre esta politica, puedes escribir a privacidad@bunnatic.com.",
+            "Si tienes dudas sobre esta politica, puedes escribir a privacy@bunnatic.com.",
             "Para obtener mas informacion sobre el tratamiento de datos personales relacionado con el uso de cookies, puedes consultar tambien nuestra Politica de Privacidad.",
           ],
         },
@@ -208,7 +208,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
           paragraphs: [
             "Titular: Bunnatic.",
             "Lloc web: bunnatic.com.",
-            "Contacte general: hola@bunnatic.com.",
+            "Contacte general: hello@bunnatic.com.",
           ],
         },
         {
@@ -301,7 +301,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
         {
           title: "6. Drets de l'usuari",
           paragraphs: [
-            "Pots exercir els teus drets d'acces, rectificacio, supressio, oposicio, limitacio i portabilitat enviant una sollicitud a privacitat@bunnatic.com.",
+            "Pots exercir els teus drets d'acces, rectificacio, supressio, oposicio, limitacio i portabilitat enviant una sollicitud a privacy@bunnatic.com.",
             "Si consideres que els teus drets no s'han ates correctament, pots presentar una reclamacio davant l'Agencia Espanyola de Proteccio de Dades (AEPD).",
           ],
         },
@@ -367,7 +367,7 @@ export const legalContent: Record<LegalLocale, Record<LegalPageKey, LegalPageCon
         {
           title: "7. Mes informacio i contacte",
           paragraphs: [
-            "Si tens dubtes sobre aquesta politica, pots escriure a privacitat@bunnatic.com.",
+            "Si tens dubtes sobre aquesta politica, pots escriure a privacy@bunnatic.com.",
             "Per obtenir mes informacio sobre el tractament de dades personals relacionat amb l'us de cookies, pots consultar tambe la nostra Politica de Privacitat.",
           ],
         },

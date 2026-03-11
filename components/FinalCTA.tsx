@@ -14,7 +14,7 @@ export default function FinalCTA() {
   const pathname = usePathname() ?? "/";
   const locale = pathname.split("/").filter(Boolean)[0];
   const hasLocale = locale === "es" || locale === "ca";
-  const targetPath = hasLocale ? `/${locale}/crear` : "/crear";
+  const targetPath = hasLocale ? `/${locale}/crear-pagina-web-negocio` : "/crear-pagina-web-negocio";
 
   return (
     <section className="relative overflow-hidden bg-[#0a0a0a] py-24 sm:py-32">

@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: CreateLayoutProps): Promise<M
       safeLocale === "ca"
         ? "Troba el teu negoci a Google i publica una web professional en minuts amb IA."
         : "Encuentra tu negocio en Google y publica una web profesional en minutos con IA.",
-    esPath: "/crear",
-    caPath: "/crear",
+    esPath: "/crear-pagina-web-negocio",
+    caPath: "/crear-pagina-web-negocio",
   });
 }
 

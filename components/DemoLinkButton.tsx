@@ -27,7 +27,7 @@ function DemoLinkButtonContent({ className, label }: DemoLinkButtonProps) {
   const segments = pathname.split("/").filter(Boolean);
   const locale = segments[0];
   const hasLocale = locale === "es" || locale === "ca";
-  const targetPath = hasLocale ? `/${locale}/crear` : "/crear";
+  const targetPath = hasLocale ? `/${locale}/crear-pagina-web-negocio` : "/crear-pagina-web-negocio";
   const source = `${pathname}${paramsText ? `?${paramsText}` : ""}`;
   const defaultLabel = locale === "ca" ? "Provar demo gratuïta" : "Probar demo gratis";
 

@@ -73,6 +73,16 @@ function getCanonicalBusinessRedirectPath(pathname: string) {
   return `${localePrefix}/negocio/${localizedSlug}`;
 }
 
+function getLegacyCreateRedirectPath(pathname: string) {
+  const legacyCreateMatch = pathname.match(/^\/(?:(es|ca)\/)?crear\/?$/);
+  if (!legacyCreateMatch) {
+    return null;
+  }
+
+  const localePrefix = getLocalePrefix(pathname);
+  return `${localePrefix}/crear-pagina-web-negocio`;
+}
+
 function getLocalizedStaticRewritePath(pathname: string) {
   const locale = getLocaleFromPath(pathname);
   const localePrefix = getLocalePrefix(pathname);
@@ -133,6 +143,15 @@ export default async function middleware(request: NextRequest) {
   const supabaseResponse = await updateSession(request);
 
   const {pathname} = new URL(request.url);
+  const legacyCreateRedirectPath = getLegacyCreateRedirectPath(pathname);
+  if (legacyCreateRedirectPath) {
+    const url = new URL(request.url);
+    url.pathname = legacyCreateRedirectPath;
+    const response = NextResponse.redirect(url, 308);
+    copyResponseCookies(supabaseResponse, response);
+    return response;
+  }
+
   const redirectPath = getCanonicalBusinessRedirectPath(pathname);
 
   if (redirectPath) {
@@ -161,4 +180,3 @@ export default async function middleware(request: NextRequest) {
 export const config = {
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
-

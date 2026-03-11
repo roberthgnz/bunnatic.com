@@ -68,8 +68,10 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   const segments = pathname.split("/").filter(Boolean);
   const locale = segments[0];
   const hasLocale = locale === "es" || locale === "ca";
-  const isCreatePage = hasLocale ? segments[1] === "crear" : segments[0] === "crear";
-  const targetPath = hasLocale ? `/${locale}/crear` : "/crear";
+  const isCreatePage = hasLocale
+    ? segments[1] === "crear-pagina-web-negocio" || segments[1] === "crear"
+    : segments[0] === "crear-pagina-web-negocio" || segments[0] === "crear";
+  const targetPath = hasLocale ? `/${locale}/crear-pagina-web-negocio` : "/crear-pagina-web-negocio";
   const checkoutPath = hasLocale ? `/${locale}/checkout` : "/checkout";
   const homePath = hasLocale ? `/${locale}` : "/";
   const signupPath = hasLocale ? `/${locale}/signup` : "/signup";
@@ -87,6 +89,10 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
     ? language === "ca"
       ? "Provar demo ara"
       : "Ver en accion"
+    : isCreatePage
+      ? language === "ca"
+        ? "Crear compte"
+        : "Crear cuenta"
     : t.navbar.cta;
   const dashboardLabel = "Dashboard";
   const logoutLabel = language === "ca" ? "Tancar sessio" : "Cerrar sesion";

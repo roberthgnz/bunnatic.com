@@ -29,6 +29,7 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const initializedRef = useRef(false);
+  const consentDefaultSetRef = useRef(false);
   const [hasConsent, setHasConsent] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const isGa4 = trackingId.startsWith('G-');
@@ -56,10 +57,31 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
         const windowFlags = window as unknown as Record<string, unknown>;
         windowFlags[`ga-disable-${trackingId}`] = !consentGranted;
 
-        if (consentGranted) {
+        if (isGa4) {
           ensureGtagStub();
+          if (!consentDefaultSetRef.current) {
+            window.gtag?.('consent', 'default', {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'denied',
+              wait_for_update: 500,
+            });
+            consentDefaultSetRef.current = true;
+          }
+
+          window.gtag?.('consent', 'update', {
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            analytics_storage: consentGranted ? 'granted' : 'denied',
+          });
         } else {
-          initializedRef.current = false;
+          if (consentGranted) {
+            ensureGtagStub();
+          } else {
+            initializedRef.current = false;
+          }
         }
       }
     };
@@ -70,10 +92,10 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
     return () => {
       window.removeEventListener(COOKIE_CONSENT_EVENT, syncConsent);
     };
-  }, [trackingId]);
+  }, [isGa4, trackingId]);
 
   useEffect(() => {
-    if (!hasConsent || typeof window === 'undefined') {
+    if (typeof window === 'undefined') {
       return;
     }
 
@@ -82,7 +104,7 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
     }
 
     const windowFlags = window as unknown as Record<string, unknown>;
-    windowFlags[`ga-disable-${trackingId}`] = false;
+    windowFlags[`ga-disable-${trackingId}`] = !hasConsent;
 
     if (isGa4) {
       ensureGtagStub();
@@ -107,7 +129,6 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
 
   useEffect(() => {
     if (
-      !hasConsent ||
       !scriptLoaded ||
       !initializedRef.current ||
       typeof window === 'undefined'
@@ -129,11 +150,7 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
 
     window.ga('set', 'page', page);
     window.ga('send', 'pageview');
-  }, [hasConsent, isGa4, pathname, scriptLoaded, searchParams]);
-
-  if (!hasConsent) {
-    return null;
-  }
+  }, [isGa4, pathname, scriptLoaded, searchParams]);
 
   return (
     <Script

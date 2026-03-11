@@ -28,7 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   const pathGroups: Array<Record<Locale, string>> = [];
 
-  const basePaths = ["/", "/crear", "/signin", "/signup"];
+  const basePaths = ["/", "/crear-pagina-web-negocio", "/signin", "/signup"];
   basePaths.forEach((path) => {
     pathGroups.push({ es: path, ca: path });
   });

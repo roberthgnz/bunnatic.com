@@ -14,7 +14,7 @@ export default function Hero() {
   const pathname = usePathname() ?? "/";
   const locale = pathname.split("/").filter(Boolean)[0];
   const hasLocale = locale === "es" || locale === "ca";
-  const targetPath = hasLocale ? `/${locale}/crear` : "/crear";
+  const targetPath = hasLocale ? `/${locale}/crear-pagina-web-negocio` : "/crear-pagina-web-negocio";
 
   return (
     <section className="relative overflow-hidden bg-white px-4 py-24 sm:px-6 lg:px-8 lg:py-32">

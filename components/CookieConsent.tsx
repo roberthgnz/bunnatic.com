@@ -30,8 +30,8 @@ const copy = {
     description:
       'Usamos cookies tecnicas para el funcionamiento del sitio. Las cookies se activan solo con tu consentimiento.',
     policy: 'Politica de cookies',
-    acceptAll: 'Aceptar cookies',
-    rejectAll: 'Rechazar cookies',
+    acceptAll: 'Aceptar',
+    rejectAll: 'Rechazar',
     configure: 'Configurar',
     preferencesTitle: 'Preferencias de cookies',
     preferencesDescription:
@@ -52,8 +52,8 @@ const copy = {
     description:
       'Fem servir cookies tecniques per al funcionament del lloc. Les cookies nomes s activen amb el teu consentiment.',
     policy: 'Politica de cookies',
-    acceptAll: 'Acceptar cookies',
-    rejectAll: 'Rebutjar cookies',
+    acceptAll: 'Acceptar',
+    rejectAll: 'Rebutjar',
     configure: 'Configurar',
     preferencesTitle: 'Preferencies de cookies',
     preferencesDescription:

@@ -15,12 +15,13 @@ const createPageContent = {
     crear: {
       title: "Encuentra tu negocio",
       subtitle: "Extraemos tu información pública y creamos una web lista para publicar en segundos.",
-      searchPlaceholder: "Ej: Pizzería Napoli, Madrid",
+      searchPlaceholder: "Ej: Pizzería Napoli, Madrid o https://tu-negocio.com",
       searchButton: "Buscar",
-      resultsTitle: "Resultados de Google",
+      resultsTitle: "Resultados",
       analyzingTitle: "La IA está analizando tu negocio...",
       analyzingSubtitle: "Extrayendo información de Google, leyendo reseñas y generando textos optimizados para SEO.",
-      step1: "Conectando con Google My Business",
+      step1Google: "Extrayendo información del negocio",
+      step1Web: "Analizando tu sitio web",
       step2: "Extrayendo dirección y horarios",
       step3: "Generando diseño y textos persuasivos",
       extractedData: "Datos Extraídos",
@@ -60,12 +61,13 @@ const createPageContent = {
     crear: {
       title: "Troba el teu negoci",
       subtitle: "Connectem amb Google My Business per extreure la teva informació i crear la teva web en segons.",
-      searchPlaceholder: "Ex: Pizzeria Napoli, Barcelona",
+      searchPlaceholder: "Ex: Pizzeria Napoli, Barcelona o https://el-teu-negoci.com",
       searchButton: "Cercar",
-      resultsTitle: "Resultats de Google",
+      resultsTitle: "Resultats",
       analyzingTitle: "La IA està analitzant el teu negoci...",
       analyzingSubtitle: "Extraient informació de Google, llegint ressenyes i generant textos optimitzats per a SEO.",
-      step1: "Connectant amb Google My Business",
+      step1Google: "Extraient informació del negoci",
+      step1Web: "Analitzant el teu lloc web",
       step2: "Extraient adreça i horaris",
       step3: "Generant disseny i textos persuasius",
       extractedData: "Dades Extretes",
@@ -103,6 +105,15 @@ const createPageContent = {
   },
 } as const;
 
+function isCompleteHttpUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export default function CreateWebPage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-white" />}>
@@ -124,6 +135,9 @@ function CreateWebContent() {
   const [placeDetails, setPlaceDetails] = useState<any>(null);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [draftId, setDraftId] = useState<string | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [analysisInputMode, setAnalysisInputMode] = useState<"google" | "url">("google");
+  const [lastSearchMode, setLastSearchMode] = useState<"google" | "url" | null>(null);
 
   const typeLabels = {
     es: {
@@ -276,23 +290,137 @@ function CreateWebContent() {
     }
   }
   const signupHref = `/${language}/signup?${signupParams.toString()}`;
-  const showNoResults = hasSearched && !isSearching && query.trim().length > 0 && places.length === 0;
+  const showNoResults =
+    lastSearchMode === "google" &&
+    hasSearched &&
+    !isSearching &&
+    query.trim().length > 0 &&
+    places.length === 0;
+  const genericUrlError =
+    language === "es"
+      ? "No pudimos analizar esa URL. Verifica que sea pública y vuelve a intentarlo."
+      : "No hem pogut analitzar aquesta URL. Verifica que sigui pública i torna-ho a provar.";
+  const urlPollIntervalMs = 1200;
+  const urlPollMaxWaitMs = 90000;
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim()) return;
-    trackFunnelEvent("crear_search_submitted", { locale: language, has_source: Boolean(pageSearchParams.get("source")) });
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) return;
+    const inputMode: "google" | "url" = isCompleteHttpUrl(trimmedQuery) ? "url" : "google";
+    setLastSearchMode(inputMode);
+    trackFunnelEvent("crear_search_submitted", {
+      locale: language,
+      has_source: Boolean(pageSearchParams.get("source")),
+      input_mode: inputMode,
+    });
 
     setIsSearching(true);
     setHasSearched(true);
+    setSearchError(null);
     setPlaces([]);
+
+    if (inputMode === "url") {
+      const nextDraftId = `url-${Date.now()}`;
+      setDraftId(nextDraftId);
+      setSelectedPlace({ place_id: trimmedQuery, name: trimmedQuery });
+      setStep("analyzing");
+      setAnalysisInputMode("url");
+      setPlaceDetails(null);
+      setAnalysisProgress(0);
+
+      const progressInterval = window.setInterval(() => {
+        setAnalysisProgress((current) => Math.min(92, current + 2));
+      }, 350);
+
+      try {
+        const startRes = await fetch("/api/places/crawl", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: trimmedQuery, lang: language }),
+        });
+        const startData = await startRes.json();
+        if (!startRes.ok || !startData.jobId) {
+          throw new Error(typeof startData.error === "string" ? startData.error : genericUrlError);
+        }
+
+        const pollStart = Date.now();
+        let finalResult: any | null = null;
+
+        while (Date.now() - pollStart < urlPollMaxWaitMs) {
+          await new Promise((resolve) => window.setTimeout(resolve, urlPollIntervalMs));
+
+          const statusRes = await fetch(
+            `/api/places/crawl?jobId=${encodeURIComponent(startData.jobId)}&url=${encodeURIComponent(trimmedQuery)}`,
+            { cache: "no-store" }
+          );
+          const statusData = await statusRes.json();
+
+          if (!statusRes.ok) {
+            throw new Error(typeof statusData.error === "string" ? statusData.error : genericUrlError);
+          }
+
+          if (statusData.status === "completed" && statusData.result) {
+            finalResult = statusData.result;
+            break;
+          }
+        }
+
+        if (!finalResult) {
+          throw new Error(
+            language === "es"
+              ? "El análisis está tardando más de lo esperado. Vuelve a intentarlo."
+              : "L'anàlisi està trigant més del previst. Torna-ho a provar."
+          );
+        }
+
+        setAnalysisProgress(100);
+        setPlaceDetails(finalResult);
+
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(
+            `draft:${nextDraftId}`,
+            JSON.stringify({
+              draftId: nextDraftId,
+              placeId: finalResult?.place_id ?? finalResult?.website ?? trimmedQuery,
+              name: finalResult?.name ?? trimmedQuery,
+              sector: finalResult?.types?.[0] ?? "",
+              source: sourceValue,
+              updatedAt: Date.now(),
+            })
+          );
+        }
+
+        setStep("preview");
+        trackFunnelEvent("crear_preview_generated", {
+          locale: language,
+          draft_id: nextDraftId,
+          input_mode: "url",
+        });
+      } catch (error) {
+        console.error("Error crawling URL with Firecrawl:", error);
+        setSearchError(error instanceof Error && error.message ? error.message : genericUrlError);
+        setStep("search");
+      } finally {
+        window.clearInterval(progressInterval);
+        setIsSearching(false);
+      }
+
+      return;
+    }
+
     try {
-      const res = await fetch(`/api/places/search?q=${encodeURIComponent(query)}&lang=${language}`);
+      const res = await fetch(`/api/places/search?q=${encodeURIComponent(trimmedQuery)}&lang=${language}`);
       const data = await res.json();
       setPlaces(Array.isArray(data.results) ? data.results : []);
     } catch (error) {
       console.error("Error searching places:", error);
       setPlaces([]);
+      setSearchError(
+        language === "es"
+          ? "No pudimos buscar negocios en Google en este momento."
+          : "No hem pogut cercar negocis a Google en aquest moment."
+      );
     } finally {
       setIsSearching(false);
     }
@@ -303,6 +431,7 @@ function CreateWebContent() {
     setDraftId(nextDraftId);
     setSelectedPlace(place);
     setStep("analyzing");
+    setAnalysisInputMode("google");
     setPlaceDetails(null);
     setAnalysisProgress(0);
 
@@ -343,9 +472,18 @@ function CreateWebContent() {
 
       await Promise.all([analysisPromise, detailsPromise]);
       setStep("preview");
-      trackFunnelEvent("crear_preview_generated", { locale: language, draft_id: nextDraftId });
+      trackFunnelEvent("crear_preview_generated", {
+        locale: language,
+        draft_id: nextDraftId,
+        input_mode: "google",
+      });
     } catch (error) {
       console.error("Error fetching place details:", error);
+      setSearchError(
+        language === "es"
+          ? "No pudimos cargar los datos del negocio. Inténtalo de nuevo."
+          : "No hem pogut carregar les dades del negoci. Torna-ho a provar."
+      );
       setStep("search"); // Revert on error
     } finally {
       window.clearInterval(progressInterval);
@@ -356,7 +494,7 @@ function CreateWebContent() {
     <main className="min-h-screen bg-slate-50 font-sans text-gray-900">
       <Navbar />
 
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:py-10 lg:py-12 sm:px-6 lg:px-8">
         <AnimatePresence mode="wait">
           {step === "search" && (
             <motion.div
@@ -366,80 +504,96 @@ function CreateWebContent() {
               exit={{ opacity: 0, y: -20 }}
               className="mx-auto max-w-2xl"
             >
-              <div className="text-center mb-10">
-                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 mb-4">
-                  <Zap className="h-4 w-4" />
-                  Web lista en menos de 2 minutos
+              <div className="text-center mb-8 sm:mb-10">
+                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-emerald-700 mb-3 sm:mb-4">
+                  <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="whitespace-nowrap">Web lista en menos de 2 min</span>
                 </div>
-                <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+                <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl px-2">
                   {t.crear.title}
                 </h1>
-                <p className="mt-4 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
+                <p className="mt-3 sm:mt-4 text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto px-4">
                   {t.crear.subtitle}
                 </p>
-                <div className="mt-6 flex items-center justify-center gap-6 text-sm text-gray-500">
+                <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-500 px-4">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                    <span>Sin tarjeta de crédito</span>
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-500 flex-shrink-0" />
+                    <span className="whitespace-nowrap">Sin tarjeta de crédito</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                    <span>Prueba gratis 14 días</span>
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-500 flex-shrink-0" />
+                    <span className="whitespace-nowrap">Prueba gratis 14 días</span>
                   </div>
                 </div>
               </div>
 
-              <form onSubmit={handleSearch} className="relative mb-8">
-                <div className="relative flex items-center">
-                  <Search className="absolute left-4 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder={t.crear.searchPlaceholder}
-                    className="w-full rounded-full border-2 border-gray-200 py-3 sm:py-4 pl-10 sm:pl-12 pr-14 sm:pr-20 text-base sm:text-lg focus:border-emerald-500 focus:outline-none focus:ring-0 shadow-sm transition-colors"
-                  />
+              <form onSubmit={handleSearch} className="relative mb-6 sm:mb-8">
+                <div className="relative flex flex-col sm:flex-row gap-3 sm:gap-0 sm:items-center">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400 pointer-events-none z-10" />
+                    <input
+                      type="text"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={t.crear.searchPlaceholder}
+                      className="w-full rounded-full border-2 border-gray-200 py-3 sm:py-4 pl-9 sm:pl-12 pr-3 sm:pr-16 text-sm sm:text-base lg:text-lg focus:border-emerald-500 focus:outline-none focus:ring-0 shadow-sm transition-colors"
+                    />
+                  </div>
                   <Button
                     type="submit"
                     variant="default"
                     disabled={isSearching || !query.trim()}
-                    aria-label={t.crear.searchButton}
-                    className="absolute right-2 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gray-900 p-0 text-white transition-all hover:scale-105 hover:bg-gray-800 disabled:opacity-50"
+                    className="w-full sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 h-11 sm:h-12 rounded-full bg-gray-900 px-6 sm:px-0 sm:w-12 text-sm font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800 disabled:opacity-50 disabled:hover:scale-100 shadow-lg sm:shadow-none"
                   >
-                    {isSearching ? <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" /> : <Search className="h-4 w-4 sm:h-5 sm:w-5" />}
+                    {isSearching ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin sm:inline-block" />
+                        <span className="ml-2 sm:hidden">Buscando...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Search className="h-5 w-5 sm:inline-block" />
+                        <span className="ml-2 sm:hidden">{t.crear.searchButton}</span>
+                      </>
+                    )}
                   </Button>
                 </div>
               </form>
+              {searchError && (
+                <div className="mb-4 sm:mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {searchError}
+                </div>
+              )}
 
               {places.length > 0 && (
-                <div className="rounded-3xl bg-white p-3 sm:p-4 shadow-sm ring-1 ring-gray-200">
-                  <h3 className="mb-3 sm:mb-4 px-2 sm:px-4 text-xs sm:text-sm font-bold uppercase tracking-wider text-gray-500">
+                <div className="rounded-2xl sm:rounded-3xl bg-white p-2 sm:p-3 lg:p-4 shadow-sm ring-1 ring-gray-200">
+                  <h3 className="mb-2 sm:mb-3 lg:mb-4 px-2 sm:px-3 lg:px-4 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-500">
                     {t.crear.resultsTitle}
                   </h3>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5 sm:space-y-2">
                     {places.map((place) => (
                       <button
                         type="button"
-                        className="flex w-full items-start gap-3 sm:gap-4 rounded-2xl p-3 sm:p-4 text-left transition-colors hover:bg-gray-50 focus:bg-emerald-50 focus:outline-none active:bg-gray-100"
+                        className="flex w-full items-start gap-2.5 sm:gap-3 lg:gap-4 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 lg:p-4 text-left transition-colors hover:bg-gray-50 focus:bg-emerald-50 focus:outline-none active:bg-gray-100"
                         key={place.place_id}
                         onClick={() => handleSelectPlace(place)}
                       >
-                        <div className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                          <MapPin className="h-5 w-5 sm:h-6 sm:w-6" />
+                        <div className="flex h-9 w-9 sm:h-10 sm:w-10 lg:h-12 lg:w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                          <MapPin className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h4 className="break-words text-base sm:text-lg font-bold leading-tight text-gray-900">{place.name}</h4>
-                          <p className="mt-1 break-words text-xs sm:text-sm text-gray-500">{place.formatted_address}</p>
+                          <h4 className="break-words text-sm sm:text-base lg:text-lg font-bold leading-tight text-gray-900">{place.name}</h4>
+                          <p className="mt-0.5 sm:mt-1 break-words text-[11px] sm:text-xs lg:text-sm text-gray-500 line-clamp-2">{place.formatted_address}</p>
                           {place.rating && (
-                            <div className="mt-2 flex flex-wrap items-center gap-1 text-sm font-medium text-amber-600">
-                              <Star className="h-4 w-4 flex-shrink-0 fill-amber-500 text-amber-500" />
+                            <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-1 text-xs sm:text-sm font-medium text-amber-600">
+                              <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 fill-amber-500 text-amber-500" />
                               <span className="break-words">
-                                {place.rating} ({place.user_ratings_total} {t.crear.reviewsAnalyzed})
+                                {place.rating} ({place.user_ratings_total})
                               </span>
                             </div>
                           )}
                         </div>
-                        <ArrowRight className="mt-1 h-5 w-5 flex-shrink-0 text-gray-400" />
+                        <ArrowRight className="mt-0.5 sm:mt-1 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-gray-400" />
                       </button>
                     ))}
                   </div>
@@ -447,12 +601,12 @@ function CreateWebContent() {
               )}
 
               {showNoResults && (
-                <div className="mt-6 space-y-4">
-                  <div className="rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-orange-50 p-6 sm:p-8">
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-900">{t.crear.noResultsTitle}</h3>
+                <div className="mt-4 sm:mt-6">
+                  <div className="rounded-2xl sm:rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-orange-50 p-5 sm:p-6 lg:p-8">
+                    <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">{t.crear.noResultsTitle}</h3>
                     <p className="mt-2 text-sm sm:text-base text-gray-600">{t.crear.noResultsSubtitle}</p>
-                    <div className="mt-6 pt-6 border-t border-amber-100">
-                      <p className="text-sm font-semibold text-gray-900 mb-3">¿Prefieres que te ayudemos personalmente?</p>
+                    <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-amber-100">
+                      <p className="text-sm sm:text-base font-semibold text-gray-900 mb-3">¿Prefieres que te ayudemos personalmente?</p>
                       <Button
                         asChild
                         variant="default"
@@ -468,62 +622,62 @@ function CreateWebContent() {
               )}
 
               {!hasSearched && !isSearching && (
-                <div className="mt-12 space-y-8">
+                <div className="mt-8 sm:mt-12 space-y-6 sm:space-y-8">
                   {/* Social Proof */}
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 mb-2">
+                  <div className="text-center px-4">
+                    <div className="flex items-center justify-center gap-0.5 sm:gap-1 mb-2">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
+                        <Star key={i} className="h-4 w-4 sm:h-5 sm:w-5 fill-amber-400 text-amber-400" />
                       ))}
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600">
                       Más de 1,200 negocios ya tienen su web con nosotros
                     </p>
                   </div>
 
                   {/* Quick Benefits */}
-                  <div className="grid gap-4 sm:grid-cols-3">
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 text-center">
-                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 mb-4">
-                        <Zap className="h-6 w-6 text-emerald-600" />
+                  <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
+                    <div className="rounded-xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-gray-200 text-center">
+                      <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-emerald-100 mb-3 sm:mb-4">
+                        <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600" />
                       </div>
-                      <h3 className="font-bold text-gray-900 mb-2">Rápido</h3>
-                      <p className="text-sm text-gray-600">Tu web lista en menos de 2 minutos</p>
+                      <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-1 sm:mb-2">Rápido</h3>
+                      <p className="text-xs sm:text-sm text-gray-600">Tu web lista en menos de 2 minutos</p>
                     </div>
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 text-center">
-                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 mb-4">
-                        <Search className="h-6 w-6 text-blue-600" />
+                    <div className="rounded-xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-gray-200 text-center">
+                      <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-blue-100 mb-3 sm:mb-4">
+                        <Search className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                       </div>
-                      <h3 className="font-bold text-gray-900 mb-2">SEO Optimizado</h3>
-                      <p className="text-sm text-gray-600">Aparece en Google desde el día 1</p>
+                      <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-1 sm:mb-2">SEO Optimizado</h3>
+                      <p className="text-xs sm:text-sm text-gray-600">Aparece en Google desde el día 1</p>
                     </div>
-                    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 text-center">
-                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 mb-4">
-                        <Phone className="h-6 w-6 text-purple-600" />
+                    <div className="rounded-xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-gray-200 text-center">
+                      <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-purple-100 mb-3 sm:mb-4">
+                        <Phone className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
                       </div>
-                      <h3 className="font-bold text-gray-900 mb-2">Más Clientes</h3>
-                      <p className="text-sm text-gray-600">Formularios y llamadas directas</p>
+                      <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-1 sm:mb-2">Más Clientes</h3>
+                      <p className="text-xs sm:text-sm text-gray-600">Formularios y llamadas directas</p>
                     </div>
                   </div>
 
                   {/* CTA alternativo */}
-                  <div className="rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8 sm:p-10 text-center text-white shadow-xl">
-                    <h3 className="text-2xl sm:text-3xl font-bold mb-3">
+                  <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 sm:p-8 lg:p-10 text-center text-white shadow-xl">
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3 px-2">
                       ¿No encuentras tu negocio en Google?
                     </h3>
-                    <p className="text-gray-300 mb-6 max-w-xl mx-auto">
+                    <p className="text-sm sm:text-base text-gray-300 mb-5 sm:mb-6 max-w-xl mx-auto px-2">
                       No hay problema. Podemos crear tu web desde cero con toda la información que necesites.
                     </p>
                     <Button
                       asChild
                       variant="default"
-                      className="rounded-full bg-emerald-500 px-8 py-4 text-base font-bold text-white hover:bg-emerald-400"
+                      className="w-full sm:w-auto rounded-full bg-emerald-500 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-bold text-white hover:bg-emerald-400"
                     >
                       <Link href={signupHref}>
                         Crear mi web ahora →
                       </Link>
                     </Button>
-                    <p className="mt-4 text-sm text-gray-400">
+                    <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-400">
                       Sin compromiso • Cancela cuando quieras
                     </p>
                   </div>
@@ -538,23 +692,23 @@ function CreateWebContent() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.05 }}
-              className="flex flex-col items-center justify-center py-10 sm:py-20 text-center px-4"
+              className="flex flex-col items-center justify-center py-8 sm:py-12 lg:py-20 text-center px-4"
             >
-              <div className="relative flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center">
+              <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 lg:h-32 lg:w-32 items-center justify-center">
                 <div className="absolute inset-0 animate-ping rounded-full bg-emerald-200 opacity-20" />
-                <div className="absolute inset-4 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
-                <Zap className="h-8 w-8 sm:h-10 sm:w-10 text-emerald-600" />
+                <div className="absolute inset-3 sm:inset-4 animate-spin rounded-full border-3 sm:border-4 border-emerald-500 border-t-transparent" />
+                <Zap className="h-7 w-7 sm:h-8 sm:w-8 lg:h-10 lg:w-10 text-emerald-600" />
               </div>
-              <h2 className="mt-6 sm:mt-8 text-2xl sm:text-3xl font-extrabold text-gray-900">
+              <h2 className="mt-5 sm:mt-6 lg:mt-8 text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 px-4">
                 {t.crear.analyzingTitle}
               </h2>
-              <p className="mt-4 text-lg text-gray-600 max-w-md">
+              <p className="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg text-gray-600 max-w-md px-4">
                 {t.crear.analyzingSubtitle}
               </p>
 
-              <div className="mt-8 w-full max-w-md">
-                <div className="mb-2 text-right text-sm font-medium text-gray-600">{analysisProgress}%</div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+              <div className="mt-6 sm:mt-8 w-full max-w-md px-4">
+                <div className="mb-2 text-right text-xs sm:text-sm font-medium text-gray-600">{analysisProgress}%</div>
+                <div className="h-1.5 sm:h-2 w-full overflow-hidden rounded-full bg-gray-200">
                   <div
                     className="h-full rounded-full bg-emerald-500 transition-all duration-200"
                     style={{ width: `${analysisProgress}%` }}
@@ -562,23 +716,23 @@ function CreateWebContent() {
                 </div>
               </div>
               
-              <div className="mt-10 w-full max-w-sm space-y-4 text-left">
-                <div className="flex items-center gap-3 text-emerald-600 font-medium">
-                  {analysisProgress >= 20 ? <CheckCircle2 className="h-5 w-5" /> : <Loader2 className="h-5 w-5 animate-spin" />}
-                  <span>{t.crear.step1}</span>
+              <div className="mt-8 sm:mt-10 w-full max-w-sm space-y-3 sm:space-y-4 text-left px-4">
+                <div className="flex items-center gap-2.5 sm:gap-3 text-sm sm:text-base text-emerald-600 font-medium">
+                  {analysisProgress >= 20 ? <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> : <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 animate-spin" />}
+                  <span>{analysisInputMode === "url" ? t.crear.step1Web : t.crear.step1Google}</span>
                 </div>
                 <motion.div 
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
-                  className="flex items-center gap-3 text-emerald-600 font-medium"
+                  className="flex items-center gap-2.5 sm:gap-3 text-sm sm:text-base text-emerald-600 font-medium"
                 >
-                  {analysisProgress >= 55 ? <CheckCircle2 className="h-5 w-5" /> : <Loader2 className="h-5 w-5 animate-spin" />}
+                  {analysisProgress >= 55 ? <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> : <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 animate-spin" />}
                   <span>{t.crear.step2}</span>
                 </motion.div>
                 <motion.div 
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}
-                  className="flex items-center gap-3 text-emerald-600 font-medium"
+                  className="flex items-center gap-2.5 sm:gap-3 text-sm sm:text-base text-emerald-600 font-medium"
                 >
-                  {analysisProgress >= 90 ? <CheckCircle2 className="h-5 w-5" /> : <Loader2 className="h-5 w-5 animate-spin" />}
+                  {analysisProgress >= 90 ? <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> : <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 animate-spin" />}
                   <span>{t.crear.step3}</span>
                 </motion.div>
               </div>
@@ -590,56 +744,56 @@ function CreateWebContent() {
               key="preview"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="grid gap-8 lg:grid-cols-3"
+              className="grid gap-6 sm:gap-8 lg:grid-cols-3"
             >
               {/* Sidebar / Info extracted */}
-              <div className="space-y-4 sm:space-y-6 lg:col-span-1">
-                <div className="rounded-3xl bg-white p-4 sm:p-6 shadow-sm ring-1 ring-gray-200">
-                  <div className="mb-4 sm:mb-6 flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-600">
-                    <CheckCircle2 className="h-5 w-5" />
-                    {t.crear.extractedData}
+              <div className="space-y-4 sm:space-y-6 lg:col-span-1 order-2 lg:order-1">
+                <div className="rounded-2xl sm:rounded-3xl bg-white p-4 sm:p-5 lg:p-6 shadow-sm ring-1 ring-gray-200">
+                  <div className="mb-4 sm:mb-5 lg:mb-6 flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-600">
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                    <span>{t.crear.extractedData}</span>
                   </div>
                   
-                  <h2 className="text-2xl font-bold text-gray-900">{placeDetails.name}</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 break-words">{placeDetails.name}</h2>
                   
-                  <div className="mt-6 space-y-4">
-                    <div className="flex items-start gap-3 text-gray-600">
-                      <MapPin className="h-5 w-5 flex-shrink-0 text-gray-400" />
-                      <span className="text-sm">{placeDetails.formatted_address}</span>
+                  <div className="mt-5 sm:mt-6 space-y-3 sm:space-y-4">
+                    <div className="flex items-start gap-2.5 sm:gap-3 text-gray-600">
+                      <MapPin className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-gray-400 mt-0.5" />
+                      <span className="text-xs sm:text-sm break-words">{placeDetails.formatted_address}</span>
                     </div>
                     {placeDetails.formatted_phone_number && (
-                      <div className="flex items-center gap-3 text-gray-600">
-                        <Phone className="h-5 w-5 flex-shrink-0 text-gray-400" />
-                        <span className="text-sm">{placeDetails.formatted_phone_number}</span>
+                      <div className="flex items-center gap-2.5 sm:gap-3 text-gray-600">
+                        <Phone className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-gray-400" />
+                        <span className="text-xs sm:text-sm">{placeDetails.formatted_phone_number}</span>
                       </div>
                     )}
                     {placeDetails.rating && (
-                      <div className="flex items-center gap-3 text-gray-600">
-                        <Star className="h-5 w-5 flex-shrink-0 text-amber-500 fill-amber-500" />
-                        <span className="text-sm font-medium text-gray-900">{placeDetails.rating}</span>
-                        <span className="text-sm">({placeDetails.user_ratings_total || placeDetails.reviews?.length || 0} {t.crear.reviewsAnalyzed})</span>
+                      <div className="flex items-center gap-2.5 sm:gap-3 text-gray-600">
+                        <Star className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-amber-500 fill-amber-500" />
+                        <span className="text-xs sm:text-sm font-medium text-gray-900">{placeDetails.rating}</span>
+                        <span className="text-xs sm:text-sm">({placeDetails.user_ratings_total || placeDetails.reviews?.length || 0} {t.crear.reviewsAnalyzed})</span>
                       </div>
                     )}
                     {priceLevelValue && (
-                      <div className="flex items-center gap-3 text-gray-600">
-                        <span className="text-sm text-gray-400">{t.crear.priceLevel}:</span>
-                        <span className="text-sm font-medium text-gray-900">{priceLevelValue}</span>
+                      <div className="flex items-center gap-2.5 sm:gap-3 text-gray-600">
+                        <span className="text-xs sm:text-sm text-gray-400">{t.crear.priceLevel}:</span>
+                        <span className="text-xs sm:text-sm font-medium text-gray-900">{priceLevelValue}</span>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="rounded-3xl bg-gray-900 p-6 text-white shadow-lg">
-                  <h3 className="text-lg font-bold">{t.crear.allCorrect}</h3>
-                  <p className="mt-2 text-sm text-gray-400">
+                <div className="rounded-2xl sm:rounded-3xl bg-gray-900 p-5 sm:p-6 text-white shadow-lg">
+                  <h3 className="text-base sm:text-lg font-bold">{t.crear.allCorrect}</h3>
+                  <p className="mt-2 text-xs sm:text-sm text-gray-400">
                     {t.crear.generatedProposal}
                   </p>
-                  <div className="mt-6 space-y-3">
+                  <div className="mt-5 sm:mt-6 space-y-2.5 sm:space-y-3">
                     <Button
                       asChild
                       type="button"
                       variant="default"
-                      className="h-12 w-full rounded-full bg-emerald-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-400"
+                      className="h-11 sm:h-12 w-full rounded-full bg-emerald-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-400"
                     >
                       <Link
                         href={signupHref}
@@ -648,6 +802,7 @@ function CreateWebContent() {
                             locale: language,
                             draft_id: draftId ?? "",
                             plan_suggested: planSuggested,
+                            input_mode: analysisInputMode,
                           })
                         }
                       >
@@ -658,7 +813,7 @@ function CreateWebContent() {
                       type="button"
                       onClick={() => setStep("search")}
                       variant="ghost"
-                      className="h-12 w-full rounded-full border border-white/20 bg-transparent px-4 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+                      className="h-11 sm:h-12 w-full rounded-full border border-white/20 bg-transparent px-4 text-sm font-semibold text-white transition-colors hover:bg-white/10"
                     >
                       {t.crear.searchAnother}
                     </Button>
@@ -667,20 +822,20 @@ function CreateWebContent() {
               </div>
 
               {/* Preview Area */}
-              <div className="lg:col-span-2">
-                <div className="mb-2 sm:mb-3 px-1 text-xs text-slate-500">
+              <div className="lg:col-span-2 order-1 lg:order-2">
+                <div className="mb-2 sm:mb-3 px-1 text-[10px] sm:text-xs text-slate-500">
                   {t.crear.minimalistNote}
                 </div>
-                <div className="overflow-hidden rounded-2xl sm:rounded-3xl border border-gray-200 bg-white shadow-xl">
+                <div className="overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl border border-gray-200 bg-white shadow-xl">
                   {/* Browser Chrome */}
-                  <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-3 py-2 sm:px-4 sm:py-3">
-                    <div className="flex gap-1.5">
-                      <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-400" />
-                      <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-amber-400" />
-                      <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-emerald-400" />
+                  <div className="flex items-center gap-1.5 sm:gap-2 border-b border-gray-100 bg-gray-50 px-2.5 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3">
+                    <div className="flex gap-1 sm:gap-1.5">
+                      <div className="h-2 w-2 sm:h-2.5 sm:w-2.5 lg:h-3 lg:w-3 rounded-full bg-red-400" />
+                      <div className="h-2 w-2 sm:h-2.5 sm:w-2.5 lg:h-3 lg:w-3 rounded-full bg-amber-400" />
+                      <div className="h-2 w-2 sm:h-2.5 sm:w-2.5 lg:h-3 lg:w-3 rounded-full bg-emerald-400" />
                     </div>
-                    <div className="ml-2 sm:ml-4 flex-1 rounded-md bg-white px-2 py-1 sm:px-3 text-[10px] sm:text-xs text-gray-400 shadow-sm flex items-center gap-2 truncate">
-                      <Globe className="h-3 w-3 flex-shrink-0" />
+                    <div className="ml-1.5 sm:ml-2 lg:ml-4 flex-1 rounded-md bg-white px-2 sm:px-2.5 lg:px-3 py-0.5 sm:py-1 text-[9px] sm:text-[10px] lg:text-xs text-gray-400 shadow-sm flex items-center gap-1.5 sm:gap-2 truncate">
+                      <Globe className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
                       <span className="truncate">
                         {placeDetails.name.toLowerCase().replace(/\s+/g, '')}.bunnatic.com
                       </span>
@@ -688,20 +843,20 @@ function CreateWebContent() {
                   </div>
                   
                   {/* Generated Site Preview */}
-                  <div className="h-[500px] sm:h-[600px] overflow-y-auto bg-white overscroll-contain">
+                  <div className="h-[400px] sm:h-[500px] lg:h-[600px] overflow-y-auto bg-white overscroll-contain">
                     {/* Hero Section */}
-                    <div className="relative bg-slate-900 px-4 py-12 sm:px-8 sm:py-20 text-center text-white">
+                    <div className="relative bg-slate-900 px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-20 text-center text-white">
                       <div className="absolute inset-0 opacity-20 bg-[url('https://picsum.photos/seed/business/1200/800')] bg-cover bg-center" />
                       <div className="absolute inset-0 bg-slate-900/60" />
                       <div className="relative z-10">
-                        <h1 className="text-3xl sm:text-4xl font-extrabold lg:text-5xl">{placeDetails.name}</h1>
-                        <p className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-300 max-w-xl mx-auto">
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold break-words px-2">{placeDetails.name}</h1>
+                        <p className="mt-2.5 sm:mt-3 lg:mt-4 text-sm sm:text-base lg:text-lg text-gray-300 max-w-xl mx-auto px-4">
                           {placeDetails.types?.[0] ? t.crear.heroSubtitle.replace('{type}', placeDetails.types[0].replace(/_/g, ' ')) : t.crear.heroFallback}
                         </p>
                         <Button
                           type="button"
                           variant="default"
-                          className="mt-6 sm:mt-8 rounded-full bg-emerald-500 px-6 py-2 sm:px-8 sm:py-3 text-sm sm:text-base font-bold text-white"
+                          className="mt-5 sm:mt-6 lg:mt-8 rounded-full bg-emerald-500 px-5 py-2 sm:px-6 sm:py-2.5 lg:px-8 lg:py-3 text-xs sm:text-sm lg:text-base font-bold text-white"
                         >
                           {t.crear.contactNow}
                         </Button>
@@ -709,10 +864,10 @@ function CreateWebContent() {
                     </div>
 
                     {/* Info Section */}
-                    <div className="px-4 py-10 sm:px-8 sm:py-16">
-                      <div className="grid gap-8 sm:grid-cols-2">
+                    <div className="px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+                      <div className="grid gap-6 sm:gap-8 sm:grid-cols-2">
                         <div>
-                          <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{t.crear.aboutUs}</h3>
+                          <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{t.crear.aboutUs}</h3>
                           <p className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600 leading-relaxed">
                             {aboutText}
                           </p>
@@ -750,16 +905,16 @@ function CreateWebContent() {
 
                     {/* Services Section */}
                     {hasDetectedServices && (
-                      <div className="px-4 py-10 sm:px-8 sm:py-14 border-t border-gray-100">
+                      <div className="px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-14 border-t border-gray-100">
                         <div className="mx-auto max-w-4xl">
-                          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 text-center">{t.crear.servicesTitle}</h3>
-                          <p className="mt-2 text-center text-sm text-gray-500">{t.crear.servicesSubtitle}</p>
-                          <div className="mt-6 sm:mt-8 grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
+                          <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 text-center">{t.crear.servicesTitle}</h3>
+                          <p className="mt-1.5 sm:mt-2 text-center text-xs sm:text-sm text-gray-500">{t.crear.servicesSubtitle}</p>
+                          <div className="mt-5 sm:mt-6 lg:mt-8 grid gap-2.5 sm:gap-3 lg:gap-4 grid-cols-1 sm:grid-cols-2">
                             {detectedServices.map((serviceName) => (
-                              <div key={serviceName} className="rounded-2xl border border-gray-200 bg-white px-4 py-3">
-                                <p className="flex items-center gap-2 text-sm font-medium text-gray-800">
-                                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-500" />
-                                  {serviceName}
+                              <div key={serviceName} className="rounded-xl sm:rounded-2xl border border-gray-200 bg-white px-3.5 py-2.5 sm:px-4 sm:py-3">
+                                <p className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-800">
+                                  <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 text-emerald-500" />
+                                  <span className="break-words">{serviceName}</span>
                                 </p>
                               </div>
                             ))}
@@ -770,21 +925,21 @@ function CreateWebContent() {
                     
                     {/* Reviews Section */}
                     {placeDetails.reviews?.some((review: any) => typeof review?.text === "string" && review.text.trim().length > 0) && (
-                      <div className="bg-gray-50 px-4 py-10 sm:px-8 sm:py-16">
-                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 text-center mb-6 sm:mb-10">{t.crear.whatClientsSay}</h3>
-                        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
+                      <div className="bg-gray-50 px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+                        <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 text-center mb-5 sm:mb-8 lg:mb-10">{t.crear.whatClientsSay}</h3>
+                        <div className="grid gap-3.5 sm:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2">
                           {placeDetails.reviews
                             .filter((review: any) => typeof review?.text === "string" && review.text.trim().length > 0)
                             .slice(0, 2)
                             .map((review: any, idx: number) => (
-                            <div key={idx} className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
-                              <div className="flex items-center gap-1 mb-3">
+                            <div key={idx} className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100">
+                              <div className="flex items-center gap-0.5 sm:gap-1 mb-2.5 sm:mb-3">
                                 {[...Array(review.rating)].map((_, i) => (
-                                  <Star key={i} className="h-4 w-4 fill-amber-500 text-amber-500" />
+                                  <Star key={i} className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-amber-500 text-amber-500" />
                                 ))}
                               </div>
-                              <p className="text-gray-600 text-sm italic whitespace-pre-line">&quot;{review.text}&quot;</p>
-                              <p className="mt-4 text-sm font-bold text-gray-900">- {review.author_name}</p>
+                              <p className="text-gray-600 text-xs sm:text-sm italic whitespace-pre-line line-clamp-4">&quot;{review.text}&quot;</p>
+                              <p className="mt-3 sm:mt-4 text-xs sm:text-sm font-bold text-gray-900">- {review.author_name}</p>
                             </div>
                           ))}
                         </div>
@@ -803,44 +958,44 @@ function CreateWebContent() {
               animate={{ opacity: 1, scale: 1 }}
               className="mx-auto max-w-4xl"
             >
-              <div className="rounded-3xl bg-white p-6 sm:p-12 shadow-xl ring-1 ring-gray-200 text-center">
-                <div className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-emerald-100 mb-6">
-                  <CheckCircle2 className="h-8 w-8 sm:h-10 sm:w-10 text-emerald-600" />
+              <div className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 lg:p-12 shadow-xl ring-1 ring-gray-200 text-center">
+                <div className="mx-auto flex h-14 w-14 sm:h-16 sm:w-16 lg:h-20 lg:w-20 items-center justify-center rounded-full bg-emerald-100 mb-5 sm:mb-6">
+                  <CheckCircle2 className="h-7 w-7 sm:h-8 sm:w-8 lg:h-10 lg:w-10 text-emerald-600" />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 lg:text-4xl">{t.crear.publishedTitle}</h2>
-                <p className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-600">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 px-4">{t.crear.publishedTitle}</h2>
+                <p className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-600 px-4">
                   {t.crear.publishedSubtitle.replace('{name}', placeDetails.name)}
                 </p>
                 
-                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                  <Globe className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400" />
-                  <a href="#" className="text-base sm:text-xl font-medium text-emerald-600 hover:underline break-all">
+                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 p-4 bg-gray-50 rounded-xl sm:rounded-2xl border border-gray-100">
+                  <Globe className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 flex-shrink-0" />
+                  <a href="#" className="text-base sm:text-lg lg:text-xl font-medium text-emerald-600 hover:underline break-all">
                     {placeDetails.name.toLowerCase().replace(/\s+/g, '')}.bunnatic.com
                   </a>
                 </div>
 
-                <div className="mt-8 sm:mt-12 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-3 text-left">
-                  <div className="rounded-2xl bg-slate-50 p-5 sm:p-6 border border-gray-100">
-                    <h3 className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider">{t.crear.visitsToday}</h3>
+                <div className="mt-8 sm:mt-10 lg:mt-12 grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-3 text-left">
+                  <div className="rounded-xl sm:rounded-2xl bg-slate-50 p-4 sm:p-5 lg:p-6 border border-gray-100">
+                    <h3 className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">{t.crear.visitsToday}</h3>
                     <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-gray-900">0</p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-5 sm:p-6 border border-gray-100">
-                    <h3 className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider">{t.crear.contacts}</h3>
+                  <div className="rounded-xl sm:rounded-2xl bg-slate-50 p-4 sm:p-5 lg:p-6 border border-gray-100">
+                    <h3 className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">{t.crear.contacts}</h3>
                     <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-gray-900">0</p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-5 sm:p-6 border border-gray-100">
-                    <h3 className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider">{t.crear.seoStatus}</h3>
-                    <p className="mt-2 text-lg font-bold text-emerald-600 flex items-center gap-2">
-                      <CheckCircle2 className="h-5 w-5" /> {t.crear.optimized}
+                  <div className="rounded-xl sm:rounded-2xl bg-slate-50 p-4 sm:p-5 lg:p-6 border border-gray-100">
+                    <h3 className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">{t.crear.seoStatus}</h3>
+                    <p className="mt-2 text-base sm:text-lg font-bold text-emerald-600 flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" /> {t.crear.optimized}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
                   <Button
                     type="button"
                     variant="default"
-                    className="w-full sm:w-auto rounded-full bg-gray-900 px-8 py-3 sm:py-4 text-sm font-bold text-white transition-colors hover:bg-gray-800"
+                    className="w-full sm:w-auto rounded-full bg-gray-900 px-6 sm:px-8 py-3 sm:py-4 text-sm font-bold text-white transition-colors hover:bg-gray-800"
                   >
                     {t.crear.goToDashboard}
                   </Button>
@@ -848,7 +1003,7 @@ function CreateWebContent() {
                     type="button"
                     onClick={() => setStep("search")}
                     variant="outline"
-                    className="w-full sm:w-auto rounded-full bg-white border border-gray-200 px-8 py-3 sm:py-4 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50"
+                    className="w-full sm:w-auto rounded-full bg-white border border-gray-200 px-6 sm:px-8 py-3 sm:py-4 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50"
                   >
                     {t.crear.createAnother}
                   </Button>

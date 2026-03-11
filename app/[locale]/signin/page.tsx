@@ -76,7 +76,7 @@ function SignInContent() {
       searchParams.get("next") ??
       searchParams.get("returnTo") ??
       searchParams.get("to") ??
-      "/crear";
+      "/dashboard";
 
     return redirectRaw.startsWith(`/${pathname.split("/")[1]}/`)
       ? redirectRaw

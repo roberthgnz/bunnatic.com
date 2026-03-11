@@ -126,7 +126,7 @@ const CONTEXT_KEYS = ["plan", "planSuggested", "source", "draftId", "sector", "u
 
 function normalizeInternalPath(path: string) {
   if (!path || !path.startsWith("/") || path.startsWith("//")) {
-    return "/crear";
+    return "/dashboard";
   }
   return path;
 }
@@ -159,10 +159,10 @@ function SignUpContent() {
       searchParams.get("next") ??
       searchParams.get("returnTo") ??
       searchParams.get("to") ??
-      "/crear";
+      "/dashboard";
 
     const [targetPathRaw, targetQueryRaw = ""] = redirectRaw.split("?");
-    const safeTargetPath = normalizeInternalPath(targetPathRaw || "/crear");
+    const safeTargetPath = normalizeInternalPath(targetPathRaw || "/dashboard");
     const targetQuery = new URLSearchParams(targetQueryRaw);
 
     for (const [key, value] of searchParams.entries()) {

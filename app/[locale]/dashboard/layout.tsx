@@ -45,6 +45,8 @@ const dashboardContent = {
   },
 } as const
 
+import PlanBadge from './_components/PlanBadge'
+
 export default function DashboardLayout({
   children,
 }: {
@@ -128,8 +130,13 @@ export default function DashboardLayout({
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="-ml-1" />
+          </div>
+          <div className="flex items-center gap-4">
+             <PlanBadge plan="Impulso" />
+          </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           {children}

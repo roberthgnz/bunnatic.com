@@ -49,7 +49,7 @@ export default async function DashboardPage({
           <p className="text-muted-foreground">{t.subtitle}</p>
         </div>
         <Button asChild>
-          <Link href={`/${locale}/onboarding`}>
+          <Link href={`/${locale}/dashboard/new`}>
             <Plus className="mr-2 h-4 w-4" />
             {t.createBusiness}
           </Link>
@@ -62,7 +62,7 @@ export default async function DashboardPage({
             <h3 className="text-2xl font-bold tracking-tight">{t.noBusinesses}</h3>
             <p className="text-sm text-muted-foreground">{t.startNow}</p>
             <Button asChild className="mt-4">
-              <Link href={`/${locale}/onboarding`}>
+              <Link href={`/${locale}/dashboard/new`}>
                 {t.createBusiness}
               </Link>
             </Button>

@@ -9,7 +9,7 @@ export async function generateBusinessContent(name: string, category: string) {
   
   let description = `Bienvenido a ${name}. Somos especialistas en ${category} ofreciendo la mejor calidad y servicio a nuestros clientes. Ven a visitarnos y descubre todo lo que podemos hacer por ti.`
   
-  const services = []
+  const services: any[] = []
 
   if (isRestaurant) {
     description = `En ${name}, nos apasiona la gastronomía. Ofrecemos una experiencia culinaria única con ingredientes frescos y locales. Nuestro ambiente acogedor es perfecto para cenas románticas, comidas familiares o eventos especiales. ¡Reserva tu mesa hoy!`

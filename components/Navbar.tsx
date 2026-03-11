@@ -43,12 +43,16 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   useEffect(() => {
     const supabase = createClient();
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setUser(user);
     };
     getUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -57,7 +61,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
 
   async function handleLogout() {
     await logout();
-    toast.success("Has cerrado sesión");
+    toast.success("Has cerrado sesion");
     router.refresh();
   }
 
@@ -69,6 +73,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   const checkoutPath = hasLocale ? `/${locale}/checkout` : "/checkout";
   const homePath = hasLocale ? `/${locale}` : "/";
   const signupPath = hasLocale ? `/${locale}/signup` : "/signup";
+  const dashboardPath = hasLocale ? `/${locale}/dashboard` : "/dashboard";
   const source = `${pathname}${paramsText ? `?${paramsText}` : ""}`;
   const demoHref = `${targetPath}?source=${encodeURIComponent(source)}`;
   const signupParams = new URLSearchParams(paramsText);
@@ -81,8 +86,10 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   const ctaText = useDemoCta
     ? language === "ca"
       ? "Provar demo ara"
-      : "Ver en acción"
+      : "Ver en accion"
     : t.navbar.cta;
+  const dashboardLabel = "Dashboard";
+  const logoutLabel = language === "ca" ? "Tancar sessio" : "Cerrar sesion";
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-xl transition-all">
@@ -141,22 +148,33 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
             </Button>
           </div>
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <User className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem className="text-xs text-gray-500 disabled">
-                  {user.email}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Cerrar sesión
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-2">
+              <Link
+                href={dashboardPath}
+                className="rounded-full bg-gray-900 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm transition-all hover:scale-105 hover:bg-gray-800 hover:shadow-md"
+              >
+                {dashboardLabel}
+              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="text-xs text-gray-500 disabled">
+                    {user.email}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={dashboardPath}>{dashboardLabel}</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {logoutLabel}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           ) : (
             <Link
               href={ctaHref}

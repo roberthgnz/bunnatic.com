@@ -58,6 +58,8 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
 
         if (consentGranted) {
           ensureGtagStub();
+        } else {
+          initializedRef.current = false;
         }
       }
     };
@@ -71,7 +73,7 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
   }, [trackingId]);
 
   useEffect(() => {
-    if (!hasConsent || !scriptLoaded || typeof window === 'undefined') {
+    if (!hasConsent || typeof window === 'undefined') {
       return;
     }
 
@@ -86,7 +88,13 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
       ensureGtagStub();
       window.gtag?.('js', new Date());
       window.gtag?.('config', trackingId, {send_page_view: false});
+      initializedRef.current = true;
+      return;
     } else {
+      if (!scriptLoaded) {
+        return;
+      }
+
       if (typeof window.ga !== 'function') {
         return;
       }
@@ -100,6 +108,7 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
   useEffect(() => {
     if (
       !hasConsent ||
+      !scriptLoaded ||
       !initializedRef.current ||
       typeof window === 'undefined'
     ) {
@@ -120,7 +129,7 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
 
     window.ga('set', 'page', page);
     window.ga('send', 'pageview');
-  }, [hasConsent, isGa4, pathname, searchParams]);
+  }, [hasConsent, isGa4, pathname, scriptLoaded, searchParams]);
 
   if (!hasConsent) {
     return null;

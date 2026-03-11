@@ -6,6 +6,7 @@ import { Zap, Search, MapPin, Star, Phone, Globe, CheckCircle2, Loader2, ArrowRi
 import { motion, AnimatePresence } from "motion/react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/components/LanguageProvider";
 import { useSearchParams } from "next/navigation";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
@@ -52,6 +53,13 @@ const createPageContent = {
       optimized: "Optimizado",
       goToDashboard: "Ir al Panel de Control",
       createAnother: "Crear otra web",
+      noResultsTitle: "No encontramos coincidencias",
+      noResultsSubtitle: "Prueba con el nombre exacto del negocio y la ciudad para mejorar los resultados.",
+      howToTitle: "How to crear tu web en 3 pasos",
+      howToSubtitle: "Así se verá el flujo después de seleccionar tu negocio.",
+      howToStep1: "Buscar y seleccionar tu negocio",
+      howToStep2: "La IA analiza datos y reseñas",
+      howToStep3: "Publicas tu web en minutos",
     },
   },
   ca: {
@@ -95,6 +103,13 @@ const createPageContent = {
       optimized: "Optimitzat",
       goToDashboard: "Anar al Tauler de Control",
       createAnother: "Crear una altra web",
+      noResultsTitle: "No hem trobat coincidències",
+      noResultsSubtitle: "Prova amb el nom exacte del negoci i la ciutat per millorar els resultats.",
+      howToTitle: "How to crear el teu web en 3 passos",
+      howToSubtitle: "Així es veurà el flux després de seleccionar el teu negoci.",
+      howToStep1: "Cerca i selecciona el teu negoci",
+      howToStep2: "La IA analitza dades i ressenyes",
+      howToStep3: "Publiques el teu web en minuts",
     },
   },
 } as const;
@@ -115,6 +130,7 @@ function CreateWebContent() {
   const [query, setQuery] = useState("");
   const [places, setPlaces] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<any>(null);
   const [placeDetails, setPlaceDetails] = useState<any>(null);
   const [analysisProgress, setAnalysisProgress] = useState(0);
@@ -271,6 +287,7 @@ function CreateWebContent() {
     }
   }
   const signupHref = `/${language}/signup?${signupParams.toString()}`;
+  const showNoResults = hasSearched && !isSearching && query.trim().length > 0 && places.length === 0;
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,14 +295,15 @@ function CreateWebContent() {
     trackFunnelEvent("crear_search_submitted", { locale: language, has_source: Boolean(pageSearchParams.get("source")) });
 
     setIsSearching(true);
+    setHasSearched(true);
+    setPlaces([]);
     try {
       const res = await fetch(`/api/places/search?q=${encodeURIComponent(query)}&lang=${language}`);
       const data = await res.json();
-      if (data.results) {
-        setPlaces(data.results);
-      }
+      setPlaces(Array.isArray(data.results) ? data.results : []);
     } catch (error) {
       console.error("Error searching places:", error);
+      setPlaces([]);
     } finally {
       setIsSearching(false);
     }
@@ -421,6 +439,40 @@ function CreateWebContent() {
                         <ArrowRight className="mt-1 h-5 w-5 flex-shrink-0 text-gray-400" />
                       </button>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {showNoResults && (
+                <div className="mt-6 space-y-4">
+                  <div className="rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-slate-50 p-5 sm:p-6">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900">{t.crear.noResultsTitle}</h3>
+                    <p className="mt-2 text-sm sm:text-base text-gray-600">{t.crear.noResultsSubtitle}</p>
+                  </div>
+
+                  <div className="rounded-3xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
+                    <div className="mb-4">
+                      <h4 className="text-sm sm:text-base font-bold tracking-tight text-gray-900">{t.crear.howToTitle}</h4>
+                      <p className="mt-1 text-xs sm:text-sm text-gray-500">{t.crear.howToSubtitle}</p>
+                    </div>
+
+                    <div className="space-y-3">
+                      {[t.crear.howToStep1, t.crear.howToStep2, t.crear.howToStep3].map((stepLabel, idx) => (
+                        <div key={stepLabel} className="rounded-2xl border border-gray-100 bg-slate-50/70 p-3 sm:p-4">
+                          <div className="mb-3 flex items-center gap-3">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white">
+                              {idx + 1}
+                            </div>
+                            <p className="text-sm font-semibold text-gray-800">{stepLabel}</p>
+                          </div>
+                          <div className="space-y-2">
+                            <Skeleton className="h-3.5 w-4/5 rounded-full bg-gray-200" />
+                            <Skeleton className="h-3.5 w-full rounded-full bg-gray-200" />
+                            <Skeleton className="h-3.5 w-2/3 rounded-full bg-gray-200" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

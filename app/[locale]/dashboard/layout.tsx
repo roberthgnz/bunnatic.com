@@ -17,7 +17,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Building2, Home, LogOut, Settings, User, Zap } from 'lucide-react'
+import { Building2, Home, LogOut, Settings, User, Zap, CreditCard } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/lib/supabase/actions'
@@ -30,6 +30,7 @@ const dashboardContent = {
       businesses: 'Mis negocios',
       profile: 'Perfil',
       settings: 'Configuración',
+      subscription: 'Suscripción',
       logout: 'Cerrar sesión',
     },
   },
@@ -40,6 +41,7 @@ const dashboardContent = {
       businesses: 'Els meus negocis',
       profile: 'Perfil',
       settings: 'Configuració',
+      subscription: 'Subscripció',
       logout: 'Tancar sessió',
     },
   },
@@ -110,6 +112,14 @@ export default function DashboardLayout({
                     <Link href={`${localePrefix}/dashboard/settings`}>
                       <Settings />
                       <span>{t.menu.settings}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname === `${localePrefix}/dashboard/subscription`}>
+                    <Link href={`${localePrefix}/dashboard/subscription`}>
+                      <CreditCard />
+                      <span>{t.menu.subscription}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

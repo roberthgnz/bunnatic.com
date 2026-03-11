@@ -138,6 +138,8 @@ function CreateWebContent() {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [analysisInputMode, setAnalysisInputMode] = useState<"google" | "url">("google");
   const [lastSearchMode, setLastSearchMode] = useState<"google" | "url" | null>(null);
+  const [rateLimitExceeded, setRateLimitExceeded] = useState(false);
+  const [rateLimitResetAt, setRateLimitResetAt] = useState<number | null>(null);
 
   const typeLabels = {
     es: {
@@ -319,6 +321,7 @@ function CreateWebContent() {
     setHasSearched(true);
     setSearchError(null);
     setPlaces([]);
+    setRateLimitExceeded(false);
 
     if (inputMode === "url") {
       const nextDraftId = `url-${Date.now()}`;
@@ -334,12 +337,19 @@ function CreateWebContent() {
       }, 350);
 
       try {
-        const startRes = await fetch("/api/places/crawl", {
+        const startRes = await fetch("/api/demo/places/crawl", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url: trimmedQuery, lang: language }),
         });
         const startData = await startRes.json();
+        
+        if (startRes.status === 429) {
+          setRateLimitExceeded(true);
+          setRateLimitResetAt(startData.resetAt || null);
+          throw new Error(startData.message || genericUrlError);
+        }
+        
         if (!startRes.ok || !startData.jobId) {
           throw new Error(typeof startData.error === "string" ? startData.error : genericUrlError);
         }
@@ -351,7 +361,7 @@ function CreateWebContent() {
           await new Promise((resolve) => window.setTimeout(resolve, urlPollIntervalMs));
 
           const statusRes = await fetch(
-            `/api/places/crawl?jobId=${encodeURIComponent(startData.jobId)}&url=${encodeURIComponent(trimmedQuery)}`,
+            `/api/demo/places/crawl?jobId=${encodeURIComponent(startData.jobId)}&url=${encodeURIComponent(trimmedQuery)}`,
             { cache: "no-store" }
           );
           const statusData = await statusRes.json();
@@ -410,9 +420,19 @@ function CreateWebContent() {
     }
 
     try {
-      const res = await fetch(`/api/places/search?q=${encodeURIComponent(trimmedQuery)}&lang=${language}`);
+      const res = await fetch(`/api/demo/places/search?q=${encodeURIComponent(trimmedQuery)}&lang=${language}`);
       const data = await res.json();
-      setPlaces(Array.isArray(data.results) ? data.results : []);
+      
+      if (res.status === 429) {
+        setRateLimitExceeded(true);
+        setRateLimitResetAt(data.resetAt || null);
+        setSearchError(data.message || (language === "es"
+          ? "Has alcanzado el límite de búsquedas de demostración."
+          : "Has arribat al límit de cerques de demostració."));
+        setPlaces([]);
+      } else {
+        setPlaces(Array.isArray(data.results) ? data.results : []);
+      }
     } catch (error) {
       console.error("Error searching places:", error);
       setPlaces([]);
@@ -452,8 +472,15 @@ function CreateWebContent() {
 
     try {
       const detailsPromise = (async () => {
-        const res = await fetch(`/api/places/details?place_id=${place.place_id}&lang=${language}`);
+        const res = await fetch(`/api/demo/places/details?place_id=${place.place_id}&lang=${language}`);
         const data = await res.json();
+        
+        if (res.status === 429) {
+          setRateLimitExceeded(true);
+          setRateLimitResetAt(data.resetAt || null);
+          throw new Error(data.message || "Rate limit exceeded");
+        }
+        
         if (!data.result) {
           throw new Error("Place details not found");
         }
@@ -559,9 +586,72 @@ function CreateWebContent() {
                   </Button>
                 </div>
               </form>
-              {searchError && (
+              {searchError && !rateLimitExceeded && (
                 <div className="mb-4 sm:mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {searchError}
+                </div>
+              )}
+
+              {rateLimitExceeded && (
+                <div className="mb-4 sm:mb-6 rounded-2xl sm:rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 p-5 sm:p-6 lg:p-8 shadow-lg">
+                  <div className="flex items-start gap-3 sm:gap-4 mb-4">
+                    <div className="flex-shrink-0 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-amber-200">
+                      <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-amber-700" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-2">
+                        {language === "es" 
+                          ? "¡Vaya! Has alcanzado el límite de demostración" 
+                          : "Vaja! Has arribat al límit de demostració"}
+                      </h3>
+                      <p className="text-sm sm:text-base text-gray-700 mb-1">
+                        {language === "es"
+                          ? "Has usado tus 5 búsquedas gratuitas. Vemos que tienes mucho interés en crear tu web."
+                          : "Has utilitzat les teves 5 cerques gratuïtes. Veiem que tens molt d'interès en crear el teu web."}
+                      </p>
+                      {rateLimitResetAt && (
+                        <p className="text-xs sm:text-sm text-gray-600 mt-2">
+                          {language === "es"
+                            ? `Podrás volver a probar en ${Math.ceil((rateLimitResetAt - Date.now()) / (1000 * 60 * 60))} horas, o regístrate ahora para acceso ilimitado.`
+                            : `Podràs tornar a provar en ${Math.ceil((rateLimitResetAt - Date.now()) / (1000 * 60 * 60))} hores, o registra't ara per accés il·limitat.`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="rounded-xl bg-white/80 p-4 border border-amber-200">
+                      <h4 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">
+                        {language === "es" ? "Regístrate y obtén:" : "Registra't i obtén:"}
+                      </h4>
+                      <ul className="space-y-1.5 text-xs sm:text-sm text-gray-700">
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                          <span>{language === "es" ? "Búsquedas ilimitadas" : "Cerques il·limitades"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                          <span>{language === "es" ? "Publica tu web en minutos" : "Publica el teu web en minuts"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                          <span>{language === "es" ? "14 días de prueba gratis" : "14 dies de prova gratis"}</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                          <span>{language === "es" ? "Sin tarjeta de crédito" : "Sense targeta de crèdit"}</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <Button
+                      asChild
+                      variant="default"
+                      className="w-full rounded-full bg-gray-900 px-6 py-3 sm:py-4 text-sm sm:text-base font-bold text-white hover:bg-gray-800 shadow-lg"
+                    >
+                      <Link href={signupHref}>
+                        {language === "es" ? "Crear mi cuenta gratis →" : "Crear el meu compte gratis →"}
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               )}
 

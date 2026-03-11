@@ -247,7 +247,7 @@ export function CookieConsent() {
         <button
           type="button"
           onClick={() => openCookiePreferences()}
-          className="fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950/85 px-3 py-2 text-xs font-medium text-slate-200 shadow-lg backdrop-blur hover:border-emerald-400/40 hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
+          className="fixed bottom-4 left-4 z-40 hidden items-center gap-2 rounded-full border border-slate-700 bg-slate-950/85 px-3 py-2 text-xs font-medium text-slate-200 shadow-lg backdrop-blur hover:border-emerald-400/40 hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 md:inline-flex"
         >
           <Cookie className="h-3.5 w-3.5" />
           {t.reopen}

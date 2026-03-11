@@ -66,7 +66,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     locales.map((locale) => ({
       url: toAbsoluteUrl(pathsByLocale[locale], locale, baseUrl),
       lastModified,
-      changeFrequency: "weekly",
+      changeFrequency: "weekly" as const,
       priority: pathsByLocale[locale] === "/" ? 1 : 0.7,
       alternates: {
         languages: Object.fromEntries(

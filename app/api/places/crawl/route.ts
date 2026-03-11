@@ -32,16 +32,16 @@ function toObject(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
-function pickFirstString(...values: Array<unknown>): string | null {
+function pickFirstString(...values: Array<unknown>): string | undefined {
   for (const value of values) {
     if (typeof value === "string" && value.trim().length > 0) {
       return value.trim();
     }
   }
-  return null;
+  return undefined;
 }
 
-function pickFirstNumber(...values: Array<unknown>): number | null {
+function pickFirstNumber(...values: Array<unknown>): number | undefined {
   for (const value of values) {
     if (typeof value === "number" && Number.isFinite(value)) {
       return value;
@@ -53,7 +53,7 @@ function pickFirstNumber(...values: Array<unknown>): number | null {
       }
     }
   }
-  return null;
+  return undefined;
 }
 
 function normalizeTypeLabel(raw: string): string {
@@ -64,9 +64,9 @@ function normalizeTypeLabel(raw: string): string {
     .replace(/\s+/g, "_");
 }
 
-function extractPlainText(markdown: string | undefined): string | null {
+function extractPlainText(markdown: string | undefined): string | undefined {
   if (typeof markdown !== "string" || markdown.trim().length === 0) {
-    return null;
+    return undefined;
   }
   const text = markdown
     .replace(/!\[[^\]]*]\([^)]+\)/g, " ")
@@ -74,20 +74,20 @@ function extractPlainText(markdown: string | undefined): string | null {
     .replace(/[#>*_`~-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  return text.length > 0 ? text : null;
+  return text.length > 0 ? text : undefined;
 }
 
-function extractPhoneFromText(text: string | null): string | null {
+function extractPhoneFromText(text: string | undefined): string | undefined {
   if (!text) {
-    return null;
+    return undefined;
   }
   const match = text.match(/(?:\+?\d[\d\s().-]{6,}\d)/);
-  return match ? match[0].trim() : null;
+  return match ? match[0].trim() : undefined;
 }
 
-function getPageUrl(page: Document): string | null {
+function getPageUrl(page: Document): string | undefined {
   if (!page.metadata) {
-    return null;
+    return undefined;
   }
   return pickFirstString(page.metadata.url, page.metadata.sourceURL, page.metadata.ogUrl);
 }

@@ -5,6 +5,15 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
 
 import { generateBusinessContent } from '@/lib/ai'
+import {
+  buildBusinessSourcePreview as buildBusinessSourcePreviewPayload,
+  getGenerationEntitlementFromPlan,
+  mapStripePriceIdToGenerationPlan,
+  type BusinessSourcePreview,
+  type GenerationEntitlement,
+  type SourceBlock,
+  type SourceType,
+} from '@/lib/businessSourceGeneration'
 
 function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -49,6 +58,49 @@ async function findUserIdByEmail(email: string) {
   return {}
 }
 
+function getMonthBoundsIso() {
+  const now = new Date()
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+  const nextMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1))
+
+  return {
+    monthStartIso: monthStart.toISOString(),
+    nextMonthStartIso: nextMonthStart.toISOString(),
+  }
+}
+
+async function getGenerationEntitlementInternal(
+  userId: string
+): Promise<{ entitlement: GenerationEntitlement } | { error: string }> {
+  const supabase = await createClient()
+  const { monthStartIso, nextMonthStartIso } = getMonthBoundsIso()
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('stripe_price_id')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (profileError) {
+    return { error: profileError.message }
+  }
+
+  const { count, error: countError } = await supabase
+    .from('business_generation_usage')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', monthStartIso)
+    .lt('created_at', nextMonthStartIso)
+
+  if (countError) {
+    return { error: countError.message }
+  }
+
+  const plan = mapStripePriceIdToGenerationPlan(profile?.stripe_price_id ?? null)
+  const entitlement = getGenerationEntitlementFromPlan(plan, count ?? 0)
+  return { entitlement }
+}
+
 export async function generateAndApplyContent(businessId: string, name: string, category: string) {
   const supabase = await createClient()
   
@@ -80,6 +132,264 @@ export async function generateAndApplyContent(businessId: string, name: string, 
 
   revalidatePath('/dashboard')
   return { success: true }
+}
+
+export async function getGenerationEntitlement(userId?: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  const targetUserId = userId ?? user.id
+  if (targetUserId !== user.id) {
+    return { error: 'Unauthorized' }
+  }
+
+  return getGenerationEntitlementInternal(targetUserId)
+}
+
+export async function buildBusinessSourcePreview(input: {
+  sourceType: SourceType
+  sourcePayload: unknown
+}) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  const preview = buildBusinessSourcePreviewPayload(input)
+  return { preview }
+}
+
+export async function consumeGenerationQuota(
+  userId: string,
+  businessId: string,
+  sourceType: SourceType
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated', allowed: false as const }
+  }
+
+  if (user.id !== userId) {
+    return { error: 'Unauthorized', allowed: false as const }
+  }
+
+  const { data: business, error: businessError } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('id', businessId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (businessError) {
+    return { error: businessError.message, allowed: false as const }
+  }
+
+  if (!business) {
+    return { error: 'No tienes permisos sobre este negocio.', allowed: false as const }
+  }
+
+  const entitlementResult = await getGenerationEntitlementInternal(user.id)
+  if ('error' in entitlementResult) {
+    return { error: entitlementResult.error, allowed: false as const }
+  }
+
+  const { entitlement } = entitlementResult
+  if (entitlement.isLimited && (entitlement.remaining ?? 0) <= 0) {
+    return {
+      allowed: false as const,
+      remaining: 0,
+      entitlement,
+      limitBlocked: true,
+      error: 'Has alcanzado el límite mensual de generaciones de tu plan.',
+    }
+  }
+
+  const { error: insertError } = await supabase
+    .from('business_generation_usage')
+    .insert({
+      user_id: user.id,
+      business_id: businessId,
+      source_type: sourceType,
+    })
+
+  if (insertError) {
+    return { error: insertError.message, allowed: false as const }
+  }
+
+  const nextEntitlementResult = await getGenerationEntitlementInternal(user.id)
+  if ('error' in nextEntitlementResult) {
+    return {
+      allowed: true as const,
+      remaining: entitlement.remaining,
+      entitlement,
+    }
+  }
+
+  return {
+    allowed: true as const,
+    remaining: nextEntitlementResult.entitlement.remaining,
+    entitlement: nextEntitlementResult.entitlement,
+  }
+}
+
+export async function applyBusinessSourceGeneration(input: {
+  businessId: string
+  sourceType: SourceType
+  selectedBlocks: SourceBlock[]
+  previewPayload: BusinessSourcePreview
+}) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  const selectedBlocks = Array.from(new Set(input.selectedBlocks))
+  if (selectedBlocks.length === 0) {
+    return { error: 'Selecciona al menos un bloque para aplicar.' }
+  }
+
+  const { data: business, error: businessError } = await supabase
+    .from('businesses')
+    .select('id, slug')
+    .eq('id', input.businessId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (businessError) {
+    return { error: businessError.message }
+  }
+
+  if (!business) {
+    return { error: 'No tienes permisos sobre este negocio.' }
+  }
+
+  const quotaResult = await consumeGenerationQuota(user.id, input.businessId, input.sourceType)
+  if (!quotaResult.allowed) {
+    return {
+      error: quotaResult.error ?? 'No se pudo consumir cuota de generación.',
+      limitBlocked: Boolean(quotaResult.limitBlocked),
+      entitlement: quotaResult.entitlement,
+      remaining: quotaResult.remaining,
+    }
+  }
+
+  const updatedBlocks: SourceBlock[] = []
+  const preview = input.previewPayload
+
+  if (selectedBlocks.includes('profile')) {
+    const profileUpdates: Record<string, unknown> = {
+      place_data: preview.rawSource ?? {},
+      updated_at: new Date().toISOString(),
+    }
+
+    if (preview.profile.name) {
+      profileUpdates.name = preview.profile.name
+    }
+    if (preview.profile.category) {
+      profileUpdates.category = preview.profile.category
+    }
+    if (preview.profile.description) {
+      profileUpdates.description = preview.profile.description
+    }
+    if (preview.profile.address) {
+      profileUpdates.address = preview.profile.address
+    }
+    if (preview.profile.phone) {
+      profileUpdates.phone = preview.profile.phone
+    }
+    if (preview.profile.website) {
+      profileUpdates.website = preview.profile.website
+    }
+
+    if (input.sourceType === 'google' && preview.profile.googlePlaceId) {
+      profileUpdates.google_place_id = preview.profile.googlePlaceId
+    }
+
+    const { error: profileError } = await supabase
+      .from('businesses')
+      .update(profileUpdates)
+      .eq('id', input.businessId)
+      .eq('user_id', user.id)
+
+    if (profileError) {
+      return { error: profileError.message }
+    }
+
+    updatedBlocks.push('profile')
+  }
+
+  if (selectedBlocks.includes('services')) {
+    const { error: deleteServicesError } = await supabase
+      .from('services')
+      .delete()
+      .eq('business_id', input.businessId)
+
+    if (deleteServicesError) {
+      return { error: deleteServicesError.message }
+    }
+
+    if (preview.services.length > 0) {
+      const { error: insertServicesError } = await supabase
+        .from('services')
+        .insert(
+          preview.services.map((service) => ({
+            business_id: input.businessId,
+            name: service.name,
+            description: service.description || null,
+            price: null,
+            duration: null,
+          }))
+        )
+
+      if (insertServicesError) {
+        return { error: insertServicesError.message }
+      }
+    }
+
+    updatedBlocks.push('services')
+  }
+
+  if (selectedBlocks.includes('hours') && preview.hours.length > 0) {
+    const { error: hoursError } = await supabase
+      .from('working_hours')
+      .upsert(
+        preview.hours.map((hour) => ({
+          business_id: input.businessId,
+          day_of_week: hour.day_of_week,
+          open_time: hour.is_closed ? null : hour.open_time,
+          close_time: hour.is_closed ? null : hour.close_time,
+          is_closed: hour.is_closed,
+        })),
+        { onConflict: 'business_id, day_of_week' }
+      )
+
+    if (hoursError) {
+      return { error: hoursError.message }
+    }
+
+    updatedBlocks.push('hours')
+  }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/dashboard/businesses')
+  revalidatePath(`/dashboard/businesses/${business.slug}`)
+
+  return {
+    success: true,
+    updatedBlocks,
+    entitlement: quotaResult.entitlement,
+    remaining: quotaResult.remaining,
+  }
 }
 
 export async function signup(formData: FormData) {

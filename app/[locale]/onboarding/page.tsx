@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
+import { content } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -47,6 +48,12 @@ function OnboardingContent() {
     googlePlaceId: "",
     placeData: "",
   });
+  const languageKey = language === "ca" ? "ca" : "es";
+
+  const selectedTier = useMemo(() => {
+    const tiers = content[languageKey].pricing.tiers;
+    return tiers.find((tier) => tier.id === `tier-${plan}`) ?? tiers[0];
+  }, [languageKey, plan]);
 
   const legalLinks = useMemo(() => {
     const lang = language === "ca" ? "ca" : "es";
@@ -201,7 +208,7 @@ function OnboardingContent() {
       previewTitle: "El teu negoci",
       previewUrl: "elneutenegoci.bunnatic.com",
     },
-  }[language === "ca" ? "ca" : "es"];
+  }[languageKey];
 
   if (step === "checkout") {
     return (
@@ -220,8 +227,8 @@ function OnboardingContent() {
 
           <p className="text-sm sm:text-base text-gray-600 max-w-lg mx-auto">
             {language === "es"
-              ? "Sin tarjeta de crédito. Sin compromiso."
-              : "Sense targeta de crèdit. Sense compromís."}
+              ? `Incluye prueba del plan ${selectedTier.name}. Sin tarjeta de crédito.`
+              : `Inclou prova del pla ${selectedTier.name}. Sense targeta de crèdit.`}
           </p>
         </div>
 
@@ -236,8 +243,11 @@ function OnboardingContent() {
                   {language === "es" ? "Plan" : "Pla"}
                 </p>
                 <h2 className="text-xl font-bold text-gray-900 truncate">
-                  {plan.charAt(0).toUpperCase() + plan.slice(1)}
+                  {selectedTier.name}
                 </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {selectedTier.description}
+                </p>
               </div>
             </div>
 
@@ -262,7 +272,19 @@ function OnboardingContent() {
                 <CheckCircle2 className="h-3 w-3 text-emerald-600" />
               </div>
               <span className="text-sm text-gray-700">
-                {language === "es" ? "14 días de prueba gratis" : "14 dies de prova gratis"}
+                {language === "es"
+                  ? `14 días de prueba del plan ${selectedTier.name}`
+                  : `14 dies de prova del pla ${selectedTier.name}`}
+              </span>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+              </div>
+              <span className="text-sm text-gray-700">
+                {selectedTier.features[0]?.title}
+                {selectedTier.features[0]?.detail ? ` · ${selectedTier.features[0].detail}` : ""}
               </span>
             </div>
 
@@ -300,7 +322,7 @@ function OnboardingContent() {
                   })
                 }
               >
-                {language === "es" ? "Continuar con onboarding" : "Continuar amb l'onboarding"}
+                {language === "es" ? "Empezar" : "Començar"}
               </Link>
             </Button>
 

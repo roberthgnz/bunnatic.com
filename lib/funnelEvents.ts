@@ -9,7 +9,12 @@ export type FunnelEventName =
   | "signup_completed"
   | "checkout_started"
   | "checkout_completed"
-  | "onboarding_step_completed";
+  | "onboarding_step_completed"
+  | "source_selected"
+  | "preview_generated"
+  | "apply_submitted"
+  | "apply_success"
+  | "limit_blocked";
 
 type FunnelPayload = Record<string, string | number | boolean | null | undefined>;
 

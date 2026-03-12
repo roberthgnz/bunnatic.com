@@ -39,9 +39,14 @@ export function TeamSwitcher({
   addTeamHref?: string
 }) {
   const { isMobile } = useSidebar()
+  const [mounted, setMounted] = React.useState(false)
   const [activeTeam, setActiveTeam] = React.useState<TeamItem | undefined>(
     teams[0]
   )
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   React.useEffect(() => {
     if (!teams.length) {
@@ -61,6 +66,25 @@ export function TeamSwitcher({
 
   if (!activeTeam) {
     return null
+  }
+
+  if (!mounted) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <activeTeam.logo className="size-4" />
+            </div>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">{activeTeam.name}</span>
+              <span className="truncate text-xs">{activeTeam.plan}</span>
+            </div>
+            <ChevronsUpDown className="ml-auto" />
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    )
   }
 
   return (

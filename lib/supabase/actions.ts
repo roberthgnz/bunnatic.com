@@ -14,6 +14,56 @@ import {
   type SourceBlock,
   type SourceType,
 } from '@/lib/businessSourceGeneration'
+import {
+  createCloudflareCustomHostname,
+  deleteCloudflareCustomHostname,
+  extractOwnershipVerificationRecord,
+  findCloudflareCustomHostnameByHostname,
+  getCloudflareCustomHostname,
+  mapCloudflareStatus,
+  type DomainConnectionStatus,
+} from '@/lib/domains/cloudflare'
+import { getCloudflareCnameTarget, isPlatformHost } from '@/lib/domains/config'
+import { normalizeHostname } from '@/lib/domains/hostname'
+
+type BusinessDomainRecord = {
+  id: string
+  business_id: string
+  hostname: string
+  status: DomainConnectionStatus
+  verification_method: 'txt' | 'http'
+  cloudflare_custom_hostname_id: string | null
+  cloudflare_ssl_status: string | null
+  cloudflare_ssl_method: string | null
+  cloudflare_ownership_verification: Record<string, unknown>
+  cloudflare_verification_errors: Array<Record<string, unknown>>
+  verification_record_name: string | null
+  verification_record_value: string | null
+  activated_at: string | null
+  last_checked_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+async function getOwnedBusinessBySlug(slug: string, userId: string) {
+  const supabase = await createClient()
+  const { data: business, error } = await supabase
+    .from('businesses')
+    .select('id, slug')
+    .eq('slug', slug)
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  if (!business) {
+    return { error: 'No tienes permisos para gestionar el dominio de este negocio.' }
+  }
+
+  return { business }
+}
 
 function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -755,6 +805,345 @@ export async function getBusinessBySlug(slug: string) {
     .maybeSingle()
 
   return membership ? business : null
+}
+
+export async function getBusinessDomain(slug: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return null
+  }
+
+  const business = await getBusinessBySlug(slug)
+  if (!business) {
+    return null
+  }
+
+  const { data: domain, error } = await supabase
+    .from('business_domains')
+    .select('*')
+    .eq('business_id', business.id)
+    .maybeSingle()
+
+  if (error) {
+    return null
+  }
+
+  return (domain as BusinessDomainRecord | null) ?? null
+}
+
+export async function getBusinessDomainByBusinessId(businessId: string) {
+  const supabase = await createClient()
+  const { data: domain, error } = await supabase
+    .from('business_domains')
+    .select('*')
+    .eq('business_id', businessId)
+    .maybeSingle()
+
+  if (error) {
+    return null
+  }
+
+  return (domain as BusinessDomainRecord | null) ?? null
+}
+
+function computeActivatedAt(
+  currentStatus: DomainConnectionStatus,
+  previousActivatedAt: string | null
+) {
+  if (currentStatus !== 'active') {
+    return previousActivatedAt
+  }
+
+  return previousActivatedAt ?? new Date().toISOString()
+}
+
+export async function connectBusinessDomain(slug: string, formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Debes iniciar sesión para conectar un dominio.' }
+  }
+
+  const hostnameInput = String(formData.get('hostname') || '')
+  const hostname = normalizeHostname(hostnameInput)
+  if (!hostname) {
+    return { error: 'Introduce un dominio válido (por ejemplo: www.tunegocio.com).' }
+  }
+
+  if (isPlatformHost(hostname)) {
+    return { error: 'Ese dominio pertenece a la plataforma y no puede asignarse a un negocio.' }
+  }
+
+  const ownedBusiness = await getOwnedBusinessBySlug(slug, user.id)
+  if ('error' in ownedBusiness) {
+    return { error: ownedBusiness.error }
+  }
+
+  const business = ownedBusiness.business
+
+  const { data: collision, error: collisionError } = await supabase
+    .from('business_domains')
+    .select('id, business_id, hostname')
+    .eq('hostname', hostname)
+    .neq('business_id', business.id)
+    .maybeSingle()
+
+  if (collisionError) {
+    return { error: collisionError.message }
+  }
+
+  if (collision) {
+    return { error: 'Este dominio ya está conectado a otro negocio.' }
+  }
+
+  const { data: existingDomain, error: existingError } = await supabase
+    .from('business_domains')
+    .select('*')
+    .eq('business_id', business.id)
+    .maybeSingle()
+
+  if (existingError) {
+    return { error: existingError.message }
+  }
+
+  const previousDomain = (existingDomain as BusinessDomainRecord | null) ?? null
+  const domainChanged = previousDomain && previousDomain.hostname !== hostname
+
+  try {
+    let cloudflareDomain
+    try {
+      cloudflareDomain = await createCloudflareCustomHostname(hostname)
+    } catch (error) {
+      const existingInCloudflare = await findCloudflareCustomHostnameByHostname(hostname).catch(() => null)
+      if (!existingInCloudflare?.id) {
+        throw error
+      }
+      cloudflareDomain = existingInCloudflare
+    }
+
+    if (!cloudflareDomain?.id) {
+      const existingInCloudflare = await findCloudflareCustomHostnameByHostname(hostname)
+      if (!existingInCloudflare?.id) {
+        return { error: 'Cloudflare no devolvió un identificador para el dominio.' }
+      }
+      cloudflareDomain = existingInCloudflare
+    }
+
+    const mappedStatus = mapCloudflareStatus(cloudflareDomain)
+    const verificationRecord = extractOwnershipVerificationRecord(cloudflareDomain)
+    const verificationMethod = cloudflareDomain.ssl?.method === 'http' ? 'http' : 'txt'
+
+    const payload = {
+      business_id: business.id,
+      hostname,
+      status: mappedStatus,
+      verification_method: verificationMethod,
+      cloudflare_custom_hostname_id: cloudflareDomain.id,
+      cloudflare_ssl_status: cloudflareDomain.ssl?.status ?? null,
+      cloudflare_ssl_method: cloudflareDomain.ssl?.method ?? null,
+      cloudflare_ownership_verification: cloudflareDomain.ownership_verification ?? {},
+      cloudflare_verification_errors: cloudflareDomain.verification_errors ?? [],
+      verification_record_name: verificationRecord.name,
+      verification_record_value: verificationRecord.value,
+      activated_at: computeActivatedAt(mappedStatus, previousDomain?.activated_at ?? null),
+      last_checked_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+
+    const { data: domain, error: upsertError } = await supabase
+      .from('business_domains')
+      .upsert(payload, { onConflict: 'business_id' })
+      .select('*')
+      .single()
+
+    if (upsertError) {
+      return { error: upsertError.message }
+    }
+
+    let cleanupWarning: string | null = null
+    if (
+      domainChanged &&
+      previousDomain?.cloudflare_custom_hostname_id &&
+      previousDomain.cloudflare_custom_hostname_id !== cloudflareDomain.id
+    ) {
+      try {
+        await deleteCloudflareCustomHostname(previousDomain.cloudflare_custom_hostname_id)
+      } catch (error) {
+        cleanupWarning =
+          error instanceof Error
+            ? error.message
+            : 'El nuevo dominio se conectó, pero no se pudo borrar el dominio anterior en Cloudflare.'
+      }
+    }
+
+    revalidatePath(`/dashboard/businesses/${slug}/settings`)
+    revalidatePath(`/dashboard/businesses/${slug}/overview`)
+    revalidatePath(`/w/${slug}`)
+
+    return {
+      success: true,
+      domain: domain as BusinessDomainRecord,
+      dnsTarget: getCloudflareCnameTarget(),
+      warning: cleanupWarning,
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'No se pudo conectar el dominio en Cloudflare.'
+    return { error: message }
+  }
+}
+
+export async function refreshBusinessDomainStatus(slug: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Debes iniciar sesión para actualizar el estado del dominio.' }
+  }
+
+  const ownedBusiness = await getOwnedBusinessBySlug(slug, user.id)
+  if ('error' in ownedBusiness) {
+    return { error: ownedBusiness.error }
+  }
+
+  const business = ownedBusiness.business
+  const { data: domain, error: domainError } = await supabase
+    .from('business_domains')
+    .select('*')
+    .eq('business_id', business.id)
+    .maybeSingle()
+
+  if (domainError) {
+    return { error: domainError.message }
+  }
+
+  const currentDomain = (domain as BusinessDomainRecord | null) ?? null
+  if (!currentDomain) {
+    return { error: 'Este negocio todavía no tiene un dominio conectado.' }
+  }
+
+  try {
+    const cloudflareDomain = currentDomain.cloudflare_custom_hostname_id
+      ? await getCloudflareCustomHostname(currentDomain.cloudflare_custom_hostname_id)
+      : await findCloudflareCustomHostnameByHostname(currentDomain.hostname)
+
+    if (!cloudflareDomain) {
+      const { data: updatedDomain, error: updateError } = await supabase
+        .from('business_domains')
+        .update({
+          status: 'error',
+          cloudflare_verification_errors: [{ message: 'Cloudflare no encontró este custom hostname.' }],
+          last_checked_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', currentDomain.id)
+        .select('*')
+        .single()
+
+      if (updateError) {
+        return { error: updateError.message }
+      }
+
+      return { success: true, domain: updatedDomain as BusinessDomainRecord }
+    }
+
+    const mappedStatus = mapCloudflareStatus(cloudflareDomain)
+    const verificationRecord = extractOwnershipVerificationRecord(cloudflareDomain)
+
+    const { data: updatedDomain, error: updateError } = await supabase
+      .from('business_domains')
+      .update({
+        hostname: cloudflareDomain.hostname.toLowerCase(),
+        status: mappedStatus,
+        cloudflare_custom_hostname_id: cloudflareDomain.id,
+        cloudflare_ssl_status: cloudflareDomain.ssl?.status ?? null,
+        cloudflare_ssl_method: cloudflareDomain.ssl?.method ?? null,
+        cloudflare_ownership_verification: cloudflareDomain.ownership_verification ?? {},
+        cloudflare_verification_errors: cloudflareDomain.verification_errors ?? [],
+        verification_record_name: verificationRecord.name,
+        verification_record_value: verificationRecord.value,
+        activated_at: computeActivatedAt(mappedStatus, currentDomain.activated_at),
+        last_checked_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', currentDomain.id)
+      .select('*')
+      .single()
+
+    if (updateError) {
+      return { error: updateError.message }
+    }
+
+    revalidatePath(`/dashboard/businesses/${slug}/settings`)
+    revalidatePath(`/dashboard/businesses/${slug}/overview`)
+    revalidatePath(`/w/${slug}`)
+
+    return {
+      success: true,
+      domain: updatedDomain as BusinessDomainRecord,
+      dnsTarget: getCloudflareCnameTarget(),
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'No se pudo consultar el estado en Cloudflare.'
+    return { error: message }
+  }
+}
+
+export async function disconnectBusinessDomain(slug: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Debes iniciar sesión para desconectar un dominio.' }
+  }
+
+  const ownedBusiness = await getOwnedBusinessBySlug(slug, user.id)
+  if ('error' in ownedBusiness) {
+    return { error: ownedBusiness.error }
+  }
+
+  const business = ownedBusiness.business
+
+  const { data: domain, error: domainError } = await supabase
+    .from('business_domains')
+    .select('*')
+    .eq('business_id', business.id)
+    .maybeSingle()
+
+  if (domainError) {
+    return { error: domainError.message }
+  }
+
+  const currentDomain = (domain as BusinessDomainRecord | null) ?? null
+  if (!currentDomain) {
+    return { success: true }
+  }
+
+  if (currentDomain.cloudflare_custom_hostname_id) {
+    try {
+      await deleteCloudflareCustomHostname(currentDomain.cloudflare_custom_hostname_id)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No se pudo eliminar el custom hostname en Cloudflare.'
+      return { error: message }
+    }
+  }
+
+  const { error: deleteError } = await supabase
+    .from('business_domains')
+    .delete()
+    .eq('id', currentDomain.id)
+
+  if (deleteError) {
+    return { error: deleteError.message }
+  }
+
+  revalidatePath(`/dashboard/businesses/${slug}/settings`)
+  revalidatePath(`/dashboard/businesses/${slug}/overview`)
+  revalidatePath(`/w/${slug}`)
+
+  return { success: true }
 }
 
 export async function updateBusiness(slug: string, formData: FormData) {

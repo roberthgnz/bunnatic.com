@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
   getBusinessBySlug,
+  getBusinessDomainByBusinessId,
   getSections,
   getWorkingHours,
   getServices,
@@ -34,6 +35,11 @@ export default async function BusinessDetailLayout({
     getWorkingHours(business.id),
     getSections(business.id),
   ])
+  const businessDomain = await getBusinessDomainByBusinessId(business.id)
+  const publicHref =
+    businessDomain?.status === 'active'
+      ? `https://${businessDomain.hostname}`
+      : `/${locale}/w/${business.slug}`
 
   const activeDays = workingHours.filter((hour) => !hour.is_closed).length
   const hasProfile = Boolean(
@@ -136,14 +142,14 @@ export default async function BusinessDetailLayout({
 
               {/* Public link action */}
               <Button variant="outline" size="sm" asChild className="h-7 text-xs px-2 sm:px-3 text-slate-600 hidden md:flex">
-                <Link href={`/${locale}/w/${business.slug}`} target="_blank">
+                <Link href={publicHref} target="_blank">
                   {t.viewPublic}
                   <ExternalLink className="ml-1.5 h-3 w-3" />
                 </Link>
               </Button>
                {/* Mobile variant */}
                <Button variant="outline" size="icon" asChild className="h-7 w-7 text-slate-600 md:hidden ml-auto">
-                <Link href={`/${locale}/w/${business.slug}`} target="_blank">
+                <Link href={publicHref} target="_blank">
                   <ExternalLink className="h-3 w-3" />
                   <span className="sr-only">{t.viewPublic}</span>
                 </Link>

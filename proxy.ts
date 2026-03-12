@@ -1,6 +1,8 @@
 import createMiddleware from 'next-intl/middleware';
 import {NextRequest, NextResponse} from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
+import { getDefaultLocale, isPlatformHost } from '@/lib/domains/config';
+import { normalizeHostname } from '@/lib/domains/hostname';
 import {
   getBusinessLandingBySlug,
   getBusinessSlugByLocale,
@@ -34,11 +36,15 @@ function copyResponseCookies(source: NextResponse, target: NextResponse) {
 }
 
 function getLocaleFromPath(pathname: string): Locale {
+  if (pathname === '/es' || pathname.startsWith('/es/')) {
+    return 'es';
+  }
+
   if (pathname === '/ca' || pathname.startsWith('/ca/')) {
     return 'ca';
   }
 
-  return 'es';
+  return getDefaultLocale() === 'ca' ? 'ca' : 'es';
 }
 
 function getLocalePrefix(pathname: string): string {
@@ -138,11 +144,45 @@ function getLocalizedStaticRewritePath(pathname: string) {
   return `${localePrefix}/${fsSlug}`;
 }
 
+function getRequestHost(request: NextRequest) {
+  const xForwardedHost = request.headers.get('x-forwarded-host');
+  const hostHeader = (xForwardedHost || request.headers.get('host') || '').trim().toLowerCase();
+  if (!hostHeader) {
+    return null;
+  }
+
+  const normalized = hostHeader.split(',')[0]?.trim().replace(/:\d+$/, '') || '';
+  const safeHost = normalizeHostname(normalized);
+  return safeHost;
+}
+
+function getCustomDomainRewritePath(request: NextRequest, pathname: string) {
+  const host = getRequestHost(request);
+  if (!host || isPlatformHost(host)) {
+    return null;
+  }
+
+  if (/^\/(?:(es|ca)\/)?w\/domain\/[^/]+\/?$/.test(pathname)) {
+    return null;
+  }
+
+  const locale = getLocaleFromPath(pathname);
+  const localePrefix = locale === 'ca' ? '/ca' : '';
+  return `${localePrefix}/w/domain/${host}`;
+}
+
 export default async function middleware(request: NextRequest) {
+  const {pathname} = new URL(request.url);
+  const customDomainRewritePath = getCustomDomainRewritePath(request, pathname);
+  if (customDomainRewritePath) {
+    const rewriteUrl = new URL(request.url);
+    rewriteUrl.pathname = customDomainRewritePath;
+    return NextResponse.rewrite(rewriteUrl);
+  }
+
   // First, update the Supabase session
   const { response: supabaseResponse, user, onboardingCompleted } = await updateSession(request);
 
-  const {pathname} = new URL(request.url);
   const localePrefix = getLocalePrefix(pathname);
 
   const guestOnlyAuthPagesMatch = pathname.match(/^\/(?:(es|ca)\/)?(signin|signup)(?:\/|$)/);

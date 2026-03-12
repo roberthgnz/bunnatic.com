@@ -1,16 +1,16 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getServices, getWorkingHours } from '@/lib/supabase/actions'
-import { getPublicBusinessBySlug } from '@/lib/supabase/public'
-import PublicBusinessSite from '../_components/PublicBusinessSite'
+import { getPublicBusinessByHostname } from '@/lib/supabase/public'
+import PublicBusinessSite from '../../_components/PublicBusinessSite'
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ locale: string; slug: string }>
+  params: Promise<{ locale: string; hostname: string }>
 }): Promise<Metadata> {
-  const { slug } = await params
-  const business = await getPublicBusinessBySlug(slug)
+  const { hostname } = await params
+  const business = await getPublicBusinessByHostname(hostname)
 
   if (!business) {
     return {
@@ -24,13 +24,13 @@ export async function generateMetadata({
   }
 }
 
-export default async function PublicBusinessPage({
+export default async function PublicBusinessDomainPage({
   params,
 }: {
-  params: Promise<{ locale: string; slug: string }>
+  params: Promise<{ locale: string; hostname: string }>
 }) {
-  const { locale, slug } = await params
-  const business = await getPublicBusinessBySlug(slug)
+  const { locale, hostname } = await params
+  const business = await getPublicBusinessByHostname(hostname)
 
   if (!business) {
     notFound()

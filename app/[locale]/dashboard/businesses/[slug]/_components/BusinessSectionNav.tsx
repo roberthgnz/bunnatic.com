@@ -8,11 +8,9 @@ import {
   Briefcase,
   Calendar as CalendarIcon,
   Clock,
-  FileCheck,
   LayoutGrid,
   MessageSquare,
   Settings,
-  ShieldCheck,
   Sparkles,
   Users,
 } from 'lucide-react'
@@ -74,8 +72,6 @@ export default function BusinessSectionNav({
       title: isCatalan ? 'Control' : 'Control',
       items: [
         { key: 'team', href: `${base}/team`, label: isCatalan ? 'Equip' : 'Equipo', icon: Users },
-        { key: 'reviews', href: `${base}/reviews`, label: isCatalan ? 'Revisions' : 'Revisiones', icon: FileCheck },
-        { key: 'audit', href: `${base}/audit`, label: isCatalan ? 'Auditoria' : 'Auditoría', icon: ShieldCheck },
         {
           key: 'settings',
           href: `${base}/settings`,

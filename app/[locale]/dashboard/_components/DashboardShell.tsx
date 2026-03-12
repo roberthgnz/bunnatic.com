@@ -214,11 +214,9 @@ export default function DashboardShell({
   const segmentLabelMap: Record<string, string> = {
     overview: language === 'ca' ? 'Resum' : 'Resumen',
     analytics: 'Analytics',
-    reviews: language === 'ca' ? 'Ressenyes' : 'Reseñas',
     calendar: language === 'ca' ? 'Calendari' : 'Calendario',
     settings: t.menu.settings,
     team: language === 'ca' ? 'Equip' : 'Equipo',
-    audit: language === 'ca' ? 'Auditoria' : 'Auditoría',
     leads: 'Leads',
     hours: language === 'ca' ? 'Horaris' : 'Horarios',
     services: language === 'ca' ? 'Serveis' : 'Servicios',

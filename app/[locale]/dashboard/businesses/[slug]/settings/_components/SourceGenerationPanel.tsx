@@ -477,7 +477,6 @@ export default function SourceGenerationPanel({
               <Button
                 type="submit"
                 disabled={isSearching || isBuildingPreview}
-                className="h-10 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-sm border-0"
               >
                 {isSearching ? (
                   <>
@@ -551,7 +550,6 @@ export default function SourceGenerationPanel({
             <Button
               type="submit"
               disabled={isCrawling || isBuildingPreview}
-              className="h-10 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-sm border-0"
             >
               {isCrawling ? (
                 <>
@@ -745,7 +743,7 @@ export default function SourceGenerationPanel({
                     type="button"
                     onClick={handleApply}
                     disabled={isApplying || !hasSelectableBlocks || isLimitReached}
-                    className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-semibold shadow-sm border-0 disabled:opacity-50"
+                    className="w-full h-1"
                   >
                     {isApplying ? (
                       <>

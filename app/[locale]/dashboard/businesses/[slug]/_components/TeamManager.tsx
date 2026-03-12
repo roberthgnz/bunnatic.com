@@ -195,7 +195,7 @@ export default function TeamManager({
             type="submit"
             disabled={isSubmitting}
             size="sm"
-            className="gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 shadow-sm"
+            
           >
             {isSubmitting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />

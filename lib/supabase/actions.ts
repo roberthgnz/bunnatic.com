@@ -825,8 +825,42 @@ export async function getBusinesses() {
 
   const allBusinesses = [...(ownedBusinesses || []), ...teamBusinesses]
   const deduped = Array.from(new Map(allBusinesses.map((business) => [business.id, business])).values())
+  const businessIds = deduped.map((business) => business.id)
 
-  return deduped.sort(
+  let domainByBusinessId = new Map<
+    string,
+    { hostname: string; status: DomainConnectionStatus }
+  >()
+
+  if (businessIds.length > 0) {
+    const { data: domains } = await supabase
+      .from('business_domains')
+      .select('business_id, hostname, status')
+      .in('business_id', businessIds)
+
+    if (domains && Array.isArray(domains)) {
+      domainByBusinessId = new Map(
+        domains.map((domain: any) => [
+          domain.business_id,
+          {
+            hostname: domain.hostname,
+            status: domain.status as DomainConnectionStatus,
+          },
+        ])
+      )
+    }
+  }
+
+  return deduped
+    .map((business) => {
+      const domain = domainByBusinessId.get(business.id)
+      return {
+        ...business,
+        custom_domain: domain?.hostname ?? null,
+        custom_domain_status: domain?.status ?? null,
+      }
+    })
+    .sort(
     (a, b) => new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime()
   )
 }

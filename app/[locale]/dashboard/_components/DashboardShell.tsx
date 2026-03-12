@@ -25,11 +25,28 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
-import { Building2, Home, PlusCircle, Settings, HelpCircle, Search } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
+import {
+  Building2,
+  Home,
+  PlusCircle,
+  Settings,
+  HelpCircle,
+  Search,
+  ChevronDown,
+  MessageSquarePlus,
+  Bug,
+  Lightbulb,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/lib/supabase/actions'
-import PlanBadge from './PlanBadge'
 import { useEffect, useState } from 'react'
 import { TeamSwitcher } from '@/components/team-switcher'
 import { NavUser } from '@/components/nav-user'
@@ -48,6 +65,9 @@ const dashboardContent = {
       settings: 'Configuración',
       getHelp: 'Obtener ayuda',
       search: 'Buscar',
+      giveFeedback: 'Dar feedback',
+      feedbackIssue: 'Incidencia',
+      feedbackIdea: 'Idea',
       account: 'Cuenta',
       billing: 'Facturación',
       notifications: 'Notificaciones',
@@ -73,6 +93,9 @@ const dashboardContent = {
       settings: 'Configuració',
       getHelp: 'Obtenir ajuda',
       search: 'Cercar',
+      giveFeedback: 'Donar feedback',
+      feedbackIssue: 'Incidència',
+      feedbackIdea: 'Idea',
       account: 'Compte',
       billing: 'Facturació',
       notifications: 'Notificacions',
@@ -342,7 +365,29 @@ export default function DashboardShell({
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-4">
-            <PlanBadge />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="button" variant="outline" size="sm" className="gap-1">
+                  <MessageSquarePlus className="size-4" />
+                  {t.menu.giveFeedback}
+                  <ChevronDown className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuItem asChild>
+                  <Link href={`mailto:hello@bunnatic.com?subject=${encodeURIComponent(t.menu.feedbackIssue)}`}>
+                    <Bug className="size-4" />
+                    {t.menu.feedbackIssue}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`mailto:hello@bunnatic.com?subject=${encodeURIComponent(t.menu.feedbackIdea)}`}>
+                    <Lightbulb className="size-4" />
+                    {t.menu.feedbackIdea}
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">

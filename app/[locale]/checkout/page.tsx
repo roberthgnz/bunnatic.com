@@ -5,9 +5,11 @@ import { useLanguage } from "@/components/LanguageProvider";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
-import { Suspense, useEffect, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useSyncExternalStore } from "react";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
 import { getLegalSlug } from "@/lib/pageSlugs";
+
+const EMPTY_DRAFT_SNAPSHOT = "";
 
 export default function CheckoutPage() {
   return (
@@ -23,6 +25,8 @@ function CheckoutContent() {
   const pathname = usePathname() ?? "/";
   const plan = searchParams.get("plan") || searchParams.get("planSuggested") || "starter";
   const draftId = searchParams.get("draftId");
+  const publishIntent = searchParams.get("publishIntent");
+  const tempGenerationKey = searchParams.get("tempGenerationKey");
   const locale = pathname.split("/").filter(Boolean)[0];
   const hasLocale = locale === "es" || locale === "ca";
   const localePrefix = hasLocale ? `/${locale}` : "";
@@ -44,18 +48,30 @@ function CheckoutContent() {
     if (source) {
       params.set("source", source);
     }
+    if (publishIntent) {
+      params.set("publishIntent", publishIntent);
+    }
+    if (tempGenerationKey) {
+      params.set("tempGenerationKey", tempGenerationKey);
+    }
     return `${localePrefix}/onboarding?${params.toString()}`;
-  }, [draftId, localePrefix, plan, searchParams]);
+  }, [draftId, localePrefix, plan, publishIntent, searchParams, tempGenerationKey]);
+  const draftSnapshot = useSyncExternalStore(
+    (callback) => {
+      if (typeof window === "undefined") return () => {};
+      window.addEventListener("storage", callback);
+      return () => window.removeEventListener("storage", callback);
+    },
+    () => {
+      if (!draftId || typeof window === "undefined") return EMPTY_DRAFT_SNAPSHOT;
+      return window.localStorage.getItem(`draft:${draftId}`) ?? EMPTY_DRAFT_SNAPSHOT;
+    },
+    () => EMPTY_DRAFT_SNAPSHOT
+  );
   const draftData = useMemo(() => {
-    if (!draftId || typeof window === "undefined") {
-      return { name: "", sector: "" };
-    }
-    const raw = window.localStorage.getItem(`draft:${draftId}`);
-    if (!raw) {
-      return { name: "", sector: "" };
-    }
+    if (!draftSnapshot) return { name: "", sector: "" };
     try {
-      const parsed = JSON.parse(raw) as { name?: string; sector?: string };
+      const parsed = JSON.parse(draftSnapshot) as { name?: string; sector?: string };
       return {
         name: parsed.name ?? "",
         sector: parsed.sector ?? "",
@@ -63,7 +79,7 @@ function CheckoutContent() {
     } catch {
       return { name: "", sector: "" };
     }
-  }, [draftId]);
+  }, [draftSnapshot]);
 
   useEffect(() => {
     trackFunnelEvent("checkout_started", {
@@ -77,11 +93,6 @@ function CheckoutContent() {
     <div className="mx-auto max-w-2xl px-4 py-6 sm:py-12 lg:py-16">
       {/* Header */}
       <div className="text-center mb-6 sm:mb-10">
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 mb-4">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          {language === "es" ? "Último paso" : "Últim pas"}
-        </div>
-          
           <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 mb-3">
             {language === "es" ? "Comienza tu prueba" : "Comença la teva prova"}
             <br />
@@ -252,6 +263,5 @@ function CheckoutContent() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

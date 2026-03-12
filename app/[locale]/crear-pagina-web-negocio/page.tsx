@@ -135,6 +135,8 @@ function CreateWebContent() {
   const [placeDetails, setPlaceDetails] = useState<any>(null);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [draftId, setDraftId] = useState<string | null>(null);
+  const [tempSessionId, setTempSessionId] = useState<string | null>(null);
+  const [tempGenerationKey, setTempGenerationKey] = useState<string | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [analysisInputMode, setAnalysisInputMode] = useState<"google" | "url">("google");
   const [lastSearchMode, setLastSearchMode] = useState<"google" | "url" | null>(null);
@@ -292,6 +294,12 @@ function CreateWebContent() {
     }
   }
   const signupHref = `/${language}/signup?${signupParams.toString()}`;
+  const publishSignupParams = new URLSearchParams(signupParams.toString());
+  publishSignupParams.set("publishIntent", "1");
+  if (tempGenerationKey) {
+    publishSignupParams.set("tempGenerationKey", tempGenerationKey);
+  }
+  const publishSignupHref = `/${language}/signup?${publishSignupParams.toString()}`;
   const showNoResults =
     lastSearchMode === "google" &&
     hasSearched &&
@@ -304,6 +312,55 @@ function CreateWebContent() {
       : "No hem pogut analitzar aquesta URL. Verifica que sigui pública i torna-ho a provar.";
   const urlPollIntervalMs = 1200;
   const urlPollMaxWaitMs = 90000;
+
+  const getOrCreateTempSessionId = () => {
+    if (typeof window === "undefined") return null;
+    if (tempSessionId) return tempSessionId;
+
+    const existing = window.localStorage.getItem("temp-generation-session-id");
+    if (existing) {
+      setTempSessionId(existing);
+      return existing;
+    }
+
+    const created = crypto.randomUUID();
+    window.localStorage.setItem("temp-generation-session-id", created);
+    setTempSessionId(created);
+    return created;
+  };
+
+  const saveTemporaryGeneration = async (
+    generatedPlaceData: any,
+    nextDraftId: string
+  ): Promise<string | null> => {
+    try {
+      const sessionId = getOrCreateTempSessionId();
+      const response = await fetch("/api/temp-generation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: sessionId ?? undefined,
+          draftId: nextDraftId,
+          source: sourceValue,
+          placeData: generatedPlaceData,
+        }),
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+      if (typeof data.key === "string" && data.key.length > 0) {
+        setTempGenerationKey(data.key);
+        return data.key;
+      }
+    } catch (error) {
+      console.error("Error saving temporary generation:", error);
+    }
+
+    return null;
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -386,6 +443,7 @@ function CreateWebContent() {
 
         setAnalysisProgress(100);
         setPlaceDetails(finalResult);
+        await saveTemporaryGeneration(finalResult, nextDraftId);
 
         if (typeof window !== "undefined") {
           window.localStorage.setItem(
@@ -485,6 +543,7 @@ function CreateWebContent() {
           throw new Error("Place details not found");
         }
         setPlaceDetails(data.result);
+        await saveTemporaryGeneration(data.result, nextDraftId);
         if (typeof window !== "undefined") {
           window.localStorage.setItem(`draft:${nextDraftId}`, JSON.stringify({
             draftId: nextDraftId,
@@ -886,7 +945,7 @@ function CreateWebContent() {
                       className="h-11 sm:h-12 w-full rounded-full bg-emerald-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-400"
                     >
                       <Link
-                        href={signupHref}
+                        href={publishSignupHref}
                         onClick={() =>
                           trackFunnelEvent("crear_publish_clicked", {
                             locale: language,

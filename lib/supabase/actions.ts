@@ -263,6 +263,20 @@ export async function createBusiness(formData: FormData) {
   const slug = formData.get('slug') as string
   const description = formData.get('description') as string
   const category = formData.get('category') as string
+  const address = (formData.get('address') as string) || null
+  const phone = (formData.get('phone') as string) || null
+  const website = (formData.get('website') as string) || null
+  const googlePlaceId = (formData.get('google_place_id') as string) || null
+  const placeDataRaw = (formData.get('place_data') as string) || null
+
+  let placeData: unknown = null
+  if (placeDataRaw) {
+    try {
+      placeData = JSON.parse(placeDataRaw)
+    } catch {
+      placeData = null
+    }
+  }
 
   const { error } = await supabase
     .from('businesses')
@@ -272,6 +286,11 @@ export async function createBusiness(formData: FormData) {
       slug,
       description,
       category,
+      address,
+      phone,
+      website,
+      google_place_id: googlePlaceId,
+      place_data: placeData,
     })
 
   if (error) {

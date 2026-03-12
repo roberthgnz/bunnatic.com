@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,12 +22,56 @@ function OnboardingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const plan = searchParams.get("plan") ?? "starter";
+  const publishIntent = searchParams.get("publishIntent") === "1";
+  const tempGenerationKey = searchParams.get("tempGenerationKey");
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     category: "",
     description: "",
+    address: "",
+    phone: "",
+    website: "",
+    googlePlaceId: "",
+    placeData: "",
   });
+
+  useEffect(() => {
+    if (!publishIntent || !tempGenerationKey) return;
+
+    let cancelled = false;
+
+    const hydrateFromTempGeneration = async () => {
+      try {
+        const response = await fetch(`/api/temp-generation?key=${encodeURIComponent(tempGenerationKey)}`);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const generation = data?.generation;
+        if (!generation || cancelled) return;
+
+        setFormData((prev) => ({
+          ...prev,
+          name: prev.name || (generation.name ?? ""),
+          category: prev.category || (generation.category ?? ""),
+          description: prev.description || (generation.description ?? ""),
+          address: generation.address ?? "",
+          phone: generation.phone ?? "",
+          website: generation.website ?? "",
+          googlePlaceId: generation.googlePlaceId ?? "",
+          placeData: generation.placeData ? JSON.stringify(generation.placeData) : "",
+        }));
+      } catch (error) {
+        console.error("Error hydrating onboarding from temp generation:", error);
+      }
+    };
+
+    hydrateFromTempGeneration();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [publishIntent, tempGenerationKey]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -150,6 +194,12 @@ function OnboardingContent() {
                 />
               </div>
 
+              <input type="hidden" name="address" value={formData.address} readOnly />
+              <input type="hidden" name="phone" value={formData.phone} readOnly />
+              <input type="hidden" name="website" value={formData.website} readOnly />
+              <input type="hidden" name="google_place_id" value={formData.googlePlaceId} readOnly />
+              <input type="hidden" name="place_data" value={formData.placeData} readOnly />
+
               <Button
                 type="submit"
                 disabled={loading}
@@ -211,4 +261,3 @@ function OnboardingContent() {
     </div>
   );
 }
-

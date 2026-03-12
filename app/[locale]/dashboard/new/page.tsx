@@ -1,229 +1,341 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { createBusinessFromGoogle } from "@/lib/supabase/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Loader2, Search, MapPin, Star, CheckCircle2, ArrowRight } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2, Search, MapPin, Star, CheckCircle2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "motion/react";
+import Link from "next/link";
 
-export default function NewSitePage({ params }: { params: Promise<{ locale: string }> }) {
-  // Use 'any' for now to avoid complex locale typing issues in this snippet, 
-  // in real code we should unwrap params properly
-  const [query, setQuery] = useState("");
-  const [places, setPlaces] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [selectedPlace, setSelectedPlace] = useState<any>(null);
-  const [placeDetails, setPlaceDetails] = useState<any>(null);
-  const [step, setStep] = useState<"search" | "analyzing" | "preview">("search");
-  const [creating, setCreating] = useState(false);
+type Place = {
+  place_id: string;
+  name: string;
+  formatted_address: string;
+};
+
+type PlaceDetails = {
+  place_id: string;
+  name: string;
+  formatted_address: string;
+  formatted_phone_number?: string;
+  website?: string;
+  rating?: number;
+  user_ratings_total?: number;
+  types?: string[];
+  reviews?: Array<{ text: string; author_name: string }>;
+  editorial_summary?: { overview?: string };
+};
+
+type Step = "search" | "analyzing" | "preview";
+
+export default function NewSitePage() {
+  const params = useParams<{ locale: string }>();
+  const locale = params?.locale === "ca" ? "ca" : "es";
   const router = useRouter();
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [query, setQuery] = useState("");
+  const [places, setPlaces] = useState<Place[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null);
+  const [step, setStep] = useState<Step>("search");
+  const [creating, setCreating] = useState(false);
+
+  const t = useMemo(
+    () =>
+      ({
+        es: {
+          title: "Crear negocio",
+          subtitle: "Busca tu negocio en Google y genera su panel en minutos.",
+          back: "Volver al dashboard",
+          searchPlaceholder: "Ej: Restaurante Casa Pepe",
+          search: "Buscar",
+          searching: "Buscando...",
+          noResults: "No encontramos resultados para esa búsqueda.",
+          analyzing: "Analizando negocio...",
+          analyzingHint: "Estamos preparando una base inicial de contenido y estructura.",
+          extractedData: "Datos detectados",
+          create: "Crear negocio",
+          creating: "Creando...",
+          searchAgain: "Volver a buscar",
+          previewTitle: "Vista previa inicial",
+          about: "Sobre el negocio",
+          reviews: "Reseñas",
+          fallbackDescription: "Tu negocio, ahora con una presencia online profesional.",
+          fallbackAbout: "En {name}, nos dedicamos a ofrecer el mejor servicio a nuestros clientes.",
+          searchError: "No hemos podido completar la búsqueda.",
+          detailsError: "No hemos podido obtener los detalles del negocio.",
+          createError: "No hemos podido crear el negocio.",
+          createSuccess: "Negocio creado correctamente",
+          rating: "valoraciones",
+        },
+        ca: {
+          title: "Crear negoci",
+          subtitle: "Cerca el teu negoci a Google i genera el seu panell en minuts.",
+          back: "Tornar al dashboard",
+          searchPlaceholder: "Ex: Restaurant Casa Pepe",
+          search: "Cercar",
+          searching: "Cercant...",
+          noResults: "No hem trobat resultats per a aquesta cerca.",
+          analyzing: "Analitzant negoci...",
+          analyzingHint: "Estem preparant una base inicial de contingut i estructura.",
+          extractedData: "Dades detectades",
+          create: "Crear negoci",
+          creating: "Creant...",
+          searchAgain: "Tornar a cercar",
+          previewTitle: "Vista prèvia inicial",
+          about: "Sobre el negoci",
+          reviews: "Ressenyes",
+          fallbackDescription: "El teu negoci, ara amb una presència online professional.",
+          fallbackAbout: "A {name}, ens dediquem a oferir el millor servei als nostres clients.",
+          searchError: "No hem pogut completar la cerca.",
+          detailsError: "No hem pogut obtenir els detalls del negoci.",
+          createError: "No hem pogut crear el negoci.",
+          createSuccess: "Negoci creat correctament",
+          rating: "valoracions",
+        },
+      })[locale],
+    [locale]
+  );
+
+  const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!query.trim()) return;
+
     setIsSearching(true);
+    setPlaces([]);
+    setStep("search");
+
     try {
-      // Re-using the public API route for search
-      const res = await fetch(`/api/places/search?q=${encodeURIComponent(query)}&lang=es`);
+      const res = await fetch(`/api/places/search?q=${encodeURIComponent(query)}&lang=${locale}`);
       const data = await res.json();
-      if (data.results) {
-        setPlaces(data.results);
+
+      if (!res.ok) {
+        throw new Error(data?.error || t.searchError);
       }
+
+      setPlaces(Array.isArray(data.results) ? data.results : []);
     } catch (error) {
       console.error("Error searching places:", error);
-      toast.error("Error al buscar negocios");
+      toast.error(t.searchError);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleSelectPlace = async (place: any) => {
+  const handleSelectPlace = async (place: Place) => {
     setSelectedPlace(place);
     setStep("analyzing");
-    
-    // Simulate analysis + fetch details
+    setPlaceDetails(null);
+
     try {
-      const res = await fetch(`/api/places/details?place_id=${place.place_id}&lang=es`);
+      const res = await fetch(`/api/places/details?place_id=${place.place_id}&lang=${locale}`);
       const data = await res.json();
-      if (!data.result) throw new Error("No details");
+
+      if (!res.ok || !data.result) {
+        throw new Error(data?.error || t.detailsError);
+      }
+
       setPlaceDetails(data.result);
-      
-      // Artificial delay for "Analysis" effect
-      setTimeout(() => setStep("preview"), 2000);
+      setStep("preview");
     } catch (error) {
       console.error(error);
-      toast.error("Error al obtener detalles");
+      toast.error(t.detailsError);
       setStep("search");
+      setSelectedPlace(null);
     }
   };
 
   const handleCreate = async () => {
     if (!placeDetails) return;
+
     setCreating(true);
-    
-    const result = await createBusinessFromGoogle(placeDetails);
-    
-    if (result?.error) {
-      toast.error(result.error);
+    try {
+      const result = await createBusinessFromGoogle(placeDetails);
+      if (result?.error || !result?.slug) {
+        throw new Error(result?.error || t.createError);
+      }
+
+      toast.success(t.createSuccess);
+      router.push(`/${locale}/dashboard/businesses/${result.slug}`);
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : t.createError);
       setCreating(false);
-    } else {
-      toast.success("Sitio web creado correctamente");
-      router.push(`/es/dashboard/businesses/${result.slug}`); // Assuming 'es' or we need to get locale from params
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Crear nuevo sitio web</h1>
+    <div className="mx-auto w-full max-w-6xl space-y-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{t.title}</h1>
+          <p className="text-sm text-slate-600">{t.subtitle}</p>
+        </div>
+        <Button asChild variant="outline">
+          <Link href={`/${locale}/dashboard`}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t.back}
+          </Link>
+        </Button>
+      </div>
 
-      <AnimatePresence mode="wait">
-        {step === "search" && (
-          <motion.div
-            key="search"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="max-w-2xl mx-auto"
-          >
-            <Card className="p-6">
-              <form onSubmit={handleSearch} className="relative mb-6">
-                <div className="flex gap-2">
-                  <Input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Ej: Restaurante Casa Pepe"
-                    className="h-12 text-lg"
-                  />
-                  <Button type="submit" disabled={isSearching} className="h-12 w-12 p-0">
-                    {isSearching ? <Loader2 className="animate-spin" /> : <Search />}
-                  </Button>
-                </div>
-              </form>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t.search}</CardTitle>
+          <CardDescription>{t.subtitle}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSearch} className="flex flex-col gap-3 sm:flex-row">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t.searchPlaceholder}
+              className="h-10"
+              required
+            />
+            <Button type="submit" disabled={isSearching} className="sm:w-36">
+              {isSearching ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t.searching}
+                </>
+              ) : (
+                <>
+                  <Search className="mr-2 h-4 w-4" />
+                  {t.search}
+                </>
+              )}
+            </Button>
+          </form>
 
-              <div className="space-y-2">
-                {places.map((place) => (
-                  <button
-                    key={place.place_id}
-                    onClick={() => handleSelectPlace(place)}
-                    className="w-full text-left p-4 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all flex items-start gap-3"
-                  >
-                    <div className="bg-emerald-100 p-2 rounded-full text-emerald-600">
-                      <MapPin className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-gray-900">{place.name}</h3>
-                      <p className="text-sm text-gray-500">{place.formatted_address}</p>
-                    </div>
-                    <ArrowRight className="h-5 w-5 text-gray-300 mt-1" />
-                  </button>
-                ))}
-              </div>
-            </Card>
-          </motion.div>
-        )}
-
-        {step === "analyzing" && (
-          <motion.div
-            key="analyzing"
-            className="text-center py-20"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <Loader2 className="h-12 w-12 text-emerald-600 animate-spin mx-auto mb-4" />
-            <h2 className="text-2xl font-bold">Analizando negocio con IA...</h2>
-            <p className="text-gray-500">Generando estructura, textos y diseño.</p>
-          </motion.div>
-        )}
-
-        {step === "preview" && placeDetails && (
-          <motion.div
-            key="preview"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="grid lg:grid-cols-3 gap-8"
-          >
-            <div className="lg:col-span-1 space-y-6">
-              <Card className="p-6">
-                <h3 className="font-bold text-gray-500 uppercase text-xs tracking-wider mb-4">Datos Extraídos</h3>
-                <h2 className="text-xl font-bold mb-4">{placeDetails.name}</h2>
-                <div className="space-y-3 text-sm text-gray-600">
-                  <div className="flex gap-2">
-                    <MapPin className="h-4 w-4" />
-                    {placeDetails.formatted_address}
+          {step === "search" && places.length > 0 && (
+            <div className="mt-5 space-y-2">
+              {places.map((place) => (
+                <button
+                  key={place.place_id}
+                  onClick={() => handleSelectPlace(place)}
+                  className="flex w-full items-start gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 text-left transition-colors hover:bg-slate-50"
+                  type="button"
+                >
+                  <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
+                    <MapPin className="h-4 w-4 text-slate-600" />
                   </div>
-                  {placeDetails.rating && (
-                    <div className="flex gap-2">
-                      <Star className="h-4 w-4 text-amber-500" />
-                      {placeDetails.rating} ({placeDetails.user_ratings_total} reseñas)
-                    </div>
-                  )}
-                </div>
-              </Card>
-
-              <Button 
-                onClick={handleCreate} 
-                disabled={creating}
-                className="w-full h-12 text-lg bg-emerald-600 hover:bg-emerald-700"
-              >
-                {creating ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Creando sitio...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="mr-2 h-5 w-5" />
-                    Crear Sitio Web
-                  </>
-                )}
-              </Button>
-              
-              <Button variant="ghost" onClick={() => setStep("search")} className="w-full">
-                Volver a buscar
-              </Button>
+                  <div className="flex-1">
+                    <p className="font-medium text-slate-900">{place.name}</p>
+                    <p className="text-sm text-slate-600">{place.formatted_address}</p>
+                  </div>
+                </button>
+              ))}
             </div>
+          )}
 
-            <div className="lg:col-span-2">
-              <div className="bg-white border rounded-xl shadow-lg overflow-hidden h-[600px] overflow-y-auto relative">
-                {/* Simple Preview */}
-                <div className="bg-slate-900 text-white p-12 text-center">
-                  <h1 className="text-3xl font-bold mb-4">{placeDetails.name}</h1>
-                  <p className="text-gray-300">
-                    {placeDetails.editorial_summary?.overview || "Tu negocio, ahora con una presencia online profesional."}
-                  </p>
-                </div>
-                <div className="p-8 grid gap-8">
-                  <div>
-                    <h3 className="text-xl font-bold mb-4">Sobre nosotros</h3>
-                    <p className="text-gray-600">
-                      En {placeDetails.name}, nos dedicamos a ofrecer el mejor servicio.
-                      {placeDetails.rating > 4.5 && " Nuestros clientes nos avalan con una valoración excelente."}
-                    </p>
-                  </div>
-                  {placeDetails.reviews && (
-                    <div>
-                      <h3 className="text-xl font-bold mb-4">Opiniones</h3>
-                      <div className="grid gap-4">
-                        {placeDetails.reviews.slice(0, 2).map((r: any, i: number) => (
-                          <div key={i} className="bg-slate-50 p-4 rounded-lg text-sm">
-                            <p className="italic mb-2">"{r.text}"</p>
-                            <p className="font-bold text-xs">- {r.author_name}</p>
-                          </div>
-                        ))}
+          {step === "search" && !isSearching && query.trim().length > 0 && places.length === 0 && (
+            <p className="mt-4 text-sm text-slate-600">{t.noResults}</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {step === "analyzing" && selectedPlace && (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <Loader2 className="mx-auto mb-3 h-8 w-8 animate-spin text-emerald-600" />
+            <p className="text-base font-semibold text-slate-900">{t.analyzing}</p>
+            <p className="mt-1 text-sm text-slate-600">{t.analyzingHint}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {step === "preview" && placeDetails && (
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle>{t.extractedData}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p className="text-sm font-semibold text-slate-900">{placeDetails.name}</p>
+                <p className="text-sm text-slate-600">{placeDetails.formatted_address}</p>
+              </div>
+              {placeDetails.rating ? (
+                <p className="flex items-center gap-1 text-sm text-slate-600">
+                  <Star className="h-4 w-4 text-amber-500" />
+                  {placeDetails.rating} ({placeDetails.user_ratings_total || 0} {t.rating})
+                </p>
+              ) : null}
+              <div className="space-y-2 pt-2">
+                <Button onClick={handleCreate} disabled={creating} className="w-full">
+                  {creating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {t.creating}
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      {t.create}
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    setStep("search");
+                    setSelectedPlace(null);
+                    setPlaceDetails(null);
+                  }}
+                >
+                  {t.searchAgain}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>{t.previewTitle}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <section className="rounded-md border border-slate-200 bg-slate-50/60 p-5">
+                <h2 className="text-xl font-semibold text-slate-900">{placeDetails.name}</h2>
+                <p className="mt-2 text-sm text-slate-600">
+                  {placeDetails.editorial_summary?.overview || t.fallbackDescription}
+                </p>
+              </section>
+
+              <section>
+                <h3 className="text-base font-semibold text-slate-900">{t.about}</h3>
+                <p className="mt-2 text-sm text-slate-600">
+                  {placeDetails.editorial_summary?.overview ||
+                    t.fallbackAbout.replace("{name}", placeDetails.name)}
+                </p>
+              </section>
+
+              {placeDetails.reviews && placeDetails.reviews.length > 0 ? (
+                <section>
+                  <h3 className="text-base font-semibold text-slate-900">{t.reviews}</h3>
+                  <div className="mt-3 space-y-3">
+                    {placeDetails.reviews.slice(0, 2).map((review, index) => (
+                      <div key={`${review.author_name}-${index}`} className="rounded-md border border-slate-200 bg-white p-4">
+                        <p className="text-sm text-slate-700">
+                          <q>{review.text}</q>
+                        </p>
+                        <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          {review.author_name}
+                        </p>
                       </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

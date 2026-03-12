@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner'
 import { Loader2, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { Textarea } from '@/components/ui/textarea'
 
 export default function ServicesManager({ 
   businessId, 
@@ -19,6 +20,7 @@ export default function ServicesManager({
   locale: string 
 }) {
   const [loading, setLoading] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const router = useRouter()
 
   const t = {
@@ -29,9 +31,12 @@ export default function ServicesManager({
       name: 'Nombre del servicio',
       price: 'Precio (€)',
       duration: 'Duración (min)',
+      descriptionField: 'Descripción breve (opcional)',
       delete: 'Eliminar',
       confirmDelete: '¿Estás seguro?',
       noServices: 'No hay servicios registrados.',
+      added: 'Servicio añadido',
+      removed: 'Servicio eliminado',
     },
     ca: {
       title: 'Serveis',
@@ -40,9 +45,12 @@ export default function ServicesManager({
       name: 'Nom del servei',
       price: 'Preu (€)',
       duration: 'Durada (min)',
+      descriptionField: 'Descripció breu (opcional)',
       delete: 'Eliminar',
       confirmDelete: 'Estàs segur?',
       noServices: 'No hi ha serveis registrats.',
+      added: 'Servei afegit',
+      removed: 'Servei eliminat',
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
@@ -55,7 +63,7 @@ export default function ServicesManager({
     if (res?.error) {
       toast.error(res.error)
     } else {
-      toast.success('Servicio añadido')
+      toast.success(t.added)
       event.currentTarget.reset()
       router.refresh()
     }
@@ -64,13 +72,15 @@ export default function ServicesManager({
 
   async function handleDelete(id: string) {
     if (!confirm(t.confirmDelete)) return
+    setDeletingId(id)
     const res = await deleteService(id)
     if (res?.error) {
       toast.error(res.error)
     } else {
-      toast.success('Servicio eliminado')
+      toast.success(t.removed)
       router.refresh()
     }
+    setDeletingId(null)
   }
 
   return (
@@ -80,20 +90,34 @@ export default function ServicesManager({
           <CardTitle>{t.title}</CardTitle>
           <CardDescription>{t.description}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleAdd} className="flex gap-4 items-end mb-6 flex-wrap">
-            <div className="grid w-full max-w-sm items-center gap-1.5">
+        <CardContent className="space-y-6">
+          <form onSubmit={handleAdd} className="grid gap-3 rounded-lg border bg-slate-50/60 p-4 md:grid-cols-12">
+            <div className="md:col-span-4">
               <Input name="name" placeholder={t.name} required />
             </div>
-            <div className="grid w-32 items-center gap-1.5">
-              <Input name="price" type="number" step="0.01" placeholder={t.price} />
+            <div className="md:col-span-2">
+              <Input name="price" type="number" step="0.01" min="0" placeholder={t.price} />
             </div>
-            <div className="grid w-32 items-center gap-1.5">
-              <Input name="duration" type="number" placeholder={t.duration} />
+            <div className="md:col-span-2">
+              <Input name="duration" type="number" min="1" placeholder={t.duration} />
             </div>
-            <Button type="submit" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
-              {t.add}
+            <div className="md:col-span-3">
+              <Textarea
+                name="description"
+                placeholder={t.descriptionField}
+                rows={1}
+                className="min-h-10 resize-none"
+              />
+            </div>
+            <Button type="submit" disabled={loading} className="md:col-span-1">
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t.add}
+                </>
+              )}
             </Button>
           </form>
 
@@ -114,8 +138,18 @@ export default function ServicesManager({
                         {service.price ? `${service.price}€` : ''}
                       </p>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(service.id)}>
-                      <Trash2 className="h-4 w-4 text-red-500" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(service.id)}
+                      disabled={deletingId === service.id}
+                      aria-label={`${t.delete} ${service.name}`}
+                    >
+                      {deletingId === service.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+                      ) : (
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      )}
                     </Button>
                   </div>
                 ))}

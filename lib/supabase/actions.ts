@@ -1,10 +1,53 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
 
 import { generateBusinessContent } from '@/lib/ai'
+
+function createAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!url || !serviceRoleKey) {
+    return null
+  }
+
+  return createSupabaseAdminClient(url, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
+
+async function findUserIdByEmail(email: string) {
+  const admin = createAdminClient()
+  if (!admin) {
+    return { error: 'No se pudo inicializar el servicio de invitaciones.' }
+  }
+
+  let page = 1
+  const perPage = 200
+
+  while (page <= 10) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage })
+    if (error) {
+      return { error: error.message }
+    }
+
+    const match = data.users.find((user) => user.email?.toLowerCase() === email)
+    if (match?.id) {
+      return { userId: match.id }
+    }
+
+    if (data.users.length < perPage) break
+    page += 1
+  }
+
+  return {}
+}
 
 export async function generateAndApplyContent(businessId: string, name: string, category: string) {
   const supabase = await createClient()
@@ -85,6 +128,8 @@ export async function getProfile() {
     .single()
 
   return profile
+    ? { ...profile, email: user.email }
+    : { id: user.id, full_name: user.user_metadata?.full_name || null, email: user.email }
 }
 
 export async function updateProfile(formData: FormData) {
@@ -113,7 +158,7 @@ export async function updateProfile(formData: FormData) {
     return { error: error.message }
   }
 
-  revalidatePath('/account')
+  revalidatePath('/dashboard/profile')
   return { success: true }
 }
 
@@ -309,13 +354,30 @@ export async function getBusinesses() {
     return []
   }
 
-  const { data: businesses } = await supabase
+  const { data: ownedBusinesses } = await supabase
     .from('businesses')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
-  return businesses || []
+  const { data: teamMemberships } = await supabase
+    .from('team_members')
+    .select(`
+      businesses!inner (*)
+    `)
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+
+  const teamBusinesses = (teamMemberships || [])
+    .map((membership: any) => membership.businesses)
+    .filter(Boolean)
+
+  const allBusinesses = [...(ownedBusinesses || []), ...teamBusinesses]
+  const deduped = Array.from(new Map(allBusinesses.map((business) => [business.id, business])).values())
+
+  return deduped.sort(
+    (a, b) => new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime()
+  )
 }
 
 export async function getBusinessBySlug(slug: string) {
@@ -329,11 +391,26 @@ export async function getBusinessBySlug(slug: string) {
   const { data: business } = await supabase
     .from('businesses')
     .select('*')
-    .eq('user_id', user.id)
     .eq('slug', slug)
     .single()
 
-  return business
+  if (!business) {
+    return null
+  }
+
+  if (business.user_id === user.id) {
+    return business
+  }
+
+  const { data: membership } = await supabase
+    .from('team_members')
+    .select('id')
+    .eq('business_id', business.id)
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .maybeSingle()
+
+  return membership ? business : null
 }
 
 export async function updateBusiness(slug: string, formData: FormData) {
@@ -394,14 +471,14 @@ export async function createService(businessId: string, formData: FormData) {
       name,
       description,
       price: price ? parseFloat(price) : null,
-      duration: duration ? parseInt(duration) : null,
+      duration: duration ? parseInt(duration, 10) : null,
     })
 
   if (error) {
     return { error: error.message }
   }
 
-  revalidatePath('/dashboard/businesses/[slug]', 'page') // Revalidate parent page might be tricky with dynamic params, better to revalidate specific path in UI usage
+  revalidatePath('/dashboard')
   return { success: true }
 }
 
@@ -437,19 +514,29 @@ export async function getCalendarEvents(businessId: string) {
 export async function createCalendarEvent(businessId: string, title: string, start: Date, end: Date, type: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  
+
+  if (!user) {
+    return { error: 'Debes iniciar sesión para crear eventos.' }
+  }
+
+  if (!title.trim()) {
+    return { error: 'El título del evento es obligatorio.' }
+  }
+
   const { error } = await supabase
     .from('calendar_events')
     .insert({
       business_id: businessId,
-      title,
+      title: title.trim(),
       start_time: start.toISOString(),
       end_time: end.toISOString(),
-      type,
-      created_by: user?.id
+      type: type.trim() || 'general',
+      created_by: user.id
     })
 
   if (error) return { error: error.message }
+
+  revalidatePath('/dashboard')
   return { success: true }
 }
 
@@ -494,12 +581,8 @@ export async function updateSectionStatus(sectionId: string, status: string) {
     .eq('id', sectionId)
 
   if (error) return { error: error.message }
-  
-  // Log this action
-  // In a real app we would use triggers or a wrapper function, but let's do it manually here
-  // We need business_id first
-  // Skipping log for brevity/performance in this MVP action
-  
+
+  revalidatePath('/dashboard')
   return { success: true }
 }
 
@@ -510,62 +593,104 @@ export async function getTeamMembers(businessId: string) {
     .from('team_members')
     .select(`
       *,
-      profiles (full_name, avatar_url, email: id) 
-    `) // Note: joining auth.users is not directly possible via client due to security, usually we join profiles. Assuming profiles has user info.
-       // Actually, profiles table uses id = auth.uid(), so we can join profiles.
+      profiles:user_id (full_name, avatar_url)
+    `)
     .eq('business_id', businessId)
-  
-  // We need to fetch email separately or assume it's in profiles if we added it there?
-  // Profiles table structure: id, updated_at, username, full_name, avatar_url, website. No email.
-  // We might need to store invited_email in team_members for display until they accept?
-  // Yes, team_members has invited_email.
-  
+
   return members || []
 }
 
 export async function inviteTeamMember(businessId: string, email: string, role: string) {
   const supabase = await createClient()
-  
-  // Check if user exists (optional, or just create invite)
-  // For simplicity, just insert as pending invite
-  const { error } = await supabase
+  const { data: { user } } = await supabase.auth.getUser()
+  const normalizedEmail = email.trim().toLowerCase()
+  const normalizedRole = role.trim().toLowerCase()
+  const allowedRoles = ['admin', 'editor', 'viewer']
+
+  if (!user) {
+    return { error: 'Debes iniciar sesión para invitar miembros.' }
+  }
+
+  if (!normalizedEmail) {
+    return { error: 'El email es obligatorio.' }
+  }
+
+  if (!allowedRoles.includes(normalizedRole)) {
+    return { error: 'Rol no válido.' }
+  }
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('id', businessId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!business) {
+    return { error: 'No tienes permisos para invitar miembros en este negocio.' }
+  }
+
+  const userLookup = await findUserIdByEmail(normalizedEmail)
+  if (userLookup.error) {
+    return { error: userLookup.error }
+  }
+
+  if (!userLookup.userId) {
+    return { error: 'El usuario debe registrarse primero para poder ser añadido al equipo.' }
+  }
+
+  const { data: existing } = await supabase
     .from('team_members')
-    .insert({
-      business_id: businessId,
-      user_id: '00000000-0000-0000-0000-000000000000', // Placeholder or handle pending differently?
-      // Actually RLS might fail if we try to insert a dummy UUID that doesn't exist in auth.users if there is FK constraint.
-      // The FK `user_id uuid references auth.users` enforces existence.
-      // So we can only invite EXISTING users by ID, OR we need a separate `invitations` table or allow null user_id.
-      // My SQL schema said `user_id uuid references auth.users not null`. This is strict.
-      // I should have made user_id nullable for pending invites.
-      // Let's FIX the schema first? Or just mock the action for now?
-      // I will assume for this MVP we just invite by "simulating" it or I need to alter the table.
-      // Let's alter the table to allow null user_id for pending invites.
-      invited_email: email,
-      role,
-      status: 'pending'
-    })
-  
-  // Wait, I cannot insert if user_id is not null.
-  // I will use a second tool call to fix the migration or I can try to find the user by email if I have admin rights (service role).
-  // But I am using standard client.
-  // I will skip the actual insert for now and just return success to mock the UI, 
-  // OR I will perform a migration update in the next step.
-  // Let's do the migration update properly.
-  
-  if (error) return { error: error.message }
+    .select('id, status')
+    .eq('business_id', businessId)
+    .eq('user_id', userLookup.userId)
+    .maybeSingle()
+
+  if (existing?.status === 'active') {
+    return { error: 'Este usuario ya forma parte del equipo.' }
+  }
+
+  const payload = {
+    business_id: businessId,
+    user_id: userLookup.userId,
+    invited_email: normalizedEmail,
+    role: normalizedRole,
+    status: 'active',
+  }
+
+  const { error } = existing
+    ? await supabase.from('team_members').update(payload).eq('id', existing.id)
+    : await supabase.from('team_members').insert(payload)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/dashboard')
   return { success: true }
 }
 
 export async function removeTeamMember(memberId: string) {
   const supabase = await createClient()
+  const { data: member } = await supabase
+    .from('team_members')
+    .select('id, role')
+    .eq('id', memberId)
+    .maybeSingle()
+
+  if (member?.role === 'owner') {
+    return { error: 'No se puede eliminar al propietario del negocio.' }
+  }
+
   const { error } = await supabase.from('team_members').delete().eq('id', memberId)
   if (error) return { error: error.message }
+
+  revalidatePath('/dashboard')
   return { success: true }
 }
 
 // Analytics
-export async function getAnalyticsSummary(businessId: string) {
+export async function getAnalyticsSummary(_businessId: string) {
   // Mock data for now as we don't have real events yet
   return {
     visits: Math.floor(Math.random() * 1000),
@@ -634,20 +759,21 @@ export async function getWorkingHours(businessId: string) {
 export async function saveWorkingHours(businessId: string, hours: any[]) {
   const supabase = await createClient()
   
-  // Upsert allows inserting or updating based on conflict
   const { error } = await supabase
     .from('working_hours')
     .upsert(
       hours.map(h => ({
         business_id: businessId,
         day_of_week: h.day_of_week,
-        open_time: h.open_time,
-        close_time: h.close_time,
+        open_time: h.is_closed ? null : h.open_time,
+        close_time: h.is_closed ? null : h.close_time,
         is_closed: h.is_closed
       })),
       { onConflict: 'business_id, day_of_week' }
     )
 
   if (error) return { error: error.message }
+
+  revalidatePath('/dashboard')
   return { success: true }
 }

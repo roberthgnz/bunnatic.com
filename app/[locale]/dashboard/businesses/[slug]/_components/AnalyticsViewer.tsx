@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 const data = [
   { name: 'Lun', visits: 40 },
@@ -28,6 +28,7 @@ export default function AnalyticsViewer({
       unique: 'Usuarios Únicos',
       duration: 'Duración Media',
       bounce: 'Rebote',
+      hint: 'Datos de muestra mientras se conecta la analítica real.',
     },
     ca: {
       title: 'Analítica',
@@ -36,11 +37,12 @@ export default function AnalyticsViewer({
       unique: 'Usuaris Únics',
       duration: 'Durada Mitjana',
       bounce: 'Rebot',
+      hint: "Dades de mostra mentre es connecta l'analítica real.",
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-business-id={businessId}>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -83,7 +85,9 @@ export default function AnalyticsViewer({
       <Card className="col-span-4">
         <CardHeader>
           <CardTitle>{t.title}</CardTitle>
-          <CardDescription>{t.description}</CardDescription>
+          <CardDescription>
+            {t.description} {t.hint}
+          </CardDescription>
         </CardHeader>
         <CardContent className="pl-2">
           <ResponsiveContainer width="100%" height={350}>

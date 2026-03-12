@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { updateSectionStatus } from '@/lib/supabase/actions'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { FileText, Eye, CheckCircle2 } from 'lucide-react'
+import { FileText } from 'lucide-react'
 
 export default function ContentReviewManager({ 
   sections,
@@ -28,6 +28,8 @@ export default function ContentReviewManager({
       section: 'Sección',
       actions: 'Acciones',
       update: 'Actualizar estado',
+      noSections: 'No hay secciones disponibles para revisar.',
+      saved: 'Estado actualizado',
     },
     ca: {
       title: 'Revisions de Contingut',
@@ -40,8 +42,12 @@ export default function ContentReviewManager({
       section: 'Secció',
       actions: 'Accions',
       update: 'Actualitzar estat',
+      noSections: 'No hi ha seccions disponibles per revisar.',
+      saved: 'Estat actualitzat',
     },
   }[locale === 'ca' ? 'ca' : 'es']
+  const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const router = useRouter()
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -52,13 +58,15 @@ export default function ContentReviewManager({
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
+    setUpdatingId(id)
     const res = await updateSectionStatus(id, newStatus)
     if (res?.error) {
       toast.error(res.error)
     } else {
-      toast.success('Estado actualizado')
-      // Optimistic update or router.refresh()
+      toast.success(t.saved)
+      router.refresh()
     }
+    setUpdatingId(null)
   }
 
   return (
@@ -68,8 +76,13 @@ export default function ContentReviewManager({
         <CardDescription>{t.description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {sections.map((section) => (
+        {sections.length === 0 ? (
+          <div className="rounded-md border border-dashed p-8 text-center text-sm text-slate-500">
+            {t.noSections}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {sections.map((section) => (
             <div key={section.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
               <div className="flex items-center gap-4">
                 <div className="h-10 w-10 bg-slate-100 rounded-lg flex items-center justify-center">
@@ -88,9 +101,10 @@ export default function ContentReviewManager({
                   {t.status[section.status as keyof typeof t.status] || section.status}
                 </Badge>
                 
-                <Select 
+                <Select
                   defaultValue={section.status} 
                   onValueChange={(val) => handleStatusChange(section.id, val)}
+                  disabled={updatingId === section.id}
                 >
                   <SelectTrigger className="w-[140px]">
                     <SelectValue />
@@ -103,8 +117,9 @@ export default function ContentReviewManager({
                 </Select>
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   )

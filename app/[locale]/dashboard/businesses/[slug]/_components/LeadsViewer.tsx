@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { format } from 'date-fns'
+import { ca, es } from 'date-fns/locale'
 
 export default function LeadsViewer({ 
   leads,
@@ -15,19 +16,13 @@ export default function LeadsViewer({
       title: 'Leads y Contactos',
       description: 'Personas que han contactado a través de tu web.',
       noLeads: 'No hay mensajes todavía.',
-      name: 'Nombre',
-      email: 'Email',
-      date: 'Fecha',
-      message: 'Mensaje',
+      received: 'Recibido',
     },
     ca: {
       title: 'Leads i Contactes',
       description: 'Persones que han contactat a través del teu web.',
       noLeads: 'No hi ha missatges encara.',
-      name: 'Nom',
-      email: 'Email',
-      date: 'Data',
-      message: 'Missatge',
+      received: 'Rebut',
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
@@ -46,18 +41,21 @@ export default function LeadsViewer({
           <div className="rounded-md border">
             <div className="grid grid-cols-1 divide-y">
               {leads.map((lead) => (
-                <div key={lead.id} className="p-4 hover:bg-muted/50">
-                  <div className="flex justify-between items-start mb-2">
+                <div key={lead.id} className="p-4">
+                  <div className="mb-2 flex items-start justify-between gap-3">
                     <div>
-                      <h4 className="font-semibold">{lead.name}</h4>
+                      <h4 className="font-semibold text-slate-900">{lead.name}</h4>
                       <p className="text-sm text-muted-foreground">{lead.email}</p>
                       {lead.phone && <p className="text-sm text-muted-foreground">{lead.phone}</p>}
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      {format(new Date(lead.created_at), 'dd/MM/yyyy HH:mm')}
+                      {t.received}:{' '}
+                      {format(new Date(lead.created_at), 'dd/MM/yyyy HH:mm', {
+                        locale: locale === 'ca' ? ca : es,
+                      })}
                     </span>
                   </div>
-                  <p className="text-sm mt-2 bg-slate-50 p-3 rounded-md border">
+                  <p className="mt-2 rounded-md border bg-slate-50 p-3 text-sm">
                     {lead.message}
                   </p>
                 </div>

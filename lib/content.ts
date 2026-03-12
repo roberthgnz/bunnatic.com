@@ -3,12 +3,14 @@ export const content = {
     navbar: {
       logo: "Bunnatic",
       languages: "ES | CA",
-      platformLabel: "Plataform",
+      platformLabel: "Características",
       coreFeaturesLabel: "Características",
       coreFeatures: [
         { id: "generacion-ia", label: "Generación con IA" },
         { id: "seo-local", label: "SEO local" },
-        { id: "edicion-asistida", label: "Edición visual + IA" }
+        { id: "edicion-asistida", label: "Edición visual + IA" },
+        { id: "formularios-contacto", label: "Captación de clientes" },
+        { id: "hosting-dominio", label: "Hosting y dominio incluidos" }
       ],
       cta: "Probar demo gratis →",
     },
@@ -426,12 +428,14 @@ export const content = {
     navbar: {
       logo: "Bunnatic",
       languages: "ES | CA",
-      platformLabel: "Plataform",
+      platformLabel: "Característiques",
       coreFeaturesLabel: "Característiques",
       coreFeatures: [
         { id: "generacion-ia", label: "Generació amb IA" },
         { id: "seo-local", label: "SEO local" },
-        { id: "edicion-asistida", label: "Edició visual + IA" }
+        { id: "edicion-asistida", label: "Edició visual + IA" },
+        { id: "formularios-contacto", label: "Captació de clients" },
+        { id: "hosting-dominio", label: "Hàsting i domini inclosos" }
       ],
       cta: "Provar demo gratuïta →",
     },

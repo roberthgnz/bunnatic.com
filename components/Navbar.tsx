@@ -117,7 +117,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
                 size="sm"
                 className="hidden sm:flex items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
               >
-                {t.navbar.platformLabel}
+                {t.navbar.coreFeaturesLabel}
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

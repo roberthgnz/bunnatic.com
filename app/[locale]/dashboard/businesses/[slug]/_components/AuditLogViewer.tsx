@@ -3,8 +3,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { FileText, User, Settings, Users, Activity } from 'lucide-react'
+import { FileText, Settings, Users, Activity } from 'lucide-react'
 import { format } from 'date-fns'
+import { ca, es } from 'date-fns/locale'
 
 export default function AuditLogViewer({ 
   logs,
@@ -91,7 +92,11 @@ export default function AuditLogViewer({
                       <Badge variant="secondary" className="font-normal text-[10px]">
                         {log.action.toUpperCase()}
                       </Badge>
-                      <span>{format(new Date(log.created_at), 'dd/MM/yyyy HH:mm')}</span>
+                      <span>
+                        {format(new Date(log.created_at), 'dd/MM/yyyy HH:mm', {
+                          locale: locale === 'ca' ? ca : es,
+                        })}
+                      </span>
                     </div>
                   </div>
                 </div>

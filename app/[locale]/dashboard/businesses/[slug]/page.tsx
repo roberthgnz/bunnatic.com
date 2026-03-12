@@ -41,6 +41,11 @@ export default async function BusinessDetailsPage({
     es: {
       back: 'Volver',
       viewPublic: 'Ver web pública',
+      summary: {
+        services: 'Servicios',
+        leads: 'Mensajes',
+        team: 'Miembros',
+      },
       tabs: {
         overview: 'Resumen',
         services: 'Servicios',
@@ -62,6 +67,11 @@ export default async function BusinessDetailsPage({
     ca: {
       back: 'Tornar',
       viewPublic: 'Veure web pública',
+      summary: {
+        services: 'Serveis',
+        leads: 'Missatges',
+        team: 'Membres',
+      },
       tabs: {
         overview: 'Resum',
         services: 'Serveis',
@@ -83,18 +93,18 @@ export default async function BusinessDetailsPage({
   }[locale === 'ca' ? 'ca' : 'es']
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div className="flex items-center gap-4 py-4">
-        <Button variant="ghost" size="icon" asChild>
+    <div className="space-y-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <Button variant="ghost" size="icon" asChild className="shrink-0">
           <Link href={`/${locale}/dashboard`}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold tracking-tight">{business.name}</h1>
-          <p className="text-muted-foreground">{business.slug}</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{business.name}</h1>
+          <p className="text-sm text-slate-600">{business.slug}</p>
         </div>
-        <Button variant="outline" asChild>
+        <Button variant="outline" asChild className="sm:ml-auto">
           <Link href={`/${locale}/w/${business.slug}`} target="_blank">
             <ExternalLink className="mr-2 h-4 w-4" />
             {t.viewPublic}
@@ -102,46 +112,67 @@ export default async function BusinessDetailsPage({
         </Button>
       </div>
 
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">{t.summary.services}</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-semibold text-slate-900">{services.length}</CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">{t.summary.leads}</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-semibold text-slate-900">{leads.length}</CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">{t.summary.team}</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-semibold text-slate-900">{teamMembers.length}</CardContent>
+        </Card>
+      </div>
+
       <Tabs defaultValue="overview" className="space-y-4">
         <div className="overflow-x-auto pb-2">
-          <TabsList className="h-auto flex-wrap justify-start gap-2 bg-transparent p-0">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-white border">
+          <TabsList className="h-auto min-w-max gap-2 bg-transparent p-0">
+            <TabsTrigger value="overview" className="border bg-white data-[state=active]:border-emerald-200 data-[state=active]:text-emerald-700">
               <LayoutGrid className="mr-2 h-4 w-4" />
               {t.tabs.overview}
             </TabsTrigger>
-            <TabsTrigger value="services" className="data-[state=active]:bg-white border">
+            <TabsTrigger value="services" className="border bg-white data-[state=active]:border-emerald-200 data-[state=active]:text-emerald-700">
               <Briefcase className="mr-2 h-4 w-4" />
               {t.tabs.services}
             </TabsTrigger>
-            <TabsTrigger value="hours" className="data-[state=active]:bg-white border">
+            <TabsTrigger value="hours" className="border bg-white data-[state=active]:border-emerald-200 data-[state=active]:text-emerald-700">
               <Clock className="mr-2 h-4 w-4" />
               {t.tabs.hours}
             </TabsTrigger>
-            <TabsTrigger value="leads" className="data-[state=active]:bg-white border">
+            <TabsTrigger value="leads" className="border bg-white data-[state=active]:border-emerald-200 data-[state=active]:text-emerald-700">
               <MessageSquare className="mr-2 h-4 w-4" />
               {t.tabs.leads}
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-white border">
+            <TabsTrigger value="analytics" className="border bg-white data-[state=active]:border-emerald-200 data-[state=active]:text-emerald-700">
               <BarChart3 className="mr-2 h-4 w-4" />
               {t.tabs.analytics}
             </TabsTrigger>
-            <TabsTrigger value="team" className="data-[state=active]:bg-white border">
+            <TabsTrigger value="team" className="border bg-white data-[state=active]:border-emerald-200 data-[state=active]:text-emerald-700">
               <Users className="mr-2 h-4 w-4" />
               {t.tabs.team}
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="data-[state=active]:bg-white border">
+            <TabsTrigger value="calendar" className="border bg-white data-[state=active]:border-emerald-200 data-[state=active]:text-emerald-700">
               <CalendarIcon className="mr-2 h-4 w-4" />
               {t.tabs.calendar}
             </TabsTrigger>
-            <TabsTrigger value="reviews" className="data-[state=active]:bg-white border">
+            <TabsTrigger value="reviews" className="border bg-white data-[state=active]:border-emerald-200 data-[state=active]:text-emerald-700">
               <FileCheck className="mr-2 h-4 w-4" />
               {t.tabs.reviews}
             </TabsTrigger>
-            <TabsTrigger value="audit" className="data-[state=active]:bg-white border">
+            <TabsTrigger value="audit" className="border bg-white data-[state=active]:border-emerald-200 data-[state=active]:text-emerald-700">
               <ShieldCheck className="mr-2 h-4 w-4" />
               {t.tabs.audit}
             </TabsTrigger>
-            <TabsTrigger value="settings" className="data-[state=active]:bg-white border">
+            <TabsTrigger value="settings" className="border bg-white data-[state=active]:border-emerald-200 data-[state=active]:text-emerald-700">
               <Settings className="mr-2 h-4 w-4" />
               {t.tabs.settings}
             </TabsTrigger>
@@ -191,7 +222,7 @@ export default async function BusinessDetailsPage({
         </TabsContent>
 
         <TabsContent value="calendar">
-          <CalendarManager events={calendarEvents} locale={locale} />
+          <CalendarManager businessId={business.id} events={calendarEvents} locale={locale} />
         </TabsContent>
 
         <TabsContent value="reviews">

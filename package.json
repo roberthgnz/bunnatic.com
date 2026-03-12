@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "clean": "next clean",
+    "supabase:test-send-email": "tsx scripts/test-send-email-function.ts",
     "ratelimit:check": "tsx scripts/manage-ratelimit.ts check",
     "ratelimit:reset": "tsx scripts/manage-ratelimit.ts reset",
     "ratelimit:list": "tsx scripts/manage-ratelimit.ts list"

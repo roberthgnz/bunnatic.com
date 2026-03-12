@@ -31,16 +31,16 @@ export default async function BusinessSettingsPage({
   }[locale === 'ca' ? 'ca' : 'es']
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div className="flex items-center gap-4 py-4">
-        <Button variant="ghost" size="icon" asChild>
+    <div className="space-y-5">
+      <div className="flex items-start gap-4">
+        <Button variant="ghost" size="icon" asChild className="shrink-0">
           <Link href={`/${locale}/dashboard/businesses/${slug}`}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{t.title}</h1>
-          <p className="text-muted-foreground">{t.subtitle}</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{t.title}</h1>
+          <p className="text-sm text-slate-600">{t.subtitle}</p>
         </div>
       </div>
 

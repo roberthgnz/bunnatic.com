@@ -5,21 +5,25 @@ import { inviteTeamMember, removeTeamMember } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { toast } from 'sonner'
-import { Loader2, Plus, Trash2, UserPlus, Mail } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Loader2, Trash2, UserPlus, Mail } from 'lucide-react'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
-export default function TeamManager({ 
-  businessId, 
+export default function TeamManager({
+  businessId,
   initialMembers,
-  locale 
-}: { 
-  businessId: string, 
-  initialMembers: any[],
-  locale: string 
+  locale,
+}: {
+  businessId: string
+  initialMembers: any[]
+  locale: string
 }) {
   const [loading, setLoading] = useState(false)
-  
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'editor' | 'viewer'>('editor')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const router = useRouter()
+
   const t = {
     es: {
       title: 'Equipo',
@@ -31,12 +35,16 @@ export default function TeamManager({
       roles: {
         admin: 'Administrador',
         editor: 'Editor',
-        viewer: 'Visualizador'
+        viewer: 'Visualizador',
       },
       pending: 'Pendiente',
+      active: 'Activo',
       remove: 'Eliminar',
-      confirmRemove: '¿Estás seguro de que quieres eliminar a este usuario?',
-      noMembers: 'Aún no hay miembros en el equipo.',
+      confirmRemove: '¿Seguro que quieres eliminar este acceso?',
+      noMembers: 'Todavía no hay miembros en el equipo.',
+      invited: 'Invitación enviada',
+      removed: 'Miembro eliminado',
+      unknownUser: 'Usuario sin nombre',
     },
     ca: {
       title: 'Equip',
@@ -48,12 +56,16 @@ export default function TeamManager({
       roles: {
         admin: 'Administrador',
         editor: 'Editor',
-        viewer: 'Visualitzador'
+        viewer: 'Visualitzador',
       },
       pending: 'Pendent',
+      active: 'Actiu',
       remove: 'Eliminar',
-      confirmRemove: 'Estàs segur que vols eliminar aquest usuari?',
-      noMembers: 'Encara no hi ha membres a l\'equip.',
+      confirmRemove: 'Segur que vols eliminar aquest accés?',
+      noMembers: "Encara no hi ha membres a l'equip.",
+      invited: 'Invitació enviada',
+      removed: 'Membre eliminat',
+      unknownUser: 'Usuari sense nom',
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
@@ -61,93 +73,122 @@ export default function TeamManager({
     event.preventDefault()
     setLoading(true)
     const formData = new FormData(event.currentTarget)
-    const email = formData.get('email') as string
-    const role = formData.get('role') as string
-    
-    const res = await inviteTeamMember(businessId, email, role)
+    const email = String(formData.get('email') || '').trim().toLowerCase()
+
+    const res = await inviteTeamMember(businessId, email, selectedRole)
     if (res?.error) {
       toast.error(res.error)
-    } else {
-      toast.success('Invitación enviada (simulada)')
-      ;(event.target as HTMLFormElement).reset()
+      setLoading(false)
+      return
     }
+
+    toast.success(t.invited)
+    event.currentTarget.reset()
+    setSelectedRole('editor')
     setLoading(false)
+    router.refresh()
   }
 
   async function handleRemove(id: string) {
     if (!confirm(t.confirmRemove)) return
+    setDeletingId(id)
+
     const res = await removeTeamMember(id)
     if (res?.error) {
       toast.error(res.error)
-    } else {
-      toast.success('Miembro eliminado')
+      setDeletingId(null)
+      return
     }
+
+    toast.success(t.removed)
+    setDeletingId(null)
+    router.refresh()
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t.invite}</CardTitle>
-          <CardDescription>{t.description}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleInvite} className="flex gap-4 items-end mb-6 flex-wrap">
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Input name="email" type="email" placeholder={t.emailPlaceholder} required />
-            </div>
-            <div className="grid w-40 items-center gap-1.5">
-              <Select name="role" defaultValue="editor">
-                <SelectTrigger>
-                  <SelectValue placeholder={t.role} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">{t.roles.admin}</SelectItem>
-                  <SelectItem value="editor">{t.roles.editor}</SelectItem>
-                  <SelectItem value="viewer">{t.roles.viewer}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button type="submit" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4 mr-2" />}
-              {t.send}
-            </Button>
-          </form>
-
-          <div className="rounded-md border divide-y">
-            {initialMembers.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground flex flex-col items-center gap-2">
-                <Mail className="h-8 w-8 text-gray-300" />
-                <p>{t.noMembers}</p>
-              </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>{t.title}</CardTitle>
+        <CardDescription>{t.description}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <form onSubmit={handleInvite} className="grid gap-3 rounded-lg border bg-slate-50/60 p-4 md:grid-cols-12">
+          <div className="md:col-span-6">
+            <Input name="email" type="email" placeholder={t.emailPlaceholder} required />
+          </div>
+          <div className="md:col-span-3">
+            <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as typeof selectedRole)}>
+              <SelectTrigger>
+                <SelectValue placeholder={t.role} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">{t.roles.admin}</SelectItem>
+                <SelectItem value="editor">{t.roles.editor}</SelectItem>
+                <SelectItem value="viewer">{t.roles.viewer}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button type="submit" disabled={loading} className="md:col-span-3">
+            {loading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              initialMembers.map((member) => (
-                <div key={member.id} className="flex items-center justify-between p-4">
+              <UserPlus className="mr-2 h-4 w-4" />
+            )}
+            {t.send}
+          </Button>
+        </form>
+
+        <div className="rounded-md border divide-y">
+          {initialMembers.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 p-8 text-center text-sm text-muted-foreground">
+              <Mail className="h-8 w-8 text-slate-300" />
+              <p>{t.noMembers}</p>
+            </div>
+          ) : (
+            initialMembers.map((member) => {
+              const displayName = member.profiles?.full_name || member.invited_email || t.unknownUser
+              const role = t.roles[member.role as keyof typeof t.roles] || member.role
+              const status = member.status === 'pending' ? t.pending : t.active
+
+              return (
+                <div key={member.id} className="flex items-center justify-between gap-3 p-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
-                      {member.invited_email?.[0]?.toUpperCase() || member.profiles?.full_name?.[0] || 'U'}
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-700">
+                      {displayName[0]?.toUpperCase() || 'U'}
                     </div>
                     <div>
-                      <p className="font-medium">{member.profiles?.full_name || member.invited_email}</p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground bg-slate-100 px-2 py-0.5 rounded-full">
-                          {t.roles[member.role as keyof typeof t.roles] || member.role}
-                        </span>
-                        {member.status === 'pending' && (
-                          <span className="text-xs text-amber-600 font-medium">{t.pending}</span>
-                        )}
-                      </div>
+                      <p className="text-sm font-medium text-slate-900">{displayName}</p>
+                      <p className="text-xs text-slate-500">{member.invited_email || '-'}</p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => handleRemove(member.id)}>
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+
+                  <div className="flex items-center gap-3">
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700">
+                      {role}
+                    </span>
+                    <span className="rounded-full border border-slate-200 bg-white px-2 py-1 text-xs text-slate-600">
+                      {status}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemove(member.id)}
+                      disabled={deletingId === member.id}
+                      aria-label={`${t.remove} ${displayName}`}
+                    >
+                      {deletingId === member.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+                      ) : (
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+              )
+            })
+          )}
+        </div>
+      </CardContent>
+    </Card>
   )
 }

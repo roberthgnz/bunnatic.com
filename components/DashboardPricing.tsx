@@ -1,10 +1,9 @@
 "use client";
 
 import { content } from "@/lib/content";
-import { Check, ChevronDown, CircleHelp, Loader2 } from "lucide-react";
+import { Check, CircleHelp, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useLanguage } from "./LanguageProvider";
@@ -173,12 +172,12 @@ export default function DashboardPricing() {
             type="button"
             onClick={() => setIsAnnual((prev) => !prev)}
             variant="outline"
-            className="mt-6 inline-flex h-auto w-full items-center justify-between gap-2 rounded-2xl border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 sm:mt-8 sm:h-10 sm:w-auto sm:justify-center sm:gap-3 sm:rounded-full sm:px-4 sm:py-0 sm:text-sm"
+            className="mt-6 inline-flex h-auto w-full items-center justify-between gap-2 rounded-lg border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 sm:mt-8 sm:h-10 sm:w-auto sm:justify-center sm:gap-3 sm:px-4 sm:py-0 sm:text-sm"
             aria-pressed={isAnnual}
           >
             <span
               className={`inline-flex h-7 w-12 shrink-0 items-center rounded-full p-1 transition-colors ${
-                isAnnual ? "bg-indigo-600" : "bg-slate-200"
+                isAnnual ? "bg-emerald-600" : "bg-slate-200"
               }`}
             >
               <span
@@ -189,7 +188,7 @@ export default function DashboardPricing() {
             </span>
             <span className="text-right leading-tight sm:text-left sm:leading-none">
               {t.pricing.billingLabel},{" "}
-              <span className="text-indigo-600">{t.pricing.saveLabel}</span>
+              <span className="text-emerald-700">{t.pricing.saveLabel}</span>
             </span>
           </Button>
         </div>
@@ -202,7 +201,7 @@ export default function DashboardPricing() {
               return (
                 <Card 
                   key={tier.id}
-                  className={`relative flex h-full flex-col overflow-hidden rounded-3xl border ${
+                  className={`relative flex h-full flex-col overflow-hidden rounded-xl border ${
                     isStarter ? "border-emerald-100 bg-emerald-50/40" : "border-slate-200 bg-white"
                   }`}
                 >
@@ -245,9 +244,9 @@ export default function DashboardPricing() {
                     <Button
                       onClick={() => handleSubscribe(tier.id)}
                       disabled={isLoading}
-                      className={`h-10 w-full rounded-full px-5 text-sm font-semibold ${
+                      className={`h-10 w-full rounded-lg px-5 text-sm font-semibold ${
                         isStarter
-                          ? "bg-emerald-500 text-white hover:bg-emerald-400"
+                          ? "bg-emerald-600 text-white hover:bg-emerald-700"
                           : "bg-slate-900 text-white hover:bg-slate-800"
                       }`}
                     >

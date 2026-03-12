@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { updateBusiness, generateAndApplyContent } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { Loader2, Sparkles } from 'lucide-react'
 
@@ -38,6 +39,7 @@ export default function BusinessSettingsForm({
       generate: 'Generar con IA',
       generating: 'Generando...',
       aiSuccess: 'Contenido generado correctamente. Revisa los cambios.',
+      aiError: 'No se pudo generar contenido con IA.',
     },
     ca: {
       nameLabel: 'Nom del negoci',
@@ -49,6 +51,7 @@ export default function BusinessSettingsForm({
       generate: 'Generar amb IA',
       generating: 'Generant...',
       aiSuccess: 'Contingut generat correctament. Revisa els canvis.',
+      aiError: "No s'ha pogut generar contingut amb IA.",
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
@@ -73,7 +76,7 @@ export default function BusinessSettingsForm({
     setAiLoading(true)
     const res = await generateAndApplyContent(business.id, business.name, business.category)
     if (res?.error) {
-      toast.error(res.error)
+      toast.error(res.error || t.aiError)
     } else {
       toast.success(t.aiSuccess)
       router.refresh()
@@ -114,24 +117,24 @@ export default function BusinessSettingsForm({
           <label htmlFor="description" className="text-sm font-medium">
             {t.descLabel}
           </label>
-          <Button 
+          <Button
             type="button" 
             variant="outline" 
             size="sm" 
             onClick={handleAiGenerate}
             disabled={aiLoading || loading}
-            className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+            className="border-slate-300 text-slate-700 hover:bg-slate-50"
           >
             {aiLoading ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Sparkles className="mr-2 h-3 w-3" />}
             {aiLoading ? t.generating : t.generate}
           </Button>
         </div>
-        <textarea
+        <Textarea
           id="description"
           name="description"
           defaultValue={business.description || ''}
           rows={6}
-          className="w-full max-w-md rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          className="max-w-2xl"
         />
       </div>
 

@@ -93,7 +93,7 @@ export default async function BusinessDetailLayout({
         : 'border-slate-200 bg-slate-100 text-slate-700'
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6">
       {/* Slim Header - Navigation & Base Information */}
       <Card className="border-slate-200 shadow-sm rounded-xl overflow-hidden bg-white">
         <CardContent className="p-4 sm:px-6 sm:py-3 flex flex-col gap-4 sm:flex-row sm:items-center justify-between">

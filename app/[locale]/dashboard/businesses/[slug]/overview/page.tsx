@@ -127,7 +127,7 @@ export default async function BusinessOverviewPage({
   const recommendationsCount = setupTasks.filter((t) => !t.done).length;
 
   return (
-    <div className="flex flex-col gap-6 max-w-6xl mx-auto pb-10">
+    <div className="flex w-full flex-col gap-6 pb-10">
       {/* Top Section - Production Deployment Style */}
       <Card className="overflow-hidden border-slate-200 shadow-sm rounded-xl">
         {/* Header */}

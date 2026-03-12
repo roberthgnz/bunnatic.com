@@ -8,11 +8,10 @@
     "start": "next start",
     "lint": "eslint .",
     "clean": "next clean",
-    "supabase:test-send-email": "tsx scripts/test-send-email-function.ts",
-    "resend:create-confirm-sign-up-template": "tsx scripts/create-confirm-sign-up-template.tsx",
     "ratelimit:check": "tsx scripts/manage-ratelimit.ts check",
     "ratelimit:reset": "tsx scripts/manage-ratelimit.ts reset",
-    "ratelimit:list": "tsx scripts/manage-ratelimit.ts list"
+    "ratelimit:list": "tsx scripts/manage-ratelimit.ts list",
+    "resend:create-confirm-sign-up-template": "tsx scripts/create-confirm-sign-up-template.tsx"
   },
   "dependencies": {
     "@google/genai": "^1.17.0",

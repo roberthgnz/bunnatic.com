@@ -6,5 +6,5 @@ export default async function BusinessDetailsRootPage({
   params: Promise<{ locale: string; slug: string }>
 }) {
   const { locale, slug } = await params
-  redirect(`/${locale}/dashboard/businesses/${slug}/generation`)
+  redirect(`/${locale}/dashboard/businesses/${slug}/overview`)
 }

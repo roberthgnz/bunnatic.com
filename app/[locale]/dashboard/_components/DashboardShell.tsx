@@ -53,6 +53,12 @@ const dashboardContent = {
       notifications: 'Notificaciones',
       logout: 'Cerrar sesión',
     },
+    plans: {
+      starter: 'Esencial',
+      pro: 'Impulso',
+      agency: 'Equipo',
+      scale: 'Expansión',
+    },
   },
   ca: {
     title: 'Bunnatic',
@@ -72,6 +78,12 @@ const dashboardContent = {
       notifications: 'Notificacions',
       logout: 'Tancar sessió',
     },
+    plans: {
+      starter: 'Essencial',
+      pro: 'Impuls',
+      agency: 'Equip',
+      scale: 'Expansió',
+    },
   },
 } as const
 
@@ -83,7 +95,7 @@ export default function DashboardShell({
   const { language } = useLanguage()
   const t = dashboardContent[language]
   const pathname = usePathname()
-  const [userProfile, setUserProfile] = useState<{ full_name?: string | null; email?: string | null; avatar_url?: string | null } | null>(null)
+  const [userProfile, setUserProfile] = useState<{ full_name?: string | null; email?: string | null; avatar_url?: string | null; plan?: string } | null>(null)
   const [businesses, setBusinesses] = useState<Array<{ id: string; name: string; slug: string }>>([])
 
   const localePrefix = `/${language}`
@@ -168,12 +180,17 @@ export default function DashboardShell({
     },
   ]
 
+  const getPlanName = (planKey: string | undefined) => {
+    if (!planKey) return t.plans.starter
+    return t.plans[planKey as keyof typeof t.plans] || t.plans.starter
+  }
+
   const teamSwitcherItems =
     businesses.length > 0
       ? businesses.map((business) => ({
         name: business.name,
         logo: Building2,
-        plan: t.platform,
+        plan: getPlanName(userProfile?.plan),
         href: `${localePrefix}/dashboard/businesses/${business.slug}`,
       }))
       : [

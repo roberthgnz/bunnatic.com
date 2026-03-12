@@ -4,25 +4,32 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { ComponentType } from 'react'
 import {
-  Sparkles,
-  LayoutGrid,
-  Briefcase,
-  Clock,
-  MessageSquare,
   BarChart3,
-  Users,
+  Briefcase,
   Calendar as CalendarIcon,
+  Clock,
   FileCheck,
-  ShieldCheck,
+  LayoutGrid,
+  MessageSquare,
   Settings,
+  ShieldCheck,
+  Sparkles,
+  Users,
 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
-type SectionItem = {
+type NavItem = {
   key: string
   href: string
   label: string
   icon: ComponentType<{ className?: string }>
-  highlight?: boolean
+  featured?: boolean
+}
+
+type NavGroup = {
+  key: string
+  title: string
+  items: NavItem[]
 }
 
 export default function BusinessSectionNav({
@@ -36,59 +43,88 @@ export default function BusinessSectionNav({
   const isCatalan = locale === 'ca'
   const base = `/${locale}/dashboard/businesses/${slug}`
 
-  const items: SectionItem[] = [
+  const groups: NavGroup[] = [
     {
-      key: 'generation',
-      href: `${base}/generation`,
-      label: isCatalan ? 'Generació IA' : 'Generación IA',
-      icon: Sparkles,
-      highlight: true,
+      key: 'operation',
+      title: isCatalan ? 'Operació' : 'Operación',
+      items: [
+        {
+          key: 'generation',
+          href: `${base}/generation`,
+          label: isCatalan ? 'Generació IA' : 'Generación IA',
+          icon: Sparkles,
+          featured: true,
+        },
+        { key: 'overview', href: `${base}/overview`, label: isCatalan ? 'Resum' : 'Resumen', icon: LayoutGrid },
+        { key: 'services', href: `${base}/services`, label: isCatalan ? 'Serveis' : 'Servicios', icon: Briefcase },
+        { key: 'hours', href: `${base}/hours`, label: isCatalan ? 'Horari' : 'Horario', icon: Clock },
+      ],
     },
-    { key: 'overview', href: `${base}/overview`, label: isCatalan ? 'Resum' : 'Resumen', icon: LayoutGrid },
-    { key: 'services', href: `${base}/services`, label: isCatalan ? 'Serveis' : 'Servicios', icon: Briefcase },
-    { key: 'hours', href: `${base}/hours`, label: isCatalan ? 'Horari' : 'Horario', icon: Clock },
-    { key: 'leads', href: `${base}/leads`, label: isCatalan ? 'Missatges' : 'Mensajes', icon: MessageSquare },
-    { key: 'analytics', href: `${base}/analytics`, label: isCatalan ? 'Analítica' : 'Analítica', icon: BarChart3 },
-    { key: 'team', href: `${base}/team`, label: isCatalan ? 'Equip' : 'Equipo', icon: Users },
-    { key: 'calendar', href: `${base}/calendar`, label: isCatalan ? 'Calendari' : 'Calendario', icon: CalendarIcon },
-    { key: 'reviews', href: `${base}/reviews`, label: isCatalan ? 'Revisions' : 'Revisiones', icon: FileCheck },
-    { key: 'audit', href: `${base}/audit`, label: isCatalan ? 'Auditoria' : 'Auditoría', icon: ShieldCheck },
     {
-      key: 'settings',
-      href: `${base}/settings`,
-      label: isCatalan ? 'Configuració' : 'Configuración',
-      icon: Settings,
+      key: 'growth',
+      title: isCatalan ? 'Creixement' : 'Crecimiento',
+      items: [
+        { key: 'leads', href: `${base}/leads`, label: isCatalan ? 'Missatges' : 'Mensajes', icon: MessageSquare },
+        { key: 'analytics', href: `${base}/analytics`, label: 'Analítica', icon: BarChart3 },
+        { key: 'calendar', href: `${base}/calendar`, label: isCatalan ? 'Calendari' : 'Calendario', icon: CalendarIcon },
+      ],
+    },
+    {
+      key: 'control',
+      title: isCatalan ? 'Control' : 'Control',
+      items: [
+        { key: 'team', href: `${base}/team`, label: isCatalan ? 'Equip' : 'Equipo', icon: Users },
+        { key: 'reviews', href: `${base}/reviews`, label: isCatalan ? 'Revisions' : 'Revisiones', icon: FileCheck },
+        { key: 'audit', href: `${base}/audit`, label: isCatalan ? 'Auditoria' : 'Auditoría', icon: ShieldCheck },
+        {
+          key: 'settings',
+          href: `${base}/settings`,
+          label: isCatalan ? 'Configuració' : 'Configuración',
+          icon: Settings,
+        },
+      ],
     },
   ]
 
   return (
-    <div className="overflow-x-auto pb-2">
-      <div className="flex h-auto min-w-max gap-2 bg-transparent p-0">
-        {items.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
-          const Icon = item.icon
-          const baseClasses =
-            'inline-flex items-center rounded-md border px-3 py-2 text-sm font-medium transition-colors'
-          const classes = item.highlight
-            ? `${baseClasses} ${
-                isActive
+    <div className="grid gap-3 lg:grid-cols-3">
+      {groups.map((group) => (
+        <section key={group.key} className="rounded-xl border border-slate-200 bg-white p-3">
+          <p className="px-1 pb-2 text-xs font-medium uppercase tracking-wide text-slate-500">{group.title}</p>
+          <div className="space-y-1.5">
+            {group.items.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+              const Icon = item.icon
+              const featuredClasses = item.featured
+                ? isActive
                   ? 'border-emerald-300 bg-emerald-100 text-emerald-900'
                   : 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
-              }`
-            : `${baseClasses} ${
-                isActive
-                  ? 'border-emerald-200 bg-white text-emerald-700'
-                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-              }`
+                : ''
+              const classes = item.featured
+                ? `flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${featuredClasses}`
+                : `flex w-full items-center rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                      : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                  }`
 
-          return (
-            <Link key={item.key} href={item.href} className={classes}>
-              <Icon className="mr-2 h-4 w-4" />
-              {item.label}
-            </Link>
-          )
-        })}
-      </div>
+              return (
+                <Link key={item.key} href={item.href} className={classes}>
+                  <span className="inline-flex items-center">
+                    <Icon className="mr-2 h-4 w-4" />
+                    {item.label}
+                  </span>
+                  {item.featured ? (
+                    <Badge variant="outline" className="border-emerald-200 text-[10px] text-emerald-700">
+                      AI
+                    </Badge>
+                  ) : null}
+                </Link>
+              )
+            })}
+          </div>
+        </section>
+      ))}
     </div>
   )
 }

@@ -36,6 +36,7 @@ import {
   Tag,
   AlignLeft,
   Navigation,
+  Star,
 } from "lucide-react";
 
 type PlaceSearchResult = {
@@ -124,6 +125,11 @@ export default function SourceGenerationPanel({
           blockServicesDesc: "Catálogo de servicios detectados",
           blockHours: "Horarios",
           blockHoursDesc: "Horario de apertura semanal",
+          ratingLabel: "Valoración",
+          reviewsLabel: "Reseñas",
+          priceLabel: "Precio",
+          statusLabel: "Estado",
+          mapsLabel: "Google Maps",
           noPreview: "Aún no hay preview generado.",
           noServices: "No se detectaron servicios en la fuente.",
           noHours: "No se detectaron horarios en la fuente.",
@@ -161,6 +167,11 @@ export default function SourceGenerationPanel({
           blockServicesDesc: "Catàleg de serveis detectats",
           blockHours: "Horaris",
           blockHoursDesc: "Horari d'obertura setmanal",
+          ratingLabel: "Valoració",
+          reviewsLabel: "Ressenyes",
+          priceLabel: "Preu",
+          statusLabel: "Estat",
+          mapsLabel: "Google Maps",
           noPreview: "Encara no hi ha vista prèvia generada.",
           noServices: "No s'han detectat serveis a la font.",
           noHours: "No s'han detectat horaris a la font.",
@@ -617,6 +628,30 @@ export default function SourceGenerationPanel({
                     </div>
                     <div className="space-y-2">
                       <p className="text-sm font-bold text-slate-900">{preview.profile.name || "—"}</p>
+                      {typeof preview.profile.rating === "number" && (
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                          <Star className="h-3 w-3 text-amber-500" />
+                          {t.ratingLabel}: {preview.profile.rating.toFixed(1)} / 5
+                        </div>
+                      )}
+                      {typeof preview.profile.reviewCount === "number" && (
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                          <Sparkles className="h-3 w-3" />
+                          {t.reviewsLabel}: {preview.profile.reviewCount}
+                        </div>
+                      )}
+                      {typeof preview.profile.priceLevel === "number" && preview.profile.priceLevel > 0 && (
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                          <Tag className="h-3 w-3" />
+                          {t.priceLabel}: {"€".repeat(preview.profile.priceLevel)}
+                        </div>
+                      )}
+                      {preview.profile.businessStatus && (
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                          <Tag className="h-3 w-3" />
+                          {t.statusLabel}: {preview.profile.businessStatus}
+                        </div>
+                      )}
                       {preview.profile.category && (
                         <div className="flex items-center gap-1.5 text-xs text-slate-500">
                           <Tag className="h-3 w-3" />
@@ -645,6 +680,12 @@ export default function SourceGenerationPanel({
                         <div className="flex items-center gap-1.5 text-xs text-slate-500 truncate">
                           <Globe className="h-3 w-3 shrink-0" />
                           <span className="truncate">{preview.profile.website}</span>
+                        </div>
+                      )}
+                      {preview.profile.mapsUrl && (
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 truncate">
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{t.mapsLabel}: {preview.profile.mapsUrl}</span>
                         </div>
                       )}
                     </div>

@@ -18,6 +18,11 @@ export type SourceProfilePreview = {
   phone: string;
   website: string;
   googlePlaceId: string;
+  rating: number | null;
+  reviewCount: number | null;
+  priceLevel: number | null;
+  businessStatus: string;
+  mapsUrl: string;
 };
 
 export type SourceServicePreview = {
@@ -103,6 +108,27 @@ function parseTime(rawValue: unknown): string | null {
   return null;
 }
 
+function toNumberValue(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return null;
+}
+
+function normalizeBusinessStatus(rawStatus: unknown): string {
+  const status = toStringValue(rawStatus);
+  if (!status) return "";
+  return normalizeTypeLabel(status.toLowerCase());
+}
+
 function getServicesFromSource(source: Record<string, unknown>): SourceServicePreview[] {
   const fromServicesArray = Array.isArray(source.services)
     ? source.services
@@ -117,7 +143,21 @@ function getServicesFromSource(source: Record<string, unknown>): SourceServicePr
         .map(normalizeTypeLabel)
     : [];
 
-  const uniqueServices = Array.from(new Set([...fromServicesArray, ...fromTypesArray]));
+  const fromCapabilities = [
+    source.delivery ? "Delivery" : "",
+    source.takeout ? "Takeout" : "",
+    source.dine_in ? "Dine In" : "",
+    source.reservable ? "Reservable" : "",
+    source.serves_breakfast ? "Breakfast" : "",
+    source.serves_lunch ? "Lunch" : "",
+    source.serves_dinner ? "Dinner" : "",
+    source.serves_vegetarian_food ? "Vegetarian Options" : "",
+    source.wheelchair_accessible_entrance ? "Wheelchair Accessible Entrance" : "",
+  ].filter((value) => value.length > 0);
+
+  const uniqueServices = Array.from(
+    new Set([...fromServicesArray, ...fromTypesArray, ...fromCapabilities])
+  );
 
   return uniqueServices.slice(0, 10).map((service) => ({
     name: service,
@@ -266,6 +306,11 @@ export function buildBusinessSourcePreview({
     ),
     website: pickFirstString(source.website),
     googlePlaceId: sourceType === "google" ? pickFirstString(source.place_id) : "",
+    rating: toNumberValue(source.rating),
+    reviewCount: toNumberValue(source.user_ratings_total),
+    priceLevel: toNumberValue(source.price_level),
+    businessStatus: normalizeBusinessStatus(source.business_status),
+    mapsUrl: pickFirstString(source.url),
   };
 
   return {

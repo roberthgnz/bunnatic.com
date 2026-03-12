@@ -17,7 +17,7 @@ export async function GET(request: Request) {
 
   try {
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,user_ratings_total,formatted_phone_number,international_phone_number,formatted_address,website,reviews,photos,url,types,price_level,business_status,editorial_summary,opening_hours,delivery,takeout,dine_in,reservable,serves_breakfast,serves_lunch,serves_dinner,serves_vegetarian_food,wheelchair_accessible_entrance&language=${safeLanguage}&region=es&key=${apiKey}`
+      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=place_id,name,rating,user_ratings_total,formatted_phone_number,international_phone_number,formatted_address,website,reviews,photos,url,types,price_level,business_status,editorial_summary,opening_hours,delivery,takeout,dine_in,reservable,serves_breakfast,serves_lunch,serves_dinner,serves_vegetarian_food,wheelchair_accessible_entrance&language=${safeLanguage}&region=es&key=${apiKey}`
     );
     const data = await response.json();
     return NextResponse.json(data);

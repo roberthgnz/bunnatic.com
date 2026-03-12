@@ -1,6 +1,5 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { format } from 'date-fns'
 import { ca, es } from 'date-fns/locale'
 import { Mail, MessageSquare, Phone, User } from 'lucide-react'
@@ -28,12 +27,12 @@ export default function LeadsViewer({
   }[locale === 'ca' ? 'ca' : 'es']
 
   return (
-    <Card className="overflow-hidden border-slate-200 shadow-sm">
-      <CardHeader className="border-b border-slate-100 bg-slate-50/60">
-        <CardTitle className="text-sm font-semibold text-slate-900">{t.title}</CardTitle>
-        <CardDescription className="text-xs text-slate-500">{t.description}</CardDescription>
-      </CardHeader>
-      <CardContent className="p-0">
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
+        <h3 className="text-sm font-semibold text-slate-900">{t.title}</h3>
+        <p className="mt-0.5 text-xs text-slate-500">{t.description}</p>
+      </div>
+      <div>
         {leads.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-12 text-center">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
@@ -81,7 +80,7 @@ export default function LeadsViewer({
               ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

@@ -1,13 +1,18 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
+import { Suspense, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createBusiness } from "@/lib/supabase/actions";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
+import { getLegalSlug } from "@/lib/pageSlugs";
+import { trackFunnelEvent } from "@/lib/funnelEvents";
+
+const EMPTY_DRAFT_SNAPSHOT = "";
 
 export default function OnboardingPage() {
   return (
@@ -21,7 +26,14 @@ function OnboardingContent() {
   const { language } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname() ?? "/";
+  const locale = pathname.split("/").filter(Boolean)[0];
+  const hasLocale = locale === "es" || locale === "ca";
+  const localePrefix = hasLocale ? `/${locale}` : "";
   const plan = searchParams.get("plan") ?? "starter";
+  const step = searchParams.get("step") === "business" ? "business" : "checkout";
+  const source = searchParams.get("source");
+  const draftId = searchParams.get("draftId");
   const publishIntent = searchParams.get("publishIntent") === "1";
   const tempGenerationKey = searchParams.get("tempGenerationKey");
   const [loading, setLoading] = useState(false);
@@ -36,8 +48,71 @@ function OnboardingContent() {
     placeData: "",
   });
 
+  const legalLinks = useMemo(() => {
+    const lang = language === "ca" ? "ca" : "es";
+    return {
+      terms: `/${getLegalSlug("aviso-legal", lang)}`,
+      privacy: `/${getLegalSlug("politica-privacidad", lang)}`,
+    };
+  }, [language]);
+
+  const businessStepHref = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set("step", "business");
+    params.set("plan", plan);
+    if (draftId) {
+      params.set("draftId", draftId);
+    }
+    if (source) {
+      params.set("source", source);
+    }
+    if (publishIntent) {
+      params.set("publishIntent", "1");
+    }
+    if (tempGenerationKey) {
+      params.set("tempGenerationKey", tempGenerationKey);
+    }
+    return `${localePrefix}/onboarding?${params.toString()}`;
+  }, [draftId, localePrefix, plan, publishIntent, source, tempGenerationKey]);
+
+  const draftSnapshot = useSyncExternalStore(
+    (callback) => {
+      if (typeof window === "undefined") return () => {};
+      window.addEventListener("storage", callback);
+      return () => window.removeEventListener("storage", callback);
+    },
+    () => {
+      if (!draftId || typeof window === "undefined") return EMPTY_DRAFT_SNAPSHOT;
+      return window.localStorage.getItem(`draft:${draftId}`) ?? EMPTY_DRAFT_SNAPSHOT;
+    },
+    () => EMPTY_DRAFT_SNAPSHOT
+  );
+
+  const draftData = useMemo(() => {
+    if (!draftSnapshot) return { name: "", sector: "" };
+    try {
+      const parsed = JSON.parse(draftSnapshot) as { name?: string; sector?: string };
+      return {
+        name: parsed.name ?? "",
+        sector: parsed.sector ?? "",
+      };
+    } catch {
+      return { name: "", sector: "" };
+    }
+  }, [draftSnapshot]);
+
   useEffect(() => {
-    if (!publishIntent || !tempGenerationKey) return;
+    if (step !== "checkout") return;
+
+    trackFunnelEvent("checkout_started", {
+      locale: language,
+      plan,
+      has_draft: Boolean(draftId),
+    });
+  }, [draftId, language, plan, step]);
+
+  useEffect(() => {
+    if (step !== "business" || !publishIntent || !tempGenerationKey) return;
 
     let cancelled = false;
 
@@ -71,7 +146,7 @@ function OnboardingContent() {
     return () => {
       cancelled = true;
     };
-  }, [publishIntent, tempGenerationKey]);
+  }, [publishIntent, step, tempGenerationKey]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -99,7 +174,7 @@ function OnboardingContent() {
     es: {
       title: "Crea tu espacio de trabajo",
       subtitle: "Configura tu negocio para comenzar.",
-      step: "1/3",
+      step: "2/2",
       nameLabel: "Nombre del negocio",
       namePlaceholder: "Ej. Restaurante La Plaza",
       categoryLabel: "Categoría",
@@ -114,7 +189,7 @@ function OnboardingContent() {
     ca: {
       title: "Crea el teu espai de treball",
       subtitle: "Configura el teu negoci per començar.",
-      step: "1/3",
+      step: "2/2",
       nameLabel: "Nom del negoci",
       namePlaceholder: "Ex. Restaurant La Plaça",
       categoryLabel: "Categoria",
@@ -127,6 +202,152 @@ function OnboardingContent() {
       previewUrl: "elneutenegoci.bunnatic.com",
     },
   }[language === "ca" ? "ca" : "es"];
+
+  if (step === "checkout") {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-6 sm:py-12 lg:py-16">
+        <div className="text-center mb-6 sm:mb-10">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 mb-2">
+            {language === "es" ? "Paso 1 de 2" : "Pas 1 de 2"}
+          </p>
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 mb-3">
+            {language === "es" ? "Comienza tu prueba" : "Comença la teva prova"}
+            <br />
+            <span className="text-emerald-700">
+              {language === "es" ? "gratuita de 14 días" : "gratuïta de 14 dies"}
+            </span>
+          </h1>
+
+          <p className="text-sm sm:text-base text-gray-600 max-w-lg mx-auto">
+            {language === "es"
+              ? "Sin tarjeta de crédito. Sin compromiso."
+              : "Sense targeta de crèdit. Sense compromís."}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+          <div className="bg-emerald-50 p-4 sm:p-6 border-b border-emerald-100">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-10 w-10 rounded-lg bg-emerald-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                {plan.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-emerald-600 font-medium uppercase">
+                  {language === "es" ? "Plan" : "Pla"}
+                </p>
+                <h2 className="text-xl font-bold text-gray-900 truncate">
+                  {plan.charAt(0).toUpperCase() + plan.slice(1)}
+                </h2>
+              </div>
+            </div>
+
+            {draftData.name && (
+              <div className="bg-white rounded-lg p-3 border border-emerald-100">
+                <p className="text-xs text-gray-600 mb-1">
+                  {language === "es" ? "Web para:" : "Web per a:"}
+                </p>
+                <p className="font-semibold text-gray-900 text-sm break-words">{draftData.name}</p>
+                {draftData.sector && (
+                  <p className="text-xs text-gray-600 mt-1">
+                    {draftData.sector}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="p-4 sm:p-6 space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+              </div>
+              <span className="text-sm text-gray-700">
+                {language === "es" ? "14 días de prueba gratis" : "14 dies de prova gratis"}
+              </span>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+              </div>
+              <span className="text-sm text-gray-700">
+                {language === "es" ? "Sin tarjeta de crédito" : "Sense targeta de crèdit"}
+              </span>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+              </div>
+              <span className="text-sm text-gray-700">
+                {language === "es" ? "Cancela cuando quieras" : "Cancel·la quan vulguis"}
+              </span>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-6 pt-0">
+            <Button
+              asChild
+              className="w-full rounded-full bg-slate-900 h-12 sm:h-14 text-sm sm:text-base font-bold text-white hover:bg-slate-800 transition-colors"
+            >
+              <Link
+                href={businessStepHref}
+                onClick={() =>
+                  trackFunnelEvent("checkout_completed", {
+                    locale: language,
+                    plan,
+                    has_draft: Boolean(draftId),
+                  })
+                }
+              >
+                {language === "es" ? "Continuar con onboarding" : "Continuar amb l'onboarding"}
+              </Link>
+            </Button>
+
+            <p className="text-center text-xs text-gray-500 mt-4 leading-relaxed">
+              {language === "es" ? (
+                <>
+                  Al continuar, aceptas nuestros{" "}
+                  <Link
+                    href={legalLinks.terms}
+                    className="text-emerald-600 hover:text-emerald-700 underline"
+                  >
+                    términos
+                  </Link>
+                  {" "}y{" "}
+                  <Link
+                    href={legalLinks.privacy}
+                    className="text-emerald-600 hover:text-emerald-700 underline"
+                  >
+                    privacidad
+                  </Link>
+                  .
+                </>
+              ) : (
+                <>
+                  En continuar, acceptes els nostres{" "}
+                  <Link
+                    href={legalLinks.terms}
+                    className="text-emerald-600 hover:text-emerald-700 underline"
+                  >
+                    termes
+                  </Link>
+                  {" "}i{" "}
+                  <Link
+                    href={legalLinks.privacy}
+                    className="text-emerald-600 hover:text-emerald-700 underline"
+                  >
+                    privacitat
+                  </Link>
+                  .
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:py-16">

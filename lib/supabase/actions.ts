@@ -292,6 +292,23 @@ export async function createBusinessFromGoogle(placeData: any) {
     if (hoursError) console.error('Error creating hours', hoursError)
   }
 
+  const onboardingCompletedAt = new Date().toISOString()
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .upsert(
+      {
+        id: user.id,
+        onboarding_completed: true,
+        onboarding_completed_at: onboardingCompletedAt,
+        updated_at: onboardingCompletedAt,
+      },
+      { onConflict: 'id' }
+    )
+
+  if (profileError) {
+    console.error('Error marking onboarding as completed:', profileError)
+  }
+
   revalidatePath('/dashboard')
   return { success: true, slug }
 }
@@ -340,6 +357,23 @@ export async function createBusiness(formData: FormData) {
 
   if (error) {
     return { error: error.message }
+  }
+
+  const onboardingCompletedAt = new Date().toISOString()
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .upsert(
+      {
+        id: user.id,
+        onboarding_completed: true,
+        onboarding_completed_at: onboardingCompletedAt,
+        updated_at: onboardingCompletedAt,
+      },
+      { onConflict: 'id' }
+    )
+
+  if (profileError) {
+    return { error: profileError.message }
   }
 
   revalidatePath('/dashboard')

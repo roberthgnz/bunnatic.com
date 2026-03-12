@@ -46,6 +46,17 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  let onboardingCompleted = false
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('onboarding_completed')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    onboardingCompleted = Boolean(profile?.onboarding_completed)
+  }
+
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/signin') &&
@@ -67,5 +78,9 @@ export async function updateSession(request: NextRequest) {
   //    the cookies!
   // 4. Return the myNewResponse object.
 
-  return supabaseResponse
+  return {
+    response: supabaseResponse,
+    user,
+    onboardingCompleted,
+  }
 }

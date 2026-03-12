@@ -140,9 +140,35 @@ function getLocalizedStaticRewritePath(pathname: string) {
 
 export default async function middleware(request: NextRequest) {
   // First, update the Supabase session
-  const supabaseResponse = await updateSession(request);
+  const { response: supabaseResponse, user, onboardingCompleted } = await updateSession(request);
 
   const {pathname} = new URL(request.url);
+  const localePrefix = getLocalePrefix(pathname);
+
+  const guestOnlyAuthPagesMatch = pathname.match(/^\/(?:(es|ca)\/)?(signin|signup)(?:\/|$)/);
+  if (guestOnlyAuthPagesMatch && user) {
+    const url = new URL(request.url);
+    if (onboardingCompleted) {
+      url.pathname = `${localePrefix}/dashboard`;
+      url.search = '';
+    } else {
+      url.pathname = `${localePrefix}/onboarding`;
+      url.search = '?step=checkout';
+    }
+    const response = NextResponse.redirect(url);
+    copyResponseCookies(supabaseResponse, response);
+    return response;
+  }
+
+  const onboardingOrCheckoutMatch = pathname.match(/^\/(?:(es|ca)\/)?(onboarding|checkout)(?:\/|$)/);
+  if (onboardingOrCheckoutMatch && user && onboardingCompleted) {
+    const url = new URL(request.url);
+    url.pathname = `${localePrefix}/dashboard`;
+    const response = NextResponse.redirect(url);
+    copyResponseCookies(supabaseResponse, response);
+    return response;
+  }
+
   const legacyCreateRedirectPath = getLegacyCreateRedirectPath(pathname);
   if (legacyCreateRedirectPath) {
     const url = new URL(request.url);

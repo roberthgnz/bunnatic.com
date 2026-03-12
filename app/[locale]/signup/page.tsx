@@ -127,7 +127,7 @@ const CONTEXT_KEYS = ["plan", "planSuggested", "source", "draftId", "sector", "u
 
 function normalizeInternalPath(path: string) {
   if (!path || !path.startsWith("/") || path.startsWith("//")) {
-    return "/dashboard";
+    return "/onboarding";
   }
   return path;
 }
@@ -159,10 +159,11 @@ function SignUpContent() {
       searchParams.get("next") ??
       searchParams.get("returnTo") ??
       searchParams.get("to") ??
-      "/dashboard";
+      "/onboarding?step=checkout";
 
     const [targetPathRaw, targetQueryRaw = ""] = redirectRaw.split("?");
-    const safeTargetPath = normalizeInternalPath(targetPathRaw || "/dashboard");
+    const safeTargetPath = normalizeInternalPath(targetPathRaw || "/onboarding");
+    const normalizedTargetPath = safeTargetPath === "/checkout" ? "/onboarding" : safeTargetPath;
     const targetQuery = new URLSearchParams(targetQueryRaw);
 
     for (const [key, value] of searchParams.entries()) {
@@ -177,17 +178,21 @@ function SignUpContent() {
     const plan = searchParams.get("plan") ?? searchParams.get("planSuggested");
     const source = searchParams.get("source");
 
-    if (safeTargetPath === "/checkout" && plan && !targetQuery.has("plan")) {
+    if (normalizedTargetPath === "/onboarding" && !targetQuery.has("step")) {
+      targetQuery.set("step", "checkout");
+    }
+
+    if (normalizedTargetPath === "/onboarding" && plan && !targetQuery.has("plan")) {
       targetQuery.set("plan", plan);
     }
 
     const serialized = targetQuery.toString();
-    const targetWithQuery = `${safeTargetPath}${serialized ? `?${serialized}` : ""}`;
+    const targetWithQuery = `${normalizedTargetPath}${serialized ? `?${serialized}` : ""}`;
     const destination = targetWithQuery.startsWith(`/${language}/`)
       ? targetWithQuery
       : `${localePrefix}${targetWithQuery}`;
 
-    return { destination, safeTargetPath, plan, source };
+    return { destination, safeTargetPath: normalizedTargetPath, plan, source };
   }, [localePrefix, language, searchParams]);
 
   const signinHref = useMemo(() => {

@@ -7,11 +7,11 @@ import { z } from 'zod'
 import { createService, deleteService } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { toast } from 'sonner'
-import { Loader2, Trash2, Plus } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { Textarea } from '@/components/ui/textarea'
+import { FormField } from '@/components/ui/form-field'
+import { toast } from 'sonner'
+import { Loader2, Trash2, Plus, Package } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 const schema = z.object({
   name: z.string().min(2, { message: 'name_min' }),
@@ -46,44 +46,50 @@ export default function ServicesManager({
     es: {
       title: 'Servicios',
       description: 'Gestiona los servicios que ofrece tu negocio.',
-      add: 'Añadir servicio',
-      name: 'Nombre del servicio',
+      addTitle: 'Añadir servicio',
+      name: 'Nombre',
       price: 'Precio (€)',
       duration: 'Duración (min)',
-      descriptionField: 'Descripción breve (opcional)',
+      descriptionField: 'Descripción breve',
+      descHint: 'Opcional · máx. 300 caracteres',
+      add: 'Añadir',
       delete: 'Eliminar',
-      confirmDelete: '¿Estás seguro?',
-      noServices: 'No hay servicios registrados.',
+      confirmDelete: '¿Eliminar este servicio?',
+      noServices: 'No hay servicios registrados aún.',
       added: 'Servicio añadido',
       removed: 'Servicio eliminado',
       errors: {
-        name_min: 'El nombre debe tener al menos 2 caracteres',
+        name_min: 'Mínimo 2 caracteres',
         price_min: 'El precio no puede ser negativo',
-        duration_min: 'La duración debe ser un número entero ≥ 1',
+        duration_min: 'Entero ≥ 1',
         description_max: 'Máximo 300 caracteres',
       },
     },
     ca: {
       title: 'Serveis',
       description: 'Gestiona els serveis que ofereix el teu negoci.',
-      add: 'Afegir servei',
-      name: 'Nom del servei',
+      addTitle: 'Afegir servei',
+      name: 'Nom',
       price: 'Preu (€)',
       duration: 'Durada (min)',
-      descriptionField: 'Descripció breu (opcional)',
+      descriptionField: 'Descripció breu',
+      descHint: 'Opcional · màx. 300 caràcters',
+      add: 'Afegir',
       delete: 'Eliminar',
-      confirmDelete: 'Estàs segur?',
-      noServices: 'No hi ha serveis registrats.',
+      confirmDelete: 'Eliminar aquest servei?',
+      noServices: 'No hi ha serveis registrats encara.',
       added: 'Servei afegit',
       removed: 'Servei eliminat',
       errors: {
-        name_min: 'El nom ha de tenir almenys 2 caràcters',
+        name_min: 'Mínim 2 caràcters',
         price_min: 'El preu no pot ser negatiu',
-        duration_min: 'La durada ha de ser un nombre enter ≥ 1',
+        duration_min: 'Enter ≥ 1',
         description_max: 'Màxim 300 caràcters',
       },
     },
   }[locale === 'ca' ? 'ca' : 'es']
+
+  const err = (key: string) => t.errors[key as keyof typeof t.errors] ?? key
 
   const {
     register,
@@ -125,128 +131,92 @@ export default function ServicesManager({
     setDeletingId(null)
   }
 
-  const fieldError = (key: keyof typeof t.errors, msg?: string) =>
-    msg ? t.errors[key] ?? msg : undefined
-
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t.title}</CardTitle>
-          <CardDescription>{t.description}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 rounded-lg border bg-slate-50/60 p-4">
-            <div className="grid gap-3 md:grid-cols-12">
-              <div className="md:col-span-4 space-y-1">
-                <Input
-                  {...register('name')}
-                  placeholder={t.name}
-                  aria-invalid={!!errors.name}
-                />
-                {errors.name && (
-                  <p className="text-xs text-red-500">
-                    {t.errors[errors.name.message as keyof typeof t.errors] ?? errors.name.message}
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
+        <h3 className="text-sm font-semibold text-slate-900">{t.title}</h3>
+        <p className="mt-0.5 text-xs text-slate-500">{t.description}</p>
+      </div>
+
+      {/* Add form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 border-b border-slate-100">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">{t.addTitle}</p>
+        <div className="grid gap-3 sm:grid-cols-12">
+          <div className="sm:col-span-5">
+            <FormField label={t.name} error={errors.name ? err(errors.name.message!) : undefined} required>
+              <Input {...register('name')} aria-invalid={!!errors.name} className="h-9" />
+            </FormField>
+          </div>
+          <div className="sm:col-span-2">
+            <FormField label={t.price} error={errors.price ? err(errors.price.message!) : undefined}>
+              <Input {...register('price')} type="number" step="0.01" min="0" aria-invalid={!!errors.price} className="h-9" />
+            </FormField>
+          </div>
+          <div className="sm:col-span-2">
+            <FormField label={t.duration} error={errors.duration ? err(errors.duration.message!) : undefined}>
+              <Input {...register('duration')} type="number" min="1" aria-invalid={!!errors.duration} className="h-9" />
+            </FormField>
+          </div>
+          <div className="sm:col-span-3">
+            <FormField label={t.descriptionField} hint={t.descHint} error={errors.description ? err(errors.description.message!) : undefined}>
+              <Textarea {...register('description')} rows={1} aria-invalid={!!errors.description} className="min-h-9 resize-none" />
+            </FormField>
+          </div>
+        </div>
+        <div className="mt-3 flex justify-end">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            size="sm"
+            className="gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 shadow-sm"
+          >
+            {isSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+            {t.add}
+          </Button>
+        </div>
+      </form>
+
+      {/* Services list */}
+      {initialServices.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 py-12 text-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
+            <Package className="h-5 w-5 text-slate-400" />
+          </div>
+          <p className="text-sm text-slate-500">{t.noServices}</p>
+        </div>
+      ) : (
+        <ul className="divide-y divide-slate-100">
+          {initialServices.map((service) => (
+            <li key={service.id} className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-slate-50/60 transition-colors">
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-slate-900 truncate">{service.name}</p>
+                {(service.duration || service.price) && (
+                  <p className="mt-0.5 text-xs text-slate-400">
+                    {service.duration ? `${service.duration} min` : ''}
+                    {service.duration && service.price ? ' · ' : ''}
+                    {service.price ? `${service.price}€` : ''}
                   </p>
                 )}
               </div>
-
-              <div className="md:col-span-2 space-y-1">
-                <Input
-                  {...register('price')}
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder={t.price}
-                  aria-invalid={!!errors.price}
-                />
-                {errors.price && (
-                  <p className="text-xs text-red-500">
-                    {t.errors[errors.price.message as keyof typeof t.errors] ?? errors.price.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="md:col-span-2 space-y-1">
-                <Input
-                  {...register('duration')}
-                  type="number"
-                  min="1"
-                  placeholder={t.duration}
-                  aria-invalid={!!errors.duration}
-                />
-                {errors.duration && (
-                  <p className="text-xs text-red-500">
-                    {t.errors[errors.duration.message as keyof typeof t.errors] ?? errors.duration.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="md:col-span-3 space-y-1">
-                <Textarea
-                  {...register('description')}
-                  placeholder={t.descriptionField}
-                  rows={1}
-                  className="min-h-10 resize-none"
-                  aria-invalid={!!errors.description}
-                />
-                {errors.description && (
-                  <p className="text-xs text-red-500">
-                    {t.errors[errors.description.message as keyof typeof t.errors] ?? errors.description.message}
-                  </p>
-                )}
-              </div>
-
-              <Button type="submit" disabled={isSubmitting} className="md:col-span-1">
-                {isSubmitting ? (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => handleDelete(service.id)}
+                disabled={deletingId === service.id}
+                aria-label={`${t.delete} ${service.name}`}
+                className="shrink-0 text-slate-400 hover:text-red-500 hover:bg-red-50"
+              >
+                {deletingId === service.id ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <>
-                    <Plus className="mr-2 h-4 w-4" />
-                    {t.add}
-                  </>
+                  <Trash2 className="h-4 w-4" />
                 )}
               </Button>
-            </div>
-          </form>
-
-          <div className="rounded-md border">
-            {initialServices.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                {t.noServices}
-              </div>
-            ) : (
-              <div className="divide-y">
-                {initialServices.map((service) => (
-                  <div key={service.id} className="flex items-center justify-between p-4">
-                    <div>
-                      <p className="font-medium">{service.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {service.duration ? `${service.duration} min` : ''}
-                        {service.duration && service.price ? ' • ' : ''}
-                        {service.price ? `${service.price}€` : ''}
-                      </p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(service.id)}
-                      disabled={deletingId === service.id}
-                      aria-label={`${t.delete} ${service.name}`}
-                    >
-                      {deletingId === service.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
-                      ) : (
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      )}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

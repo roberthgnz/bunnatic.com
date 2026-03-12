@@ -1,17 +1,28 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { createCalendarEvent } from '@/lib/supabase/actions'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Plus, Loader2 } from 'lucide-react'
+import { FormField } from '@/components/ui/form-field'
+import { Plus, Loader2, CalendarDays, Clock } from 'lucide-react'
 import { format, set } from 'date-fns'
 import { es, ca } from 'date-fns/locale'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+
+const schema = z.object({
+  title: z.string().min(1, { message: 'title_required' }),
+  type: z.string().min(1, { message: 'type_required' }),
+  startTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: 'time_format' }),
+  endTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: 'time_format' }),
+}).refine((d) => d.endTime > d.startTime, { message: 'time_order', path: ['endTime'] })
+
+type FormValues = z.infer<typeof schema>
 
 export default function CalendarManager({
   businessId,
@@ -23,21 +34,15 @@ export default function CalendarManager({
   locale: string
 }) {
   const [date, setDate] = useState<Date | undefined>(new Date())
-  const [title, setTitle] = useState('')
-  const [type, setType] = useState('general')
-  const [startTime, setStartTime] = useState('09:00')
-  const [endTime, setEndTime] = useState('10:00')
-  const [saving, setSaving] = useState(false)
   const router = useRouter()
-
   const currentLocale = locale === 'ca' ? ca : es
 
   const t = {
     es: {
       title: 'Calendario compartido',
       description: 'Agenda reuniones internas, tareas y publicaciones.',
-      add: 'Añadir evento',
-      eventTitle: 'Título',
+      addTitle: 'Nuevo evento',
+      eventTitle: 'Título del evento',
       eventType: 'Tipo',
       start: 'Inicio',
       end: 'Fin',
@@ -45,13 +50,19 @@ export default function CalendarManager({
       noDate: 'Selecciona una fecha para crear eventos.',
       saveError: 'No se pudo guardar el evento.',
       saved: 'Evento guardado',
-      invalidTime: 'La hora de fin debe ser posterior al inicio.',
+      add: 'Crear evento',
+      errors: {
+        title_required: 'El título es obligatorio',
+        type_required: 'El tipo es obligatorio',
+        time_format: 'Formato inválido',
+        time_order: 'El fin debe ser posterior al inicio',
+      },
     },
     ca: {
       title: 'Calendari compartit',
       description: 'Agenda reunions internes, tasques i publicacions.',
-      add: 'Afegir esdeveniment',
-      eventTitle: 'Títol',
+      addTitle: 'Nou esdeveniment',
+      eventTitle: "Títol de l'esdeveniment",
       eventType: 'Tipus',
       start: 'Inici',
       end: 'Fi',
@@ -59,133 +70,145 @@ export default function CalendarManager({
       noDate: 'Selecciona una data per crear esdeveniments.',
       saveError: "No s'ha pogut desar l'esdeveniment.",
       saved: 'Esdeveniment desat',
-      invalidTime: "L'hora de finalització ha de ser posterior a la d'inici.",
+      add: 'Crear esdeveniment',
+      errors: {
+        title_required: 'El títol és obligatori',
+        type_required: 'El tipus és obligatori',
+        time_format: 'Format invàlid',
+        time_order: "El final ha de ser posterior a l'inici",
+      },
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
+  const err = (key: string) => t.errors[key as keyof typeof t.errors] ?? key
+
   const selectedEvents = useMemo(
-    () =>
-      events.filter((event) => date && new Date(event.start_time).toDateString() === date.toDateString()),
+    () => events.filter((e) => date && new Date(e.start_time).toDateString() === date.toDateString()),
     [date, events]
   )
 
-  async function handleCreateEvent(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    if (!date) {
-      toast.error(t.noDate)
-      return
-    }
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { title: '', type: 'general', startTime: '09:00', endTime: '10:00' },
+  })
 
-    const [startHour, startMinute] = startTime.split(':').map(Number)
-    const [endHour, endMinute] = endTime.split(':').map(Number)
+  async function onSubmit(values: FormValues) {
+    if (!date) { toast.error(t.noDate); return }
 
-    const startDate = set(date, { hours: startHour, minutes: startMinute, seconds: 0, milliseconds: 0 })
-    const endDate = set(date, { hours: endHour, minutes: endMinute, seconds: 0, milliseconds: 0 })
+    const [sh, sm] = values.startTime.split(':').map(Number)
+    const [eh, em] = values.endTime.split(':').map(Number)
+    const startDate = set(date, { hours: sh, minutes: sm, seconds: 0, milliseconds: 0 })
+    const endDate = set(date, { hours: eh, minutes: em, seconds: 0, milliseconds: 0 })
 
-    if (endDate <= startDate) {
-      toast.error(t.invalidTime)
-      return
-    }
-
-    setSaving(true)
-    const res = await createCalendarEvent(businessId, title.trim(), startDate, endDate, type.trim().toLowerCase())
-    if (res?.error) {
-      toast.error(res.error || t.saveError)
-      setSaving(false)
-      return
-    }
+    const res = await createCalendarEvent(businessId, values.title.trim(), startDate, endDate, values.type.trim().toLowerCase())
+    if (res?.error) { toast.error(res.error || t.saveError); return }
 
     toast.success(t.saved)
-    setTitle('')
-    setType('general')
-    setStartTime('09:00')
-    setEndTime('10:00')
-    setSaving(false)
+    reset()
     router.refresh()
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
-      <Card>
-        <CardContent className="p-4">
-          <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md border" locale={currentLocale} />
-        </CardContent>
-      </Card>
+    <div className="grid gap-4 lg:grid-cols-[300px_1fr]">
+      {/* Calendar picker */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="border-b border-slate-100 bg-slate-50/60 px-4 py-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            {date ? format(date, 'MMMM yyyy', { locale: currentLocale }) : t.title}
+          </p>
+        </div>
+        <div className="p-3">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            locale={currentLocale}
+            className="rounded-md"
+          />
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
+      {/* Right panel */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        {/* Header */}
+        <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
+          <h3 className="text-sm font-semibold text-slate-900">
             {date ? format(date, 'EEEE, d MMMM', { locale: currentLocale }) : t.title}
-          </CardTitle>
-          <CardDescription>{t.description}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <form onSubmit={handleCreateEvent} className="grid gap-3 rounded-md border bg-slate-50/60 p-4 md:grid-cols-2">
-            <div className="md:col-span-2">
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder={t.eventTitle}
-                required
-              />
-            </div>
-            <Input value={type} onChange={(e) => setType(e.target.value)} placeholder={t.eventType} required />
-            <div className="flex items-center gap-2">
-              <div className="flex-1">
-                <label className="mb-1 block text-xs text-slate-500">{t.start}</label>
-                <Input value={startTime} onChange={(e) => setStartTime(e.target.value)} type="time" required />
-              </div>
-              <div className="flex-1">
-                <label className="mb-1 block text-xs text-slate-500">{t.end}</label>
-                <Input value={endTime} onChange={(e) => setEndTime(e.target.value)} type="time" required />
-              </div>
-            </div>
-            <Button type="submit" disabled={saving} className="md:col-span-2 md:justify-self-end">
-              {saving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t.add}
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t.add}
-                </>
-              )}
-            </Button>
-          </form>
+          </h3>
+          <p className="mt-0.5 text-xs text-slate-500">{t.description}</p>
+        </div>
 
-          {selectedEvents.length === 0 ? (
-            <div className="flex min-h-32 items-center justify-center rounded-md border border-dashed text-sm text-slate-500">
-              {t.noEvents}
+        {/* Add event form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="border-b border-slate-100 px-6 py-5">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">{t.addTitle}</p>
+          <div className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <FormField label={t.eventTitle} error={errors.title ? err(errors.title.message!) : undefined} required>
+                <Input {...register('title')} aria-invalid={!!errors.title} className="h-9" />
+              </FormField>
+              <FormField label={t.eventType} error={errors.type ? err(errors.type.message!) : undefined} required>
+                <Input {...register('type')} aria-invalid={!!errors.type} className="h-9" />
+              </FormField>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {selectedEvents.map((event) => (
-                <div key={event.id} className="flex items-start gap-3 rounded-md border border-slate-200 p-4">
-                  <div className="flex h-12 w-12 flex-col items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-slate-700">
-                    <span className="text-[10px] uppercase leading-none">
-                      {format(new Date(event.start_time), 'MMM', { locale: currentLocale })}
+            <div className="grid gap-3 sm:grid-cols-2">
+              <FormField label={t.start} error={errors.startTime ? err(errors.startTime.message!) : undefined}>
+                <Input {...register('startTime')} type="time" aria-invalid={!!errors.startTime} className="h-9" />
+              </FormField>
+              <FormField label={t.end} error={errors.endTime ? err(errors.endTime.message!) : undefined}>
+                <Input {...register('endTime')} type="time" aria-invalid={!!errors.endTime} className="h-9" />
+              </FormField>
+            </div>
+          </div>
+          <div className="mt-3 flex justify-end">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              size="sm"
+              className="gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 shadow-sm"
+            >
+              {isSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+              {t.add}
+            </Button>
+          </div>
+        </form>
+
+        {/* Events list */}
+        {selectedEvents.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-12 text-center">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
+              <CalendarDays className="h-5 w-5 text-slate-400" />
+            </div>
+            <p className="text-sm text-slate-500">{t.noEvents}</p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-slate-100 px-6 pt-4 pb-6 space-y-2">
+            {selectedEvents.map((event) => (
+              <li key={event.id} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/40 p-4">
+                <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm">
+                  <span className="text-[9px] uppercase font-semibold tracking-wide text-slate-400">
+                    {format(new Date(event.start_time), 'MMM', { locale: currentLocale })}
+                  </span>
+                  <span className="text-lg font-bold leading-none">
+                    {format(new Date(event.start_time), 'd')}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-slate-900">{event.title}</p>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1 text-xs text-slate-500">
+                      <Clock className="h-3 w-3" />
+                      {format(new Date(event.start_time), 'HH:mm')} – {format(new Date(event.end_time), 'HH:mm')}
                     </span>
-                    <span className="text-lg font-semibold leading-none">
-                      {format(new Date(event.start_time), 'd')}
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600 ring-1 ring-blue-200">
+                      {event.type}
                     </span>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-slate-900">{event.title}</p>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
-                      <Badge variant="outline">
-                        {format(new Date(event.start_time), 'HH:mm')} - {format(new Date(event.end_time), 'HH:mm')}
-                      </Badge>
-                      <Badge variant="secondary">{event.type}</Badge>
-                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   )
 }

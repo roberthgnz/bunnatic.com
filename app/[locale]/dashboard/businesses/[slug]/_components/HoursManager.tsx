@@ -5,10 +5,9 @@ import { z } from 'zod'
 import { saveWorkingHours } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Save, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 
@@ -66,36 +65,35 @@ export default function HoursManager({
     es: {
       title: 'Horario de apertura',
       description: 'Define cuándo está abierto tu negocio.',
-      save: 'Guardar cambios',
+      save: 'Guardar horario',
       days: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
       closed: 'Cerrado',
-      from: 'Apertura',
-      to: 'Cierre',
+      from: 'Abre',
+      to: 'Cierra',
       saved: 'Horario guardado',
       errors: {
         time_format: 'Formato de hora inválido',
-        time_order: 'La hora de cierre debe ser posterior a la de apertura',
+        time_order: 'El cierre debe ser posterior a la apertura',
       },
     },
     ca: {
       title: "Horari d'obertura",
       description: 'Defineix quan està obert el teu negoci.',
-      save: 'Desar canvis',
+      save: 'Desar horari',
       days: ['Diumenge', 'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte'],
       closed: 'Tancat',
-      from: 'Obertura',
-      to: 'Tancament',
+      from: 'Obre',
+      to: 'Tanca',
       saved: 'Horari desat',
       errors: {
         time_format: "Format d'hora invàlid",
-        time_order: "L'hora de tancament ha de ser posterior a l'obertura",
+        time_order: "El tancament ha de ser posterior a l'obertura",
       },
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
   function updateDay(index: number, field: keyof HoursRow, value: string | boolean) {
     setHoursState((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
-    // Clear validation error for this day when user makes a change
     setValidationErrors((prev) => {
       const next = { ...prev }
       delete next[index]
@@ -118,7 +116,6 @@ export default function HoursManager({
       toast.error(Object.values(errorMap)[0] ?? 'Error de validación')
       return
     }
-
     setValidationErrors({})
     setLoading(true)
     const res = await saveWorkingHours(businessId, hoursState)
@@ -131,72 +128,106 @@ export default function HoursManager({
     setLoading(false)
   }
 
+  const hasErrors = Object.keys(validationErrors).length > 0
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t.title}</CardTitle>
-        <CardDescription>{t.description}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {hoursState.map((day, index) => (
-          <div
-            key={day.day_of_week}
-            className={`grid gap-3 rounded-md border p-4 md:grid-cols-[180px_140px_1fr] ${
-              validationErrors[index] ? 'border-red-300 bg-red-50/40' : 'border-slate-200 bg-white'
-            }`}
-          >
-            <p className="text-sm font-medium text-slate-900">{t.days[day.day_of_week]}</p>
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
+        <h3 className="text-sm font-semibold text-slate-900">{t.title}</h3>
+        <p className="mt-0.5 text-xs text-slate-500">{t.description}</p>
+      </div>
 
-            <div className="flex items-center gap-2">
-              <Switch
-                id={`closed-${day.day_of_week}`}
-                checked={day.is_closed}
-                onCheckedChange={(checked) => updateDay(index, 'is_closed', checked)}
-              />
-              <Label htmlFor={`closed-${day.day_of_week}`} className="text-sm text-slate-600">
-                {t.closed}
-              </Label>
-            </div>
+      <div className="px-6 py-5 space-y-2">
+        {hoursState.map((day, index) => {
+          const hasError = !!validationErrors[index]
+          return (
+            <div
+              key={day.day_of_week}
+              className={`grid items-center gap-3 rounded-lg border px-4 py-3 transition-colors md:grid-cols-[160px_auto_1fr] ${
+                hasError
+                  ? 'border-red-200 bg-red-50/40'
+                  : day.is_closed
+                  ? 'border-slate-100 bg-slate-50/40'
+                  : 'border-slate-200 bg-white'
+              }`}
+            >
+              {/* Day name */}
+              <p className={`text-sm font-medium ${day.is_closed ? 'text-slate-400' : 'text-slate-800'}`}>
+                {t.days[day.day_of_week]}
+              </p>
 
-            {day.is_closed ? (
-              <p className="text-sm text-slate-500">-</p>
-            ) : (
-              <div className="space-y-1">
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="space-y-1">
-                    <Label className="text-xs text-slate-500">{t.from}</Label>
-                    <Input
-                      type="time"
-                      value={day.open_time}
-                      onChange={(e) => updateDay(index, 'open_time', e.target.value)}
-                      aria-invalid={!!validationErrors[index]}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs text-slate-500">{t.to}</Label>
-                    <Input
-                      type="time"
-                      value={day.close_time}
-                      onChange={(e) => updateDay(index, 'close_time', e.target.value)}
-                      aria-invalid={!!validationErrors[index]}
-                    />
-                  </div>
-                </div>
-                {validationErrors[index] && (
-                  <p className="text-xs text-red-500">{validationErrors[index]}</p>
-                )}
+              {/* Closed toggle */}
+              <div className="flex items-center gap-2">
+                <Switch
+                  id={`closed-${day.day_of_week}`}
+                  checked={day.is_closed}
+                  onCheckedChange={(checked) => updateDay(index, 'is_closed', checked)}
+                />
+                <Label
+                  htmlFor={`closed-${day.day_of_week}`}
+                  className={`text-xs ${day.is_closed ? 'text-slate-400' : 'text-slate-500'}`}
+                >
+                  {t.closed}
+                </Label>
               </div>
-            )}
-          </div>
-        ))}
 
-        <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={loading}>
-            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {t.save}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+              {/* Time inputs or error */}
+              {day.is_closed ? (
+                <span className="text-xs text-slate-300">—</span>
+              ) : (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs text-slate-400 w-9 shrink-0">{t.from}</span>
+                      <Input
+                        type="time"
+                        value={day.open_time}
+                        onChange={(e) => updateDay(index, 'open_time', e.target.value)}
+                        aria-invalid={hasError}
+                        className="h-8 w-28 text-sm"
+                      />
+                    </div>
+                    <span className="text-slate-300">→</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs text-slate-400 w-9 shrink-0">{t.to}</span>
+                      <Input
+                        type="time"
+                        value={day.close_time}
+                        onChange={(e) => updateDay(index, 'close_time', e.target.value)}
+                        aria-invalid={hasError}
+                        className="h-8 w-28 text-sm"
+                      />
+                    </div>
+                  </div>
+                  {hasError && (
+                    <p className="flex items-center gap-1 text-xs text-red-500">
+                      <AlertCircle className="h-3 w-3 shrink-0" />
+                      {validationErrors[index]}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/40 px-6 py-3">
+        <p className="text-xs text-slate-400">
+          {hasErrors ? '● Hay errores pendientes de corregir' : ''}
+        </p>
+        <Button
+          onClick={handleSave}
+          disabled={loading}
+          size="sm"
+          className="gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 shadow-sm"
+        >
+          {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+          {t.save}
+        </Button>
+      </div>
+    </div>
   )
 }

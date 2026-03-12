@@ -8,8 +8,9 @@ import { updateBusiness } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { FormField } from '@/components/ui/form-field'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Save } from 'lucide-react'
 
 interface Business {
   id: string
@@ -38,11 +39,16 @@ export default function BusinessSettingsForm({
 
   const t = {
     es: {
+      heading: 'Información general',
+      subheading: 'Datos básicos que identifican tu negocio en Bunnatic.',
       nameLabel: 'Nombre del negocio',
+      nameHint: 'Tal como aparecerá en tu perfil público.',
       categoryLabel: 'Categoría',
+      categoryHint: 'Ej: Restaurante, Peluquería, Fisioterapia…',
       descLabel: 'Descripción',
+      descHint: 'Máximo 500 caracteres.',
       submit: 'Guardar cambios',
-      submitting: 'Guardando...',
+      submitting: 'Guardando…',
       success: 'Negocio actualizado correctamente',
       errors: {
         name_min: 'El nombre debe tener al menos 2 caracteres',
@@ -51,11 +57,16 @@ export default function BusinessSettingsForm({
       },
     },
     ca: {
+      heading: 'Informació general',
+      subheading: 'Dades bàsiques que identifiquen el teu negoci a Bunnatic.',
       nameLabel: 'Nom del negoci',
+      nameHint: 'Tal com apareixerà al teu perfil públic.',
       categoryLabel: 'Categoria',
+      categoryHint: 'Ex: Restaurant, Perruqueria, Fisioteràpia…',
       descLabel: 'Descripció',
+      descHint: 'Màxim 500 caràcters.',
       submit: 'Desar canvis',
-      submitting: 'Desant...',
+      submitting: 'Desant…',
       success: 'Negoci actualitzat correctament',
       errors: {
         name_min: 'El nom ha de tenir almenys 2 caràcters',
@@ -68,7 +79,7 @@ export default function BusinessSettingsForm({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -77,6 +88,9 @@ export default function BusinessSettingsForm({
       description: business.description ?? '',
     },
   })
+
+  const err = (key: string) =>
+    t.errors[key as keyof typeof t.errors] ?? key
 
   async function onSubmit(values: FormValues) {
     const formData = new FormData()
@@ -95,64 +109,76 @@ export default function BusinessSettingsForm({
   }
 
   return (
-    <div className="space-y-6">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium">
-            {t.nameLabel}
-          </label>
-          <Input
-            id="name"
-            {...register('name')}
-            className="max-w-md"
-            aria-invalid={!!errors.name}
-          />
-          {errors.name && (
-            <p className="text-sm text-red-500">
-              {t.errors[errors.name.message as keyof typeof t.errors] ?? errors.name.message}
-            </p>
-          )}
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
+        <h3 className="text-sm font-semibold text-slate-900">{t.heading}</h3>
+        <p className="mt-0.5 text-xs text-slate-500">{t.subheading}</p>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="px-6 py-6 space-y-5">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <FormField
+              label={t.nameLabel}
+              hint={t.nameHint}
+              error={errors.name ? err(errors.name.message!) : undefined}
+              required
+            >
+              <Input
+                {...register('name')}
+                aria-invalid={!!errors.name}
+                className="h-9"
+              />
+            </FormField>
+
+            <FormField
+              label={t.categoryLabel}
+              hint={t.categoryHint}
+              error={errors.category ? err(errors.category.message!) : undefined}
+              required
+            >
+              <Input
+                {...register('category')}
+                aria-invalid={!!errors.category}
+                className="h-9"
+              />
+            </FormField>
+          </div>
+
+          <FormField
+            label={t.descLabel}
+            hint={t.descHint}
+            error={errors.description ? err(errors.description.message!) : undefined}
+          >
+            <Textarea
+              {...register('description')}
+              rows={5}
+              aria-invalid={!!errors.description}
+              className="resize-none"
+            />
+          </FormField>
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="category" className="text-sm font-medium">
-            {t.categoryLabel}
-          </label>
-          <Input
-            id="category"
-            {...register('category')}
-            className="max-w-md"
-            aria-invalid={!!errors.category}
-          />
-          {errors.category && (
-            <p className="text-sm text-red-500">
-              {t.errors[errors.category.message as keyof typeof t.errors] ?? errors.category.message}
-            </p>
-          )}
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/40 px-6 py-3">
+          <p className="text-xs text-slate-400">
+            {isDirty ? '● Cambios sin guardar' : ''}
+          </p>
+          <Button
+            type="submit"
+            disabled={isSubmitting || !isDirty}
+            size="sm"
+            className="gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 shadow-sm"
+          >
+            {isSubmitting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Save className="h-3.5 w-3.5" />
+            )}
+            {isSubmitting ? t.submitting : t.submit}
+          </Button>
         </div>
-
-        <div className="space-y-2">
-          <label htmlFor="description" className="text-sm font-medium">
-            {t.descLabel}
-          </label>
-          <Textarea
-            id="description"
-            {...register('description')}
-            rows={6}
-            className="max-w-2xl"
-            aria-invalid={!!errors.description}
-          />
-          {errors.description && (
-            <p className="text-sm text-red-500">
-              {t.errors[errors.description.message as keyof typeof t.errors] ?? errors.description.message}
-            </p>
-          )}
-        </div>
-
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isSubmitting ? t.submitting : t.submit}
-        </Button>
       </form>
     </div>
   )

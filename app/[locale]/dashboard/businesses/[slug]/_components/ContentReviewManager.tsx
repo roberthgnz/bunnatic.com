@@ -3,59 +3,43 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateSectionStatus } from '@/lib/supabase/actions'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { FileText } from 'lucide-react'
+import { FileText, Loader2, LayoutGrid } from 'lucide-react'
 
-export default function ContentReviewManager({ 
+const statusConfig = {
+  published: { label_es: 'Publicado', label_ca: 'Publicat', cls: 'bg-emerald-50 text-emerald-700 ring-emerald-200' },
+  review: { label_es: 'En revisión', label_ca: 'En revisió', cls: 'bg-amber-50 text-amber-700 ring-amber-200' },
+  draft: { label_es: 'Borrador', label_ca: 'Esborrany', cls: 'bg-slate-50 text-slate-600 ring-slate-200' },
+}
+
+export default function ContentReviewManager({
   sections,
-  locale 
-}: { 
-  sections: any[],
-  locale: string 
+  locale,
+}: {
+  sections: any[]
+  locale: string
 }) {
   const t = {
     es: {
-      title: 'Revisiones de Contenido',
+      title: 'Revisiones de contenido',
       description: 'Gestiona el estado y aprobación de las secciones de tu web.',
-      status: {
-        draft: 'Borrador',
-        review: 'En Revisión',
-        published: 'Publicado',
-      },
-      section: 'Sección',
-      actions: 'Acciones',
-      update: 'Actualizar estado',
+      status: { draft: 'Borrador', review: 'En revisión', published: 'Publicado' },
       noSections: 'No hay secciones disponibles para revisar.',
       saved: 'Estado actualizado',
     },
     ca: {
-      title: 'Revisions de Contingut',
-      description: 'Gestiona l\'estat i aprovació de les seccions de la teva web.',
-      status: {
-        draft: 'Esborrany',
-        review: 'En Revisió',
-        published: 'Publicat',
-      },
-      section: 'Secció',
-      actions: 'Accions',
-      update: 'Actualitzar estat',
+      title: 'Revisions de contingut',
+      description: "Gestiona l'estat i aprovació de les seccions de la teva web.",
+      status: { draft: 'Esborrany', review: 'En revisió', published: 'Publicat' },
       noSections: 'No hi ha seccions disponibles per revisar.',
       saved: 'Estat actualitzat',
     },
   }[locale === 'ca' ? 'ca' : 'es']
+
+  const isCa = locale === 'ca'
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const router = useRouter()
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'published': return 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-emerald-200'
-      case 'review': return 'bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200'
-      default: return 'bg-slate-100 text-slate-800 hover:bg-slate-100 border-slate-200'
-    }
-  }
 
   async function handleStatusChange(id: string, newStatus: string) {
     setUpdatingId(id)
@@ -70,57 +54,89 @@ export default function ContentReviewManager({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t.title}</CardTitle>
-        <CardDescription>{t.description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {sections.length === 0 ? (
-          <div className="rounded-md border border-dashed p-8 text-center text-sm text-slate-500">
-            {t.noSections}
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
+        <h3 className="text-sm font-semibold text-slate-900">{t.title}</h3>
+        <p className="mt-0.5 text-xs text-slate-500">{t.description}</p>
+      </div>
+
+      {sections.length === 0 ? (
+        <div className="flex flex-col items-center gap-3 py-14 text-center">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
+            <LayoutGrid className="h-5 w-5 text-slate-400" />
           </div>
-        ) : (
-          <div className="space-y-4">
-            {sections.map((section) => (
-            <div key={section.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 bg-slate-100 rounded-lg flex items-center justify-center">
-                  <FileText className="h-5 w-5 text-slate-500" />
+          <p className="text-sm text-slate-500">{t.noSections}</p>
+        </div>
+      ) : (
+        <ul className="divide-y divide-slate-100">
+          {sections.map((section) => {
+            const status = section.status as keyof typeof statusConfig
+            const cfg = statusConfig[status] ?? statusConfig.draft
+            const statusLabel = isCa ? cfg.label_ca : cfg.label_es
+
+            return (
+              <li
+                key={section.id}
+                className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-slate-50/50 transition-colors"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                    <FileText className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold capitalize text-slate-900">{section.type}</p>
+                    <p className="truncate text-xs text-slate-400 max-w-[260px]">
+                      {section.content?.title || '—'}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-semibold capitalize">{section.type}</h4>
-                  <p className="text-sm text-muted-foreground truncate max-w-[300px]">
-                    {section.content.title || 'Sin título'}
-                  </p>
+
+                <div className="flex shrink-0 items-center gap-3">
+                  <span className={`hidden sm:inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ${cfg.cls}`}>
+                    {statusLabel}
+                  </span>
+
+                  <div className="relative">
+                    {updatingId === section.id && (
+                      <Loader2 className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-slate-400 pointer-events-none z-10" />
+                    )}
+                    <Select
+                      defaultValue={section.status}
+                      onValueChange={(val) => handleStatusChange(section.id, val)}
+                      disabled={updatingId === section.id}
+                    >
+                      <SelectTrigger className={`h-8 w-36 text-xs ${updatingId === section.id ? 'pl-7' : ''}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="draft">
+                          <span className="flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                            {t.status.draft}
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="review">
+                          <span className="flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                            {t.status.review}
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="published">
+                          <span className="flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            {t.status.published}
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <Badge variant="outline" className={getStatusColor(section.status)}>
-                  {t.status[section.status as keyof typeof t.status] || section.status}
-                </Badge>
-                
-                <Select
-                  defaultValue={section.status} 
-                  onValueChange={(val) => handleStatusChange(section.id, val)}
-                  disabled={updatingId === section.id}
-                >
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">{t.status.draft}</SelectItem>
-                    <SelectItem value="review">{t.status.review}</SelectItem>
-                    <SelectItem value="published">{t.status.published}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </div>
   )
 }

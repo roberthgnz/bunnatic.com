@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { z } from 'zod'
 import { saveWorkingHours } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,6 +19,25 @@ type HoursRow = {
   is_closed: boolean
 }
 
+const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
+
+const hoursRowSchema = z
+  .object({
+    day_of_week: z.number().int().min(0).max(6),
+    open_time: z.string().regex(timeRegex, { message: 'time_format' }),
+    close_time: z.string().regex(timeRegex, { message: 'time_format' }),
+    is_closed: z.boolean(),
+  })
+  .refine(
+    (row) => {
+      if (row.is_closed) return true
+      return row.open_time < row.close_time
+    },
+    { message: 'time_order', path: ['close_time'] }
+  )
+
+const hoursSchema = z.array(hoursRowSchema)
+
 export default function HoursManager({
   businessId,
   initialHours,
@@ -28,6 +48,7 @@ export default function HoursManager({
   locale: string
 }) {
   const [loading, setLoading] = useState(false)
+  const [validationErrors, setValidationErrors] = useState<Record<number, string>>({})
   const router = useRouter()
 
   const days = [0, 1, 2, 3, 4, 5, 6]
@@ -51,6 +72,10 @@ export default function HoursManager({
       from: 'Apertura',
       to: 'Cierre',
       saved: 'Horario guardado',
+      errors: {
+        time_format: 'Formato de hora inválido',
+        time_order: 'La hora de cierre debe ser posterior a la de apertura',
+      },
     },
     ca: {
       title: "Horari d'obertura",
@@ -61,14 +86,40 @@ export default function HoursManager({
       from: 'Obertura',
       to: 'Tancament',
       saved: 'Horari desat',
+      errors: {
+        time_format: "Format d'hora invàlid",
+        time_order: "L'hora de tancament ha de ser posterior a l'obertura",
+      },
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
   function updateDay(index: number, field: keyof HoursRow, value: string | boolean) {
     setHoursState((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
+    // Clear validation error for this day when user makes a change
+    setValidationErrors((prev) => {
+      const next = { ...prev }
+      delete next[index]
+      return next
+    })
   }
 
   async function handleSave() {
+    const result = hoursSchema.safeParse(hoursState)
+    if (!result.success) {
+      const errorMap: Record<number, string> = {}
+      result.error.issues.forEach((issue) => {
+        const dayIndex = Number(issue.path[0])
+        if (!isNaN(dayIndex)) {
+          const msgKey = issue.message as keyof typeof t.errors
+          errorMap[dayIndex] = t.errors[msgKey] ?? issue.message
+        }
+      })
+      setValidationErrors(errorMap)
+      toast.error(Object.values(errorMap)[0] ?? 'Error de validación')
+      return
+    }
+
+    setValidationErrors({})
     setLoading(true)
     const res = await saveWorkingHours(businessId, hoursState)
     if (res?.error) {
@@ -90,7 +141,9 @@ export default function HoursManager({
         {hoursState.map((day, index) => (
           <div
             key={day.day_of_week}
-            className="grid gap-3 rounded-md border border-slate-200 bg-white p-4 md:grid-cols-[180px_140px_1fr]"
+            className={`grid gap-3 rounded-md border p-4 md:grid-cols-[180px_140px_1fr] ${
+              validationErrors[index] ? 'border-red-300 bg-red-50/40' : 'border-slate-200 bg-white'
+            }`}
           >
             <p className="text-sm font-medium text-slate-900">{t.days[day.day_of_week]}</p>
 
@@ -108,23 +161,30 @@ export default function HoursManager({
             {day.is_closed ? (
               <p className="text-sm text-slate-500">-</p>
             ) : (
-              <div className="grid gap-2 sm:grid-cols-2">
-                <div className="space-y-1">
-                  <Label className="text-xs text-slate-500">{t.from}</Label>
-                  <Input
-                    type="time"
-                    value={day.open_time}
-                    onChange={(e) => updateDay(index, 'open_time', e.target.value)}
-                  />
+              <div className="space-y-1">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-500">{t.from}</Label>
+                    <Input
+                      type="time"
+                      value={day.open_time}
+                      onChange={(e) => updateDay(index, 'open_time', e.target.value)}
+                      aria-invalid={!!validationErrors[index]}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-500">{t.to}</Label>
+                    <Input
+                      type="time"
+                      value={day.close_time}
+                      onChange={(e) => updateDay(index, 'close_time', e.target.value)}
+                      aria-invalid={!!validationErrors[index]}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs text-slate-500">{t.to}</Label>
-                  <Input
-                    type="time"
-                    value={day.close_time}
-                    onChange={(e) => updateDay(index, 'close_time', e.target.value)}
-                  />
-                </div>
+                {validationErrors[index] && (
+                  <p className="text-xs text-red-500">{validationErrors[index]}</p>
+                )}
               </div>
             )}
           </div>

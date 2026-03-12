@@ -1,6 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { createService, deleteService } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,16 +13,32 @@ import { Loader2, Trash2, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Textarea } from '@/components/ui/textarea'
 
-export default function ServicesManager({ 
-  businessId, 
+const schema = z.object({
+  name: z.string().min(2, { message: 'name_min' }),
+  price: z
+    .string()
+    .optional()
+    .refine((v) => !v || Number(v) >= 0, { message: 'price_min' }),
+  duration: z
+    .string()
+    .optional()
+    .refine((v) => !v || (Number.isInteger(Number(v)) && Number(v) >= 1), {
+      message: 'duration_min',
+    }),
+  description: z.string().max(300, { message: 'description_max' }).optional(),
+})
+
+type FormValues = z.infer<typeof schema>
+
+export default function ServicesManager({
+  businessId,
   initialServices,
-  locale 
-}: { 
-  businessId: string, 
-  initialServices: any[],
-  locale: string 
+  locale,
+}: {
+  businessId: string
+  initialServices: any[]
+  locale: string
 }) {
-  const [loading, setLoading] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const router = useRouter()
 
@@ -37,6 +56,12 @@ export default function ServicesManager({
       noServices: 'No hay servicios registrados.',
       added: 'Servicio añadido',
       removed: 'Servicio eliminado',
+      errors: {
+        name_min: 'El nombre debe tener al menos 2 caracteres',
+        price_min: 'El precio no puede ser negativo',
+        duration_min: 'La duración debe ser un número entero ≥ 1',
+        description_max: 'Máximo 300 caracteres',
+      },
     },
     ca: {
       title: 'Serveis',
@@ -51,23 +76,40 @@ export default function ServicesManager({
       noServices: 'No hi ha serveis registrats.',
       added: 'Servei afegit',
       removed: 'Servei eliminat',
+      errors: {
+        name_min: 'El nom ha de tenir almenys 2 caràcters',
+        price_min: 'El preu no pot ser negatiu',
+        duration_min: 'La durada ha de ser un nombre enter ≥ 1',
+        description_max: 'Màxim 300 caràcters',
+      },
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
-  async function handleAdd(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setLoading(true)
-    const formData = new FormData(event.currentTarget)
-    
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { name: '', price: '', duration: '', description: '' },
+  })
+
+  async function onSubmit(values: FormValues) {
+    const formData = new FormData()
+    formData.set('name', values.name)
+    if (values.price) formData.set('price', values.price)
+    if (values.duration) formData.set('duration', values.duration)
+    if (values.description) formData.set('description', values.description)
+
     const res = await createService(businessId, formData)
     if (res?.error) {
       toast.error(res.error)
     } else {
       toast.success(t.added)
-      event.currentTarget.reset()
+      reset()
       router.refresh()
     }
-    setLoading(false)
   }
 
   async function handleDelete(id: string) {
@@ -83,6 +125,9 @@ export default function ServicesManager({
     setDeletingId(null)
   }
 
+  const fieldError = (key: keyof typeof t.errors, msg?: string) =>
+    msg ? t.errors[key] ?? msg : undefined
+
   return (
     <div className="space-y-6">
       <Card>
@@ -91,34 +136,78 @@ export default function ServicesManager({
           <CardDescription>{t.description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <form onSubmit={handleAdd} className="grid gap-3 rounded-lg border bg-slate-50/60 p-4 md:grid-cols-12">
-            <div className="md:col-span-4">
-              <Input name="name" placeholder={t.name} required />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 rounded-lg border bg-slate-50/60 p-4">
+            <div className="grid gap-3 md:grid-cols-12">
+              <div className="md:col-span-4 space-y-1">
+                <Input
+                  {...register('name')}
+                  placeholder={t.name}
+                  aria-invalid={!!errors.name}
+                />
+                {errors.name && (
+                  <p className="text-xs text-red-500">
+                    {t.errors[errors.name.message as keyof typeof t.errors] ?? errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="md:col-span-2 space-y-1">
+                <Input
+                  {...register('price')}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder={t.price}
+                  aria-invalid={!!errors.price}
+                />
+                {errors.price && (
+                  <p className="text-xs text-red-500">
+                    {t.errors[errors.price.message as keyof typeof t.errors] ?? errors.price.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="md:col-span-2 space-y-1">
+                <Input
+                  {...register('duration')}
+                  type="number"
+                  min="1"
+                  placeholder={t.duration}
+                  aria-invalid={!!errors.duration}
+                />
+                {errors.duration && (
+                  <p className="text-xs text-red-500">
+                    {t.errors[errors.duration.message as keyof typeof t.errors] ?? errors.duration.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="md:col-span-3 space-y-1">
+                <Textarea
+                  {...register('description')}
+                  placeholder={t.descriptionField}
+                  rows={1}
+                  className="min-h-10 resize-none"
+                  aria-invalid={!!errors.description}
+                />
+                {errors.description && (
+                  <p className="text-xs text-red-500">
+                    {t.errors[errors.description.message as keyof typeof t.errors] ?? errors.description.message}
+                  </p>
+                )}
+              </div>
+
+              <Button type="submit" disabled={isSubmitting} className="md:col-span-1">
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t.add}
+                  </>
+                )}
+              </Button>
             </div>
-            <div className="md:col-span-2">
-              <Input name="price" type="number" step="0.01" min="0" placeholder={t.price} />
-            </div>
-            <div className="md:col-span-2">
-              <Input name="duration" type="number" min="1" placeholder={t.duration} />
-            </div>
-            <div className="md:col-span-3">
-              <Textarea
-                name="description"
-                placeholder={t.descriptionField}
-                rows={1}
-                className="min-h-10 resize-none"
-              />
-            </div>
-            <Button type="submit" disabled={loading} className="md:col-span-1">
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <>
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t.add}
-                </>
-              )}
-            </Button>
           </form>
 
           <div className="rounded-md border">
@@ -133,7 +222,7 @@ export default function ServicesManager({
                     <div>
                       <p className="font-medium">{service.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {service.duration ? `${service.duration} min` : ''} 
+                        {service.duration ? `${service.duration} min` : ''}
                         {service.duration && service.price ? ' • ' : ''}
                         {service.price ? `${service.price}€` : ''}
                       </p>

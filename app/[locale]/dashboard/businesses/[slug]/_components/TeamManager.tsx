@@ -1,6 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { inviteTeamMember, removeTeamMember } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,6 +12,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Trash2, UserPlus, Mail } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+
+const schema = z.object({
+  email: z.string().email({ message: 'email_invalid' }),
+  role: z.enum(['admin', 'editor', 'viewer'], { message: 'role_required' }),
+})
+
+type FormValues = z.infer<typeof schema>
 
 export default function TeamManager({
   businessId,
@@ -19,8 +29,6 @@ export default function TeamManager({
   initialMembers: any[]
   locale: string
 }) {
-  const [loading, setLoading] = useState(false)
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'editor' | 'viewer'>('editor')
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const router = useRouter()
 
@@ -45,6 +53,10 @@ export default function TeamManager({
       invited: 'Invitación enviada',
       removed: 'Miembro eliminado',
       unknownUser: 'Usuario sin nombre',
+      errors: {
+        email_invalid: 'Introduce un correo electrónico válido',
+        role_required: 'Selecciona un rol',
+      },
     },
     ca: {
       title: 'Equip',
@@ -66,40 +78,44 @@ export default function TeamManager({
       invited: 'Invitació enviada',
       removed: 'Membre eliminat',
       unknownUser: 'Usuari sense nom',
+      errors: {
+        email_invalid: 'Introdueix un correu electrònic vàlid',
+        role_required: 'Selecciona un rol',
+      },
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
-  async function handleInvite(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setLoading(true)
-    const formData = new FormData(event.currentTarget)
-    const email = String(formData.get('email') || '').trim().toLowerCase()
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '', role: 'editor' },
+  })
 
-    const res = await inviteTeamMember(businessId, email, selectedRole)
+  async function onSubmit(values: FormValues) {
+    const res = await inviteTeamMember(businessId, values.email, values.role)
     if (res?.error) {
       toast.error(res.error)
-      setLoading(false)
       return
     }
-
     toast.success(t.invited)
-    event.currentTarget.reset()
-    setSelectedRole('editor')
-    setLoading(false)
+    reset()
     router.refresh()
   }
 
   async function handleRemove(id: string) {
     if (!confirm(t.confirmRemove)) return
     setDeletingId(id)
-
     const res = await removeTeamMember(id)
     if (res?.error) {
       toast.error(res.error)
       setDeletingId(null)
       return
     }
-
     toast.success(t.removed)
     setDeletingId(null)
     router.refresh()
@@ -112,30 +128,55 @@ export default function TeamManager({
         <CardDescription>{t.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <form onSubmit={handleInvite} className="grid gap-3 rounded-lg border bg-slate-50/60 p-4 md:grid-cols-12">
-          <div className="md:col-span-6">
-            <Input name="email" type="email" placeholder={t.emailPlaceholder} required />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 rounded-lg border bg-slate-50/60 p-4">
+          <div className="grid gap-3 md:grid-cols-12">
+            <div className="md:col-span-6 space-y-1">
+              <Input
+                {...register('email')}
+                type="email"
+                placeholder={t.emailPlaceholder}
+                aria-invalid={!!errors.email}
+              />
+              {errors.email && (
+                <p className="text-xs text-red-500">
+                  {t.errors[errors.email.message as keyof typeof t.errors] ?? errors.email.message}
+                </p>
+              )}
+            </div>
+
+            <div className="md:col-span-3 space-y-1">
+              <Controller
+                name="role"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger aria-invalid={!!errors.role}>
+                      <SelectValue placeholder={t.role} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">{t.roles.admin}</SelectItem>
+                      <SelectItem value="editor">{t.roles.editor}</SelectItem>
+                      <SelectItem value="viewer">{t.roles.viewer}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.role && (
+                <p className="text-xs text-red-500">
+                  {t.errors[errors.role.message as keyof typeof t.errors] ?? errors.role.message}
+                </p>
+              )}
+            </div>
+
+            <Button type="submit" disabled={isSubmitting} className="md:col-span-3">
+              {isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <UserPlus className="mr-2 h-4 w-4" />
+              )}
+              {t.send}
+            </Button>
           </div>
-          <div className="md:col-span-3">
-            <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as typeof selectedRole)}>
-              <SelectTrigger>
-                <SelectValue placeholder={t.role} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">{t.roles.admin}</SelectItem>
-                <SelectItem value="editor">{t.roles.editor}</SelectItem>
-                <SelectItem value="viewer">{t.roles.viewer}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <Button type="submit" disabled={loading} className="md:col-span-3">
-            {loading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <UserPlus className="mr-2 h-4 w-4" />
-            )}
-            {t.send}
-          </Button>
         </form>
 
         <div className="rounded-md border divide-y">

@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -41,14 +44,15 @@ type PlaceSearchResult = {
   formatted_address: string;
 };
 
-function isValidHttpUrl(value: string): boolean {
-  try {
-    const parsed = new URL(value);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
+const googleSearchSchema = z.object({
+  query: z.string().min(1, { message: "query_required" }),
+});
+type GoogleSearchValues = z.infer<typeof googleSearchSchema>;
+
+const urlCrawlSchema = z.object({
+  url: z.string().url({ message: "url_invalid" }),
+});
+type UrlCrawlValues = z.infer<typeof urlCrawlSchema>;
 
 function getProfileHasContent(preview: BusinessSourcePreview): boolean {
   const { profile } = preview;
@@ -74,9 +78,7 @@ export default function SourceGenerationPanel({
   const router = useRouter();
   const safeLocale = locale === "ca" ? "ca" : "es";
   const [sourceType, setSourceType] = useState<SourceType>("google");
-  const [googleQuery, setGoogleQuery] = useState("");
   const [googleResults, setGoogleResults] = useState<PlaceSearchResult[]>([]);
-  const [url, setUrl] = useState("");
   const [preview, setPreview] = useState<BusinessSourcePreview | null>(null);
   const [selectedBlocks, setSelectedBlocks] = useState<Set<SourceBlock>>(new Set());
   const [entitlement, setEntitlement] = useState<GenerationEntitlement | null>(null);
@@ -84,6 +86,16 @@ export default function SourceGenerationPanel({
   const [isBuildingPreview, setIsBuildingPreview] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
   const [isCrawling, setIsCrawling] = useState(false);
+
+  const googleSearchForm = useForm<GoogleSearchValues>({
+    resolver: zodResolver(googleSearchSchema),
+    defaultValues: { query: "" },
+  });
+
+  const urlCrawlForm = useForm<UrlCrawlValues>({
+    resolver: zodResolver(urlCrawlSchema),
+    defaultValues: { url: "" },
+  });
 
   const t = useMemo(
     () =>
@@ -192,16 +204,13 @@ export default function SourceGenerationPanel({
     trackFunnelEvent("source_selected", { source_type: nextSource, locale: safeLocale });
   };
 
-  const handleGoogleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!googleQuery.trim()) return;
-
+  const handleGoogleSearch = async (values: GoogleSearchValues) => {
     setIsSearching(true);
     setGoogleResults([]);
     resetGeneratedState();
 
     try {
-      const response = await fetch(`/api/places/search?q=${encodeURIComponent(googleQuery.trim())}&lang=${safeLocale}`);
+      const response = await fetch(`/api/places/search?q=${encodeURIComponent(values.query.trim())}&lang=${safeLocale}`);
       const data = (await response.json()) as { results?: PlaceSearchResult[]; error?: string };
       if (!response.ok) throw new Error(data.error || t.errorSearch);
       setGoogleResults(Array.isArray(data.results) ? data.results : []);
@@ -248,14 +257,7 @@ export default function SourceGenerationPanel({
     }
   };
 
-  const handleCrawlUrl = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmedUrl = url.trim();
-    if (!trimmedUrl || !isValidHttpUrl(trimmedUrl)) {
-      toast.error(t.errorCrawl);
-      return;
-    }
-
+  const handleCrawlUrl = async (values: UrlCrawlValues) => {
     setIsCrawling(true);
     resetGeneratedState();
 
@@ -263,7 +265,7 @@ export default function SourceGenerationPanel({
       const startResponse = await fetch("/api/places/crawl", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: trimmedUrl, lang: safeLocale }),
+        body: JSON.stringify({ url: values.url, lang: safeLocale }),
       });
       const startData = (await startResponse.json()) as { jobId?: string; error?: string };
       if (!startResponse.ok || !startData.jobId) throw new Error(startData.error || t.errorCrawl);
@@ -276,7 +278,7 @@ export default function SourceGenerationPanel({
       while (Date.now() - startedAt < timeoutMs) {
         await new Promise((resolve) => window.setTimeout(resolve, intervalMs));
         const statusResponse = await fetch(
-          `/api/places/crawl?jobId=${encodeURIComponent(startData.jobId)}&url=${encodeURIComponent(trimmedUrl)}`,
+          `/api/places/crawl?jobId=${encodeURIComponent(startData.jobId)}&url=${encodeURIComponent(values.url)}`,
           { cache: "no-store" }
         );
         const statusData = (await statusResponse.json()) as { status?: string; result?: unknown; error?: string };
@@ -443,16 +445,20 @@ export default function SourceGenerationPanel({
         {/* Search / URL input */}
         {sourceType === "google" ? (
           <div className="space-y-3">
-            <form onSubmit={handleGoogleSearch} className="flex flex-col gap-2 sm:flex-row">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                <Input
-                  value={googleQuery}
-                  onChange={(e) => setGoogleQuery(e.target.value)}
-                  placeholder={t.searchPlaceholder}
-                  required
-                  className="pl-9 h-10 border-slate-200 bg-white focus-visible:ring-blue-500/30"
-                />
+            <form onSubmit={googleSearchForm.handleSubmit(handleGoogleSearch)} className="flex flex-col gap-2 sm:flex-row">
+              <div className="relative flex-1 space-y-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <Input
+                    {...googleSearchForm.register("query")}
+                    placeholder={t.searchPlaceholder}
+                    aria-invalid={!!googleSearchForm.formState.errors.query}
+                    className="pl-9 h-10 border-slate-200 bg-white focus-visible:ring-blue-500/30"
+                  />
+                </div>
+                {googleSearchForm.formState.errors.query && (
+                  <p className="text-xs text-red-500">{t.errorSearch}</p>
+                )}
               </div>
               <Button
                 type="submit"
@@ -506,16 +512,20 @@ export default function SourceGenerationPanel({
             )}
           </div>
         ) : (
-          <form onSubmit={handleCrawlUrl} className="flex flex-col gap-2 sm:flex-row">
-            <div className="relative flex-1">
-              <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
-              <Input
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder={t.urlPlaceholder}
-                required
-                className="pl-9 h-10 border-slate-200 bg-white focus-visible:ring-blue-500/30"
-              />
+          <form onSubmit={urlCrawlForm.handleSubmit(handleCrawlUrl)} className="flex flex-col gap-2 sm:flex-row">
+            <div className="relative flex-1 space-y-1">
+              <div className="relative">
+                <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <Input
+                  {...urlCrawlForm.register("url")}
+                  placeholder={t.urlPlaceholder}
+                  aria-invalid={!!urlCrawlForm.formState.errors.url}
+                  className="pl-9 h-10 border-slate-200 bg-white focus-visible:ring-blue-500/30"
+                />
+              </div>
+              {urlCrawlForm.formState.errors.url && (
+                <p className="text-xs text-red-500">{t.errorCrawl}</p>
+              )}
             </div>
             <Button
               type="submit"

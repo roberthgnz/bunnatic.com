@@ -65,9 +65,7 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
     <main className="min-h-screen bg-white text-gray-900">
       <Navbar useDemoCta />
 
-      <section className="relative overflow-hidden px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-16 lg:px-8 lg:pb-20 lg:pt-24">
-        <div className="absolute inset-0 bg-grid-pattern opacity-60" />
-        <div className="absolute right-0 top-0 h-52 w-52 -translate-y-12 translate-x-12 rounded-full bg-emerald-200/50 blur-3xl sm:h-72 sm:w-72 sm:-translate-y-16 sm:translate-x-16" />
+      <section className="overflow-hidden border-b border-slate-200 px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-16 lg:px-8 lg:pb-20 lg:pt-24">
         <div className="relative mx-auto grid max-w-7xl gap-6 sm:gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:gap-10">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100 sm:px-4 sm:py-2 sm:text-sm">
@@ -82,7 +80,7 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <DemoLinkButton
                 label={locale === "es" ? "Probar demo gratis" : "Provar demo gratuïta"}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-sm font-bold text-white shadow-[0_10px_35px_-15px_rgba(16,185,129,0.7)] transition-all hover:bg-emerald-400 sm:w-auto sm:px-6 sm:text-base sm:hover:scale-105"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-800 sm:w-auto sm:px-6 sm:text-base"
               />
               <Link
                 href={`${localePrefix}/#pricing`}
@@ -94,7 +92,7 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
             <p className="mt-4 text-xs font-medium text-gray-500 sm:mt-5 sm:text-sm">{t.trustLine}</p>
           </div>
 
-          <div className="rounded-3xl border border-emerald-100 bg-white p-4 shadow-xl shadow-emerald-100/50 sm:p-6">
+          <div className="rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm sm:p-6">
             <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 sm:mb-5 sm:h-14 sm:w-14">
               <Building2 className="h-5 w-5 text-emerald-600 sm:h-7 sm:w-7" />
             </div>
@@ -170,7 +168,7 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href={signupHref}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-400 sm:w-auto sm:text-base sm:hover:scale-105"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-700 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-800 sm:w-auto sm:text-base"
             >
               {t.ctaPrimary}
               <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />

@@ -25,7 +25,7 @@ type NavbarProps = {
 
 export default function Navbar(props: NavbarProps) {
   return (
-    <Suspense fallback={<div className="h-16 w-full border-b border-gray-100 bg-white/80" />}>
+    <Suspense fallback={<div className="h-16 w-full border-b border-slate-200 bg-white" />}>
       <NavbarContent {...props} />
     </Suspense>
   );
@@ -98,13 +98,13 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   const logoutLabel = language === "ca" ? "Tancar sessio" : "Cerrar sesion";
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-xl transition-all">
+    <nav className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href={homePath} className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
-            <Zap className="h-5 w-5 fill-emerald-600 text-emerald-600" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-100">
+            <Zap className="h-5 w-5 fill-emerald-700 text-emerald-700" />
           </div>
-          <span className="text-base font-bold tracking-tight text-gray-900 sm:text-xl">
+          <span className="text-base font-bold tracking-tight text-slate-900 sm:text-xl">
             {t.navbar.logo}
           </span>
         </Link>
@@ -115,7 +115,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="hidden sm:flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
+                className="hidden sm:flex items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
               >
                 {t.navbar.platformLabel}
                 <ChevronDown className="h-4 w-4" />
@@ -126,7 +126,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
                 <DropdownMenuItem key={feature.id} asChild>
                   <Link
                     href={`${hasLocale ? `/${locale}` : ""}/caracteristicas/${getFeatureSlug(feature.id, language)}`}
-                    className="block rounded-lg px-2 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900"
+                    className="block rounded-md px-2 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
                   >
                     {feature.label}
                   </Link>
@@ -134,11 +134,11 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-gray-500">
+          <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-slate-500">
             <Button
               variant="ghost"
               size="sm"
-              className={`hidden hover:text-gray-900 transition-colors sm:flex ${language === "es" ? "text-gray-900 font-bold" : ""}`}
+              className={`hidden hover:text-slate-900 transition-colors sm:flex ${language === "es" ? "text-slate-900 font-bold" : ""}`}
               onClick={() => setLanguage("es")}
             >
               ES
@@ -147,7 +147,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
             <Button
               variant="ghost"
               size="sm"
-              className={`hidden hover:text-gray-900 transition-colors sm:flex ${language === "ca" ? "text-gray-900 font-bold" : ""}`}
+              className={`hidden hover:text-slate-900 transition-colors sm:flex ${language === "ca" ? "text-slate-900 font-bold" : ""}`}
               onClick={() => setLanguage("ca")}
             >
               CA
@@ -157,7 +157,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
             <div className="flex items-center gap-2">
               <Link
                 href={dashboardPath}
-                className="rounded-full bg-gray-900 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm transition-all hover:scale-105 hover:bg-gray-800 hover:shadow-md"
+                className="rounded-full bg-slate-900 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium text-white transition-colors hover:bg-slate-800"
               >
                 {dashboardLabel}
               </Link>
@@ -185,7 +185,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
             <Link
               href={ctaHref}
               onClick={() => trackFunnelEvent("landing_cta_click", { placement: "navbar", locale: language })}
-              className="rounded-full bg-gray-900 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm transition-all hover:scale-105 hover:bg-gray-800 hover:shadow-md"
+              className="rounded-full bg-slate-900 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium text-white transition-colors hover:bg-slate-800"
             >
               {ctaText}
             </Link>

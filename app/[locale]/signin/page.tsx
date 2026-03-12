@@ -195,13 +195,13 @@ function SignInContent() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[420px]">
-        <div className="bg-white px-6 py-8 shadow-xl shadow-slate-200/40 sm:rounded-3xl sm:px-10 border border-slate-100">
+        <div className="bg-white px-6 py-8 shadow-sm sm:rounded-3xl sm:px-10 border border-slate-200">
           
           <div className="mb-8">
             <Button
               variant="outline"
               type="button"
-              className="w-full h-12 gap-3 text-base font-medium text-slate-700 hover:bg-slate-50 border-slate-200 rounded-xl transition-all hover:border-slate-300"
+              className="w-full h-12 gap-3 text-base font-medium text-slate-700 hover:bg-slate-50 border-slate-200 rounded-xl transition-colors hover:border-slate-300"
               onClick={handleSocialLogin}
             >
               <GoogleLogo />
@@ -230,7 +230,7 @@ function SignInContent() {
                   autoComplete="email"
                   {...register("email")}
                   className={cn(
-                    "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 transition-all focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
+                    "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
                     errors.email ? "border-rose-300 focus:border-rose-300 focus:ring-rose-500/20" : "focus:border-emerald-500"
                   )}
                   placeholder={t.signin.emailLabel}
@@ -253,7 +253,7 @@ function SignInContent() {
                     autoComplete="current-password"
                     {...register("password")}
                     className={cn(
-                      "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 pr-11 transition-all focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
+                      "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 pr-11 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
                       errors.password ? "border-rose-300 focus:border-rose-300 focus:ring-rose-500/20" : "focus:border-emerald-500"
                     )}
                     placeholder={t.signin.passwordLabel}
@@ -280,10 +280,10 @@ function SignInContent() {
                 type="submit"
                 disabled={!isValid || isSubmitting}
                 className={cn(
-                  "group relative flex w-full h-12 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:-translate-y-0.5",
+                  "group relative flex w-full h-12 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-colors",
                   !isValid || isSubmitting
-                    ? "cursor-not-allowed bg-emerald-300 shadow-none hover:translate-y-0"
-                    : "bg-emerald-500 hover:bg-emerald-400"
+                    ? "cursor-not-allowed bg-emerald-300"
+                    : "bg-emerald-700 hover:bg-emerald-800"
                 )}
               >
                 {isSubmitting ? (

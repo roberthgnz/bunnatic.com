@@ -67,9 +67,7 @@ export default function AlternativeLanding({ slug, copy }: AlternativeLandingPro
     <main className="min-h-screen bg-white text-gray-900">
       <Navbar useDemoCta />
 
-      <section className="relative overflow-hidden px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-16 lg:px-8 lg:pb-20 lg:pt-24">
-        <div className="absolute inset-0 bg-grid-pattern opacity-60" />
-        <div className="absolute left-0 top-0 h-52 w-52 -translate-x-12 -translate-y-12 rounded-full bg-emerald-200/50 blur-3xl sm:h-72 sm:w-72 sm:-translate-x-16 sm:-translate-y-16" />
+      <section className="overflow-hidden border-b border-slate-200 px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-16 lg:px-8 lg:pb-20 lg:pt-24">
         <div className="relative mx-auto max-w-5xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100 sm:px-4 sm:py-2 sm:text-sm">
             <Clock3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -79,10 +77,10 @@ export default function AlternativeLanding({ slug, copy }: AlternativeLandingPro
           <p className="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-gray-600 sm:mt-6 sm:text-lg">{t.subtitle}</p>
           <p className="mt-3 text-xs font-semibold text-gray-500 sm:mt-4 sm:text-sm">{t.urgencyText}</p>
           <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-            <DemoLinkButton
-              label={locale === "es" ? "Probar demo gratis" : "Provar demo gratuïta"}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-bold text-white shadow-[0_10px_35px_-15px_rgba(16,185,129,0.7)] transition-all hover:bg-emerald-400 sm:w-auto sm:text-base sm:hover:scale-105"
-            />
+              <DemoLinkButton
+                label={locale === "es" ? "Probar demo gratis" : "Provar demo gratuïta"}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-700 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-800 sm:w-auto sm:text-base"
+              />
             <Link
               href={`${localePrefix}/#pricing`}
               className="inline-flex w-full items-center justify-center rounded-full border border-gray-300 px-6 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50 sm:w-auto sm:text-base"
@@ -108,7 +106,7 @@ export default function AlternativeLanding({ slug, copy }: AlternativeLandingPro
                 ))}
               </ul>
             </article>
-            <article className="relative rounded-3xl bg-emerald-50 p-5 ring-1 ring-emerald-200 shadow-sm sm:p-8">
+            <article className="relative rounded-3xl bg-emerald-50 p-5 ring-1 ring-emerald-200 sm:p-8">
               <span className="absolute -top-3 right-5 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-bold text-white sm:right-6 sm:text-xs">
                 {locale === "es" ? "Recomendado" : "Recomanat"}
               </span>
@@ -185,7 +183,7 @@ export default function AlternativeLanding({ slug, copy }: AlternativeLandingPro
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href={signupHref}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-400 sm:w-auto sm:text-base sm:hover:scale-105"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-700 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-800 sm:w-auto sm:text-base"
             >
               {t.ctaPrimary}
               <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />

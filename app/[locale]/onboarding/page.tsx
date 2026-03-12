@@ -130,7 +130,7 @@ function OnboardingContent() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:py-16">
-      <div className="rounded-2xl bg-white shadow-lg border border-gray-200 overflow-hidden">
+      <div className="rounded-2xl bg-white shadow-sm border border-gray-200 overflow-hidden">
         <div className="grid lg:grid-cols-2 gap-0">
           {/* Left side - Form */}
           <div className="p-6 sm:p-10 lg:p-12">
@@ -190,7 +190,7 @@ function OnboardingContent() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder={t.descPlaceholder}
-                  className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
 
@@ -214,9 +214,9 @@ function OnboardingContent() {
           {/* Right side - Preview */}
           <div className="hidden lg:flex bg-gray-100 p-12 items-center justify-center border-l border-gray-200">
             <div className="w-full max-w-sm">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-emerald-400 to-blue-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  <div className="h-12 w-12 rounded-lg bg-emerald-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                     {formData.name ? formData.name.charAt(0).toUpperCase() : "?"}
                   </div>
                   <div className="min-w-0 flex-1">

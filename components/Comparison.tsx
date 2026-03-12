@@ -1,7 +1,6 @@
 "use client";
 
 import { content } from "@/lib/content";
-import { AnimatePresence, motion } from "motion/react";
 import { Check, X } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -62,10 +61,7 @@ export default function Comparison({ alternativeId }: ComparisonProps) {
   const selectedCompetitorId = activeAlternative ?? manualSelectedCompetitorId;
 
   const competitor = useMemo(() => {
-    return (
-      competitors.find((item) => item.id === selectedCompetitorId) ??
-      competitors[0]
-    );
+    return competitors.find((item) => item.id === selectedCompetitorId) ?? competitors[0];
   }, [competitors, selectedCompetitorId]);
 
   const comparatorLabel = language === "ca" ? "Només amb" : "Con solo";
@@ -96,13 +92,12 @@ export default function Comparison({ alternativeId }: ComparisonProps) {
   const isLockedByRoute = Boolean(activeAlternative);
 
   return (
-    <section className="bg-white py-16 sm:py-24 lg:py-32">
+    <section className="border-b border-slate-200 bg-white py-16 sm:py-24 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl lg:max-w-none">
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
             {competitors.map((item) => {
-              const logoSrc =
-                logoByCompetitorId[item.id as keyof typeof logoByCompetitorId];
+              const logoSrc = logoByCompetitorId[item.id as keyof typeof logoByCompetitorId];
               const isActive = item.id === comparisonKey;
 
               return (
@@ -111,10 +106,10 @@ export default function Comparison({ alternativeId }: ComparisonProps) {
                   type="button"
                   disabled={isLockedByRoute}
                   onClick={() => setManualSelectedCompetitorId(item.id)}
-                  className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-2.5 py-2 text-xs font-semibold transition sm:w-auto sm:px-3 sm:py-1.5 sm:text-sm sm:font-medium ${
+                  className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-2.5 py-2 text-xs font-semibold transition-colors sm:w-auto sm:px-3 sm:py-1.5 sm:text-sm sm:font-medium ${
                     isActive
-                      ? "border-slate-900 bg-white text-slate-900"
-                      : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                      ? "border-slate-900 bg-slate-900 text-white"
+                      : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
                   } ${isLockedByRoute ? "cursor-default" : ""}`}
                 >
                   {logoSrc ? (
@@ -133,77 +128,68 @@ export default function Comparison({ alternativeId }: ComparisonProps) {
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-2 sm:mt-8 sm:gap-3">
-            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 sm:text-sm">
+            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 sm:text-sm">
               {versusLabel}
             </span>
-            <span className="text-sm font-bold uppercase tracking-wide text-gray-400 sm:text-base">VS</span>
+            <span className="text-sm font-bold uppercase tracking-wide text-slate-400 sm:text-base">VS</span>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 sm:text-sm">
               {competitor ? normalizedName(competitor.name) : "Competidor"}
             </span>
           </div>
 
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={comparisonKey}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.28, ease: "easeOut" }}
-            >
-              <h2 className="mt-6 text-2xl font-extrabold leading-[1.15] tracking-tight text-gray-900 sm:mt-8 sm:text-4xl md:text-5xl sm:whitespace-pre-line">
-                {comparison.title}
-              </h2>
+          <div key={comparisonKey}>
+            <h2 className="mt-6 text-2xl font-extrabold leading-[1.15] tracking-tight text-slate-900 sm:mt-8 sm:text-4xl md:text-5xl sm:whitespace-pre-line">
+              {comparison.title}
+            </h2>
 
-              <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-12 sm:gap-6 lg:mt-16 lg:grid-cols-2 lg:gap-8">
-                <Card className="rounded-3xl border border-gray-200 bg-gray-50/50 p-0 shadow-sm">
-                  <CardHeader className="px-5 pb-4 pt-5 sm:px-8 sm:pb-6 sm:pt-8 lg:px-10">
-                    <h3 className="flex items-center gap-2.5 text-lg font-bold text-gray-900 sm:gap-3 sm:text-2xl">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-red-100 sm:h-8 sm:w-8">
-                        <X className="h-4 w-4 text-red-600 sm:h-5 sm:w-5" />
-                      </span>
-                      {comparison.cards.facebook.title}
-                    </h3>
-                  </CardHeader>
-                  <CardContent className="px-5 pb-6 sm:px-8 sm:pb-8 lg:px-10 lg:pb-10">
-                    <ul className="space-y-4 sm:space-y-5 lg:space-y-6">
-                      {comparison.cards.facebook.items.map((item, i) => (
-                        <li key={i} className="flex gap-3 text-sm text-gray-600 sm:gap-4 sm:text-base">
-                          <X className="h-5 w-5 flex-shrink-0 text-red-400 sm:h-6 sm:w-6" />
-                          <span className="leading-relaxed sm:leading-relaxed">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-12 sm:gap-6 lg:mt-16 lg:grid-cols-2 lg:gap-8">
+              <Card className="rounded-2xl border border-slate-200 bg-slate-50 p-0 shadow-sm">
+                <CardHeader className="px-5 pb-4 pt-5 sm:px-8 sm:pb-6 sm:pt-8 lg:px-10">
+                  <h3 className="flex items-center gap-2.5 text-lg font-bold text-slate-900 sm:gap-3 sm:text-2xl">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-red-100 sm:h-8 sm:w-8">
+                      <X className="h-4 w-4 text-red-700 sm:h-5 sm:w-5" />
+                    </span>
+                    {comparison.cards.facebook.title}
+                  </h3>
+                </CardHeader>
+                <CardContent className="px-5 pb-6 sm:px-8 sm:pb-8 lg:px-10 lg:pb-10">
+                  <ul className="space-y-4 sm:space-y-5 lg:space-y-6">
+                    {comparison.cards.facebook.items.map((item, i) => (
+                      <li key={i} className="flex gap-3 text-sm text-slate-600 sm:gap-4 sm:text-base">
+                        <X className="h-5 w-5 flex-shrink-0 text-red-500 sm:h-6 sm:w-6" />
+                        <span className="leading-relaxed sm:leading-relaxed">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
 
-                <Card className="relative overflow-hidden rounded-3xl border-2 border-emerald-500 bg-white p-0 shadow-xl">
-                  <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-emerald-50 blur-3xl sm:-right-20 sm:-top-20 sm:h-64 sm:w-64" />
-                  <CardHeader className="relative z-10 px-5 pb-4 pt-5 sm:px-8 sm:pb-6 sm:pt-8 lg:px-10">
-                    <h3 className="flex items-center gap-2.5 text-lg font-bold text-gray-900 sm:gap-3 sm:text-2xl">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 sm:h-8 sm:w-8">
-                        <Check className="h-4 w-4 text-emerald-600 sm:h-5 sm:w-5" />
-                      </span>
-                      {comparison.cards.novaweb.title}
-                    </h3>
-                  </CardHeader>
-                  <CardContent className="relative z-10 px-5 pb-6 sm:px-8 sm:pb-8 lg:px-10 lg:pb-10">
-                    <ul className="space-y-4 sm:space-y-5 lg:space-y-6">
-                      {comparison.cards.novaweb.items.map((item, i) => (
-                        <li key={i} className="flex gap-3 text-sm text-gray-900 sm:gap-4 sm:text-base">
-                          <Check className="h-5 w-5 flex-shrink-0 text-emerald-500 sm:h-6 sm:w-6" />
-                          <span className="font-medium leading-relaxed sm:leading-relaxed">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="rounded-2xl border border-emerald-300 bg-white p-0 shadow-sm">
+                <CardHeader className="px-5 pb-4 pt-5 sm:px-8 sm:pb-6 sm:pt-8 lg:px-10">
+                  <h3 className="flex items-center gap-2.5 text-lg font-bold text-slate-900 sm:gap-3 sm:text-2xl">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 sm:h-8 sm:w-8">
+                      <Check className="h-4 w-4 text-emerald-700 sm:h-5 sm:w-5" />
+                    </span>
+                    {comparison.cards.novaweb.title}
+                  </h3>
+                </CardHeader>
+                <CardContent className="px-5 pb-6 sm:px-8 sm:pb-8 lg:px-10 lg:pb-10">
+                  <ul className="space-y-4 sm:space-y-5 lg:space-y-6">
+                    {comparison.cards.novaweb.items.map((item, i) => (
+                      <li key={i} className="flex gap-3 text-sm text-slate-900 sm:gap-4 sm:text-base">
+                        <Check className="h-5 w-5 flex-shrink-0 text-emerald-700 sm:h-6 sm:w-6" />
+                        <span className="font-medium leading-relaxed sm:leading-relaxed">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
 
-              <p className="mt-8 text-center text-sm font-medium text-gray-500 sm:mt-12 sm:text-base">
-                {comparison.caption}
-              </p>
-            </motion.div>
-          </AnimatePresence>
+            <p className="mt-8 text-center text-sm font-medium text-slate-500 sm:mt-12 sm:text-base">
+              {comparison.caption}
+            </p>
+          </div>
         </div>
       </div>
     </section>

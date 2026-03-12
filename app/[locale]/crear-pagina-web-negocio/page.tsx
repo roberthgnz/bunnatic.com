@@ -3,7 +3,6 @@
 import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import { Zap, Search, MapPin, Star, Phone, Globe, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/LanguageProvider";
@@ -581,13 +580,9 @@ function CreateWebContent() {
       <Navbar />
 
       <div className="mx-auto max-w-5xl px-4 py-8 sm:py-10 lg:py-12 sm:px-6 lg:px-8">
-        <AnimatePresence mode="wait">
-          {step === "search" && (
-            <motion.div
+                  {step === "search" && (
+            <div
               key="search"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
               className="mx-auto max-w-2xl"
             >
               <div className="text-center mb-8 sm:mb-10">
@@ -629,7 +624,7 @@ function CreateWebContent() {
                     type="submit"
                     variant="default"
                     disabled={isSearching || !query.trim()}
-                    className="w-full sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 h-11 sm:h-12 rounded-full bg-gray-900 px-6 sm:px-0 sm:w-12 text-sm font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800 disabled:opacity-50 disabled:hover:scale-100 shadow-lg sm:shadow-none"
+                    className="w-full sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 h-11 sm:h-12 rounded-full bg-gray-900 px-6 sm:px-0 sm:w-12 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:opacity-50 shadow-sm sm:shadow-none"
                   >
                     {isSearching ? (
                       <>
@@ -652,7 +647,7 @@ function CreateWebContent() {
               )}
 
               {rateLimitExceeded && (
-                <div className="mb-4 sm:mb-6 rounded-2xl sm:rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 p-5 sm:p-6 lg:p-8 shadow-lg">
+                <div className="mb-4 sm:mb-6 rounded-2xl sm:rounded-3xl border-2 border-amber-300 bg-amber-50 p-5 sm:p-6 lg:p-8 shadow-sm">
                   <div className="flex items-start gap-3 sm:gap-4 mb-4">
                     <div className="flex-shrink-0 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-amber-200">
                       <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-amber-700" />
@@ -704,7 +699,7 @@ function CreateWebContent() {
                     <Button
                       asChild
                       variant="default"
-                      className="w-full rounded-full bg-gray-900 px-6 py-3 sm:py-4 text-sm sm:text-base font-bold text-white hover:bg-gray-800 shadow-lg"
+                      className="w-full rounded-full bg-gray-900 px-6 py-3 sm:py-4 text-sm sm:text-base font-bold text-white hover:bg-gray-800 shadow-sm"
                     >
                       <Link href={signupHref}>
                         {language === "es" ? "Crear mi cuenta gratis →" : "Crear el meu compte gratis →"}
@@ -751,7 +746,7 @@ function CreateWebContent() {
 
               {showNoResults && (
                 <div className="mt-4 sm:mt-6">
-                  <div className="rounded-2xl sm:rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-orange-50 p-5 sm:p-6 lg:p-8">
+                  <div className="rounded-2xl sm:rounded-3xl border border-amber-200 bg-amber-50 p-5 sm:p-6 lg:p-8">
                     <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">{t.crear.noResultsTitle}</h3>
                     <p className="mt-2 text-sm sm:text-base text-gray-600">{t.crear.noResultsSubtitle}</p>
                     <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-amber-100">
@@ -810,7 +805,7 @@ function CreateWebContent() {
                   </div>
 
                   {/* CTA alternativo */}
-                  <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 sm:p-8 lg:p-10 text-center text-white shadow-xl">
+                  <div className="rounded-2xl sm:rounded-3xl bg-slate-900 p-6 sm:p-8 lg:p-10 text-center text-white shadow-sm">
                     <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3 px-2">
                       ¿No encuentras tu negocio en Google?
                     </h3>
@@ -832,19 +827,15 @@ function CreateWebContent() {
                   </div>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
 
           {step === "analyzing" && (
-            <motion.div
+            <div
               key="analyzing"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05 }}
               className="flex flex-col items-center justify-center py-8 sm:py-12 lg:py-20 text-center px-4"
             >
               <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 lg:h-32 lg:w-32 items-center justify-center">
-                <div className="absolute inset-0 animate-ping rounded-full bg-emerald-200 opacity-20" />
                 <div className="absolute inset-3 sm:inset-4 animate-spin rounded-full border-3 sm:border-4 border-emerald-500 border-t-transparent" />
                 <Zap className="h-7 w-7 sm:h-8 sm:w-8 lg:h-10 lg:w-10 text-emerald-600" />
               </div>
@@ -859,7 +850,7 @@ function CreateWebContent() {
                 <div className="mb-2 text-right text-xs sm:text-sm font-medium text-gray-600">{analysisProgress}%</div>
                 <div className="h-1.5 sm:h-2 w-full overflow-hidden rounded-full bg-gray-200">
                   <div
-                    className="h-full rounded-full bg-emerald-500 transition-all duration-200"
+                    className="h-full rounded-full bg-emerald-500 transition-colors duration-200"
                     style={{ width: `${analysisProgress}%` }}
                   />
                 </div>
@@ -870,29 +861,25 @@ function CreateWebContent() {
                   {analysisProgress >= 20 ? <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> : <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 animate-spin" />}
                   <span>{analysisInputMode === "url" ? t.crear.step1Web : t.crear.step1Google}</span>
                 </div>
-                <motion.div 
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
+                <div 
                   className="flex items-center gap-2.5 sm:gap-3 text-sm sm:text-base text-emerald-600 font-medium"
                 >
                   {analysisProgress >= 55 ? <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> : <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 animate-spin" />}
                   <span>{t.crear.step2}</span>
-                </motion.div>
-                <motion.div 
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}
+                </div>
+                <div 
                   className="flex items-center gap-2.5 sm:gap-3 text-sm sm:text-base text-emerald-600 font-medium"
                 >
                   {analysisProgress >= 90 ? <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" /> : <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 animate-spin" />}
                   <span>{t.crear.step3}</span>
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {step === "preview" && placeDetails && (
-            <motion.div
+            <div
               key="preview"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
               className="grid gap-6 sm:gap-8 lg:grid-cols-3"
             >
               {/* Sidebar / Info extracted */}
@@ -932,7 +919,7 @@ function CreateWebContent() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl sm:rounded-3xl bg-gray-900 p-5 sm:p-6 text-white shadow-lg">
+                <div className="rounded-2xl sm:rounded-3xl bg-gray-900 p-5 sm:p-6 text-white shadow-sm">
                   <h3 className="text-base sm:text-lg font-bold">{t.crear.allCorrect}</h3>
                   <p className="mt-2 text-xs sm:text-sm text-gray-400">
                     {t.crear.generatedProposal}
@@ -975,7 +962,7 @@ function CreateWebContent() {
                 <div className="mb-2 sm:mb-3 px-1 text-[10px] sm:text-xs text-slate-500">
                   {t.crear.minimalistNote}
                 </div>
-                <div className="overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl border border-gray-200 bg-white shadow-xl">
+                <div className="overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl border border-gray-200 bg-white shadow-sm">
                   {/* Browser Chrome */}
                   <div className="flex items-center gap-1.5 sm:gap-2 border-b border-gray-100 bg-gray-50 px-2.5 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3">
                     <div className="flex gap-1 sm:gap-1.5">
@@ -1097,17 +1084,15 @@ function CreateWebContent() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {step === "dashboard" && placeDetails && (
-            <motion.div
+            <div
               key="dashboard"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
               className="mx-auto max-w-4xl"
             >
-              <div className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 lg:p-12 shadow-xl ring-1 ring-gray-200 text-center">
+              <div className="rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8 lg:p-12 shadow-sm ring-1 ring-gray-200 text-center">
                 <div className="mx-auto flex h-14 w-14 sm:h-16 sm:w-16 lg:h-20 lg:w-20 items-center justify-center rounded-full bg-emerald-100 mb-5 sm:mb-6">
                   <CheckCircle2 className="h-7 w-7 sm:h-8 sm:w-8 lg:h-10 lg:w-10 text-emerald-600" />
                 </div>
@@ -1158,9 +1143,8 @@ function CreateWebContent() {
                   </Button>
                 </div>
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
       </div>
     </main>
   );

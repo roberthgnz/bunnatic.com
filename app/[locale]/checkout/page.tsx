@@ -96,7 +96,7 @@ function CheckoutContent() {
           <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 mb-3">
             {language === "es" ? "Comienza tu prueba" : "Comença la teva prova"}
             <br />
-            <span className="bg-gradient-to-r from-purple-600 via-blue-500 to-emerald-500 bg-clip-text text-transparent">
+            <span className="text-emerald-700">
               {language === "es" ? "gratuita de 14 días" : "gratuïta de 14 dies"}
             </span>
           </h1>
@@ -109,11 +109,11 @@ function CheckoutContent() {
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden mb-6">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-6">
           {/* Plan Header */}
-          <div className="bg-gradient-to-br from-emerald-50 to-blue-50 p-4 sm:p-6 border-b border-emerald-100">
+          <div className="bg-emerald-50 p-4 sm:p-6 border-b border-emerald-100">
             <div className="flex items-center gap-3 mb-3">
-              <div className="h-10 w-10 rounded-lg bg-emerald-500 flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
+              <div className="h-10 w-10 rounded-lg bg-emerald-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                 {plan.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
@@ -127,7 +127,7 @@ function CheckoutContent() {
             </div>
             
             {draftData.name && (
-              <div className="bg-white/70 rounded-lg p-3 backdrop-blur-sm">
+              <div className="bg-white rounded-lg p-3 border border-emerald-100">
                 <p className="text-xs text-gray-600 mb-1">
                   {language === "es" ? "Web para:" : "Web per a:"}
                 </p>
@@ -175,7 +175,7 @@ function CheckoutContent() {
           <div className="p-4 sm:p-6 pt-0">
             <Button 
               asChild 
-              className="w-full rounded-full bg-gray-900 h-12 sm:h-14 text-sm sm:text-base font-bold text-white hover:bg-gray-800 transition-all"
+              className="w-full rounded-full bg-slate-900 h-12 sm:h-14 text-sm sm:text-base font-bold text-white hover:bg-slate-800 transition-colors"
             >
               <Link
                 href={onboardingHref}
@@ -254,8 +254,8 @@ function CheckoutContent() {
           </div>
           
           <div className="flex flex-col items-center gap-1.5">
-            <div className="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center">
-              <CheckCircle2 className="h-5 w-5 text-purple-600" />
+            <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+              <CheckCircle2 className="h-5 w-5 text-slate-700" />
             </div>
             <p className="text-xs font-semibold text-gray-900">
               {language === "es" ? "Soporte" : "Suport"}

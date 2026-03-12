@@ -87,35 +87,35 @@ export default function BusinessSectionNav({
   ]
 
   return (
-    <div className="grid gap-3 lg:grid-cols-3">
+    <div className="flex flex-col gap-6">
       {groups.map((group) => (
-        <section key={group.key} className="rounded-xl border border-slate-200 bg-white p-3">
-          <p className="px-1 pb-2 text-xs font-medium uppercase tracking-wide text-slate-500">{group.title}</p>
-          <div className="space-y-1.5">
+        <section key={group.key}>
+          <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">{group.title}</p>
+          <div className="space-y-1">
             {group.items.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
               const Icon = item.icon
               const featuredClasses = item.featured
                 ? isActive
-                  ? 'border-emerald-300 bg-emerald-100 text-emerald-900'
-                  : 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                  ? 'bg-emerald-100/50 text-emerald-900 border-l-[3px] border-emerald-500 shadow-sm'
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 border-l-[3px] border-transparent'
                 : ''
               const classes = item.featured
-                ? `flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${featuredClasses}`
-                : `flex w-full items-center rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                ? `flex w-full items-center justify-between rounded-r-lg px-3 py-2 text-sm font-medium transition-all ${featuredClasses}`
+                : `flex w-full items-center rounded-r-lg px-3 py-2 text-sm font-medium transition-all border-l-[3px] ${
                     isActive
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                      : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                      ? 'bg-slate-100 text-slate-900 border-slate-900 shadow-sm'
+                      : 'border-transparent text-slate-600 hover:bg-slate-100/50 hover:text-slate-900'
                   }`
 
               return (
                 <Link key={item.key} href={item.href} className={classes}>
-                  <span className="inline-flex items-center">
-                    <Icon className="mr-2 h-4 w-4" />
+                  <span className="flex items-center gap-3">
+                    <Icon className={`h-4 w-4 ${isActive && !item.featured ? 'text-slate-900' : 'text-slate-500'}`} />
                     {item.label}
                   </span>
                   {item.featured ? (
-                    <Badge variant="outline" className="border-emerald-200 text-[10px] text-emerald-700">
+                    <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-[10px] text-emerald-700 px-1 py-0 h-4 leading-none">
                       AI
                     </Badge>
                   ) : null}

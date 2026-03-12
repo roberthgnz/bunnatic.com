@@ -31,6 +31,15 @@ export type CloudflareCustomHostname = {
   ssl?: {
     status?: string
     method?: string
+    validation_errors?: Array<{ message?: string; error?: string }> | null
+    validation_records?: Array<{
+      txt_name?: string
+      txt_value?: string
+      http_url?: string
+      http_body?: string
+      cname?: string
+      emails?: string[]
+    }> | null
   } | null
 }
 

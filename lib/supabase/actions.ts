@@ -36,6 +36,7 @@ type BusinessDomainRecord = {
   cloudflare_ssl_status: string | null
   cloudflare_ssl_method: string | null
   cloudflare_ownership_verification: Record<string, unknown>
+  cloudflare_ssl_validation_records: Array<Record<string, unknown>>
   cloudflare_verification_errors: Array<Record<string, unknown>>
   verification_record_name: string | null
   verification_record_value: string | null
@@ -43,6 +44,62 @@ type BusinessDomainRecord = {
   last_checked_at: string | null
   created_at: string
   updated_at: string
+}
+
+function logCloudflareValidationDebug(context: string, hostname: string, cloudflareDomain: any) {
+  const sslStatus = cloudflareDomain?.ssl?.status ?? null
+  const validationRecords = cloudflareDomain?.ssl?.validation_records ?? []
+  const ownership = cloudflareDomain?.ownership_verification ?? null
+
+  console.info('[domains][cloudflare-debug]', {
+    context,
+    hostname,
+    customHostnameId: cloudflareDomain?.id ?? null,
+    status: cloudflareDomain?.status ?? null,
+    sslStatus,
+    sslMethod: cloudflareDomain?.ssl?.method ?? null,
+    validationRecordsCount: Array.isArray(validationRecords) ? validationRecords.length : 0,
+    validationRecords,
+    ownershipVerification: ownership,
+    ownershipVerificationHttp: cloudflareDomain?.ownership_verification_http ?? null,
+  })
+
+  if (
+    sslStatus === 'pending_validation' &&
+    (!Array.isArray(validationRecords) || validationRecords.length === 0)
+  ) {
+    console.warn('[domains][cloudflare-debug] SSL pending_validation without validation_records', {
+      context,
+      hostname,
+      customHostnameId: cloudflareDomain?.id ?? null,
+      rawSsl: cloudflareDomain?.ssl ?? null,
+      rawDomain: cloudflareDomain,
+    })
+  }
+}
+
+const BUSINESS_DOMAINS_TABLE_MISSING_MESSAGE =
+  'Falta la migración de dominios en Supabase. Ejecuta las migraciones y vuelve a intentar.'
+
+function isBusinessDomainsTableMissing(
+  error: { code?: string; message?: string } | null | undefined
+) {
+  if (!error) {
+    return false
+  }
+
+  return (
+    error.code === 'PGRST205' ||
+    error.message?.includes("public.business_domains") === true
+  )
+}
+
+function getDomainQueryErrorMessage(error: { message?: string; code?: string }) {
+  if (isBusinessDomainsTableMissing(error)) {
+    return BUSINESS_DOMAINS_TABLE_MISSING_MESSAGE
+  }
+
+  return error.message || 'Error inesperado gestionando el dominio.'
 }
 
 async function getOwnedBusinessBySlug(slug: string, userId: string) {
@@ -892,7 +949,7 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
     .maybeSingle()
 
   if (collisionError) {
-    return { error: collisionError.message }
+    return { error: getDomainQueryErrorMessage(collisionError) }
   }
 
   if (collision) {
@@ -906,7 +963,7 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
     .maybeSingle()
 
   if (existingError) {
-    return { error: existingError.message }
+    return { error: getDomainQueryErrorMessage(existingError) }
   }
 
   const previousDomain = (existingDomain as BusinessDomainRecord | null) ?? null
@@ -935,6 +992,7 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
     const mappedStatus = mapCloudflareStatus(cloudflareDomain)
     const verificationRecord = extractOwnershipVerificationRecord(cloudflareDomain)
     const verificationMethod = cloudflareDomain.ssl?.method === 'http' ? 'http' : 'txt'
+    logCloudflareValidationDebug('connectBusinessDomain', hostname, cloudflareDomain)
 
     const payload = {
       business_id: business.id,
@@ -945,7 +1003,11 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
       cloudflare_ssl_status: cloudflareDomain.ssl?.status ?? null,
       cloudflare_ssl_method: cloudflareDomain.ssl?.method ?? null,
       cloudflare_ownership_verification: cloudflareDomain.ownership_verification ?? {},
-      cloudflare_verification_errors: cloudflareDomain.verification_errors ?? [],
+      cloudflare_ssl_validation_records: cloudflareDomain.ssl?.validation_records ?? [],
+      cloudflare_verification_errors: [
+        ...(cloudflareDomain.verification_errors ?? []),
+        ...(cloudflareDomain.ssl?.validation_errors ?? []),
+      ],
       verification_record_name: verificationRecord.name,
       verification_record_value: verificationRecord.value,
       activated_at: computeActivatedAt(mappedStatus, previousDomain?.activated_at ?? null),
@@ -960,7 +1022,7 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
       .single()
 
     if (upsertError) {
-      return { error: upsertError.message }
+      return { error: getDomainQueryErrorMessage(upsertError) }
     }
 
     let cleanupWarning: string | null = null
@@ -1016,7 +1078,7 @@ export async function refreshBusinessDomainStatus(slug: string) {
     .maybeSingle()
 
   if (domainError) {
-    return { error: domainError.message }
+    return { error: getDomainQueryErrorMessage(domainError) }
   }
 
   const currentDomain = (domain as BusinessDomainRecord | null) ?? null
@@ -1034,6 +1096,7 @@ export async function refreshBusinessDomainStatus(slug: string) {
         .from('business_domains')
         .update({
           status: 'error',
+          cloudflare_ssl_validation_records: [],
           cloudflare_verification_errors: [{ message: 'Cloudflare no encontró este custom hostname.' }],
           last_checked_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -1043,7 +1106,7 @@ export async function refreshBusinessDomainStatus(slug: string) {
         .single()
 
       if (updateError) {
-        return { error: updateError.message }
+        return { error: getDomainQueryErrorMessage(updateError) }
       }
 
       return { success: true, domain: updatedDomain as BusinessDomainRecord }
@@ -1051,6 +1114,7 @@ export async function refreshBusinessDomainStatus(slug: string) {
 
     const mappedStatus = mapCloudflareStatus(cloudflareDomain)
     const verificationRecord = extractOwnershipVerificationRecord(cloudflareDomain)
+    logCloudflareValidationDebug('refreshBusinessDomainStatus', currentDomain.hostname, cloudflareDomain)
 
     const { data: updatedDomain, error: updateError } = await supabase
       .from('business_domains')
@@ -1061,7 +1125,11 @@ export async function refreshBusinessDomainStatus(slug: string) {
         cloudflare_ssl_status: cloudflareDomain.ssl?.status ?? null,
         cloudflare_ssl_method: cloudflareDomain.ssl?.method ?? null,
         cloudflare_ownership_verification: cloudflareDomain.ownership_verification ?? {},
-        cloudflare_verification_errors: cloudflareDomain.verification_errors ?? [],
+        cloudflare_ssl_validation_records: cloudflareDomain.ssl?.validation_records ?? [],
+        cloudflare_verification_errors: [
+          ...(cloudflareDomain.verification_errors ?? []),
+          ...(cloudflareDomain.ssl?.validation_errors ?? []),
+        ],
         verification_record_name: verificationRecord.name,
         verification_record_value: verificationRecord.value,
         activated_at: computeActivatedAt(mappedStatus, currentDomain.activated_at),
@@ -1073,7 +1141,7 @@ export async function refreshBusinessDomainStatus(slug: string) {
       .single()
 
     if (updateError) {
-      return { error: updateError.message }
+      return { error: getDomainQueryErrorMessage(updateError) }
     }
 
     revalidatePath(`/dashboard/businesses/${slug}/settings`)
@@ -1113,7 +1181,7 @@ export async function disconnectBusinessDomain(slug: string) {
     .maybeSingle()
 
   if (domainError) {
-    return { error: domainError.message }
+    return { error: getDomainQueryErrorMessage(domainError) }
   }
 
   const currentDomain = (domain as BusinessDomainRecord | null) ?? null
@@ -1136,7 +1204,7 @@ export async function disconnectBusinessDomain(slug: string) {
     .eq('id', currentDomain.id)
 
   if (deleteError) {
-    return { error: deleteError.message }
+    return { error: getDomainQueryErrorMessage(deleteError) }
   }
 
   revalidatePath(`/dashboard/businesses/${slug}/settings`)

@@ -6,9 +6,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronDown, Zap, LogOut, User } from 'lucide-react'
+import { ChevronDown, Zap, LogOut, User, Settings, LayoutDashboard } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { getFeatureSlug } from '@/lib/pageSlugs'
@@ -64,7 +66,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
 
   async function handleLogout() {
     await logout()
-    toast.success('Has cerrado sesion')
+    toast.success('Has cerrado sesión')
     router.refresh()
   }
 
@@ -96,7 +98,19 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
       ? 'Crear cuenta'
       : t.navbar.cta
   const dashboardLabel = 'Dashboard'
-  const logoutLabel = 'Cerrar sesion'
+  const profileLabel = 'Perfil'
+  const settingsLabel = 'Configuración'
+  const logoutLabel = 'Cerrar sesión'
+
+  // Get user initials for avatar
+  const getUserInitials = (email: string | undefined) => {
+    if (!email) return 'U'
+    const parts = email.split('@')[0].split('.')
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return email.substring(0, 2).toUpperCase()
+  }
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white">
@@ -140,26 +154,54 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
             <div className="flex items-center gap-2">
               <Link
                 href={dashboardPath}
-                className="rounded-full bg-slate-900 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-slate-800 sm:px-5 sm:py-2.5 sm:text-sm"
+                className="hidden rounded-full bg-slate-900 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-slate-800 sm:flex sm:px-5 sm:py-2.5 sm:text-sm"
               >
                 {dashboardLabel}
               </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <User className="h-5 w-5" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative h-9 w-9 rounded-full border-2 border-slate-200 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white transition-all hover:border-slate-300 hover:shadow-md"
+                  >
+                    <span className="text-sm font-semibold">
+                      {getUserInitials(user.email)}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="disabled text-xs text-gray-500">
-                    {user.email}
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">Mi cuenta</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href={dashboardPath} className="cursor-pointer">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      {dashboardLabel}
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href={dashboardPath}>{dashboardLabel}</Link>
+                    <Link href="/dashboard/profile" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      {profileLabel}
+                    </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings" className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      {settingsLabel}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleLogout}
-                    className="text-red-600"
+                    className="cursor-pointer text-red-600 focus:text-red-600"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     {logoutLabel}

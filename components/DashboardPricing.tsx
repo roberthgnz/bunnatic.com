@@ -81,12 +81,46 @@ const STRIPE_PRICES = {
   },
 }
 
-export default function DashboardPricing() {
+export default function DashboardPricing({
+  currentPlan = 'starter',
+  currentPriceId = null,
+}: {
+  currentPlan?: string
+  currentPriceId?: string | null
+}) {
   const t = content
   const [isAnnual, setIsAnnual] = useState(false)
   const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null)
 
   const help = HELP_TEXT
+
+  // Map plan to tier ID
+  const planToTierId: Record<string, string> = {
+    starter: 'tier-starter',
+    pro: 'tier-pro',
+    agency: 'tier-agency',
+    scale: 'tier-scale',
+  }
+
+  const currentTierId = planToTierId[currentPlan] || 'tier-starter'
+
+  const getButtonText = (tierId: string) => {
+    if (tierId === currentTierId) {
+      return 'Plan actual'
+    }
+
+    const tierOrder = ['tier-starter', 'tier-pro', 'tier-agency', 'tier-scale']
+    const currentIndex = tierOrder.indexOf(currentTierId)
+    const targetIndex = tierOrder.indexOf(tierId)
+
+    if (targetIndex > currentIndex) {
+      return 'Mejorar plan'
+    } else {
+      return 'Cambiar plan'
+    }
+  }
+
+  const isCurrentPlan = (tierId: string) => tierId === currentTierId
 
   const handleSubscribe = async (tierId: string) => {
     try {
@@ -94,8 +128,17 @@ export default function DashboardPricing() {
 
       const priceId =
         STRIPE_PRICES[tierId as keyof typeof STRIPE_PRICES]?.[
-          isAnnual ? 'yearly' : 'monthly'
+        isAnnual ? 'yearly' : 'monthly'
         ]
+
+      console.log('=== FRONTEND DEBUG ===')
+      console.log('Tier ID:', tierId)
+      console.log('Is Annual:', isAnnual)
+      console.log('Selected priceId:', priceId)
+      console.log('All STRIPE_PRICES:', STRIPE_PRICES)
+      console.log('Environment variables:')
+      console.log('STARTER_MONTHLY:', process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER_MONTHLY)
+      console.log('STARTER_YEARLY:', process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER_YEARLY)
 
       if (!priceId) {
         toast.error('Price not configured for this plan')
@@ -187,14 +230,12 @@ export default function DashboardPricing() {
             aria-pressed={isAnnual}
           >
             <span
-              className={`inline-flex h-7 w-12 shrink-0 items-center rounded-full p-1 transition-colors ${
-                isAnnual ? 'bg-emerald-600' : 'bg-slate-200'
-              }`}
+              className={`inline-flex h-7 w-12 shrink-0 items-center rounded-full p-1 transition-colors ${isAnnual ? 'bg-emerald-600' : 'bg-slate-200'
+                }`}
             >
               <span
-                className={`h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${
-                  isAnnual ? 'translate-x-5' : 'translate-x-0'
-                }`}
+                className={`h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${isAnnual ? 'translate-x-5' : 'translate-x-0'
+                  }`}
               />
             </span>
             <span className="text-right leading-tight sm:text-left sm:leading-none">
@@ -208,22 +249,28 @@ export default function DashboardPricing() {
           {t.pricing.tiers.slice(0, 3).map((tier) => {
             const isStarter = tier.id === 'tier-starter'
             const isLoading = loadingPriceId === tier.id
+            const isCurrent = isCurrentPlan(tier.id)
 
             return (
               <Card
                 key={tier.id}
-                className={`relative flex h-full flex-col overflow-hidden rounded-xl border ${
-                  isStarter
+                className={`relative flex h-full flex-col overflow-hidden rounded-xl border ${isCurrent
+                  ? 'border-emerald-200 bg-emerald-50/60 ring-2 ring-emerald-500'
+                  : isStarter
                     ? 'border-emerald-100 bg-emerald-50/40'
                     : 'border-slate-200 bg-white'
-                }`}
+                  }`}
               >
+                {isCurrent && (
+                  <div className="absolute right-4 top-4 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">
+                    Activo
+                  </div>
+                )}
                 <CardContent className="flex h-full flex-1 flex-col p-5 sm:p-8">
                   <div>
                     <h3
-                      className={`text-2xl font-extrabold sm:text-3xl ${
-                        isStarter ? 'text-emerald-800' : 'text-slate-800'
-                      }`}
+                      className={`text-2xl font-extrabold sm:text-3xl ${isStarter ? 'text-emerald-800' : 'text-slate-800'
+                        }`}
                     >
                       {tier.name}
                     </h3>
@@ -265,20 +312,21 @@ export default function DashboardPricing() {
                   <div className="mt-6">
                     <Button
                       onClick={() => handleSubscribe(tier.id)}
-                      disabled={isLoading}
-                      className={`h-10 w-full rounded-lg px-5 text-sm font-semibold ${
-                        isStarter
+                      disabled={isLoading || isCurrent}
+                      className={`h-10 w-full rounded-lg px-5 text-sm font-semibold ${isCurrent
+                        ? 'bg-slate-300 text-slate-600 cursor-not-allowed'
+                        : isStarter
                           ? 'bg-emerald-600 text-white hover:bg-emerald-700'
                           : 'bg-slate-900 text-white hover:bg-slate-800'
-                      }`}
+                        }`}
                     >
                       {isLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Processing...
+                          Procesando...
                         </>
                       ) : (
-                        tier.cta
+                        getButtonText(tier.id)
                       )}
                     </Button>
                   </div>

@@ -16,9 +16,18 @@ export async function POST(req: Request) {
 
     const { priceId, returnUrl } = await req.json()
 
+    console.log('=== STRIPE CHECKOUT DEBUG ===')
+    console.log('Received priceId:', priceId)
+    console.log('Received returnUrl:', returnUrl)
+
     if (!priceId) {
       return new NextResponse('Price ID is required', { status: 400 })
     }
+
+    // Extract base URL from returnUrl or use APP_URL
+    const baseUrl = returnUrl
+      ? new URL(returnUrl).origin
+      : process.env.APP_URL
 
     // Get user profile to check for existing customer ID
     const { data: profile } = await supabase
@@ -45,6 +54,10 @@ export async function POST(req: Request) {
         .eq('id', user.id)
     }
 
+    console.log('Creating Stripe session with priceId:', priceId)
+    console.log('Customer ID:', customerId)
+    console.log('Base URL:', baseUrl)
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [
@@ -54,8 +67,8 @@ export async function POST(req: Request) {
         },
       ],
       mode: 'subscription',
-      success_url: `${returnUrl || process.env.APP_URL}/dashboard?success=true`,
-      cancel_url: `${returnUrl || process.env.APP_URL}/dashboard?canceled=true`,
+      success_url: `${baseUrl}/dashboard?success=true`,
+      cancel_url: `${baseUrl}/dashboard?canceled=true`,
       subscription_data: {
         metadata: {
           userId: user.id,
@@ -65,6 +78,8 @@ export async function POST(req: Request) {
         userId: user.id,
       },
     })
+
+    console.log('Session created successfully:', session.id)
 
     return NextResponse.json({ url: session.url })
   } catch (error) {

@@ -11,9 +11,10 @@ import {
 import { cn } from '@/lib/utils'
 import { Button, buttonVariants } from '@/components/ui/button'
 import {
+  ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ChevronDownIcon,
+  ChevronUpIcon,
 } from 'lucide-react'
 
 function Calendar({
@@ -159,7 +160,7 @@ function Calendar({
           orientation,
           ...props
         }: React.SVGProps<SVGSVGElement> & {
-          orientation?: 'left' | 'right' | 'down'
+          orientation?: 'left' | 'right' | 'down' | 'up'
         }) => {
           if (orientation === 'left') {
             return (
@@ -173,6 +174,12 @@ function Calendar({
                 className={cn('size-4', className)}
                 {...props}
               />
+            )
+          }
+
+          if (orientation === 'up') {
+            return (
+              <ChevronUpIcon className={cn('size-4', className)} {...props} />
             )
           }
 

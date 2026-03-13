@@ -11,6 +11,7 @@ import {
   buildBusinessSourcePreview as buildBusinessSourcePreviewAction,
   getGenerationEntitlement,
 } from '@/lib/supabase/actions'
+import { RotatingLoaderText } from '@/app/dashboard/_components/RotatingLoaderText'
 import type {
   BusinessSourcePreview,
   GenerationEntitlement,
@@ -132,6 +133,12 @@ export default function SourceGenerationPanel({
           crawling: 'Analizando...',
           previewTitle: 'Preview generado',
           generatingPreview: 'Generando preview...',
+          generatingMessages: [
+            'Analizando fuente de datos...',
+            'Extrayendo información del negocio...',
+            'Generando vista previa...',
+            'Esto puede tardar unos segundos...',
+          ],
           blocksTitle: 'Elige qué aplicar',
           blockProfile: 'Perfil',
           blockProfileDesc: 'Nombre, categoría, descripción y contacto',
@@ -176,6 +183,12 @@ export default function SourceGenerationPanel({
           crawling: 'Analitzant...',
           previewTitle: 'Vista prèvia generada',
           generatingPreview: 'Generant vista prèvia...',
+          generatingMessages: [
+            'Analitzant font de dades...',
+            'Extraient informació del negoci...',
+            'Generant vista prèvia...',
+            'Això pot trigar uns segons...',
+          ],
           blocksTitle: 'Tria què aplicar',
           blockProfile: 'Perfil',
           blockProfileDesc: 'Nom, categoria, descripció i contacte',
@@ -692,9 +705,7 @@ export default function SourceGenerationPanel({
         {(isBuildingPreview || isCrawling) && (
           <div className="animate-in fade-in flex items-center justify-center gap-3 rounded-xl border border-blue-100 bg-blue-50 py-5 duration-300">
             <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-            <span className="text-sm font-medium text-blue-700">
-              {t.generatingPreview}
-            </span>
+            <RotatingLoaderText messages={t.generatingMessages} />
           </div>
         )}
 

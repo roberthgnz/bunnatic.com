@@ -633,6 +633,133 @@ export async function applyBusinessSourceGeneration(input: {
   }
 }
 
+export async function createBusinessFromPreview(input: {
+  sourceType: SourceType
+  preview: BusinessSourcePreview
+}) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  const { preview } = input
+  const name = preview.profile.name || 'Mi Negocio'
+  const slug =
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') +
+    '-' +
+    Math.floor(Math.random() * 1000)
+
+  // 1. Create Business
+  const { data: business, error: businessError } = await supabase
+    .from('businesses')
+    .insert({
+      user_id: user.id,
+      name: name,
+      slug: slug,
+      description: preview.profile.description || `Bienvenido a ${name}`,
+      category: preview.profile.category || 'Negocio Local',
+      address: preview.profile.address,
+      phone: preview.profile.phone,
+      website: preview.profile.website,
+      google_place_id: preview.profile.googlePlaceId,
+      place_data: preview.rawSource || {},
+    })
+    .select()
+    .single()
+
+  if (businessError) return { error: businessError.message }
+
+  const businessId = business.id
+
+  // 2. Create Services
+  if (preview.services.length > 0) {
+    const { error: servicesError } = await supabase.from('services').insert(
+      preview.services.map((s) => ({
+        business_id: businessId,
+        name: s.name,
+        description: s.description,
+      }))
+    )
+    if (servicesError) console.error('Error creating services', servicesError)
+  }
+
+  // 3. Create Hours
+  if (preview.hours.length > 0) {
+    const { error: hoursError } = await supabase.from('working_hours').insert(
+      preview.hours.map((h) => ({
+        business_id: businessId,
+        day_of_week: h.day_of_week,
+        open_time: h.is_closed ? null : h.open_time,
+        close_time: h.is_closed ? null : h.close_time,
+        is_closed: h.is_closed,
+      }))
+    )
+    if (hoursError) console.error('Error creating hours', hoursError)
+  }
+
+  // 4. Create Default Sections
+  const sections = [
+    {
+      type: 'hero',
+      order_index: 0,
+      content: {
+        title: name,
+        subtitle: preview.profile.category
+          ? `El mejor servicio de ${preview.profile.category}`
+          : 'Tu negocio local de confianza',
+        ctaText: 'Contactar ahora',
+      },
+    },
+    {
+      type: 'about',
+      order_index: 1,
+      content: {
+        title: 'Sobre nosotros',
+        text:
+          preview.profile.description ||
+          `En ${name} nos dedicamos a ofrecer el mejor servicio a nuestros clientes.`,
+      },
+    },
+    {
+      type: 'services',
+      order_index: 2,
+      content: {
+        title: 'Nuestros Servicios',
+        services: preview.services.slice(0, 6).map((s) => ({
+          name: s.name,
+          description: s.description || '',
+        })),
+      },
+    },
+    {
+      type: 'contact',
+      order_index: 3,
+      content: {
+        title: 'Contacta con nosotros',
+        address: preview.profile.address,
+        phone: preview.profile.phone,
+        email: '',
+      },
+    },
+  ]
+
+  const { error: sectionsError } = await supabase
+    .from('business_sections')
+    .insert(sections.map((s) => ({ ...s, business_id: businessId })))
+
+  if (sectionsError) console.error('Error creating sections', sectionsError)
+
+  revalidatePath('/dashboard')
+  return { success: true, slug }
+}
+
 export async function signup(formData: FormData) {
   const supabase = await createClient()
 

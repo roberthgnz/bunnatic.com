@@ -9,8 +9,10 @@ import { toast } from 'sonner'
 import {
   applyBusinessSourceGeneration,
   buildBusinessSourcePreview as buildBusinessSourcePreviewAction,
+  createBusinessFromPreview,
   getGenerationEntitlement,
 } from '@/lib/supabase/actions'
+import { RotatingLoaderText } from '@/app/dashboard/_components/RotatingLoaderText'
 import type {
   BusinessSourcePreview,
   GenerationEntitlement,
@@ -140,13 +142,18 @@ export default function GlobalGenerationPanel({
           searchPlaceholder: 'Ej: Restaurante Casa Pepe Madrid',
           searchButton: 'Buscar',
           searching: 'Buscando...',
-          selectBusiness:
-            'Busca un negocio en Google para comenzar.',
+          selectBusiness: 'Busca un negocio en Google para comenzar.',
           urlPlaceholder: 'https://tu-negocio.com',
           crawlButton: 'Analizar URL',
           crawling: 'Analizando...',
           previewTitle: 'Preview generado',
           generatingPreview: 'Generando preview...',
+          generatingMessages: [
+            'Analizando fuente de datos...',
+            'Extrayendo información del negocio...',
+            'Generando vista previa...',
+            'Esto puede tardar unos segundos...',
+          ],
           targetBusinessLabel: 'Aplicar a negocio',
           selectTargetPlaceholder: 'Selecciona un negocio...',
           blocksTitle: 'Elige qué aplicar',
@@ -174,12 +181,15 @@ export default function GlobalGenerationPanel({
           errorPreview: 'No se pudo construir el preview.',
           success: 'Información actualizada correctamente.',
           noBusinesses: 'No tienes negocios creados.',
-          createBusinessFirst: 'Crea un negocio primero para usar esta función.',
+          createBusinessFirst:
+            'Crea un negocio primero para usar esta función.',
+          createNewBusiness: 'Crear nuevo negocio...',
+          createButton: 'Crear negocio',
         },
         ca: {
           title: 'Generador de contingut IA',
           subtitle:
-            'Extreu informació de Google Maps o d\'un web i aplica-la a qualsevol dels teus negocis.',
+            "Extreu informació de Google Maps o d'un web i aplica-la a qualsevol dels teus negocis.",
           sourceLabel: 'Font de dades',
           sourceGoogle: 'Google My Business',
           sourceUrl: 'URL del lloc',
@@ -188,13 +198,18 @@ export default function GlobalGenerationPanel({
           searchPlaceholder: 'Ex: Restaurant Casa Pepe Barcelona',
           searchButton: 'Cercar',
           searching: 'Cercant...',
-          selectBusiness:
-            'Cerca un negoci a Google per començar.',
+          selectBusiness: 'Cerca un negoci a Google per començar.',
           urlPlaceholder: 'https://el-teu-negoci.com',
           crawlButton: 'Analitzar URL',
           crawling: 'Analitzant...',
           previewTitle: 'Vista prèvia generada',
           generatingPreview: 'Generant vista prèvia...',
+          generatingMessages: [
+            'Analitzant font de dades...',
+            'Extraient informació del negoci...',
+            'Generant vista prèvia...',
+            'Això pot trigar uns segons...',
+          ],
           targetBusinessLabel: 'Aplicar a negoci',
           selectTargetPlaceholder: 'Selecciona un negoci...',
           blocksTitle: 'Tria què aplicar',
@@ -222,7 +237,10 @@ export default function GlobalGenerationPanel({
           errorPreview: "No s'ha pogut construir la vista prèvia.",
           success: 'Informació actualitzada correctament.',
           noBusinesses: 'No tens negocis creats.',
-          createBusinessFirst: 'Crea un negoci primer per fer servir aquesta funció.',
+          createBusinessFirst:
+            'Crea un negoci primer per fer servir aquesta funció.',
+          createNewBusiness: 'Crear nou negoci...',
+          createButton: 'Crear negoci',
         },
       })[safeLocale],
     [safeLocale]
@@ -401,6 +419,34 @@ export default function GlobalGenerationPanel({
 
   const handleApply = async () => {
     if (!preview || !selectedBusinessId) return
+
+    if (selectedBusinessId === 'new') {
+      setIsApplying(true)
+      try {
+        const result = await createBusinessFromPreview({
+          sourceType,
+          preview,
+        })
+        if ('error' in result) {
+          toast.error(result.error)
+          return
+        }
+
+        toast.success(t.success)
+        if (result.slug) {
+          router.push(`/dashboard/businesses/${result.slug}`)
+        } else {
+          router.push('/dashboard')
+        }
+      } catch (error) {
+        console.error(error)
+        toast.error(t.errorPreview)
+      } finally {
+        setIsApplying(false)
+      }
+      return
+    }
+
     if (isLimitReached) {
       trackFunnelEvent('limit_blocked', {
         source_type: sourceType,
@@ -447,9 +493,9 @@ export default function GlobalGenerationPanel({
       })
       if (result.entitlement) setEntitlement(result.entitlement)
       else await loadEntitlement()
-      
+
       // Optional: Redirect to business overview or just stay
-      const business = businesses.find(b => b.id === selectedBusinessId)
+      const business = businesses.find((b) => b.id === selectedBusinessId)
       if (business) {
         router.push(`/dashboard/businesses/${business.slug}/overview`)
       } else {
@@ -508,11 +554,14 @@ export default function GlobalGenerationPanel({
           <Building2 className="h-6 w-6 text-slate-500" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">{t.noBusinesses}</h3>
+          <h3 className="text-lg font-semibold text-slate-900">
+            {t.noBusinesses}
+          </h3>
           <p className="text-sm text-slate-500">{t.createBusinessFirst}</p>
         </div>
         <Button onClick={() => router.push('/dashboard/new')}>
-          {t.createBusinessFirst.split(' ')[0]} {/* Simple "Crea" or "Create" */}
+          {t.createBusinessFirst.split(' ')[0]}{' '}
+          {/* Simple "Crea" or "Create" */}
         </Button>
       </div>
     )
@@ -743,9 +792,7 @@ export default function GlobalGenerationPanel({
         {(isBuildingPreview || isCrawling) && (
           <div className="animate-in fade-in flex items-center justify-center gap-3 rounded-xl border border-blue-100 bg-blue-50 py-5 duration-300">
             <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-            <span className="text-sm font-medium text-blue-700">
-              {t.generatingPreview}
-            </span>
+            <RotatingLoaderText messages={t.generatingMessages} />
           </div>
         )}
 
@@ -754,27 +801,32 @@ export default function GlobalGenerationPanel({
           <>
             {preview ? (
               <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5 duration-300">
-                
                 {/* Business Selector (NEW) */}
                 <div className="space-y-2">
-                   <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
+                  <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
                     {t.targetBusinessLabel}
-                   </p>
-                   <Select
-                     value={selectedBusinessId}
-                     onValueChange={setSelectedBusinessId}
-                   >
+                  </p>
+                  <Select
+                    value={selectedBusinessId}
+                    onValueChange={setSelectedBusinessId}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder={t.selectTargetPlaceholder} />
                     </SelectTrigger>
                     <SelectContent>
-                      {businesses.map(b => (
+                      <SelectItem
+                        value="new"
+                        className="font-semibold text-blue-600"
+                      >
+                        {t.createNewBusiness}
+                      </SelectItem>
+                      {businesses.map((b) => (
                         <SelectItem key={b.id} value={b.id}>
                           {b.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
-                   </Select>
+                  </Select>
                 </div>
 
                 {/* Block selector */}
@@ -991,19 +1043,33 @@ export default function GlobalGenerationPanel({
                     type="button"
                     onClick={handleApply}
                     disabled={
-                      isApplying || !hasSelectableBlocks || isLimitReached || !selectedBusinessId
+                      isApplying ||
+                      !selectedBusinessId ||
+                      (selectedBusinessId !== 'new' &&
+                        (isLimitReached || !hasSelectableBlocks))
                     }
                     className="h-12 w-full"
                   >
                     {isApplying ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t.applying}
+                        {selectedBusinessId === 'new'
+                          ? t.createButton
+                          : t.applying}
                       </>
                     ) : (
                       <>
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        {t.applyButton}
+                        {selectedBusinessId === 'new' ? (
+                          <>
+                            <Wand2 className="mr-2 h-4 w-4" />
+                            {t.createButton}
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            {t.applyButton}
+                          </>
+                        )}
                       </>
                     )}
                   </Button>

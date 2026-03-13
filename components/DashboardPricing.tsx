@@ -10,81 +10,43 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import { useLanguage } from './LanguageProvider'
 import { toast } from 'sonner'
 
 const HELP_TEXT = {
-  es: {
-    addons: {
-      'Sección extra 3€/mes':
-        'Añade una sección adicional a tu web actual, ideal para servicios nuevos o promociones.',
-      'Usuario extra 4€/mes':
-        'Invita a otra persona de tu equipo para editar contenido con su propio acceso.',
-      'Web extra 5€/mes':
-        'Crea una web adicional para otra sede, marca o línea de negocio.',
-      'Web extra 4€/mes':
-        'Precio reducido por web adicional cuando ya estás en un plan de mayor capacidad.',
-    },
-    includes: {
-      'Dominio incluido':
-        'Incluye conexión y configuración básica de dominio para publicar sin pasos técnicos.',
-      'SSL seguro':
-        'Tu web se publica con HTTPS para proteger datos y mejorar la confianza de clientes.',
-      'Analítica básica':
-        'Métricas esenciales de visitas y páginas más vistas para medir resultados.',
-      'Todo Esencial': 'Incluye todas las funciones del plan Esencial.',
-      'SEO local':
-        'Optimización para aparecer mejor en búsquedas de tu zona y en Google Maps.',
-      'Soporte prioritario':
-        'Atención más rápida para incidencias o dudas de configuración.',
-      'Todo Impulso': 'Incluye todas las funciones del plan Impulso.',
-      'Reportes personalizados':
-        'Informes adaptados a tu negocio con los indicadores que más te importan.',
-      'Calendario compartido':
-        'Organiza cambios y publicaciones con visibilidad para todo el equipo.',
-      'Todo Equipo': 'Incluye todas las funciones del plan Equipo.',
-      'Analítica avanzada':
-        'Panel con mayor detalle para entender conversión, rendimiento y evolución.',
-      'Soporte dedicado':
-        'Canal de soporte más cercano para acompañamiento continuo.',
-    },
-    fallback: 'Información adicional de esta funcionalidad.',
+  addons: {
+    'Sección extra 3€/mes':
+      'Añade una sección adicional a tu web actual, ideal para servicios nuevos o promociones.',
+    'Usuario extra 4€/mes':
+      'Invita a otra persona de tu equipo para editar contenido con su propio acceso.',
+    'Web extra 5€/mes':
+      'Crea una web adicional para otra sede, marca o línea de negocio.',
+    'Web extra 4€/mes':
+      'Precio reducido por web adicional cuando ya estás en un plan de mayor capacidad.',
   },
-  ca: {
-    addons: {
-      'Secció extra 3€/mes':
-        'Afegeix una secció addicional a la teva web, ideal per nous serveis o promocions.',
-      'Usuari extra 4€/mes':
-        'Convida una altra persona del teu equip per editar contingut amb el seu propi accés.',
-      'Web extra 5€/mes':
-        'Crea una web addicional per a una altra seu, marca o línia de negoci.',
-      'Web extra 4€/mes':
-        'Preu reduit per web addicional quan ja ets en un pla amb més capacitat.',
-    },
-    includes: {
-      'Domini inclòs':
-        'Inclou connexió i configuració bàsica de domini per publicar sense passos tècnics.',
-      'SSL segur':
-        'La teva web es publica amb HTTPS per protegir dades i millorar la confiança dels clients.',
-      'Analítica bàsica':
-        'Mètriques essencials de visites i pàgines més vistes per mesurar resultats.',
-      'Tot Essencial': 'Inclou totes les funcions del pla Essencial.',
-      'SEO local':
-        'Optimització per aparèixer millor en cerques de la teva zona i a Google Maps.',
-      'Suport prioritari':
-        'Atenció més ràpida per incidències o dubtes de configuració.',
-      'Tot Impuls': 'Inclou totes les funcions del pla Impuls.',
-      'Informes personalitzats':
-        "Informes adaptats al teu negoci amb els indicadors que més t'importen.",
-      'Calendari compartit':
-        "Organitza canvis i publicacions amb visibilitat per a tot l'equip.",
-      'Tot Equip': 'Inclou totes les funcions del pla Equip.',
-      'Analítica avançada':
-        'Panell amb més detall per entendre conversió, rendiment i evolució.',
-      'Suport dedicat': 'Canal de suport més proper per acompanyament continu.',
-    },
-    fallback: "Informació addicional d'aquesta funcionalitat.",
+  includes: {
+    'Dominio incluido':
+      'Incluye conexión y configuración básica de dominio para publicar sin pasos técnicos.',
+    'SSL seguro':
+      'Tu web se publica con HTTPS para proteger datos y mejorar la confianza de clientes.',
+    'Analítica básica':
+      'Métricas esenciales de visitas y páginas más vistas para medir resultados.',
+    'Todo Esencial': 'Incluye todas las funciones del plan Esencial.',
+    'SEO local':
+      'Optimización para aparecer mejor en búsquedas de tu zona y en Google Maps.',
+    'Soporte prioritario':
+      'Atención más rápida para incidencias o dudas de configuración.',
+    'Todo Impulso': 'Incluye todas las funciones del plan Impulso.',
+    'Reportes personalizados':
+      'Informes adaptados a tu negocio con los indicadores que más te importan.',
+    'Calendario compartido':
+      'Organiza cambios y publicaciones con visibilidad para todo el equipo.',
+    'Todo Equipo': 'Incluye todas las funciones del plan Equipo.',
+    'Analítica avanzada':
+      'Panel con mayor detalle para entender conversión, rendimiento y evolución.',
+    'Soporte dedicado':
+      'Canal de soporte más cercano para acompañamiento continuo.',
   },
+  fallback: 'Información adicional de esta funcionalidad.',
 } as const
 
 const STRIPE_PRICES = {
@@ -120,12 +82,11 @@ const STRIPE_PRICES = {
 }
 
 export default function DashboardPricing() {
-  const { language } = useLanguage()
-  const t = content[language]
+  const t = content
   const [isAnnual, setIsAnnual] = useState(false)
   const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null)
 
-  const help = HELP_TEXT[language] || HELP_TEXT['es']
+  const help = HELP_TEXT
 
   const handleSubscribe = async (tierId: string) => {
     try {

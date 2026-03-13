@@ -2,8 +2,7 @@
 
 import { content } from '@/lib/content'
 import { Zap } from 'lucide-react'
-import { Link } from '@/i18n/navigation'
-import { useLanguage } from './LanguageProvider'
+import Link from 'next/link'
 import {
   getAlternativeSlug,
   getFeatureSlug,
@@ -12,38 +11,21 @@ import {
 import { CookiePreferencesButton } from '@/components/CookiePreferencesButton'
 
 export default function Footer() {
-  const { language } = useLanguage()
-  const t = content[language]
-  const legalLinks =
-    language === 'es'
-      ? [
-          {
-            label: 'Aviso legal',
-            href: `/${getLegalSlug('aviso-legal', 'es')}`,
-          },
-          {
-            label: 'Política de privacidad',
-            href: `/${getLegalSlug('politica-privacidad', 'es')}`,
-          },
-          {
-            label: 'Política de cookies',
-            href: `/${getLegalSlug('politica-cookies', 'es')}`,
-          },
-        ]
-      : [
-          {
-            label: 'Avís legal',
-            href: `/${getLegalSlug('aviso-legal', 'ca')}`,
-          },
-          {
-            label: 'Política de privacitat',
-            href: `/${getLegalSlug('politica-privacidad', 'ca')}`,
-          },
-          {
-            label: 'Política de cookies',
-            href: `/${getLegalSlug('politica-cookies', 'ca')}`,
-          },
-        ]
+  const t = content
+  const legalLinks = [
+    {
+      label: 'Aviso legal',
+      href: `/${getLegalSlug('aviso-legal', 'es')}`,
+    },
+    {
+      label: 'Política de privacidad',
+      href: `/${getLegalSlug('politica-privacidad', 'es')}`,
+    },
+    {
+      label: 'Política de cookies',
+      href: `/${getLegalSlug('politica-cookies', 'es')}`,
+    },
+  ]
 
   return (
     <footer className="border-t border-slate-200 bg-slate-100 py-16">
@@ -59,21 +41,20 @@ export default function Footer() {
               </span>
             </div>
             <p className="max-w-xs text-sm leading-relaxed font-medium text-slate-600">
-              {language === 'es'
-                ? 'La IA crea tu web usando los datos de tu negocio. Gratis para empezar.'
-                : 'La IA crea la teva web utilitzant les dades del teu negoci. Gratis per començar.'}
+              La IA crea tu web usando los datos de tu negocio. Gratis para
+              empezar.
             </p>
           </div>
 
           <div>
             <h3 className="mb-6 text-sm font-bold tracking-wider text-slate-900 uppercase">
-              {language === 'es' ? 'Características' : 'Característiques'}
+              Características
             </h3>
             <ul className="flex flex-col gap-4 text-sm font-medium text-slate-600">
               {t.features?.map((feature) => (
                 <li key={feature.id}>
                   <Link
-                    href={`/caracteristicas/${getFeatureSlug(feature.id, language)}`}
+                    href={`/caracteristicas/${getFeatureSlug(feature.id, 'es')}`}
                     className="transition-colors hover:text-slate-900"
                   >
                     {feature.title}
@@ -85,18 +66,16 @@ export default function Footer() {
 
           <div>
             <h3 className="mb-6 text-sm font-bold tracking-wider text-slate-900 uppercase">
-              {language === 'es' ? 'Alternativas' : 'Alternatives'}
+              Alternativas
             </h3>
             <ul className="flex flex-col gap-4 text-sm font-medium text-slate-600">
               {t.competitors?.map((competitor) => (
                 <li key={competitor.id}>
                   <Link
-                    href={`/alternativa/${getAlternativeSlug(competitor.id, language)}`}
+                    href={`/alternativa/${getAlternativeSlug(competitor.id, 'es')}`}
                     className="transition-colors hover:text-slate-900"
                   >
-                    {language === 'es'
-                      ? `Alternativa a ${competitor.name}`
-                      : `Alternativa a ${competitor.name}`}
+                    Alternativa a {competitor.name}
                   </Link>
                 </li>
               ))}

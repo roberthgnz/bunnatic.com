@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from '@/i18n/navigation'
-import { useLanguage } from '@/components/LanguageProvider'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Cookie, Shield } from 'lucide-react'
 import {
@@ -23,67 +22,38 @@ import {
 import { cn } from '@/lib/utils'
 import { getLegalSlug } from '@/lib/pageSlugs'
 
-const copy = {
-  es: {
-    badge: 'Cookies',
-    title: 'Cookies y privacidad',
-    description:
-      'Usamos cookies tecnicas para el funcionamiento del sitio. Las cookies se activan solo con tu consentimiento.',
-    policy: 'Politica de cookies',
-    acceptAll: 'Aceptar',
-    rejectAll: 'Rechazar',
-    configure: 'Configurar',
-    preferencesTitle: 'Preferencias de cookies',
-    preferencesDescription:
-      'Puedes activar o desactivar cookies. Las cookies tecnicas son obligatorias.',
-    technicalTitle: 'Cookies tecnicas',
-    technicalDescription:
-      'Necesarias para seguridad, sesion y funciones basicas.',
-    technicalState: 'Siempre activas',
-    analyticsTitle: 'Cookies',
-    analyticsDescription: 'Miden uso y rendimiento para mejorar el producto.',
-    analyticsProvider: 'Proveedor: Google Analytics',
-    analyticsOn: 'Activadas',
-    analyticsOff: 'Desactivadas',
-    save: 'Guardar preferencias',
-  },
-  ca: {
-    badge: 'Cookies',
-    title: 'Cookies i privacitat',
-    description:
-      'Fem servir cookies tecniques per al funcionament del lloc. Les cookies nomes s activen amb el teu consentiment.',
-    policy: 'Politica de cookies',
-    acceptAll: 'Acceptar',
-    rejectAll: 'Rebutjar',
-    configure: 'Configurar',
-    preferencesTitle: 'Preferencies de cookies',
-    preferencesDescription:
-      'Pots activar o desactivar cookies. Les cookies tecniques son obligatories.',
-    technicalTitle: 'Cookies tecniques',
-    technicalDescription:
-      'Necessaries per seguretat, sessio i funcions basiques.',
-    technicalState: 'Sempre actives',
-    analyticsTitle: 'Cookies',
-    analyticsDescription: 'Mesuren us i rendiment per millorar el producte.',
-    analyticsProvider: 'Proveidor: Google Analytics',
-    analyticsOn: 'Activades',
-    analyticsOff: 'Desactivades',
-    save: 'Desar preferencies',
-  },
+const t = {
+  badge: 'Cookies',
+  title: 'Cookies y privacidad',
+  description:
+    'Usamos cookies tecnicas para el funcionamiento del sitio. Las cookies se activan solo con tu consentimiento.',
+  policy: 'Politica de cookies',
+  acceptAll: 'Aceptar',
+  rejectAll: 'Rechazar',
+  configure: 'Configurar',
+  preferencesTitle: 'Preferencias de cookies',
+  preferencesDescription:
+    'Puedes activar o desactivar cookies. Las cookies tecnicas son obligatorias.',
+  technicalTitle: 'Cookies tecnicas',
+  technicalDescription:
+    'Necesarias para seguridad, sesion y funciones basicas.',
+  technicalState: 'Siempre activas',
+  analyticsTitle: 'Cookies',
+  analyticsDescription: 'Miden uso y rendimiento para mejorar el producto.',
+  analyticsProvider: 'Proveedor: Google Analytics',
+  analyticsOn: 'Activadas',
+  analyticsOff: 'Desactivadas',
+  save: 'Guardar preferencias',
 } as const
 
 export function CookieConsent() {
-  const { language } = useLanguage()
-  const t = copy[language]
   const [isMounted, setIsMounted] = useState(false)
   const [hasDecision, setHasDecision] = useState(true)
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const policyHref = useMemo(
-    () => `/${getLegalSlug('politica-cookies', language)}`,
-    [language]
-  )
+  // Use 'es' directly or just the slug since we are removing i18n
+  const policyHref = `/${getLegalSlug('politica-cookies', 'es')}`
 
   useEffect(() => {
     const syncFromCookie = () => {

@@ -7,11 +7,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { useLanguage } from './LanguageProvider'
 
 export default function FAQ() {
-  const { language } = useLanguage()
-  const t = content[language]
+  const t = content
 
   return (
     <section className="border-b border-slate-200 bg-slate-50 py-16 sm:py-24 lg:py-28">

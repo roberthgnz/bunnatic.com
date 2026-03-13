@@ -11,7 +11,6 @@ import {
 import { ChevronDown, Zap, LogOut, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
-import { useLanguage } from './LanguageProvider'
 import { getFeatureSlug } from '@/lib/pageSlugs'
 import { createClient } from '@/lib/supabase/client'
 import { Suspense, useEffect, useState } from 'react'
@@ -36,8 +35,7 @@ export default function Navbar(props: NavbarProps) {
 }
 
 function NavbarContent({ useDemoCta = false }: NavbarProps) {
-  const { language, setLanguage } = useLanguage()
-  const t = content[language]
+  const t = content
   const pathname = usePathname() ?? '/'
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -70,18 +68,14 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   }
 
   const segments = pathname.split('/').filter(Boolean)
-  const locale = segments[0]
-  const hasLocale = locale === 'es' || locale === 'ca'
-  const isCreatePage = hasLocale
-    ? segments[1] === 'crear-pagina-web-negocio' || segments[1] === 'crear'
-    : segments[0] === 'crear-pagina-web-negocio' || segments[0] === 'crear'
-  const targetPath = hasLocale
-    ? `/${locale}/crear-pagina-web-negocio`
-    : '/crear-pagina-web-negocio'
-  const checkoutPath = hasLocale ? `/${locale}/checkout` : '/checkout'
-  const homePath = hasLocale ? `/${locale}` : '/'
-  const signupPath = hasLocale ? `/${locale}/signup` : '/signup'
-  const dashboardPath = hasLocale ? `/${locale}/dashboard` : '/dashboard'
+  // Logic simplified since we only have one locale (or no locale prefix)
+  const isCreatePage =
+    segments[0] === 'crear-pagina-web-negocio' || segments[0] === 'crear'
+  const targetPath = '/crear-pagina-web-negocio'
+  const checkoutPath = '/checkout'
+  const homePath = '/'
+  const signupPath = '/signup'
+  const dashboardPath = '/dashboard'
   const source = `${pathname}${paramsText ? `?${paramsText}` : ''}`
   const demoHref = `${targetPath}?source=${encodeURIComponent(source)}`
   const signupParams = new URLSearchParams(paramsText)
@@ -96,16 +90,12 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
       ? signupFromCreateHref
       : targetPath
   const ctaText = useDemoCta
-    ? language === 'ca'
-      ? 'Provar demo ara'
-      : 'Ver en accion'
+    ? 'Ver en accion'
     : isCreatePage
-      ? language === 'ca'
-        ? 'Crear compte'
-        : 'Crear cuenta'
+      ? 'Crear cuenta'
       : t.navbar.cta
   const dashboardLabel = 'Dashboard'
-  const logoutLabel = language === 'ca' ? 'Tancar sessio' : 'Cerrar sesion'
+  const logoutLabel = 'Cerrar sesion'
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white">
@@ -135,7 +125,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
               {t.navbar.coreFeatures.map((feature) => (
                 <DropdownMenuItem key={feature.id} asChild>
                   <Link
-                    href={`${hasLocale ? `/${locale}` : ''}/caracteristicas/${getFeatureSlug(feature.id, language)}`}
+                    href={`/caracteristicas/${getFeatureSlug(feature.id, 'es')}`}
                     className="block rounded-md px-2 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
                   >
                     {feature.label}
@@ -144,25 +134,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="hidden items-center gap-2 text-sm font-medium text-slate-500 sm:flex">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`hidden transition-colors hover:text-slate-900 sm:flex ${language === 'es' ? 'font-bold text-slate-900' : ''}`}
-              onClick={() => setLanguage('es')}
-            >
-              ES
-            </Button>
-            <span>|</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`hidden transition-colors hover:text-slate-900 sm:flex ${language === 'ca' ? 'font-bold text-slate-900' : ''}`}
-              onClick={() => setLanguage('ca')}
-            >
-              CA
-            </Button>
-          </div>
+
           {user ? (
             <div className="flex items-center gap-2">
               <Link
@@ -200,7 +172,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
               onClick={() =>
                 trackFunnelEvent('landing_cta_click', {
                   placement: 'navbar',
-                  locale: language,
+                  locale: 'es',
                 })
               }
               className="rounded-full bg-slate-900 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-slate-800 sm:px-5 sm:py-2.5 sm:text-sm"

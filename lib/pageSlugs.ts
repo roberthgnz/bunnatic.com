@@ -1,57 +1,30 @@
-export type Locale = 'es' | 'ca'
 
-const featureSlugByLocale = {
-  es: {
-    'generacion-ia': 'generacion-ia',
-    'seo-local': 'seo-local',
-    'edicion-asistida': 'edicion-asistida',
-    'formularios-contacto': 'formularios-contacto',
-    'hosting-dominio': 'hosting-dominio',
-  },
-  ca: {
-    'generacion-ia': 'generacio-ia',
-    'seo-local': 'seo-local',
-    'edicion-asistida': 'edicio-assistida',
-    'formularios-contacto': 'formularis-contacte',
-    'hosting-dominio': 'hosting-domini',
-  },
+const featureSlugs = {
+  'generacion-ia': 'generacion-ia',
+  'seo-local': 'seo-local',
+  'edicion-asistida': 'edicion-asistida',
+  'formularios-contacto': 'formularios-contacto',
+  'hosting-dominio': 'hosting-dominio',
 } as const
 
-const alternativeSlugByLocale = {
-  es: {
-    facebook: 'facebook',
-    instagram: 'instagram',
-    'google-my-business': 'google-my-business',
-    wordpress: 'wordpress',
-    wix: 'wix',
-    squarespace: 'squarespace',
-  },
-  ca: {
-    facebook: 'facebook',
-    instagram: 'instagram',
-    'google-my-business': 'google-my-business',
-    wordpress: 'wordpress',
-    wix: 'wix',
-    squarespace: 'squarespace',
-  },
+const alternativeSlugs = {
+  facebook: 'facebook',
+  instagram: 'instagram',
+  'google-my-business': 'google-my-business',
+  wordpress: 'wordpress',
+  wix: 'wix',
+  squarespace: 'squarespace',
 } as const
 
-const legalSlugByLocale = {
-  es: {
-    'aviso-legal': 'aviso-legal',
-    'politica-privacidad': 'politica-privacidad',
-    'politica-cookies': 'politica-cookies',
-  },
-  ca: {
-    'aviso-legal': 'avis-legal',
-    'politica-privacidad': 'politica-privacitat',
-    'politica-cookies': 'politica-cookies',
-  },
+const legalSlugs = {
+  'aviso-legal': 'aviso-legal',
+  'politica-privacidad': 'politica-privacidad',
+  'politica-cookies': 'politica-cookies',
 } as const
 
-type FeatureId = keyof (typeof featureSlugByLocale)['es']
-type AlternativeId = keyof (typeof alternativeSlugByLocale)['es']
-type LegalId = keyof (typeof legalSlugByLocale)['es']
+type FeatureId = keyof typeof featureSlugs
+type AlternativeId = keyof typeof alternativeSlugs
+type LegalId = keyof typeof legalSlugs
 
 function reverseMap<T extends Record<string, string>>(
   source: T
@@ -61,74 +34,30 @@ function reverseMap<T extends Record<string, string>>(
   ) as Record<string, keyof T>
 }
 
-const featureIdBySlugByLocale = {
-  es: reverseMap(featureSlugByLocale.es),
-  ca: reverseMap(featureSlugByLocale.ca),
+const featureIdBySlug = reverseMap(featureSlugs)
+const alternativeIdBySlug = reverseMap(alternativeSlugs)
+const legalIdBySlug = reverseMap(legalSlugs)
+
+export function getFeatureSlug(id: string): string {
+  return featureSlugs[id as FeatureId] ?? id
 }
 
-const alternativeIdBySlugByLocale = {
-  es: reverseMap(alternativeSlugByLocale.es),
-  ca: reverseMap(alternativeSlugByLocale.ca),
+export function getAlternativeSlug(id: string): string {
+  return alternativeSlugs[id as AlternativeId] ?? id
 }
 
-const legalIdBySlugByLocale = {
-  es: reverseMap(legalSlugByLocale.es),
-  ca: reverseMap(legalSlugByLocale.ca),
+export function getLegalSlug(id: string): string {
+  return legalSlugs[id as LegalId] ?? id
 }
 
-export function getFeatureSlug(id: string, locale: Locale): string {
-  return (
-    featureSlugByLocale[locale][id as FeatureId] ??
-    featureSlugByLocale.es[id as FeatureId] ??
-    id
-  )
+export function resolveFeatureIdFromSlug(slug: string): string | null {
+  return (featureIdBySlug[slug] as string | undefined) ?? null
 }
 
-export function getAlternativeSlug(id: string, locale: Locale): string {
-  return (
-    alternativeSlugByLocale[locale][id as AlternativeId] ??
-    alternativeSlugByLocale.es[id as AlternativeId] ??
-    id
-  )
+export function resolveAlternativeIdFromSlug(slug: string): string | null {
+  return (alternativeIdBySlug[slug] as string | undefined) ?? null
 }
 
-export function getLegalSlug(id: string, locale: Locale): string {
-  return (
-    legalSlugByLocale[locale][id as LegalId] ??
-    legalSlugByLocale.es[id as LegalId] ??
-    id
-  )
-}
-
-export function resolveFeatureIdFromSlug(
-  slug: string,
-  locale: Locale
-): string | null {
-  return (
-    (featureIdBySlugByLocale[locale][slug] as string | undefined) ??
-    (featureIdBySlugByLocale.es[slug] as string | undefined) ??
-    null
-  )
-}
-
-export function resolveAlternativeIdFromSlug(
-  slug: string,
-  locale: Locale
-): string | null {
-  return (
-    (alternativeIdBySlugByLocale[locale][slug] as string | undefined) ??
-    (alternativeIdBySlugByLocale.es[slug] as string | undefined) ??
-    null
-  )
-}
-
-export function resolveLegalIdFromSlug(
-  slug: string,
-  locale: Locale
-): string | null {
-  return (
-    (legalIdBySlugByLocale[locale][slug] as string | undefined) ??
-    (legalIdBySlugByLocale.es[slug] as string | undefined) ??
-    null
-  )
+export function resolveLegalIdFromSlug(slug: string): string | null {
+  return (legalIdBySlug[slug] as string | undefined) ?? null
 }

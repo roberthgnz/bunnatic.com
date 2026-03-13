@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from 'sonner'
 import { GoogleAnalytics } from '@/components/GoogleAnalytics'
+import { CookieConsent } from '@/components/CookieConsent'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
 const gaTrackingId = process.env.NEXT_PUBLIC_GA_TRACKING_ID
@@ -30,6 +31,7 @@ export default function RootLayout({
         <TooltipProvider>
           {gaTrackingId ? <GoogleAnalytics trackingId={gaTrackingId} /> : null}
           {children}
+          <CookieConsent />
           <Toaster position="top-center" richColors />
         </TooltipProvider>
       </body>

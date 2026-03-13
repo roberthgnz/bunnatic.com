@@ -5,7 +5,6 @@ import { Check, X } from 'lucide-react'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useMemo, useState } from 'react'
-import { useLanguage } from './LanguageProvider'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 type ComparisonConfig = {
@@ -37,8 +36,7 @@ const logoByCompetitorId = {
 } as const
 
 export default function Comparison({ alternativeId }: ComparisonProps) {
-  const { language } = useLanguage()
-  const t = content[language]
+  const t = content
   const pathname = usePathname()
 
   const normalizedName = (name: string) =>
@@ -70,12 +68,10 @@ export default function Comparison({ alternativeId }: ComparisonProps) {
     )
   }, [competitors, selectedCompetitorId])
 
-  const comparatorLabel = language === 'ca' ? 'Només amb' : 'Con solo'
+  const comparatorLabel = 'Con solo'
   const versusLabel = 'Bunnatic'
   const contextualCaption = (platformName: string) =>
-    language === 'ca'
-      ? `${platformName} ajuda, però la teva web és la que converteix visites en clients.`
-      : `${platformName} ayuda, pero tu web es la que convierte visitas en clientes.`
+    `${platformName} ayuda, pero tu web es la que convierte visitas en clientes.`
 
   const comparison: ComparisonConfig = competitor
     ? {

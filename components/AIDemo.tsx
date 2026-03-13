@@ -2,12 +2,10 @@
 
 import { content } from '@/lib/content'
 import { Bot, User, Sparkles } from 'lucide-react'
-import { useLanguage } from './LanguageProvider'
 import { Card, CardContent } from '@/components/ui/card'
 
 export default function AIDemo() {
-  const { language } = useLanguage()
-  const t = content[language]
+  const t = content
 
   return (
     <section className="border-b border-slate-200 bg-slate-50 py-16 sm:py-24 lg:py-28">

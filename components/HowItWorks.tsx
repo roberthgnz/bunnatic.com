@@ -8,12 +8,10 @@ import {
   MessageCircle,
   Search,
 } from 'lucide-react'
-import { useLanguage } from './LanguageProvider'
 import { Card, CardContent } from '@/components/ui/card'
 
 export default function HowItWorks() {
-  const { language } = useLanguage()
-  const t = content[language]
+  const t = content
   const steps = [...t.howItWorks.steps].sort(
     (a, b) => Number(a.number) - Number(b.number)
   )

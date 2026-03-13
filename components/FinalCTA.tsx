@@ -3,48 +3,36 @@
 import { content } from '@/lib/content'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { useLanguage } from './LanguageProvider'
-import { usePathname } from 'next/navigation'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
 
 export default function FinalCTA() {
-  const { language } = useLanguage()
-  const t = content[language]
-  const pathname = usePathname() ?? '/'
-  const locale = pathname.split('/').filter(Boolean)[0]
-  const hasLocale = locale === 'es' || locale === 'ca'
-  const targetPath = hasLocale
-    ? `/${locale}/crear-pagina-web-negocio`
-    : '/crear-pagina-web-negocio'
+  const t = content
+  const targetPath = '/crear-pagina-web-negocio'
 
   return (
-    <section className="border-b border-slate-200 bg-white py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
-            {t.finalCta.title}
-          </h2>
-          <p className="mt-5 text-xl leading-8 font-bold text-emerald-800 sm:text-3xl">
-            {t.finalCta.subtitle}
+    <section className="bg-emerald-900 py-16 text-center sm:py-24 lg:py-28">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl">
+          <span className="block">{t.finalCta.title}</span>
+          <span className="block text-emerald-300">{t.finalCta.subtitle}</span>
+        </h2>
+        <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:mt-10">
+          <Link
+            href={targetPath}
+            onClick={() =>
+              trackFunnelEvent('landing_cta_click', {
+                placement: 'final_cta',
+                locale: 'es',
+              })
+            }
+            className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-base font-bold text-emerald-900 transition-colors hover:bg-emerald-50 sm:px-8 sm:py-4 sm:text-lg"
+          >
+            {t.finalCta.cta.replace(' →', '')}
+            <ArrowRight className="h-5 w-5" />
+          </Link>
+          <p className="text-sm font-medium text-emerald-200/80">
+            {t.finalCta.trustText}
           </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-5">
-            <Link
-              href={targetPath}
-              onClick={() =>
-                trackFunnelEvent('landing_cta_click', {
-                  placement: 'final_cta',
-                  locale: language,
-                })
-              }
-              className="inline-flex items-center gap-2 rounded-full bg-emerald-700 px-8 py-4 text-lg font-bold text-white transition-colors hover:bg-emerald-800"
-            >
-              {t.finalCta.cta.replace(' →', '')}
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-            <p className="text-sm font-medium text-slate-500">
-              {t.finalCta.trustText}
-            </p>
-          </div>
         </div>
       </div>
     </section>

@@ -3,19 +3,11 @@
 import { content } from '@/lib/content'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { useLanguage } from './LanguageProvider'
-import { usePathname } from 'next/navigation'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
 
 export default function Hero() {
-  const { language } = useLanguage()
-  const t = content[language]
-  const pathname = usePathname() ?? '/'
-  const locale = pathname.split('/').filter(Boolean)[0]
-  const hasLocale = locale === 'es' || locale === 'ca'
-  const targetPath = hasLocale
-    ? `/${locale}/crear-pagina-web-negocio`
-    : '/crear-pagina-web-negocio'
+  const t = content
+  const targetPath = '/crear-pagina-web-negocio'
 
   return (
     <section className="border-b border-slate-200 bg-white px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
@@ -43,7 +35,7 @@ export default function Hero() {
             onClick={() =>
               trackFunnelEvent('landing_cta_click', {
                 placement: 'hero',
-                locale: language,
+                locale: 'es',
               })
             }
             className="inline-flex items-center gap-2 rounded-full bg-emerald-700 px-7 py-3 text-base font-semibold text-white transition-colors hover:bg-emerald-800 sm:px-8 sm:py-4 sm:text-lg"

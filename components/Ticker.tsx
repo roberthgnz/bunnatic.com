@@ -3,7 +3,6 @@
 import { content } from '@/lib/content'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useLanguage } from './LanguageProvider'
 
 const slugify = (text: string) => {
   return text
@@ -44,8 +43,7 @@ const getBusinessSlug = (business: string) => {
 }
 
 export default function Ticker() {
-  const { language } = useLanguage()
-  const t = content[language]
+  const t = content
   const [isPaused, setIsPaused] = useState(false)
 
   return (

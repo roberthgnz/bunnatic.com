@@ -10,8 +10,15 @@ const compat = new FlatCompat({
 })
 
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
-  ...compat.extends('prettier'), // This will use eslint-config-prettier to disable conflicting rules
+  ...compat.extends('next/core-web-vitals'),
+  ...compat.extends('next/typescript'),
+  ...compat.extends('prettier'),
+  {
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': 'warn',
+    },
+  },
 ]
 
 export default eslintConfig

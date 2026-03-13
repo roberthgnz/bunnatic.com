@@ -88,8 +88,13 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
                         savedState.crawlJobId,
                         savedState.crawlUrl,
                         async (result) => {
-                            await previewGen.buildPreview('url', result, (preview) => {
-                                setSelectedBlocks(getDefaultSelectedBlocks(preview))
+                            await previewGen.buildPreview('url', result, (preview, entitlement) => {
+                                if (entitlement) {
+                                    setEntitlement(entitlement)
+                                }
+                                if (preview) {
+                                    setSelectedBlocks(getDefaultSelectedBlocks(preview))
+                                }
                             })
                         }
                     )
@@ -169,8 +174,13 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
             const data = (await response.json()) as { result?: unknown; error?: string }
             if (!response.ok || !data.result) throw new Error(data.error || t.errorDetails)
 
-            await previewGen.buildPreview('google', data.result, (preview) => {
-                setSelectedBlocks(getDefaultSelectedBlocks(preview))
+            await previewGen.buildPreview('google', data.result, (preview, entitlement) => {
+                if (entitlement) {
+                    setEntitlement(entitlement)
+                }
+                if (preview) {
+                    setSelectedBlocks(getDefaultSelectedBlocks(preview))
+                }
             })
         } catch (error) {
             console.error(error)
@@ -181,8 +191,13 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
     const handleCrawlUrl = async (values: { url: string }) => {
         resetGeneratedState()
         await urlCrawl.handleCrawl(values, async (result) => {
-            await previewGen.buildPreview('url', result, (preview) => {
-                setSelectedBlocks(getDefaultSelectedBlocks(preview))
+            await previewGen.buildPreview('url', result, (preview, entitlement) => {
+                if (entitlement) {
+                    setEntitlement(entitlement)
+                }
+                if (preview) {
+                    setSelectedBlocks(getDefaultSelectedBlocks(preview))
+                }
             })
         })
     }

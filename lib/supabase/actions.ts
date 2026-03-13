@@ -393,8 +393,48 @@ export async function buildBusinessSourcePreview(input: {
     return { error: 'Not authenticated' }
   }
 
+  // Check entitlement before building preview
+  const entitlementResult = await getGenerationEntitlementInternal(user.id)
+  if ('error' in entitlementResult) {
+    return { error: entitlementResult.error }
+  }
+
+  const { entitlement } = entitlementResult
+  if (entitlement.isLimited && (entitlement.remaining ?? 0) <= 0) {
+    return {
+      error: 'Has alcanzado el límite mensual de generaciones de tu plan.',
+      limitBlocked: true,
+      entitlement,
+    }
+  }
+
+  // Build the preview
   const preview = buildBusinessSourcePreviewPayload(input)
-  return { preview }
+
+  // Consume quota by recording the preview generation
+  const { error: insertError } = await supabase
+    .from('business_generation_usage')
+    .insert({
+      user_id: user.id,
+      business_id: null, // No business yet, just preview
+      source_type: input.sourceType,
+    })
+
+  if (insertError) {
+    console.error('Failed to record generation usage:', insertError)
+    // Don't fail the preview generation, just log the error
+  }
+
+  // Get updated entitlement
+  const nextEntitlementResult = await getGenerationEntitlementInternal(user.id)
+  const nextEntitlement = 'error' in nextEntitlementResult
+    ? entitlement
+    : nextEntitlementResult.entitlement
+
+  return {
+    preview,
+    entitlement: nextEntitlement,
+  }
 }
 
 export async function consumeGenerationQuota(
@@ -512,19 +552,10 @@ export async function applyBusinessSourceGeneration(input: {
     return { error: 'No tienes permisos sobre este negocio.' }
   }
 
-  const quotaResult = await consumeGenerationQuota(
-    user.id,
-    input.businessId,
-    input.sourceType
-  )
-  if (!quotaResult.allowed) {
-    return {
-      error: quotaResult.error ?? 'No se pudo consumir cuota de generación.',
-      limitBlocked: Boolean(quotaResult.limitBlocked),
-      entitlement: quotaResult.entitlement,
-      remaining: quotaResult.remaining,
-    }
-  }
+  // Note: Quota was already consumed when building the preview
+  // Just get current entitlement for UI update
+  const entitlementResult = await getGenerationEntitlementInternal(user.id)
+  const entitlement = 'error' in entitlementResult ? null : entitlementResult.entitlement
 
   const updatedBlocks: SourceBlock[] = []
   const preview = input.previewPayload
@@ -628,8 +659,7 @@ export async function applyBusinessSourceGeneration(input: {
   return {
     success: true,
     updatedBlocks,
-    entitlement: quotaResult.entitlement,
-    remaining: quotaResult.remaining,
+    entitlement: entitlement ?? undefined,
   }
 }
 
@@ -812,10 +842,10 @@ export async function getProfile() {
   return profile
     ? { ...profile, email: user.email }
     : {
-        id: user.id,
-        full_name: user.user_metadata?.full_name || null,
-        email: user.email,
-      }
+      id: user.id,
+      full_name: user.user_metadata?.full_name || null,
+      email: user.email,
+    }
 }
 
 export async function updateProfile(formData: FormData) {
@@ -1468,8 +1498,8 @@ export async function refreshBusinessDomainStatus(slug: string) {
   try {
     const cloudflareDomain = currentDomain.cloudflare_custom_hostname_id
       ? await getCloudflareCustomHostname(
-          currentDomain.cloudflare_custom_hostname_id
-        )
+        currentDomain.cloudflare_custom_hostname_id
+      )
       : await findCloudflareCustomHostnameByHostname(currentDomain.hostname)
 
     if (!cloudflareDomain) {

@@ -83,6 +83,15 @@ The component now properly cleans up ALL state when:
 - ✅ Clears both Redis persistence AND local component state
 - ✅ Resets to initial state for next generation
 
+### Quota Management
+Generation quota is now consumed at preview time:
+- ✅ Quota consumed when building preview (Google search or URL crawl)
+- ✅ Quota check happens BEFORE generating preview
+- ✅ User sees updated quota immediately after preview generation
+- ✅ Applying preview to business does NOT consume additional quota
+- ✅ Creating new business from preview does NOT consume additional quota
+- ✅ One preview = one quota usage, regardless of how many times it's applied
+
 ## 📚 Usage Examples
 
 ### Using Custom Hooks

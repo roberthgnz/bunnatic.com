@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { buildBusinessSourcePreview as buildBusinessSourcePreviewAction } from '@/lib/supabase/actions'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
-import type { BusinessSourcePreview, SourceType } from '@/lib/businessSourceGeneration'
-import { getDefaultSelectedBlocks } from '../utils'
+import type { BusinessSourcePreview, SourceType, GenerationEntitlement } from '@/lib/businessSourceGeneration'
 
 export function usePreviewGeneration(locale: string, errorMessage: string) {
     const [isBuildingPreview, setIsBuildingPreview] = useState(false)
@@ -12,7 +11,7 @@ export function usePreviewGeneration(locale: string, errorMessage: string) {
     const buildPreview = async (
         sourceType: SourceType,
         sourcePayload: unknown,
-        onSuccess: (preview: BusinessSourcePreview) => void
+        onSuccess: (preview: BusinessSourcePreview, entitlement?: GenerationEntitlement) => void
     ) => {
         setIsBuildingPreview(true)
 
@@ -21,11 +20,24 @@ export function usePreviewGeneration(locale: string, errorMessage: string) {
                 sourceType,
                 sourcePayload,
             })
-            if ('error' in result || !result.preview) throw new Error('Preview error')
+
+            if ('error' in result) {
+                if (result.limitBlocked) {
+                    toast.error(result.error)
+                    // Return entitlement if available to update UI
+                    if (result.entitlement) {
+                        onSuccess(null as any, result.entitlement)
+                    }
+                    return
+                }
+                throw new Error(result.error || 'Preview error')
+            }
+
+            if (!result.preview) throw new Error('Preview error')
 
             const nextPreview = result.preview
             setPreview(nextPreview)
-            onSuccess(nextPreview)
+            onSuccess(nextPreview, result.entitlement)
 
             trackFunnelEvent('preview_generated', {
                 source_type: sourceType,
@@ -51,3 +63,4 @@ export function usePreviewGeneration(locale: string, errorMessage: string) {
         setPreview,
     }
 }
+

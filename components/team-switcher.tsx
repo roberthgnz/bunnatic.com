@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { ChevronsUpDown, Plus } from 'lucide-react'
+import { ChevronsUpDown, Plus, Building2 } from 'lucide-react'
 
 import {
   DropdownMenu,
@@ -22,7 +22,7 @@ import {
 
 type TeamItem = {
   name: string
-  logo: React.ElementType
+  logo?: React.ElementType
   plan: string
   href?: string
 }
@@ -69,12 +69,13 @@ export function TeamSwitcher({
   }
 
   if (!mounted) {
+    const Logo = activeTeam.logo || Building2
     return (
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton size="lg">
             <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-              <activeTeam.logo className="size-4" />
+              <Logo className="size-4" />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{activeTeam.name}</span>
@@ -87,6 +88,8 @@ export function TeamSwitcher({
     )
   }
 
+  const ActiveLogo = activeTeam.logo || Building2
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -97,7 +100,7 @@ export function TeamSwitcher({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeTeam.logo className="size-4" />
+                <ActiveLogo className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{activeTeam.name}</span>
@@ -115,32 +118,35 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               {teamLabel}
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
-              <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
-                className="gap-2 p-2"
-                asChild={Boolean(team.href)}
-              >
-                {team.href ? (
-                  <Link href={team.href}>
-                    <div className="flex size-6 items-center justify-center rounded-md border">
-                      <team.logo className="size-3.5 shrink-0" />
-                    </div>
-                    {team.name}
-                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-                  </Link>
-                ) : (
-                  <>
-                    <div className="flex size-6 items-center justify-center rounded-md border">
-                      <team.logo className="size-3.5 shrink-0" />
-                    </div>
-                    {team.name}
-                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-                  </>
-                )}
-              </DropdownMenuItem>
-            ))}
+            {teams.map((team, index) => {
+              const TeamLogo = team.logo || Building2
+              return (
+                <DropdownMenuItem
+                  key={team.name}
+                  onClick={() => setActiveTeam(team)}
+                  className="gap-2 p-2"
+                  asChild={Boolean(team.href)}
+                >
+                  {team.href ? (
+                    <Link href={team.href}>
+                      <div className="flex size-6 items-center justify-center rounded-md border">
+                        <TeamLogo className="size-3.5 shrink-0" />
+                      </div>
+                      {team.name}
+                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                    </Link>
+                  ) : (
+                    <>
+                      <div className="flex size-6 items-center justify-center rounded-md border">
+                        <TeamLogo className="size-3.5 shrink-0" />
+                      </div>
+                      {team.name}
+                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                    </>
+                  )}
+                </DropdownMenuItem>
+              )
+            })}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="gap-2 p-2"

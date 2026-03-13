@@ -1,5 +1,3 @@
-'use client'
-
 import {
   Sidebar,
   SidebarContent,
@@ -8,21 +6,10 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
 import {
   DropdownMenu,
@@ -31,152 +18,64 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import {
-  Building2,
-  Home,
-  PlusCircle,
-  Settings,
-  HelpCircle,
-  Search,
-  ChevronDown,
-  MessageSquarePlus,
-  Bug,
-  Lightbulb,
-} from 'lucide-react'
+import { ChevronDown, MessageSquarePlus, Bug, Lightbulb } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { logout } from '@/lib/supabase/actions'
-import { useEffect, useState } from 'react'
 import { TeamSwitcher } from '@/components/team-switcher'
 import { NavUser } from '@/components/nav-user'
+import { SidebarMainItems, SidebarTopItems } from './SidebarNav'
+import { DashboardBreadcrumbs } from './DashboardBreadcrumbs'
+import { createClient } from '@/lib/supabase/server'
+import { mapStripePriceIdToGenerationPlan } from '@/lib/businessSourceGeneration'
+import { dashboardContent } from './dashboard-constants'
 
-const dashboardContent = {
-  title: 'Bunnatic',
-  enterprise: 'Enterprise',
-  platform: 'Plataforma',
-  businesses: 'Negocios',
-  addBusiness: 'Agregar negocio',
-  menu: {
-    dashboard: 'Inicio',
-    businesses: 'Mis negocios',
-    newBusiness: 'Crear negocio',
-    settings: 'Configuración',
-    getHelp: 'Obtener ayuda',
-    search: 'Buscar',
-    giveFeedback: 'Dar feedback',
-    feedbackIssue: 'Incidencia',
-    feedbackIdea: 'Idea',
-    account: 'Cuenta',
-    billing: 'Facturación',
-    notifications: 'Notificaciones',
-    logout: 'Cerrar sesión',
-  },
-  plans: {
-    starter: 'Esencial',
-    pro: 'Impulso',
-    agency: 'Equipo',
-    scale: 'Expansión',
-  },
-} as const
-
-export default function DashboardShell({
+export default async function DashboardShell({
   children,
 }: {
   children: React.ReactNode
 }) {
   const t = dashboardContent
-  const pathname = usePathname()
-  const [userProfile, setUserProfile] = useState<{
-    full_name?: string | null
-    email?: string | null
-    avatar_url?: string | null
-    plan?: string
-  } | null>(null)
-  const [businesses, setBusinesses] = useState<
-    Array<{ id: string; name: string; slug: string }>
-  >([])
-
   const localePrefix = ''
 
-  useEffect(() => {
-    async function loadProfile() {
-      try {
-        const response = await fetch('/api/profile')
-        if (response.ok) {
-          const data = await response.json()
-          setUserProfile(data)
-        }
-      } catch (error) {
-        console.error('Failed to load profile:', error)
-      }
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  let userProfile = null
+  let businesses: { id: string; name: string; slug: string }[] = []
+
+  if (user) {
+    const [profileRes, businessesRes] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('full_name, avatar_url, stripe_price_id')
+        .eq('id', user.id)
+        .maybeSingle(),
+      supabase
+        .from('businesses')
+        .select('id, name, slug')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false }),
+    ])
+
+    const profileData = profileRes.data
+    const businessesData = businessesRes.data || []
+
+    const plan = mapStripePriceIdToGenerationPlan(
+      profileData?.stripe_price_id ?? null
+    )
+
+    userProfile = {
+      full_name:
+        profileData?.full_name || user?.user_metadata?.full_name || null,
+      email: user.email,
+      avatar_url: profileData?.avatar_url || null,
+      plan,
     }
-    loadProfile()
-  }, [])
 
-  useEffect(() => {
-    async function loadBusinesses() {
-      try {
-        const response = await fetch('/api/businesses')
-        if (response.ok) {
-          const data = await response.json()
-          setBusinesses(data)
-        }
-      } catch (error) {
-        console.error('Failed to load businesses:', error)
-      }
-    }
-    loadBusinesses()
-  }, [])
-
-  const topNavItems = [
-    {
-      id: 'settings',
-      href: `${localePrefix}/dashboard/settings`,
-      icon: Settings,
-      label: t.menu.settings,
-      active: pathname === `${localePrefix}/dashboard/settings`,
-    },
-    {
-      id: 'help',
-      href: '#',
-      icon: HelpCircle,
-      label: t.menu.getHelp,
-      active: false,
-    },
-    {
-      id: 'search',
-      href: '#',
-      icon: Search,
-      label: t.menu.search,
-      active: false,
-    },
-  ]
-
-  const mainNavItems = [
-    {
-      id: 'dashboard',
-      href: `${localePrefix}/dashboard`,
-      icon: Home,
-      label: t.menu.dashboard,
-      active: pathname === `${localePrefix}/dashboard`,
-    },
-    {
-      id: 'businesses',
-      href: `${localePrefix}/dashboard/businesses`,
-      icon: Building2,
-      label: t.menu.businesses,
-      active:
-        pathname === `${localePrefix}/dashboard/businesses` ||
-        pathname.startsWith(`${localePrefix}/dashboard/businesses/`),
-    },
-    {
-      id: 'new',
-      href: `${localePrefix}/dashboard/new`,
-      icon: PlusCircle,
-      label: t.menu.newBusiness,
-      active: pathname === `${localePrefix}/dashboard/new`,
-    },
-  ]
+    businesses = businessesData
+  }
 
   const getPlanName = (planKey: string | undefined) => {
     if (!planKey) return t.plans.starter
@@ -187,59 +86,16 @@ export default function DashboardShell({
     businesses.length > 0
       ? businesses.map((business) => ({
           name: business.name,
-          logo: Building2,
           plan: getPlanName(userProfile?.plan),
           href: `${localePrefix}/dashboard/businesses/${business.slug}`,
         }))
       : [
           {
             name: t.title,
-            logo: Building2,
             plan: t.enterprise,
             href: `${localePrefix}/dashboard/businesses`,
           },
         ]
-
-  const dashboardRoot = `${localePrefix}/dashboard`
-  const currentPath = pathname.startsWith(dashboardRoot)
-    ? pathname.slice(dashboardRoot.length)
-    : ''
-  const pathSegments = currentPath
-    .split('/')
-    .filter(Boolean)
-    .filter((segment) => segment !== 'businesses')
-
-  const segmentLabelMap: Record<string, string> = {
-    overview: 'Resumen',
-    analytics: 'Analytics',
-    calendar: 'Calendario',
-    settings: t.menu.settings,
-    team: 'Equipo',
-    leads: 'Leads',
-    hours: 'Horarios',
-    services: 'Servicios',
-    generation: 'Generación',
-    profile: t.menu.account,
-    subscription: t.menu.billing,
-    new: t.menu.newBusiness,
-  }
-
-  const formatSegmentLabel = (segment: string) => {
-    if (segmentLabelMap[segment]) {
-      return segmentLabelMap[segment]
-    }
-
-    return decodeURIComponent(segment)
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, (letter) => letter.toUpperCase())
-  }
-
-  const breadcrumbParentLabel =
-    pathSegments.length === 0 ? undefined : t.menu.businesses
-  const breadcrumbPageLabel =
-    pathSegments.length === 0
-      ? t.menu.dashboard
-      : formatSegmentLabel(pathSegments[pathSegments.length - 1])
 
   return (
     <SidebarProvider>
@@ -256,35 +112,13 @@ export default function DashboardShell({
         <SidebarContent className="pt-4">
           <SidebarGroup>
             <SidebarGroupContent>
-              <SidebarMenu>
-                {mainNavItems.map((item) => (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton asChild isActive={item.active}>
-                      <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
+              <SidebarMainItems t={t} />
             </SidebarGroupContent>
           </SidebarGroup>
 
           <SidebarGroup className="mt-auto">
             <SidebarGroupContent>
-              <SidebarMenu>
-                {topNavItems.map((item) => (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton asChild isActive={item.active}>
-                      <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
+              <SidebarTopItems t={t} />
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
@@ -321,25 +155,7 @@ export default function DashboardShell({
               orientation="vertical"
               className="mr-1 data-[orientation=vertical]:h-4"
             />
-            <Breadcrumb>
-              <BreadcrumbList>
-                {breadcrumbParentLabel ? (
-                  <>
-                    <BreadcrumbItem className="hidden md:block">
-                      <BreadcrumbLink
-                        href={`${localePrefix}/dashboard/businesses`}
-                      >
-                        {breadcrumbParentLabel}
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator className="hidden md:block" />
-                  </>
-                ) : null}
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{breadcrumbPageLabel}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <DashboardBreadcrumbs t={t} />
           </div>
           <div className="flex items-center gap-4">
             <DropdownMenu>

@@ -56,7 +56,7 @@ export async function GET(request: Request) {
         'X-RateLimit-Reset': rateLimit.resetAt.toString(),
       },
     })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch places' },
       { status: 500 }

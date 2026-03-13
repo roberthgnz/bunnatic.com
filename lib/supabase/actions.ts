@@ -46,10 +46,93 @@ type BusinessDomainRecord = {
   updated_at: string
 }
 
+type CloudflareDomainDebug = {
+  id?: string | null
+  status?: string | null
+  ssl?: {
+    status?: string | null
+    method?: string | null
+    validation_records?: unknown[] | null
+  } | null
+  ownership_verification?: unknown
+  ownership_verification_http?: unknown
+}
+
+type PlaceOpeningPeriod = {
+  open: {
+    day: number
+    time: string
+  }
+  close?: {
+    time: string
+  } | null
+}
+
+type GooglePlaceData = {
+  name: string
+  editorial_summary?: {
+    overview?: string
+  }
+  types?: string[]
+  formatted_address?: string | null
+  formatted_phone_number?: string | null
+  website?: string | null
+  place_id?: string | null
+  photos?: Array<{ photo_reference?: string }>
+  reviews?: unknown[]
+  opening_hours?: {
+    periods?: PlaceOpeningPeriod[]
+  }
+  [key: string]: unknown
+}
+
+type BusinessListItem = {
+  id: string
+  created_at?: string | null
+  [key: string]: unknown
+}
+
+type ServiceInput = {
+  name: string
+  description?: string | null
+  price?: number | null
+  duration?: number | null
+}
+
+type TeamMemberContent = {
+  id: string
+  name: string
+  role: string
+  image_url: string | null
+}
+
+type WorkingHoursInput = {
+  day_of_week: number
+  open_time: string
+  close_time: string
+  is_closed: boolean
+}
+
+function parseTeamMembers(content: unknown): TeamMemberContent[] {
+  if (!content || typeof content !== 'object') return []
+  const members = (content as { members?: unknown }).members
+  if (!Array.isArray(members)) return []
+
+  return members.filter((member): member is TeamMemberContent => {
+    if (!member || typeof member !== 'object') return false
+    const candidate = member as Record<string, unknown>
+    return (
+      typeof candidate.id === 'string' &&
+      typeof candidate.name === 'string' &&
+      typeof candidate.role === 'string'
+    )
+  })
+}
+
 function logCloudflareValidationDebug(
   context: string,
   hostname: string,
-  cloudflareDomain: any
+  cloudflareDomain: CloudflareDomainDebug | null | undefined
 ) {
   const sslStatus = cloudflareDomain?.ssl?.status ?? null
   const validationRecords = cloudflareDomain?.ssl?.validation_records ?? []
@@ -655,7 +738,7 @@ export async function logout() {
   revalidatePath('/', 'layout')
 }
 
-export async function createBusinessFromGoogle(placeData: any) {
+export async function createBusinessFromGoogle(placeData: GooglePlaceData) {
   const supabase = await createClient()
   const {
     data: { user },
@@ -760,7 +843,7 @@ export async function createBusinessFromGoogle(placeData: any) {
 
   // 3. Working Hours
   if (placeData.opening_hours?.periods) {
-    const hours = placeData.opening_hours.periods.map((p: any) => ({
+    const hours = placeData.opening_hours.periods.map((p: PlaceOpeningPeriod) => ({
       business_id: businessId,
       day_of_week: p.open.day,
       open_time: `${p.open.time.slice(0, 2)}:${p.open.time.slice(2)}`,
@@ -889,11 +972,16 @@ export async function getBusinesses() {
     .eq('user_id', user.id)
     .eq('status', 'active')
 
-  const teamBusinesses = (teamMemberships || [])
-    .map((membership: any) => membership.businesses)
-    .filter(Boolean)
+  const teamBusinesses = ((teamMemberships || []) as Array<{
+    businesses: BusinessListItem | null
+  }>)
+    .map((membership) => membership.businesses)
+    .filter((business): business is BusinessListItem => Boolean(business))
 
-  const allBusinesses = [...(ownedBusinesses || []), ...teamBusinesses]
+  const allBusinesses: BusinessListItem[] = [
+    ...((ownedBusinesses || []) as BusinessListItem[]),
+    ...teamBusinesses,
+  ]
   const deduped = Array.from(
     new Map(allBusinesses.map((business) => [business.id, business])).values()
   )
@@ -912,11 +1000,17 @@ export async function getBusinesses() {
 
     if (domains && Array.isArray(domains)) {
       domainByBusinessId = new Map(
-        domains.map((domain: any) => [
+        (
+          domains as Array<{
+            business_id: string
+            hostname: string
+            status: DomainConnectionStatus
+          }>
+        ).map((domain) => [
           domain.business_id,
           {
             hostname: domain.hostname,
-            status: domain.status as DomainConnectionStatus,
+            status: domain.status,
           },
         ])
       )
@@ -1451,7 +1545,10 @@ export async function createService(businessId: string, formData: FormData) {
   return { success: true }
 }
 
-export async function createServicesBatch(businessId: string, services: any[]) {
+export async function createServicesBatch(
+  businessId: string,
+  services: ServiceInput[]
+) {
   const supabase = await createClient()
 
   const { error } = await supabase.from('services').insert(
@@ -1525,15 +1622,11 @@ export async function getPublicTeamMembers(businessId: string) {
     .eq('type', 'team')
     .maybeSingle()
 
-  if (
-    !section ||
-    !section.content ||
-    !Array.isArray((section.content as any).members)
-  ) {
+  if (!section) {
     return []
   }
 
-  return (section.content as any).members
+  return parseTeamMembers(section.content)
 }
 
 export async function createTeamMember(businessId: string, formData: FormData) {
@@ -1556,7 +1649,7 @@ export async function createTeamMember(businessId: string, formData: FormData) {
     .eq('type', 'team')
     .maybeSingle()
 
-  const members = (section?.content as any)?.members || []
+  const members = section ? parseTeamMembers(section.content) : []
   const newMember = {
     id: crypto.randomUUID(),
     name,
@@ -1608,8 +1701,8 @@ export async function deleteTeamMember(businessId: string, memberId: string) {
 
   if (!section) return { error: 'Section not found' }
 
-  const members = (section.content as any)?.members || []
-  const updatedMembers = members.filter((m: any) => m.id !== memberId)
+  const members = parseTeamMembers(section.content)
+  const updatedMembers = members.filter((member) => member.id !== memberId)
 
   const { error } = await supabase
     .from('business_sections')
@@ -1795,7 +1888,8 @@ export async function removeTeamMember(memberId: string) {
 }
 
 // Analytics
-export async function getAnalyticsSummary(_businessId: string) {
+export async function getAnalyticsSummary(businessId: string) {
+  void businessId
   // Mock data for now as we don't have real events yet
   return {
     visits: Math.floor(Math.random() * 1000),
@@ -1859,7 +1953,10 @@ export async function getWorkingHours(businessId: string) {
   return hours || []
 }
 
-export async function saveWorkingHours(businessId: string, hours: any[]) {
+export async function saveWorkingHours(
+  businessId: string,
+  hours: WorkingHoursInput[]
+) {
   const supabase = await createClient()
 
   const { error } = await supabase.from('working_hours').upsert(

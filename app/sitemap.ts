@@ -1,15 +1,11 @@
 import type { MetadataRoute } from 'next'
 import { content } from '@/lib/content'
 import { getBaseUrl } from '@/lib/seo'
-import {
-  getAlternativeSlug,
-  getFeatureSlug,
-  getLegalSlug,
-} from '@/lib/pageSlugs'
+import { getAlternativeSlug, getFeatureSlug } from '@/lib/pageSlugs'
 import { businessLandingEntries } from '@/lib/businessLandingData'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://bunnatic.com'
+  const baseUrl = getBaseUrl()
   const lastModified = new Date()
 
   const routes = [

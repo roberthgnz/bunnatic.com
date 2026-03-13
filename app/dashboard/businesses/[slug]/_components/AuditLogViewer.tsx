@@ -25,11 +25,21 @@ const iconBg: Record<string, string> = {
   settings: 'bg-slate-100 text-slate-500',
 }
 
+type AuditLogEntry = {
+  id: string
+  action: string
+  entity_type: string
+  created_at: string
+  profiles?: {
+    full_name?: string | null
+  } | null
+}
+
 export default function AuditLogViewer({
   logs,
   locale,
 }: {
-  logs: any[]
+  logs: AuditLogEntry[]
   locale: string
 }) {
   const t = {

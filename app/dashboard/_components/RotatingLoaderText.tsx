@@ -27,7 +27,7 @@ export function RotatingLoaderText({
   }, [messages.length, interval])
 
   return (
-    <div className={`relative h-6 min-w-[200px] overflow-hidden ${className}`}>
+    <div className={`relative h-10 min-w-[300px] overflow-hidden ${className}`}>
       <AnimatePresence mode="wait">
         <motion.div
           key={index}
@@ -35,7 +35,7 @@ export function RotatingLoaderText({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
-          className="absolute inset-0 flex items-center justify-center text-sm font-medium text-blue-700"
+          className="absolute inset-0 flex items-center justify-center px-4 text-center text-sm font-medium text-blue-700"
         >
           {messages[index]}
         </motion.div>

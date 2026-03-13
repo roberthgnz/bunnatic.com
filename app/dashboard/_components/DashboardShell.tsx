@@ -18,7 +18,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { ChevronDown, MessageSquarePlus, Bug, Lightbulb } from 'lucide-react'
+import {
+  ChevronDown,
+  MessageSquarePlus,
+  Bug,
+  Lightbulb,
+  Sparkles,
+} from 'lucide-react'
 import Link from 'next/link'
 import { logout } from '@/lib/supabase/actions'
 import { TeamSwitcher } from '@/components/team-switcher'
@@ -158,6 +164,18 @@ export default async function DashboardShell({
             <DashboardBreadcrumbs t={t} />
           </div>
           <div className="flex items-center gap-4">
+            {userProfile?.plan !== 'scale' && (
+              <Button
+                asChild
+                size="sm"
+                className="gap-1 bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                <Link href={`${localePrefix}/dashboard/subscription`}>
+                  <Sparkles className="size-4" />
+                  Mejorar plan
+                </Link>
+              </Button>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

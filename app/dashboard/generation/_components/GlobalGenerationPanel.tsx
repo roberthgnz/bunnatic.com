@@ -48,6 +48,9 @@ import {
   Navigation,
   Star,
   Building2,
+  ChevronsUpDown,
+  Plus,
+  Check,
 } from 'lucide-react'
 
 type PlaceSearchResult = {
@@ -103,6 +106,8 @@ export default function GlobalGenerationPanel({
 }) {
   const router = useRouter()
   const safeLocale = locale === 'ca' ? 'ca' : 'es'
+
+  // State
   const [sourceType, setSourceType] = useState<SourceType>('google')
   const [googleResults, setGoogleResults] = useState<PlaceSearchResult[]>([])
   const [preview, setPreview] = useState<BusinessSourcePreview | null>(null)
@@ -117,6 +122,9 @@ export default function GlobalGenerationPanel({
   const [isBuildingPreview, setIsBuildingPreview] = useState(false)
   const [isApplying, setIsApplying] = useState(false)
   const [isCrawling, setIsCrawling] = useState(false)
+  const [isLoadingState, setIsLoadingState] = useState(true)
+  const [crawlJobId, setCrawlJobId] = useState<string | null>(null)
+  const [crawlUrl, setCrawlUrl] = useState<string | null>(null)
 
   const googleSearchForm = useForm<GoogleSearchValues>({
     resolver: zodResolver(googleSearchSchema),
@@ -127,6 +135,153 @@ export default function GlobalGenerationPanel({
     resolver: zodResolver(urlCrawlSchema),
     defaultValues: { url: '' },
   })
+
+  // Helper to save state to Redis
+  const saveStateToRedis = async (state: {
+    sourceType: SourceType
+    googleResults: PlaceSearchResult[]
+    preview: BusinessSourcePreview | null
+    selectedBlocks: string[]
+    selectedBusinessId: string
+    googleQuery?: string
+    urlValue?: string
+    crawlJobId?: string | null
+    crawlUrl?: string | null
+  }) => {
+    try {
+      await fetch('/api/generation-state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state),
+      })
+    } catch (error) {
+      console.error('Failed to save state to Redis:', error)
+    }
+  }
+
+  // Helper to load state from Redis
+  const loadStateFromRedis = async () => {
+    try {
+      const response = await fetch('/api/generation-state')
+      if (!response.ok) return null
+      const data = (await response.json()) as {
+        state: {
+          sourceType: SourceType
+          googleResults: PlaceSearchResult[]
+          preview: BusinessSourcePreview | null
+          selectedBlocks: string[]
+          selectedBusinessId: string
+          googleQuery?: string
+          urlValue?: string
+          crawlJobId?: string | null
+          crawlUrl?: string | null
+        } | null
+      }
+      return data.state
+    } catch (error) {
+      console.error('Failed to load state from Redis:', error)
+      return null
+    }
+  }
+
+  // Helper to clear state from Redis
+  const clearStateFromRedis = async () => {
+    try {
+      await fetch('/api/generation-state', { method: 'DELETE' })
+    } catch (error) {
+      console.error('Failed to clear state from Redis:', error)
+    }
+  }
+
+  // Helper to poll crawl job status
+  const pollCrawlJob = async (jobId: string, url: string) => {
+    const timeoutMs = 90_000
+    const intervalMs = 1_200
+    const startedAt = Date.now()
+    let crawlResult: unknown = null
+
+    while (Date.now() - startedAt < timeoutMs) {
+      await new Promise((resolve) => window.setTimeout(resolve, intervalMs))
+
+      try {
+        const statusResponse = await fetch(
+          `/api/places/crawl?jobId=${encodeURIComponent(jobId)}&url=${encodeURIComponent(url)}`,
+          { cache: 'no-store' }
+        )
+        const statusData = (await statusResponse.json()) as {
+          status?: string
+          result?: unknown
+          error?: string
+        }
+
+        if (!statusResponse.ok) {
+          throw new Error(statusData.error || t.errorCrawl)
+        }
+
+        if (statusData.status === 'completed' && statusData.result) {
+          crawlResult = statusData.result
+          break
+        }
+      } catch (error) {
+        console.error('Polling error:', error)
+        throw error
+      }
+    }
+
+    if (!crawlResult) {
+      throw new Error(t.errorCrawl)
+    }
+
+    return crawlResult
+  }
+
+  // Load state on mount
+  useEffect(() => {
+    const loadState = async () => {
+      const savedState = await loadStateFromRedis()
+      if (savedState) {
+        setSourceType(savedState.sourceType || 'google')
+        setGoogleResults(savedState.googleResults || [])
+        setPreview(savedState.preview || null)
+        setSelectedBlocks(
+          new Set(savedState.selectedBlocks || []) as Set<SourceBlock>
+        )
+        setSelectedBusinessId(savedState.selectedBusinessId || '')
+        if (savedState.googleQuery) {
+          googleSearchForm.setValue('query', savedState.googleQuery)
+        }
+        if (savedState.urlValue) {
+          urlCrawlForm.setValue('url', savedState.urlValue)
+        }
+
+        // Resume crawl if there's a pending job
+        if (savedState.crawlJobId && savedState.crawlUrl) {
+          setCrawlJobId(savedState.crawlJobId)
+          setCrawlUrl(savedState.crawlUrl)
+          setIsCrawling(true)
+
+          try {
+            const crawlResult = await pollCrawlJob(
+              savedState.crawlJobId,
+              savedState.crawlUrl
+            )
+            await buildPreviewFromPayload('url', crawlResult)
+            setCrawlJobId(null)
+            setCrawlUrl(null)
+          } catch (error) {
+            console.error('Failed to resume crawl:', error)
+            toast.error(t.errorCrawl)
+            setCrawlJobId(null)
+            setCrawlUrl(null)
+          } finally {
+            setIsCrawling(false)
+          }
+        }
+      }
+      setIsLoadingState(false)
+    }
+    void loadState()
+  }, [])
 
   const t = useMemo(
     () =>
@@ -256,10 +411,40 @@ export default function GlobalGenerationPanel({
   useEffect(() => {
     void loadEntitlement()
     // Pre-select first business if available
-    if (businesses.length > 0) {
+    if (businesses.length > 0 && !selectedBusinessId) {
       setSelectedBusinessId(businesses[0].id)
     }
   }, [businesses])
+
+  // Persist state to Redis whenever it changes
+  useEffect(() => {
+    if (isLoadingState) return // Don't save while loading initial state
+
+    const timeoutId = setTimeout(() => {
+      void saveStateToRedis({
+        sourceType,
+        googleResults,
+        preview,
+        selectedBlocks: Array.from(selectedBlocks),
+        selectedBusinessId,
+        googleQuery: googleSearchForm.getValues('query'),
+        urlValue: urlCrawlForm.getValues('url'),
+        crawlJobId,
+        crawlUrl,
+      })
+    }, 500) // Debounce to avoid excessive API calls
+
+    return () => clearTimeout(timeoutId)
+  }, [
+    sourceType,
+    googleResults,
+    preview,
+    selectedBlocks,
+    selectedBusinessId,
+    crawlJobId,
+    crawlUrl,
+    isLoadingState,
+  ])
 
   const isLimitReached = Boolean(
     entitlement?.isLimited && (entitlement.remaining ?? 0) <= 0
@@ -269,6 +454,10 @@ export default function GlobalGenerationPanel({
   const resetGeneratedState = () => {
     setPreview(null)
     setSelectedBlocks(new Set())
+    setCrawlJobId(null)
+    setCrawlUrl(null)
+    // Clear Redis state when resetting
+    void clearStateFromRedis()
   }
 
   const handleSourceChange = (nextSource: SourceType) => {
@@ -372,35 +561,23 @@ export default function GlobalGenerationPanel({
       if (!startResponse.ok || !startData.jobId)
         throw new Error(startData.error || t.errorCrawl)
 
-      const timeoutMs = 90_000
-      const intervalMs = 1_200
-      const startedAt = Date.now()
-      let crawlResult: unknown = null
+      // Save jobId and URL for resume on reload
+      setCrawlJobId(startData.jobId)
+      setCrawlUrl(values.url)
 
-      while (Date.now() - startedAt < timeoutMs) {
-        await new Promise((resolve) => window.setTimeout(resolve, intervalMs))
-        const statusResponse = await fetch(
-          `/api/places/crawl?jobId=${encodeURIComponent(startData.jobId)}&url=${encodeURIComponent(values.url)}`,
-          { cache: 'no-store' }
-        )
-        const statusData = (await statusResponse.json()) as {
-          status?: string
-          result?: unknown
-          error?: string
-        }
-        if (!statusResponse.ok)
-          throw new Error(statusData.error || t.errorCrawl)
-        if (statusData.status === 'completed' && statusData.result) {
-          crawlResult = statusData.result
-          break
-        }
-      }
+      // Poll for completion
+      const crawlResult = await pollCrawlJob(startData.jobId, values.url)
 
-      if (!crawlResult) throw new Error(t.errorCrawl)
+      // Clear crawl state after completion
+      setCrawlJobId(null)
+      setCrawlUrl(null)
+
       await buildPreviewFromPayload('url', crawlResult)
     } catch (error) {
       console.error(error)
       toast.error(t.errorCrawl)
+      setCrawlJobId(null)
+      setCrawlUrl(null)
     } finally {
       setIsCrawling(false)
     }
@@ -434,6 +611,10 @@ export default function GlobalGenerationPanel({
         }
 
         toast.success(t.success)
+
+        // Clear Redis state after successful creation
+        await clearStateFromRedis()
+
         if (result.slug) {
           router.push(`/dashboard/businesses/${result.slug}`)
         } else {
@@ -495,6 +676,9 @@ export default function GlobalGenerationPanel({
       if (result.entitlement) setEntitlement(result.entitlement)
       else await loadEntitlement()
 
+      // Clear Redis state after successful apply
+      await clearStateFromRedis()
+
       // Optional: Redirect to business overview or just stay
       const business = businesses.find((b) => b.id === selectedBusinessId)
       if (business) {
@@ -546,6 +730,18 @@ export default function GlobalGenerationPanel({
     if (key === 'services') return preview.services.length === 0
     if (key === 'hours') return preview.hours.length === 0
     return false
+  }
+
+  // Show loading state while fetching from Redis
+  if (isLoadingState) {
+    return (
+      <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white p-12 shadow-sm">
+        <div className="flex items-center gap-3">
+          <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+          <p className="text-sm text-slate-500">Cargando estado...</p>
+        </div>
+      </div>
+    )
   }
 
   if (businesses.length === 0) {
@@ -623,8 +819,8 @@ export default function GlobalGenerationPanel({
               type="button"
               onClick={() => handleSourceChange('google')}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${sourceType === 'google'
-                  ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                  : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
+                : 'text-slate-500 hover:text-slate-700'
                 }`}
             >
               <MapPin className="h-3.5 w-3.5" />
@@ -634,8 +830,8 @@ export default function GlobalGenerationPanel({
               type="button"
               onClick={() => handleSourceChange('url')}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${sourceType === 'url'
-                  ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                  : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
+                : 'text-slate-500 hover:text-slate-700'
                 }`}
             >
               <Globe className="h-3.5 w-3.5" />
@@ -800,32 +996,79 @@ export default function GlobalGenerationPanel({
           <>
             {preview ? (
               <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5 duration-300">
-                {/* Business Selector (NEW) */}
+                {/* Business Selector */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
                     {t.targetBusinessLabel}
                   </p>
-                  <Select
-                    value={selectedBusinessId}
-                    onValueChange={setSelectedBusinessId}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={t.selectTargetPlaceholder} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem
-                        value="new"
-                        className="font-semibold text-blue-600"
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="h-11 w-full justify-between"
                       >
-                        {t.createNewBusiness}
-                      </SelectItem>
-                      {businesses.map((b) => (
-                        <SelectItem key={b.id} value={b.id}>
-                          {b.name}
-                        </SelectItem>
+                        <div className="flex items-center gap-2">
+                          {selectedBusinessId === 'new' ? (
+                            <>
+                              <div className="flex h-6 w-6 items-center justify-center rounded-md border bg-transparent">
+                                <Plus className="h-4 w-4" />
+                              </div>
+                              <span className="font-medium">
+                                {t.createNewBusiness}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex h-6 w-6 items-center justify-center rounded-md border">
+                                <Building2 className="h-3.5 w-3.5 shrink-0" />
+                              </div>
+                              <span>
+                                {businesses.find(
+                                  (b) => b.id === selectedBusinessId
+                                )?.name || t.selectTargetPlaceholder}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-56">
+                      <DropdownMenuLabel className="text-xs text-muted-foreground">
+                        {t.targetBusinessLabel}
+                      </DropdownMenuLabel>
+                      {businesses.map((business) => (
+                        <DropdownMenuItem
+                          key={business.id}
+                          onClick={() => setSelectedBusinessId(business.id)}
+                          className="gap-2 p-2"
+                        >
+                          <div className="flex h-6 w-6 items-center justify-center rounded-md border">
+                            <Building2 className="h-3.5 w-3.5 shrink-0" />
+                          </div>
+                          <span className="flex-1">{business.name}</span>
+                          {selectedBusinessId === business.id && (
+                            <Check className="h-4 w-4" />
+                          )}
+                        </DropdownMenuItem>
                       ))}
-                    </SelectContent>
-                  </Select>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => setSelectedBusinessId('new')}
+                        className="gap-2 p-2"
+                      >
+                        <div className="flex h-6 w-6 items-center justify-center rounded-md border bg-transparent">
+                          <Plus className="h-4 w-4" />
+                        </div>
+                        <span className="flex-1 font-medium text-muted-foreground">
+                          {t.createNewBusiness}
+                        </span>
+                        {selectedBusinessId === 'new' && (
+                          <Check className="h-4 w-4" />
+                        )}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 {/* Block selector */}
@@ -844,10 +1087,10 @@ export default function GlobalGenerationPanel({
                           disabled={disabled}
                           onClick={() => toggleBlock(key)}
                           className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${disabled
-                              ? 'cursor-not-allowed border-slate-200 bg-slate-50 opacity-40'
-                              : isSelected
-                                ? 'border-blue-300 bg-blue-50 ring-1 ring-blue-200'
-                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                            ? 'cursor-not-allowed border-slate-200 bg-slate-50 opacity-40'
+                            : isSelected
+                              ? 'border-blue-300 bg-blue-50 ring-1 ring-blue-200'
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                             }`}
                         >
                           <div

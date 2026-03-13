@@ -1,4 +1,3 @@
-
 const featureSlugs = {
   'generacion-ia': 'generacion-ia',
   'seo-local': 'seo-local',
@@ -38,15 +37,15 @@ const featureIdBySlug = reverseMap(featureSlugs)
 const alternativeIdBySlug = reverseMap(alternativeSlugs)
 const legalIdBySlug = reverseMap(legalSlugs)
 
-export function getFeatureSlug(id: string): string {
+export function getFeatureSlug(id: string, locale?: string): string {
   return featureSlugs[id as FeatureId] ?? id
 }
 
-export function getAlternativeSlug(id: string): string {
+export function getAlternativeSlug(id: string, locale?: string): string {
   return alternativeSlugs[id as AlternativeId] ?? id
 }
 
-export function getLegalSlug(id: string): string {
+export function getLegalSlug(id: string, locale?: string): string {
   return legalSlugs[id as LegalId] ?? id
 }
 

@@ -21,12 +21,19 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>
 
+type TeamMember = {
+  id: string
+  name: string
+  role: string
+  image_url?: string | null
+}
+
 export default function TeamManager({
   businessId,
   initialTeam,
 }: {
   businessId: string
-  initialTeam: any[]
+  initialTeam: TeamMember[]
 }) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const router = useRouter()

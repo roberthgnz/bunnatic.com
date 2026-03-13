@@ -4,10 +4,19 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Mail, MessageSquare, Phone, User } from 'lucide-react'
 
+type Lead = {
+  id: string
+  name: string
+  email: string
+  phone?: string | null
+  message: string
+  created_at: string
+}
+
 export default function LeadsViewer({
   leads,
 }: {
-  leads: any[]
+  leads: Lead[]
 }) {
   const t = {
     title: 'Leads y Contactos',

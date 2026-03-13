@@ -38,14 +38,17 @@ const alternativeIdBySlug = reverseMap(alternativeSlugs)
 const legalIdBySlug = reverseMap(legalSlugs)
 
 export function getFeatureSlug(id: string, locale?: string): string {
+  void locale
   return featureSlugs[id as FeatureId] ?? id
 }
 
 export function getAlternativeSlug(id: string, locale?: string): string {
+  void locale
   return alternativeSlugs[id as AlternativeId] ?? id
 }
 
 export function getLegalSlug(id: string, locale?: string): string {
+  void locale
   return legalSlugs[id as LegalId] ?? id
 }
 

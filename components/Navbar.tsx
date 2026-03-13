@@ -17,6 +17,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { logout } from '@/lib/supabase/actions'
 import { toast } from 'sonner'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
+import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 type NavbarProps = {
   useDemoCta?: boolean
@@ -40,7 +41,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const paramsText = searchParams.toString()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<SupabaseUser | null>(null)
 
   useEffect(() => {
     const supabase = createClient()

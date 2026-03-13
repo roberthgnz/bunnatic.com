@@ -4,7 +4,6 @@ import { motion } from 'motion/react'
 import {
   CheckCircle2,
   Globe,
-  Loader2,
   MapPin,
   MessageCircle,
   Search,

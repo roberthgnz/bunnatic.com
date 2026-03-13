@@ -33,13 +33,21 @@ const schema = z
 
 type FormValues = z.infer<typeof schema>
 
+type CalendarEvent = {
+  id: string
+  title: string
+  type: string
+  start_time: string
+  end_time: string
+}
+
 export default function CalendarManager({
   businessId,
   events,
   locale,
 }: {
   businessId: string
-  events: any[]
+  events: CalendarEvent[]
   locale: string
 }) {
   const [date, setDate] = useState<Date | undefined>(new Date())

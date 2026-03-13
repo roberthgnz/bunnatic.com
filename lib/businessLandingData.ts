@@ -671,6 +671,7 @@ export function getBusinessSlugByLocale(
   entry: BusinessLandingEntry,
   locale: string
 ): string {
+  void locale
   // Currently we only have one slug per entry, but this function allows for future localization
   return entry.slug
 }

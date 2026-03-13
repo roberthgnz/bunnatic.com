@@ -30,12 +30,19 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>
 
+type Service = {
+  id: string
+  name: string
+  price?: number | null
+  duration?: number | null
+}
+
 export default function ServicesManager({
   businessId,
   initialServices,
 }: {
   businessId: string
-  initialServices: any[]
+  initialServices: Service[]
 }) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const router = useRouter()

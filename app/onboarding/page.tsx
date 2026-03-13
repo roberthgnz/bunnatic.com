@@ -49,8 +49,6 @@ function OnboardingContent() {
     googlePlaceId: '',
     placeData: '',
   })
-  const languageKey = 'es'
-
   const selectedTier = useMemo(() => {
     const tiers = content.pricing.tiers
     return tiers.find((tier) => tier.id === `tier-${plan}`) ?? tiers[0]

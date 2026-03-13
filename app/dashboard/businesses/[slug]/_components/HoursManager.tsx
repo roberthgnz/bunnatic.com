@@ -42,7 +42,7 @@ export default function HoursManager({
   initialHours,
 }: {
   businessId: string
-  initialHours: any[]
+  initialHours: HoursRow[]
 }) {
   const [loading, setLoading] = useState(false)
   const [validationErrors, setValidationErrors] = useState<

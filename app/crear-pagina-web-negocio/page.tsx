@@ -74,6 +74,35 @@ const createPageContent = {
   },
 } as const
 
+type PlaceSearchResult = {
+  place_id: string
+  name: string
+  formatted_address?: string
+  rating?: number
+  user_ratings_total?: number
+  types?: string[]
+}
+
+type PlaceReview = {
+  text?: string
+  rating?: number
+  author_name?: string
+}
+
+type PlaceDetails = PlaceSearchResult & {
+  editorial_summary?: {
+    overview?: string
+  }
+  opening_hours?: {
+    open_now?: boolean
+  }
+  price_level?: number
+  website?: string
+  formatted_phone_number?: string
+  reviews?: PlaceReview[]
+  [key: string]: unknown
+}
+
 function isCompleteHttpUrl(value: string): boolean {
   try {
     const parsed = new URL(value)
@@ -99,11 +128,10 @@ function CreateWebContent() {
     'search' | 'analyzing' | 'preview' | 'dashboard'
   >('search')
   const [query, setQuery] = useState('')
-  const [places, setPlaces] = useState<any[]>([])
+  const [places, setPlaces] = useState<PlaceSearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
-  const [selectedPlace, setSelectedPlace] = useState<any>(null)
-  const [placeDetails, setPlaceDetails] = useState<any>(null)
+  const [placeDetails, setPlaceDetails] = useState<PlaceDetails | null>(null)
   const [analysisProgress, setAnalysisProgress] = useState(0)
   const [draftId, setDraftId] = useState<string | null>(null)
   const [tempSessionId, setTempSessionId] = useState<string | null>(null)
@@ -284,7 +312,7 @@ function CreateWebContent() {
   }
 
   const saveTemporaryGeneration = async (
-    generatedPlaceData: any,
+    generatedPlaceData: PlaceDetails,
     nextDraftId: string
   ): Promise<string | null> => {
     try {
@@ -339,7 +367,6 @@ function CreateWebContent() {
     if (inputMode === 'url') {
       const nextDraftId = `url-${Date.now()}`
       setDraftId(nextDraftId)
-      setSelectedPlace({ place_id: trimmedQuery, name: trimmedQuery })
       setStep('analyzing')
       setAnalysisInputMode('url')
       setPlaceDetails(null)
@@ -372,7 +399,7 @@ function CreateWebContent() {
         }
 
         const pollStart = Date.now()
-        let finalResult: any | null = null
+        let finalResult: PlaceDetails | null = null
 
         while (Date.now() - pollStart < urlPollMaxWaitMs) {
           await new Promise((resolve) =>
@@ -394,7 +421,7 @@ function CreateWebContent() {
           }
 
           if (statusData.status === 'completed' && statusData.result) {
-            finalResult = statusData.result
+            finalResult = statusData.result as PlaceDetails
             break
           }
         }
@@ -460,7 +487,7 @@ function CreateWebContent() {
         )
         setPlaces([])
       } else {
-        setPlaces(Array.isArray(data.results) ? data.results : [])
+        setPlaces(Array.isArray(data.results) ? (data.results as PlaceSearchResult[]) : [])
       }
     } catch (error) {
       console.error('Error searching places:', error)
@@ -473,10 +500,9 @@ function CreateWebContent() {
     }
   }
 
-  const handleSelectPlace = async (place: any) => {
+  const handleSelectPlace = async (place: PlaceSearchResult) => {
     const nextDraftId = `${place.place_id}-${Date.now()}`
     setDraftId(nextDraftId)
-    setSelectedPlace(place)
     setStep('analyzing')
     setAnalysisInputMode('google')
     setPlaceDetails(null)
@@ -1127,7 +1153,7 @@ function CreateWebContent() {
 
                   {/* Reviews Section */}
                   {placeDetails.reviews?.some(
-                    (review: any) =>
+                    (review: PlaceReview) =>
                       typeof review?.text === 'string' &&
                       review.text.trim().length > 0
                   ) && (
@@ -1138,18 +1164,18 @@ function CreateWebContent() {
                       <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-5 lg:gap-6">
                         {placeDetails.reviews
                           .filter(
-                            (review: any) =>
+                            (review: PlaceReview) =>
                               typeof review?.text === 'string' &&
                               review.text.trim().length > 0
                           )
                           .slice(0, 2)
-                          .map((review: any, idx: number) => (
+                          .map((review: PlaceReview, idx: number) => (
                             <div
                               key={idx}
                               className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-5 lg:p-6"
                             >
                               <div className="mb-2.5 flex items-center gap-0.5 sm:mb-3 sm:gap-1">
-                                {[...Array(review.rating)].map((_, i) => (
+                                {[...Array(typeof review.rating === 'number' ? review.rating : 0)].map((_, i) => (
                                   <Star
                                     key={i}
                                     className="h-3.5 w-3.5 fill-amber-500 text-amber-500 sm:h-4 sm:w-4"

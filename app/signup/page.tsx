@@ -3,13 +3,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import {
-  ArrowLeft,
   ArrowRight,
-  CircleCheck,
   Eye,
   EyeOff,
-  MapPin,
-  Sparkles,
   Zap,
 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'

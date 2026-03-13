@@ -31,11 +31,20 @@ const statusConfig = {
   },
 }
 
+type ReviewSection = {
+  id: string
+  type: string
+  status: string
+  content?: {
+    title?: string
+  } | null
+}
+
 export default function ContentReviewManager({
   sections,
   locale,
 }: {
-  sections: any[]
+  sections: ReviewSection[]
   locale: string
 }) {
   const t = {

@@ -6,11 +6,13 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  type CookieOptions = Parameters<NextResponse['cookies']['set']>[2]
+
   // Track cookies to ensure they persist across multiple setAll calls if Supabase splits them
   const cookiesToSetOnResponse: {
     name: string
     value: string
-    options: any
+    options?: CookieOptions
   }[] = []
 
   const supabase = createServerClient(
@@ -27,9 +29,7 @@ export async function updateSession(request: NextRequest) {
             cookiesToSetOnResponse.push(cookie)
           })
 
-          cookiesToSet.forEach(({ name, value, options }) =>
-            request.cookies.set(name, value)
-          )
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
 
           supabaseResponse = NextResponse.next({
             request,

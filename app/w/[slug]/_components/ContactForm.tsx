@@ -9,7 +9,6 @@ import { Loader2, Send } from 'lucide-react'
 
 export default function ContactForm({
   businessId,
-  locale,
 }: {
   businessId: string
   locale?: string

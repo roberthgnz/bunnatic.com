@@ -33,6 +33,8 @@ export default async function BusinessOverviewPage({
     notFound()
   }
 
+  const locale: string = 'es'
+
   const t = {
     es: {
       profile: 'Perfil del negocio',

@@ -38,7 +38,11 @@ export async function generateMetadata({
     description: localizedCopy.subtitle,
     esPath: `/negocio/${getBusinessSlugByLocale(entry, 'es')}`,
     caPath: `/negocio/${getBusinessSlugByLocale(entry, 'es')}`, // Fallback to es
-    keywords: ['web para negocios locales', 'seo local', 'captación de clientes'],
+    keywords: [
+      'web para negocios locales',
+      'seo local',
+      'captación de clientes',
+    ],
   })
 }
 
@@ -52,5 +56,5 @@ export default async function NegocioLandingPage({ params }: BusinessParams) {
 
   const localizedSlug = getBusinessSlugByLocale(entry, 'es')
 
-  return <BusinessLanding slug={localizedSlug} copy={entry.copy} />
+  return <BusinessLanding slug={localizedSlug} copy={{ es: entry.copy }} />
 }

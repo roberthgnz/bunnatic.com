@@ -251,7 +251,7 @@ function CreateWebContent() {
   const aboutText =
     placeDetails?.editorial_summary?.overview ||
     t.crear.aboutUsText
-      .replace('{rating}', placeDetails?.rating || '')
+      .replace('{rating}', String(placeDetails?.rating || ''))
       .replace(
         '{city}',
         placeDetails?.formatted_address?.split(',')?.[1]?.trim() || 'la ciudad'
@@ -291,7 +291,8 @@ function CreateWebContent() {
     !isSearching &&
     query.trim().length > 0 &&
     places.length === 0
-  const genericUrlError = 'No pudimos analizar esa URL. Verifica que sea pública y vuelve a intentarlo.'
+  const genericUrlError =
+    'No pudimos analizar esa URL. Verifica que sea pública y vuelve a intentarlo.'
   const urlPollIntervalMs = 1200
   const urlPollMaxWaitMs = 90000
 
@@ -483,18 +484,21 @@ function CreateWebContent() {
         setRateLimitExceeded(true)
         setRateLimitResetAt(data.resetAt || null)
         setSearchError(
-          data.message || 'Has alcanzado el límite de búsquedas de demostración.'
+          data.message ||
+            'Has alcanzado el límite de búsquedas de demostración.'
         )
         setPlaces([])
       } else {
-        setPlaces(Array.isArray(data.results) ? (data.results as PlaceSearchResult[]) : [])
+        setPlaces(
+          Array.isArray(data.results)
+            ? (data.results as PlaceSearchResult[])
+            : []
+        )
       }
     } catch (error) {
       console.error('Error searching places:', error)
       setPlaces([])
-      setSearchError(
-        'No pudimos buscar negocios en Google en este momento.'
-      )
+      setSearchError('No pudimos buscar negocios en Google en este momento.')
     } finally {
       setIsSearching(false)
     }
@@ -664,7 +668,8 @@ function CreateWebContent() {
                       ¡Vaya! Has alcanzado el límite de demostración
                     </h3>
                     <p className="mb-1 text-sm text-gray-700 sm:text-base">
-                      Has usado tus 5 búsquedas gratuitas. Vemos que tienes mucho interés en crear tu web.
+                      Has usado tus 5 búsquedas gratuitas. Vemos que tienes
+                      mucho interés en crear tu web.
                     </p>
                     {rateLimitResetAt && (
                       <p className="mt-2 text-xs text-gray-600 sm:text-sm">
@@ -681,27 +686,19 @@ function CreateWebContent() {
                     <ul className="space-y-1.5 text-xs text-gray-700 sm:text-sm">
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-600" />
-                        <span>
-                          Búsquedas ilimitadas
-                        </span>
+                        <span>Búsquedas ilimitadas</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-600" />
-                        <span>
-                          Publica tu web en minutos
-                        </span>
+                        <span>Publica tu web en minutos</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-600" />
-                        <span>
-                          14 días de prueba gratis
-                        </span>
+                        <span>14 días de prueba gratis</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-600" />
-                        <span>
-                          Sin tarjeta de crédito
-                        </span>
+                        <span>Sin tarjeta de crédito</span>
                       </li>
                     </ul>
                   </div>
@@ -710,9 +707,7 @@ function CreateWebContent() {
                     variant="default"
                     className="w-full rounded-full bg-gray-900 px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-gray-800 sm:py-4 sm:text-base"
                   >
-                    <Link href={signupHref}>
-                      Crear mi cuenta gratis →
-                    </Link>
+                    <Link href={signupHref}>Crear mi cuenta gratis →</Link>
                   </Button>
                 </div>
               </div>
@@ -1175,7 +1170,13 @@ function CreateWebContent() {
                               className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-5 lg:p-6"
                             >
                               <div className="mb-2.5 flex items-center gap-0.5 sm:mb-3 sm:gap-1">
-                                {[...Array(typeof review.rating === 'number' ? review.rating : 0)].map((_, i) => (
+                                {[
+                                  ...Array(
+                                    typeof review.rating === 'number'
+                                      ? review.rating
+                                      : 0
+                                  ),
+                                ].map((_, i) => (
                                   <Star
                                     key={i}
                                     className="h-3.5 w-3.5 fill-amber-500 text-amber-500 sm:h-4 sm:w-4"

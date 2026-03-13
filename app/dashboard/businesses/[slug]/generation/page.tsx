@@ -14,5 +14,5 @@ export default async function BusinessGenerationPage({
     notFound()
   }
 
-  return <SourceGenerationPanel businessId={business.id}  />
+  return <SourceGenerationPanel businessId={business.id} locale="es" />
 }

@@ -16,12 +16,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-export default async function BusinessesPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
-  const { locale } = await params
+export default async function BusinessesPage() {
+  const locale: string = 'es'
   const businesses = await getBusinesses()
 
   const t = {
@@ -93,7 +89,7 @@ export default async function BusinessesPage({
           <p className="text-sm text-slate-600">{t.subtitle}</p>
         </div>
         <Button asChild>
-          <Link href={`/${locale}/dashboard/new`}>
+          <Link href="/dashboard/new">
             <Plus className="mr-2 h-4 w-4" />
             {t.create}
           </Link>
@@ -109,7 +105,7 @@ export default async function BusinessesPage({
             <h2 className="text-lg font-semibold text-slate-900">{t.noData}</h2>
             <p className="max-w-md text-sm text-slate-600">{t.noDataHint}</p>
             <Button asChild className="mt-2">
-              <Link href={`/${locale}/dashboard/new`}>{t.create}</Link>
+              <Link href="/dashboard/new">{t.create}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -130,7 +126,7 @@ export default async function BusinessesPage({
                       <CardDescription className="mt-0.5 line-clamp-1 font-mono text-xs">
                         {business.custom_domain
                           ? business.custom_domain
-                          : `${platformHost}/${locale}/w/${business.slug}`}
+                          : `${platformHost}/w/${business.slug}`}
                       </CardDescription>
                     </div>
                   </div>
@@ -181,9 +177,7 @@ export default async function BusinessesPage({
                   </p>
                   <div className="flex items-center gap-2">
                     <Button asChild size="sm" variant="outline">
-                      <Link
-                        href={`/${locale}/dashboard/businesses/${business.slug}`}
-                      >
+                      <Link href={`/dashboard/businesses/${business.slug}`}>
                         {t.open}
                       </Link>
                     </Button>
@@ -193,7 +187,7 @@ export default async function BusinessesPage({
                           business.custom_domain &&
                           business.custom_domain_status === 'active'
                             ? `https://${business.custom_domain}`
-                            : `/${locale}/w/${business.slug}`
+                            : `/w/${business.slug}`
                         }
                         target="_blank"
                       >

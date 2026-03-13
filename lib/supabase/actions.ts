@@ -88,7 +88,17 @@ type GooglePlaceData = {
 
 type BusinessListItem = {
   id: string
+  name: string
+  slug: string
+  category?: string | null
+  description?: string | null
+  address?: string | null
+  phone?: string | null
+  website?: string | null
+  custom_domain?: string | null
+  custom_domain_status?: DomainConnectionStatus | null
   created_at?: string | null
+  updated_at?: string | null
   [key: string]: unknown
 }
 
@@ -843,15 +853,17 @@ export async function createBusinessFromGoogle(placeData: GooglePlaceData) {
 
   // 3. Working Hours
   if (placeData.opening_hours?.periods) {
-    const hours = placeData.opening_hours.periods.map((p: PlaceOpeningPeriod) => ({
-      business_id: businessId,
-      day_of_week: p.open.day,
-      open_time: `${p.open.time.slice(0, 2)}:${p.open.time.slice(2)}`,
-      close_time: p.close
-        ? `${p.close.time.slice(0, 2)}:${p.close.time.slice(2)}`
-        : null,
-      is_closed: false,
-    }))
+    const hours = placeData.opening_hours.periods.map(
+      (p: PlaceOpeningPeriod) => ({
+        business_id: businessId,
+        day_of_week: p.open.day,
+        open_time: `${p.open.time.slice(0, 2)}:${p.open.time.slice(2)}`,
+        close_time: p.close
+          ? `${p.close.time.slice(0, 2)}:${p.close.time.slice(2)}`
+          : null,
+        is_closed: false,
+      })
+    )
 
     // Fill missing days as closed? Or just insert what we have.
     // Let's insert what we have.
@@ -972,9 +984,11 @@ export async function getBusinesses() {
     .eq('user_id', user.id)
     .eq('status', 'active')
 
-  const teamBusinesses = ((teamMemberships || []) as Array<{
-    businesses: BusinessListItem | null
-  }>)
+  const teamBusinesses = (
+    (teamMemberships || []) as unknown as Array<{
+      businesses: BusinessListItem | null
+    }>
+  )
     .map((membership) => membership.businesses)
     .filter((business): business is BusinessListItem => Boolean(business))
 

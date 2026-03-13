@@ -17,6 +17,6 @@ export default async function BusinessCalendarPage({
   const events = await getCalendarEvents(business.id)
 
   return (
-    <CalendarManager businessId={business.id} events={events}  />
+    <CalendarManager businessId={business.id} events={events} locale="es" />
   )
 }

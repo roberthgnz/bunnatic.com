@@ -14,5 +14,5 @@ export default async function BusinessAnalyticsPage({
     notFound()
   }
 
-  return <AnalyticsViewer businessId={business.id}  />
+  return <AnalyticsViewer businessId={business.id} locale="es" />
 }

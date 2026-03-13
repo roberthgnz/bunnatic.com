@@ -2,12 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
-import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Zap,
-} from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, Zap } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -23,6 +18,19 @@ import { toast } from 'sonner'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
 
 import { createClient } from '@/lib/supabase/client'
+
+const CONTEXT_KEYS = [
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_term',
+  'utm_content',
+  'source',
+  'plan',
+  'planSuggested',
+  'sector',
+  'draftId',
+] as const
 
 const GoogleLogo = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">

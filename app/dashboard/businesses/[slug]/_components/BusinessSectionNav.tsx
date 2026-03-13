@@ -11,17 +11,14 @@ import {
   LayoutGrid,
   MessageSquare,
   Settings,
-  Sparkles,
   Users,
 } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 
 type NavItem = {
   key: string
   href: string
   label: string
   icon: ComponentType<{ className?: string }>
-  featured?: boolean
 }
 
 type NavGroup = {
@@ -30,11 +27,7 @@ type NavGroup = {
   items: NavItem[]
 }
 
-export default function BusinessSectionNav({
-  slug,
-}: {
-  slug: string
-}) {
+export default function BusinessSectionNav({ slug }: { slug: string }) {
   const pathname = usePathname() ?? ''
   const base = `/dashboard/businesses/${slug}`
 
@@ -43,13 +36,6 @@ export default function BusinessSectionNav({
       key: 'operation',
       title: 'Operación',
       items: [
-        {
-          key: 'generation',
-          href: `${base}/generation`,
-          label: 'Generación IA',
-          icon: Sparkles,
-          featured: true,
-        },
         {
           key: 'overview',
           href: `${base}/overview`,
@@ -126,35 +112,20 @@ export default function BusinessSectionNav({
               const isActive =
                 pathname === item.href || pathname.startsWith(`${item.href}/`)
               const Icon = item.icon
-              const featuredClasses = item.featured
-                ? isActive
-                  ? 'bg-emerald-100/50 text-emerald-900 border-l-[3px] border-emerald-500 shadow-sm'
-                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 border-l-[3px] border-transparent'
-                : ''
-              const classes = item.featured
-                ? `flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-all ${featuredClasses}`
-                : `flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-all border-l-[3px] ${
-                    isActive
-                      ? 'bg-slate-100 text-slate-900 border-slate-900 shadow-sm'
-                      : 'border-transparent text-slate-600 hover:bg-slate-100/50 hover:text-slate-900'
-                  }`
+              const classes = `flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-all border-l-[3px] ${
+                isActive
+                  ? 'bg-slate-100 text-slate-900 border-slate-900 shadow-sm'
+                  : 'border-transparent text-slate-600 hover:bg-slate-100/50 hover:text-slate-900'
+              }`
 
               return (
                 <Link key={item.key} href={item.href} className={classes}>
                   <span className="flex items-center gap-3">
                     <Icon
-                      className={`h-4 w-4 ${isActive && !item.featured ? 'text-slate-900' : 'text-slate-500'}`}
+                      className={`h-4 w-4 ${isActive ? 'text-slate-900' : 'text-slate-500'}`}
                     />
                     {item.label}
                   </span>
-                  {item.featured ? (
-                    <Badge
-                      variant="outline"
-                      className="h-4 border-emerald-200 bg-emerald-50 px-1 py-0 text-[10px] leading-none text-emerald-700"
-                    >
-                      AI
-                    </Badge>
-                  ) : null}
                 </Link>
               )
             })}

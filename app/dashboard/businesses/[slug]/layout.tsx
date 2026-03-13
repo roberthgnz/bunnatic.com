@@ -8,6 +8,7 @@ import {
 } from '@/lib/supabase/actions'
 import BusinessSectionNav from './_components/BusinessSectionNav'
 import { BusinessProvider } from './_components/BusinessContext'
+import GenerationFab from './_components/GenerationFab'
 
 export default async function BusinessDetailLayout({
   children,
@@ -50,6 +51,7 @@ export default async function BusinessDetailLayout({
           <main className="min-w-0 flex-1">{children}</main>
         </div>
       </div>
+      <GenerationFab slug={slug} />
     </BusinessProvider>
   )
 }

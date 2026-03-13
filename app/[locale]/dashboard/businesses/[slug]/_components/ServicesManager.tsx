@@ -132,7 +132,7 @@ export default function ServicesManager({
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       {/* Header */}
       <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
         <h3 className="text-sm font-semibold text-slate-900">{t.title}</h3>
@@ -140,38 +140,84 @@ export default function ServicesManager({
       </div>
 
       {/* Add form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 border-b border-slate-100">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">{t.addTitle}</p>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="border-b border-slate-100 px-6 py-5"
+      >
+        <p className="mb-3 text-xs font-semibold tracking-wider text-slate-400 uppercase">
+          {t.addTitle}
+        </p>
         <div className="grid gap-3 sm:grid-cols-12">
           <div className="sm:col-span-5">
-            <FormField label={t.name} error={errors.name ? err(errors.name.message!) : undefined} required>
-              <Input {...register('name')} aria-invalid={!!errors.name} className="h-9" />
+            <FormField
+              label={t.name}
+              error={errors.name ? err(errors.name.message!) : undefined}
+              required
+            >
+              <Input
+                {...register('name')}
+                aria-invalid={!!errors.name}
+                className="h-9"
+              />
             </FormField>
           </div>
           <div className="sm:col-span-2">
-            <FormField label={t.price} error={errors.price ? err(errors.price.message!) : undefined}>
-              <Input {...register('price')} type="number" step="0.01" min="0" aria-invalid={!!errors.price} className="h-9" />
+            <FormField
+              label={t.price}
+              error={errors.price ? err(errors.price.message!) : undefined}
+            >
+              <Input
+                {...register('price')}
+                type="number"
+                step="0.01"
+                min="0"
+                aria-invalid={!!errors.price}
+                className="h-9"
+              />
             </FormField>
           </div>
           <div className="sm:col-span-2">
-            <FormField label={t.duration} error={errors.duration ? err(errors.duration.message!) : undefined}>
-              <Input {...register('duration')} type="number" min="1" aria-invalid={!!errors.duration} className="h-9" />
+            <FormField
+              label={t.duration}
+              error={
+                errors.duration ? err(errors.duration.message!) : undefined
+              }
+            >
+              <Input
+                {...register('duration')}
+                type="number"
+                min="1"
+                aria-invalid={!!errors.duration}
+                className="h-9"
+              />
             </FormField>
           </div>
           <div className="sm:col-span-3">
-            <FormField label={t.descriptionField} hint={t.descHint} error={errors.description ? err(errors.description.message!) : undefined}>
-              <Textarea {...register('description')} rows={1} aria-invalid={!!errors.description} className="min-h-9 resize-none" />
+            <FormField
+              label={t.descriptionField}
+              hint={t.descHint}
+              error={
+                errors.description
+                  ? err(errors.description.message!)
+                  : undefined
+              }
+            >
+              <Textarea
+                {...register('description')}
+                rows={1}
+                aria-invalid={!!errors.description}
+                className="min-h-9 resize-none"
+              />
             </FormField>
           </div>
         </div>
         <div className="mt-3 flex justify-end">
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            size="sm"
-            
-          >
-            {isSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+          <Button type="submit" disabled={isSubmitting} size="sm">
+            {isSubmitting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Plus className="h-3.5 w-3.5" />
+            )}
             {t.add}
           </Button>
         </div>
@@ -188,9 +234,14 @@ export default function ServicesManager({
       ) : (
         <ul className="divide-y divide-slate-100">
           {initialServices.map((service) => (
-            <li key={service.id} className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-slate-50/60 transition-colors">
+            <li
+              key={service.id}
+              className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-slate-50/60"
+            >
               <div className="min-w-0">
-                <p className="text-sm font-medium text-slate-900 truncate">{service.name}</p>
+                <p className="truncate text-sm font-medium text-slate-900">
+                  {service.name}
+                </p>
                 {(service.duration || service.price) && (
                   <p className="mt-0.5 text-xs text-slate-400">
                     {service.duration ? `${service.duration} min` : ''}
@@ -205,7 +256,7 @@ export default function ServicesManager({
                 onClick={() => handleDelete(service.id)}
                 disabled={deletingId === service.id}
                 aria-label={`${t.delete} ${service.name}`}
-                className="shrink-0 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                className="shrink-0 text-slate-400 hover:bg-red-50 hover:text-red-500"
               >
                 {deletingId === service.id ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

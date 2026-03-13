@@ -43,6 +43,7 @@ Esto instalará `@upstash/redis` que ya está en el `package.json`.
 ## Paso 6: Verificar funcionamiento
 
 1. Inicia el servidor de desarrollo:
+
    ```bash
    pnpm dev
    ```
@@ -56,11 +57,13 @@ Esto instalará `@upstash/redis` que ya está en el `package.json`.
 ## Monitoreo en Upstash
 
 En el dashboard de Upstash puedes ver:
+
 - **Commands**: Número de comandos ejecutados
 - **Latency**: Latencia promedio de las operaciones
 - **Data Browser**: Ver las keys almacenadas (útil para debugging)
 
 Para ver las keys de rate limit:
+
 1. Ve a "Data Browser" en tu base de datos
 2. Busca keys que empiecen con `ratelimit:demo:`
 
@@ -102,6 +105,7 @@ redis-cli -u $UPSTASH_REDIS_REST_URL DEL "ratelimit:demo:YOUR_IP"
 ## Plan Gratuito de Upstash
 
 El plan gratuito incluye:
+
 - 10,000 comandos por día
 - 256 MB de almacenamiento
 - Suficiente para ~3,000-5,000 usuarios únicos por día con rate limiting

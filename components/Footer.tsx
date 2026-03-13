@@ -1,30 +1,52 @@
-"use client";
+'use client'
 
-import { content } from "@/lib/content";
-import { Zap } from "lucide-react";
-import { Link } from "@/i18n/navigation";
-import { useLanguage } from "./LanguageProvider";
-import { getAlternativeSlug, getFeatureSlug, getLegalSlug } from "@/lib/pageSlugs";
-import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
+import { content } from '@/lib/content'
+import { Zap } from 'lucide-react'
+import { Link } from '@/i18n/navigation'
+import { useLanguage } from './LanguageProvider'
+import {
+  getAlternativeSlug,
+  getFeatureSlug,
+  getLegalSlug,
+} from '@/lib/pageSlugs'
+import { CookiePreferencesButton } from '@/components/CookiePreferencesButton'
 
 export default function Footer() {
-  const { language } = useLanguage();
-  const t = content[language];
+  const { language } = useLanguage()
+  const t = content[language]
   const legalLinks =
-    language === "es"
+    language === 'es'
       ? [
-          { label: "Aviso legal", href: `/${getLegalSlug("aviso-legal", "es")}` },
-          { label: "Política de privacidad", href: `/${getLegalSlug("politica-privacidad", "es")}` },
-          { label: "Política de cookies", href: `/${getLegalSlug("politica-cookies", "es")}` },
+          {
+            label: 'Aviso legal',
+            href: `/${getLegalSlug('aviso-legal', 'es')}`,
+          },
+          {
+            label: 'Política de privacidad',
+            href: `/${getLegalSlug('politica-privacidad', 'es')}`,
+          },
+          {
+            label: 'Política de cookies',
+            href: `/${getLegalSlug('politica-cookies', 'es')}`,
+          },
         ]
       : [
-          { label: "Avís legal", href: `/${getLegalSlug("aviso-legal", "ca")}` },
-          { label: "Política de privacitat", href: `/${getLegalSlug("politica-privacidad", "ca")}` },
-          { label: "Política de cookies", href: `/${getLegalSlug("politica-cookies", "ca")}` },
-        ];
+          {
+            label: 'Avís legal',
+            href: `/${getLegalSlug('aviso-legal', 'ca')}`,
+          },
+          {
+            label: 'Política de privacitat',
+            href: `/${getLegalSlug('politica-privacidad', 'ca')}`,
+          },
+          {
+            label: 'Política de cookies',
+            href: `/${getLegalSlug('politica-cookies', 'ca')}`,
+          },
+        ]
 
   return (
-    <footer className="bg-slate-100 py-16 border-t border-slate-200">
+    <footer className="border-t border-slate-200 bg-slate-100 py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col gap-6">
@@ -36,17 +58,24 @@ export default function Footer() {
                 {t.footer.logo}
               </span>
             </div>
-            <p className="text-sm font-medium text-slate-600 max-w-xs leading-relaxed">
-              {language === 'es' ? 'La IA crea tu web usando los datos de tu negocio. Gratis para empezar.' : 'La IA crea la teva web utilitzant les dades del teu negoci. Gratis per començar.'}
+            <p className="max-w-xs text-sm leading-relaxed font-medium text-slate-600">
+              {language === 'es'
+                ? 'La IA crea tu web usando los datos de tu negocio. Gratis para empezar.'
+                : 'La IA crea la teva web utilitzant les dades del teu negoci. Gratis per començar.'}
             </p>
           </div>
 
           <div>
-            <h3 className="text-sm font-bold text-slate-900 mb-6 uppercase tracking-wider">{language === 'es' ? 'Características' : 'Característiques'}</h3>
+            <h3 className="mb-6 text-sm font-bold tracking-wider text-slate-900 uppercase">
+              {language === 'es' ? 'Características' : 'Característiques'}
+            </h3>
             <ul className="flex flex-col gap-4 text-sm font-medium text-slate-600">
               {t.features?.map((feature) => (
                 <li key={feature.id}>
-                  <Link href={`/caracteristicas/${getFeatureSlug(feature.id, language)}`} className="hover:text-slate-900 transition-colors">
+                  <Link
+                    href={`/caracteristicas/${getFeatureSlug(feature.id, language)}`}
+                    className="transition-colors hover:text-slate-900"
+                  >
                     {feature.title}
                   </Link>
                 </li>
@@ -55,12 +84,19 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-bold text-slate-900 mb-6 uppercase tracking-wider">{language === 'es' ? 'Alternativas' : 'Alternatives'}</h3>
+            <h3 className="mb-6 text-sm font-bold tracking-wider text-slate-900 uppercase">
+              {language === 'es' ? 'Alternativas' : 'Alternatives'}
+            </h3>
             <ul className="flex flex-col gap-4 text-sm font-medium text-slate-600">
               {t.competitors?.map((competitor) => (
                 <li key={competitor.id}>
-                  <Link href={`/alternativa/${getAlternativeSlug(competitor.id, language)}`} className="hover:text-slate-900 transition-colors">
-                    {language === 'es' ? `Alternativa a ${competitor.name}` : `Alternativa a ${competitor.name}`}
+                  <Link
+                    href={`/alternativa/${getAlternativeSlug(competitor.id, language)}`}
+                    className="transition-colors hover:text-slate-900"
+                  >
+                    {language === 'es'
+                      ? `Alternativa a ${competitor.name}`
+                      : `Alternativa a ${competitor.name}`}
                   </Link>
                 </li>
               ))}
@@ -68,11 +104,16 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-bold text-slate-900 mb-6 uppercase tracking-wider">Legal</h3>
+            <h3 className="mb-6 text-sm font-bold tracking-wider text-slate-900 uppercase">
+              Legal
+            </h3>
             <ul className="flex flex-col gap-4 text-sm font-medium text-slate-600">
               {legalLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="hover:text-slate-900 transition-colors">
+                  <Link
+                    href={link.href}
+                    className="transition-colors hover:text-slate-900"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -81,7 +122,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 sm:flex-row">
           <div className="text-sm font-medium text-slate-500">
             {t.footer.copyright}
           </div>
@@ -89,5 +130,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  );
+  )
 }

@@ -16,5 +16,11 @@ export default async function BusinessTeamPage({
 
   const members = await getTeamMembers(business.id)
 
-  return <TeamManager businessId={business.id} initialMembers={members} locale={locale} />
+  return (
+    <TeamManager
+      businessId={business.id}
+      initialMembers={members}
+      locale={locale}
+    />
+  )
 }

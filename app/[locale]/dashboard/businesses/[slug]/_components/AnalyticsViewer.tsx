@@ -1,7 +1,20 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
 
 const data = [
   { name: 'Lun', visits: 40 },
@@ -13,12 +26,12 @@ const data = [
   { name: 'Dom', visits: 34 },
 ]
 
-export default function AnalyticsViewer({ 
+export default function AnalyticsViewer({
   businessId,
-  locale 
-}: { 
-  businessId: string,
-  locale: string 
+  locale,
+}: {
+  businessId: string
+  locale: string
 }) {
   const t = {
     es: {
@@ -50,7 +63,9 @@ export default function AnalyticsViewer({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+12,234</div>
-            <p className="text-xs text-muted-foreground">+19% desde el mes pasado</p>
+            <p className="text-muted-foreground text-xs">
+              +19% desde el mes pasado
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -59,7 +74,9 @@ export default function AnalyticsViewer({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+573</div>
-            <p className="text-xs text-muted-foreground">+201 desde el mes pasado</p>
+            <p className="text-muted-foreground text-xs">
+              +201 desde el mes pasado
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -68,7 +85,9 @@ export default function AnalyticsViewer({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">2m 15s</div>
-            <p className="text-xs text-muted-foreground">-4% desde el mes pasado</p>
+            <p className="text-muted-foreground text-xs">
+              -4% desde el mes pasado
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -77,7 +96,9 @@ export default function AnalyticsViewer({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">45%</div>
-            <p className="text-xs text-muted-foreground">+2% desde el mes pasado</p>
+            <p className="text-muted-foreground text-xs">
+              +2% desde el mes pasado
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -92,8 +113,20 @@ export default function AnalyticsViewer({
         <CardContent className="pl-2">
           <ResponsiveContainer width="100%" height={350}>
             <BarChart data={data}>
-              <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+              <XAxis
+                dataKey="name"
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `${value}`}
+              />
               <Tooltip />
               <Bar dataKey="visits" fill="#10b981" radius={[4, 4, 0, 0]} />
             </BarChart>

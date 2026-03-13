@@ -1,20 +1,23 @@
-"use client";
+'use client'
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
-import { ArrowRight, Eye, EyeOff, Zap } from "lucide-react";
-import { useLanguage } from "@/components/LanguageProvider";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { createSigninSchema, type SigninFormValues } from "@/lib/validations/signin";
-import { cn } from "@/lib/utils";
-import { login } from "@/lib/supabase/actions";
-import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
-import { routing } from "@/i18n/routing";
+import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
+import { ArrowRight, Eye, EyeOff, Zap } from 'lucide-react'
+import { useLanguage } from '@/components/LanguageProvider'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  createSigninSchema,
+  type SigninFormValues,
+} from '@/lib/validations/signin'
+import { cn } from '@/lib/utils'
+import { login } from '@/lib/supabase/actions'
+import { toast } from 'sonner'
+import { createClient } from '@/lib/supabase/client'
+import { routing } from '@/i18n/routing'
 
 const GoogleLogo = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
@@ -35,105 +38,108 @@ const GoogleLogo = () => (
       fill="#EA4335"
     />
   </svg>
-);
+)
 
 const signInContent = {
   es: {
     navbar: {
-      logo: "Bunnatic",
+      logo: 'Bunnatic',
     },
     signin: {
-      title: "Inicia sesión",
-      subtitle: "Bienvenido de nuevo a Bunnatic",
-      newAccountText: "Crear una cuenta nueva",
-      or: "¿No tienes cuenta?",
-      emailLabel: "Correo electrónico",
-      passwordLabel: "Contraseña",
-      showPassword: "Mostrar contraseña",
-      hidePassword: "Ocultar contraseña",
-      rememberMe: "Recordarme",
-      forgotPassword: "¿Olvidaste tu contraseña?",
-      loginButton: "Entrar",
-      loginButtonLoading: "Entrando...",
-      socialGoogle: "Continuar con Google",
-      orDivider: "O entra con correo",
-      securityNote: "Datos seguros y cifrados.",
+      title: 'Inicia sesión',
+      subtitle: 'Bienvenido de nuevo a Bunnatic',
+      newAccountText: 'Crear una cuenta nueva',
+      or: '¿No tienes cuenta?',
+      emailLabel: 'Correo electrónico',
+      passwordLabel: 'Contraseña',
+      showPassword: 'Mostrar contraseña',
+      hidePassword: 'Ocultar contraseña',
+      rememberMe: 'Recordarme',
+      forgotPassword: '¿Olvidaste tu contraseña?',
+      loginButton: 'Entrar',
+      loginButtonLoading: 'Entrando...',
+      socialGoogle: 'Continuar con Google',
+      orDivider: 'O entra con correo',
+      securityNote: 'Datos seguros y cifrados.',
       validation: {
-        emailRequired: "El correo es requerido",
-        emailInvalid: "Correo electrónico inválido",
-        passwordRequired: "La contraseña es requerida",
+        emailRequired: 'El correo es requerido',
+        emailInvalid: 'Correo electrónico inválido',
+        passwordRequired: 'La contraseña es requerida',
       },
     },
   },
   ca: {
     navbar: {
-      logo: "Bunnatic",
+      logo: 'Bunnatic',
     },
     signin: {
-      title: "Inicia sessió",
-      subtitle: "Benvingut de nou a Bunnatic",
-      newAccountText: "Crear un compte nou",
-      or: "No tens compte?",
-      emailLabel: "Correu electrònic",
-      passwordLabel: "Contrasenya",
-      showPassword: "Mostra la contrasenya",
-      hidePassword: "Amaga la contrasenya",
+      title: 'Inicia sessió',
+      subtitle: 'Benvingut de nou a Bunnatic',
+      newAccountText: 'Crear un compte nou',
+      or: 'No tens compte?',
+      emailLabel: 'Correu electrònic',
+      passwordLabel: 'Contrasenya',
+      showPassword: 'Mostra la contrasenya',
+      hidePassword: 'Amaga la contrasenya',
       rememberMe: "Recorda'm",
-      forgotPassword: "Has oblidat la teva contrasenya?",
-      loginButton: "Entrar",
-      loginButtonLoading: "Entrant...",
-      socialGoogle: "Continua amb Google",
-      orDivider: "O entra amb correu",
-      securityNote: "Dades segures i xifrades.",
+      forgotPassword: 'Has oblidat la teva contrasenya?',
+      loginButton: 'Entrar',
+      loginButtonLoading: 'Entrant...',
+      socialGoogle: 'Continua amb Google',
+      orDivider: 'O entra amb correu',
+      securityNote: 'Dades segures i xifrades.',
       validation: {
-        emailRequired: "El correu és requerit",
-        emailInvalid: "Correu electrònic invàlid",
-        passwordRequired: "La contrasenya és requerida",
+        emailRequired: 'El correu és requerit',
+        emailInvalid: 'Correu electrònic invàlid',
+        passwordRequired: 'La contrasenya és requerida',
       },
     },
   },
-} as const;
+} as const
 
 export default function SignInPage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
       <SignInContent />
     </Suspense>
-  );
+  )
 }
 
 function SignInContent() {
-  const { language } = useLanguage();
-  const t = signInContent[language];
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [showPassword, setShowPassword] = useState(false);
+  const { language } = useLanguage()
+  const t = signInContent[language]
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [showPassword, setShowPassword] = useState(false)
 
   const localePrefix = useMemo(() => {
-    return language === routing.defaultLocale ? "" : `/${language}`;
-  }, [language]);
-  const homeHref = localePrefix || "/";
+    return language === routing.defaultLocale ? '' : `/${language}`
+  }, [language])
+  const homeHref = localePrefix || '/'
 
   const flow = useMemo(() => {
     const redirectRaw =
-      searchParams.get("redirect") ??
-      searchParams.get("next") ??
-      searchParams.get("returnTo") ??
-      searchParams.get("to") ??
-      "/dashboard";
+      searchParams.get('redirect') ??
+      searchParams.get('next') ??
+      searchParams.get('returnTo') ??
+      searchParams.get('to') ??
+      '/dashboard'
 
     return redirectRaw.startsWith(`/${language}/`)
       ? redirectRaw
-      : `${localePrefix}${redirectRaw}`;
-  }, [localePrefix, language, searchParams]);
+      : `${localePrefix}${redirectRaw}`
+  }, [localePrefix, language, searchParams])
 
   const signupHref = useMemo(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    const qs = params.toString();
-    return `${localePrefix}/signup${qs ? `?${qs}` : ""}`;
-  }, [localePrefix, searchParams]);
+    const params = new URLSearchParams(searchParams.toString())
+    const qs = params.toString()
+    return `${localePrefix}/signup${qs ? `?${qs}` : ''}`
+  }, [localePrefix, searchParams])
 
-  const schema = useMemo(() => createSigninSchema(t.signin.validation), [t.signin.validation]);
+  const schema = useMemo(
+    () => createSigninSchema(t.signin.validation),
+    [t.signin.validation]
+  )
 
   const {
     register,
@@ -141,67 +147,71 @@ function SignInContent() {
     formState: { errors, isValid, isSubmitting },
   } = useForm<SigninFormValues>({
     resolver: zodResolver(schema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
-  });
+  })
 
   async function onSubmit(data: SigninFormValues) {
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("password", data.password);
+    const formData = new FormData()
+    formData.append('email', data.email)
+    formData.append('password', data.password)
 
-    const result = await login(formData);
+    const result = await login(formData)
 
     if (result?.error) {
-      toast.error(result.error);
+      toast.error(result.error)
     } else {
-      router.push(flow);
+      router.push(flow)
     }
   }
 
   const handleSocialLogin = async () => {
-    const supabase = createClient();
+    const supabase = createClient()
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(flow)}`,
       },
-    });
+    })
 
     if (error) {
-      toast.error(error.message);
+      toast.error(error.message)
     }
-  };
+  }
 
   return (
-    <main className="min-h-screen bg-slate-50 font-sans text-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <main className="flex min-h-screen flex-col justify-center bg-slate-50 py-12 font-sans text-gray-900 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link href={homeHref} className="flex items-center justify-center gap-2 mb-6">
+        <Link
+          href={homeHref}
+          className="mb-6 flex items-center justify-center gap-2"
+        >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 shadow-sm">
             <Zap className="h-6 w-6 fill-emerald-600 text-emerald-600" />
           </div>
-          <span className="text-2xl font-bold tracking-tight text-gray-900">{t.navbar.logo}</span>
+          <span className="text-2xl font-bold tracking-tight text-gray-900">
+            {t.navbar.logo}
+          </span>
         </Link>
-        
-        <h2 className="mt-2 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+
+        <h2 className="mt-2 text-center text-2xl leading-9 font-bold tracking-tight text-gray-900">
           {t.signin.title}
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600 max-w-sm mx-auto">
+        <p className="mx-auto mt-2 max-w-sm text-center text-sm text-gray-600">
           {t.signin.subtitle}
         </p>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[420px]">
-        <div className="bg-white px-6 py-8 shadow-sm sm:rounded-3xl sm:px-10 border border-slate-200">
-          
+        <div className="border border-slate-200 bg-white px-6 py-8 shadow-sm sm:rounded-3xl sm:px-10">
           <div className="mb-8">
             <Button
               variant="outline"
               type="button"
-              className="w-full h-12 gap-3 text-base font-medium text-slate-700 hover:bg-slate-50 border-slate-200 rounded-xl transition-colors hover:border-slate-300"
+              className="h-12 w-full gap-3 rounded-xl border-slate-200 text-base font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
               onClick={handleSocialLogin}
             >
               <GoogleLogo />
@@ -210,51 +220,79 @@ function SignInContent() {
           </div>
 
           <div className="relative mb-8">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div
+              className="absolute inset-0 flex items-center"
+              aria-hidden="true"
+            >
               <div className="w-full border-t border-slate-200" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-slate-400 font-medium tracking-wide">
+              <span className="bg-white px-3 font-medium tracking-wide text-slate-400">
                 {t.signin.orDivider}
               </span>
             </div>
           </div>
 
-          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
+          <form
+            className="space-y-5"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+          >
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="email" className="text-sm font-medium text-gray-900 ml-1">{t.signin.emailLabel}</label>
+                <label
+                  htmlFor="email"
+                  className="ml-1 text-sm font-medium text-gray-900"
+                >
+                  {t.signin.emailLabel}
+                </label>
                 <Input
                   id="email"
                   type="email"
                   autoComplete="email"
-                  {...register("email")}
+                  {...register('email')}
                   className={cn(
-                    "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
-                    errors.email ? "border-rose-300 focus:border-rose-300 focus:ring-rose-500/20" : "focus:border-emerald-500"
+                    'h-11 rounded-xl border-slate-200 bg-slate-50 px-4 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20',
+                    errors.email
+                      ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-500/20'
+                      : 'focus:border-emerald-500'
                   )}
                   placeholder={t.signin.emailLabel}
                   aria-invalid={Boolean(errors.email)}
                 />
-                {errors.email ? <p className="text-xs font-medium text-rose-600 ml-1">{errors.email.message}</p> : null}
+                {errors.email ? (
+                  <p className="ml-1 text-xs font-medium text-rose-600">
+                    {errors.email.message}
+                  </p>
+                ) : null}
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label htmlFor="password" className="text-sm font-medium text-gray-900 ml-1">{t.signin.passwordLabel}</label>
-                  <a href="#" className="text-xs font-medium text-emerald-600 hover:text-emerald-500">
+                  <label
+                    htmlFor="password"
+                    className="ml-1 text-sm font-medium text-gray-900"
+                  >
+                    {t.signin.passwordLabel}
+                  </label>
+                  <a
+                    href="#"
+                    className="text-xs font-medium text-emerald-600 hover:text-emerald-500"
+                  >
                     {t.signin.forgotPassword}
                   </a>
                 </div>
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
-                    {...register("password")}
+                    {...register('password')}
                     className={cn(
-                      "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 pr-11 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
-                      errors.password ? "border-rose-300 focus:border-rose-300 focus:ring-rose-500/20" : "focus:border-emerald-500"
+                      'h-11 rounded-xl border-slate-200 bg-slate-50 px-4 pr-11 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20',
+                      errors.password
+                        ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-500/20'
+                        : 'focus:border-emerald-500'
                     )}
                     placeholder={t.signin.passwordLabel}
                     aria-invalid={Boolean(errors.password)}
@@ -264,13 +302,25 @@ function SignInContent() {
                     variant="ghost"
                     size="icon"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600 hover:bg-transparent"
-                    aria-label={showPassword ? t.signin.hidePassword : t.signin.showPassword}
+                    className="absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2 text-gray-400 hover:bg-transparent hover:text-gray-600"
+                    aria-label={
+                      showPassword
+                        ? t.signin.hidePassword
+                        : t.signin.showPassword
+                    }
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
-                {errors.password ? <p className="text-xs font-medium text-rose-600 ml-1">{errors.password.message}</p> : null}
+                {errors.password ? (
+                  <p className="ml-1 text-xs font-medium text-rose-600">
+                    {errors.password.message}
+                  </p>
+                ) : null}
               </div>
             </div>
 
@@ -280,10 +330,10 @@ function SignInContent() {
                 type="submit"
                 disabled={!isValid || isSubmitting}
                 className={cn(
-                  "group relative flex w-full h-12 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-colors",
+                  'group relative flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-colors',
                   !isValid || isSubmitting
-                    ? "cursor-not-allowed bg-emerald-300"
-                    : "bg-emerald-700 hover:bg-emerald-800"
+                    ? 'cursor-not-allowed bg-emerald-300'
+                    : 'bg-emerald-700 hover:bg-emerald-800'
                 )}
               >
                 {isSubmitting ? (
@@ -299,20 +349,23 @@ function SignInContent() {
                 )}
               </Button>
             </div>
-            
-            <p className="text-center text-xs text-slate-500 mt-4">
+
+            <p className="mt-4 text-center text-xs text-slate-500">
               {t.signin.securityNote}
             </p>
           </form>
 
           <p className="mt-8 text-center text-sm text-gray-500">
-            {t.signin.or}{" "}
-            <Link href={signupHref} className="font-semibold text-emerald-600 hover:text-emerald-500 hover:underline underline-offset-4">
+            {t.signin.or}{' '}
+            <Link
+              href={signupHref}
+              className="font-semibold text-emerald-600 underline-offset-4 hover:text-emerald-500 hover:underline"
+            >
               {t.signin.newAccountText}
             </Link>
           </p>
         </div>
       </div>
     </main>
-  );
+  )
 }

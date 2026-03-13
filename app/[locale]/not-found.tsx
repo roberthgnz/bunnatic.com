@@ -1,35 +1,36 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { Zap, ArrowLeft } from "lucide-react";
-import { useLanguage } from "@/components/LanguageProvider";
+import Link from 'next/link'
+import { Zap, ArrowLeft } from 'lucide-react'
+import { useLanguage } from '@/components/LanguageProvider'
 
 const notFoundContent = {
   es: {
-    title: "Página no encontrada",
-    description: "Lo sentimos, no hemos podido encontrar la página que estás buscando.",
-    back: "Volver al inicio",
+    title: 'Página no encontrada',
+    description:
+      'Lo sentimos, no hemos podido encontrar la página que estás buscando.',
+    back: 'Volver al inicio',
   },
   ca: {
-    title: "Pàgina no trobada",
-    description: "Ho sentim, no hem pogut trobar la pàgina que estàs buscant.",
+    title: 'Pàgina no trobada',
+    description: 'Ho sentim, no hem pogut trobar la pàgina que estàs buscant.',
     back: "Tornar a l'inici",
   },
-} as const;
+} as const
 
 export default function NotFound() {
-  const { language } = useLanguage();
-  const t = notFoundContent[language];
+  const { language } = useLanguage()
+  const t = notFoundContent[language]
 
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 mb-8">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4">
+      <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100">
         <Zap className="h-8 w-8 fill-emerald-600 text-emerald-600" />
       </div>
-      <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4">
+      <h1 className="mb-4 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
         {t.title}
       </h1>
-      <p className="text-lg text-gray-600 mb-8 text-center max-w-md">
+      <p className="mb-8 max-w-md text-center text-lg text-gray-600">
         {t.description}
       </p>
       <Link
@@ -40,5 +41,5 @@ export default function NotFound() {
         {t.back}
       </Link>
     </main>
-  );
+  )
 }

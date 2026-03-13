@@ -13,7 +13,10 @@ export default function PlanBadge({ plan }: { plan?: string }) {
   return (
     <Badge
       variant="outline"
-      className={colors[planName as keyof typeof colors] || 'border-slate-200 bg-slate-50 text-slate-700'}
+      className={
+        colors[planName as keyof typeof colors] ||
+        'border-slate-200 bg-slate-50 text-slate-700'
+      }
     >
       {planName}
     </Badge>

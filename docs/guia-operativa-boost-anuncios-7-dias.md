@@ -17,14 +17,17 @@ No hace falta entender Meta Ads a fondo para hacer esta prueba.
 No buscamos likes.
 
 Buscamos esto:
+
 - que la gente haga clic
 - que llegue a `/crear`
 - que pruebe la demo
 
 CTA unico:
+
 - `Probar demo gratis`
 
 Enlace unico:
+
 - `/crear`
 
 ## 2) Orden exacto de lo que tienes que hacer
@@ -49,9 +52,11 @@ Eso es todo.
 ### Cuando pulses `Promocionar`
 
 Si Instagram te pregunta el objetivo, elige:
+
 - `Mas visitas al sitio web`
 
 No elijas:
+
 - `Mas visitas al perfil`
 - `Mas mensajes`
 - `Mas interaccion`
@@ -61,23 +66,28 @@ Solo usa `Mas mensajes` el dia 6, porque ese dia si queremos que escriban por DM
 ### Cuando te pida el enlace web
 
 Pon este:
+
 - `/crear`
 
 Si quieres medir mejor, usa UTMs:
+
 - `/crear?utm_source=instagram&utm_medium=paid_social&utm_campaign=semana_1_validacion&utm_content=imagen_dia_1`
 
 ### Cuando te pida audiencia
 
 Para no liarte, usa solo una audiencia esta semana:
+
 - restaurantes en Espana
 
 Configura esto:
+
 - pais: Espana
 - edad: 25-55
 - sexo: todos
 - idioma: espanol y catalan
 
 Intereses:
+
 - restaurante
 - hosteleria
 - reservas online
@@ -90,6 +100,7 @@ No metas 20 intereses. Con 5-6 vale.
 ### Cuando te pida dinero
 
 Pon esto:
+
 - presupuesto: 15-25 EUR
 - duracion: 1 dia
 
@@ -116,6 +127,7 @@ La imagen debe ensenar esto:
 - ensena el producto real
 
 No hagas esto:
+
 - imagenes con demasiado texto
 - imagenes sin mostrar `/crear`
 - imagenes genericas de marketing con stock raro
@@ -125,30 +137,38 @@ No hagas esto:
 Usa esta estructura siempre:
 
 ### Parte 1 - Titulo grande
+
 Arriba del todo.
 
 Di una de estas frases:
+
 - `Te encuentran, pero no te reservan`
 - `Tu negocio aparece online, pero no convierte`
 - `Estas perdiendo clientes por no tener una web clara`
 
 ### Parte 2 - Imagen central
+
 Ensena una ficha de Google, Instagram o una web floja al lado de una preview mejor.
 
 Pon una de estas frases pequenas:
+
 - `Sin CTA claro`
 - `Sin reservas visibles`
 - `Sin estructura para convertir`
 
 ### Parte 3 - Solucion
+
 Debajo de la imagen central, pon una frase simple.
 
 Usa algo como:
+
 - `Asi se veria una version mucho mas clara`
 - `Aqui ya hay CTA, contacto y estructura`
 
 ### Parte 4 - CTA
+
 Abajo del todo:
+
 - `Prueba la demo gratis`
 
 ## 6) Plantilla visual muy facil para Canva
@@ -187,12 +207,15 @@ Otro ejemplo:
 No compliques el plan. Solo necesitas 6 publicaciones y 1 dia de revision.
 
 ### Dia 1
+
 Imagen sobre dolor.
 
 Idea:
+
 - `Te encuentran, pero no te reservan`
 
 Haz esta imagen asi:
+
 - arriba: titulo grande `Te encuentran, pero no te reservan`
 - centro izquierda: captura de ficha de Google o Instagram del negocio
 - centro derecha: una preview mas clara
@@ -200,20 +223,25 @@ Haz esta imagen asi:
 - boton falso final: `Probar demo gratis`
 
 Que debe verse:
+
 - que el negocio existe online
 - que no hay una llamada clara a reservar o contactar
 - que la version nueva se entiende mejor
 
 Copy del post:
+
 - `Muchos negocios locales ya aparecen online, pero siguen perdiendo clientes porque no tienen una web clara. Prueba la demo gratis.`
 
 ### Dia 2
+
 Imagen de antes y despues.
 
 Idea:
+
 - `De ficha suelta a web clara`
 
 Haz esta imagen asi:
+
 - arriba: titulo grande `De ficha suelta a web clara`
 - centro: comparativa visual muy clara `Antes` y `Despues`
 - debajo de `Antes`: `Solo presencia`
@@ -221,20 +249,25 @@ Haz esta imagen asi:
 - abajo: boton falso `Probar demo gratis`
 
 Que debe verse:
+
 - un contraste fuerte entre lo que hay ahora y lo que podria haber
 - nada de mucho texto
 - que el ojo entienda el cambio en 1 segundo
 
 Copy del post:
+
 - `Asi pasa un negocio local de tener solo presencia online a tener una web mucho mas clara para captar reservas o contactos. Prueba la demo gratis.`
 
 ### Dia 3
+
 Imagen de dinero perdido.
 
 Idea:
+
 - `Estas perdiendo reservas`
 
 Haz esta imagen asi:
+
 - arriba: titulo grande `Estas perdiendo reservas`
 - centro: captura del negocio actual
 - sobre la captura, 3 etiquetas pequenas:
@@ -245,41 +278,51 @@ Haz esta imagen asi:
 - boton falso: `Probar demo gratis`
 
 Que debe transmitir:
+
 - urgencia
 - perdida de negocio
 - problema comercial, no estetico
 
 Copy del post:
+
 - `No tener una web clara no es solo un problema de imagen. Tambien es un problema de ventas. Si hoy dependes solo de Google o Instagram, prueba la demo gratis.`
 
 ### Dia 4
+
 Repite el mejor de los tres primeros, pero con otro inicio.
 
 Ejemplo:
+
 - si gano el de antes y despues, haces otro parecido
 
 Como repetirlo sin hacer lo mismo:
+
 - cambia el titulo principal
 - usa otro negocio de ejemplo
 - cambia el texto corto de abajo
 - deja igual el CTA y el enlace
 
 Titulos alternativos:
+
 - `Tu negocio necesita algo mas que Instagram`
 - `Estar online no basta`
 - `Tu problema no es visibilidad`
 - `Necesitas una web que convierta`
 
 Ejemplo de copy:
+
 - `Si tu negocio ya recibe visitas pero no suficientes contactos, seguramente no te falta visibilidad. Te falta una web mas clara. Prueba la demo gratis.`
 
 ### Dia 5
+
 Imagen tipo ejemplo real o simulacion honesta.
 
 Idea:
+
 - `Asi podria quedar tu negocio`
 
 Haz esta imagen asi:
+
 - arriba: titulo grande `Asi podria quedar tu negocio`
 - centro: preview grande ocupando casi toda la imagen
 - encima o al lado: una pequena etiqueta `Ejemplo real` o `Simulacion`
@@ -290,48 +333,59 @@ Haz esta imagen asi:
 - boton falso final: `Probar demo gratis`
 
 Que debe transmitir:
+
 - confianza
 - claridad
 - resultado final
 
 Importante:
+
 - si no es un cliente real, escribe `Simulacion` para no parecer humo
 
 Copy del post:
+
 - `No es una idea abstracta. Asi podria verse una web pensada para convertir visitas en contactos o reservas. Prueba la demo gratis.`
 
 ### Dia 6
+
 Stories en vez de post normal.
 
 Aqui si puedes elegir:
+
 - `Mas mensajes`
 
 Haz 3 stories:
+
 1. `Tu negocio recibe visitas pero pocos contactos?`
 2. `Te digo en 1 frase que le falta a tu web`
 3. `Escribeme DEMO`
 
 Como hacerlas:
+
 - story 1: fondo simple + pregunta grande
 - story 2: captura de preview + frase `Esto es lo que cambiaria primero`
 - story 3: CTA directo `Escribeme DEMO y te digo por donde empezar`
 
 Objetivo de este dia:
+
 - no vender fuerte
 - abrir conversaciones
 - descubrir dudas reales
 
 ### Dia 7
+
 No publiques nada nuevo.
 
 Solo mira resultados.
 
 Mira esto de cada publicacion:
+
 - cual recibio mas clics
 - cual llevo mas gente a `/crear`
 - cual genero mas pruebas reales
 
 Con eso decides:
+
 - repetir la mejor
 - dejar de usar la peor
 - hacer nuevas variantes solo de la que gano
@@ -382,11 +436,13 @@ Cada dia subes una imagen clara, la promocionas con `Mas visitas al sitio web`, 
 Estos prompts estan pensados para generar la base visual del anuncio.
 
 Lo mas practico es esto:
+
 - usa la IA para sacar la composicion
 - luego mete el texto final en Canva
 - si puedes, cambia la UI generada por capturas reales de `/crear`
 
 Motivo:
+
 - las IAs de imagen suelen fallar al escribir texto exacto
 - para anuncios, el texto debe quedar limpio y legible
 
@@ -401,6 +457,7 @@ Create a static Instagram sponsored ad for a SaaS product called Bunnatic aimed 
 ### Prompt Dia 1 - Dolor
 
 Usalo para la imagen:
+
 - `Te encuentran, pero no te reservan`
 
 ```text
@@ -408,6 +465,7 @@ Create a static Instagram sponsored ad for Bunnatic, a SaaS that helps local bus
 ```
 
 Texto que luego pondras en Canva:
+
 - titulo: `Te encuentran, pero no te reservan`
 - texto corto: `El problema no es aparecer. Es no convertir.`
 - CTA: `Probar demo gratis`
@@ -415,6 +473,7 @@ Texto que luego pondras en Canva:
 ### Prompt Dia 2 - Antes y despues
 
 Usalo para la imagen:
+
 - `De ficha suelta a web clara`
 
 ```text
@@ -422,6 +481,7 @@ Create a static Instagram sponsored ad for Bunnatic, aimed at restaurant owners 
 ```
 
 Texto que luego pondras en Canva:
+
 - titulo: `De ficha suelta a web clara`
 - etiqueta izquierda: `Antes`
 - etiqueta derecha: `Despues`
@@ -430,6 +490,7 @@ Texto que luego pondras en Canva:
 ### Prompt Dia 3 - Dinero perdido
 
 Usalo para la imagen:
+
 - `Estas perdiendo reservas`
 
 ```text
@@ -437,6 +498,7 @@ Create a static Instagram sponsored ad for Bunnatic, targeting restaurant owners
 ```
 
 Texto que luego pondras en Canva:
+
 - titulo: `Estas perdiendo reservas`
 - mini etiquetas: `Sin reserva visible`, `Sin CTA claro`, `Sin contacto rapido`
 - texto corto: `Cada duda sin resolver es una oportunidad perdida`
@@ -451,6 +513,7 @@ Create a static Instagram sponsored ad for Bunnatic, a website SaaS for local bu
 ```
 
 Texto que luego pondras en Canva:
+
 - uno de estos titulos:
 - `Tu negocio necesita algo mas que Instagram`
 - `Estar online no basta`
@@ -461,6 +524,7 @@ Texto que luego pondras en Canva:
 ### Prompt Dia 5 - Ejemplo o simulacion
 
 Usalo para la imagen:
+
 - `Asi podria quedar tu negocio`
 
 ```text
@@ -468,6 +532,7 @@ Create a static Instagram sponsored ad for Bunnatic aimed at restaurant owners i
 ```
 
 Texto que luego pondras en Canva:
+
 - titulo: `Asi podria quedar tu negocio`
 - etiqueta pequena: `Simulacion`
 - bullets: `Mensaje mas claro`, `CTA visible`, `Mas opciones de contacto`
@@ -478,6 +543,7 @@ Texto que luego pondras en Canva:
 Aqui necesitas 3 piezas separadas en formato story.
 
 Formato:
+
 - `1080x1920`
 
 #### Story 1
@@ -487,6 +553,7 @@ Create an Instagram Story sponsored ad background for Bunnatic, targeting restau
 ```
 
 Texto que luego pondras:
+
 - `Tu negocio recibe visitas pero pocos contactos?`
 
 #### Story 2
@@ -496,6 +563,7 @@ Create an Instagram Story sponsored ad background for Bunnatic showing a realist
 ```
 
 Texto que luego pondras:
+
 - `Te digo en 1 frase que le falta a tu web`
 
 #### Story 3
@@ -505,6 +573,7 @@ Create an Instagram Story sponsored ad background for Bunnatic, optimized for di
 ```
 
 Texto que luego pondras:
+
 - `Escribeme DEMO`
 
 ### Prompt negativo opcional

@@ -46,7 +46,11 @@ type BusinessDomainRecord = {
   updated_at: string
 }
 
-function logCloudflareValidationDebug(context: string, hostname: string, cloudflareDomain: any) {
+function logCloudflareValidationDebug(
+  context: string,
+  hostname: string,
+  cloudflareDomain: any
+) {
   const sslStatus = cloudflareDomain?.ssl?.status ?? null
   const validationRecords = cloudflareDomain?.ssl?.validation_records ?? []
   const ownership = cloudflareDomain?.ownership_verification ?? null
@@ -58,23 +62,29 @@ function logCloudflareValidationDebug(context: string, hostname: string, cloudfl
     status: cloudflareDomain?.status ?? null,
     sslStatus,
     sslMethod: cloudflareDomain?.ssl?.method ?? null,
-    validationRecordsCount: Array.isArray(validationRecords) ? validationRecords.length : 0,
+    validationRecordsCount: Array.isArray(validationRecords)
+      ? validationRecords.length
+      : 0,
     validationRecords,
     ownershipVerification: ownership,
-    ownershipVerificationHttp: cloudflareDomain?.ownership_verification_http ?? null,
+    ownershipVerificationHttp:
+      cloudflareDomain?.ownership_verification_http ?? null,
   })
 
   if (
     sslStatus === 'pending_validation' &&
     (!Array.isArray(validationRecords) || validationRecords.length === 0)
   ) {
-    console.warn('[domains][cloudflare-debug] SSL pending_validation without validation_records', {
-      context,
-      hostname,
-      customHostnameId: cloudflareDomain?.id ?? null,
-      rawSsl: cloudflareDomain?.ssl ?? null,
-      rawDomain: cloudflareDomain,
-    })
+    console.warn(
+      '[domains][cloudflare-debug] SSL pending_validation without validation_records',
+      {
+        context,
+        hostname,
+        customHostnameId: cloudflareDomain?.id ?? null,
+        rawSsl: cloudflareDomain?.ssl ?? null,
+        rawDomain: cloudflareDomain,
+      }
+    )
   }
 }
 
@@ -90,11 +100,14 @@ function isBusinessDomainsTableMissing(
 
   return (
     error.code === 'PGRST205' ||
-    error.message?.includes("public.business_domains") === true
+    error.message?.includes('public.business_domains') === true
   )
 }
 
-function getDomainQueryErrorMessage(error: { message?: string; code?: string }) {
+function getDomainQueryErrorMessage(error: {
+  message?: string
+  code?: string
+}) {
   if (isBusinessDomainsTableMissing(error)) {
     return BUSINESS_DOMAINS_TABLE_MISSING_MESSAGE
   }
@@ -116,7 +129,9 @@ async function getOwnedBusinessBySlug(slug: string, userId: string) {
   }
 
   if (!business) {
-    return { error: 'No tienes permisos para gestionar el dominio de este negocio.' }
+    return {
+      error: 'No tienes permisos para gestionar el dominio de este negocio.',
+    }
   }
 
   return { business }
@@ -167,8 +182,12 @@ async function findUserIdByEmail(email: string) {
 
 function getMonthBoundsIso() {
   const now = new Date()
-  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
-  const nextMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1))
+  const monthStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)
+  )
+  const nextMonthStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)
+  )
 
   return {
     monthStartIso: monthStart.toISOString(),
@@ -203,16 +222,25 @@ async function getGenerationEntitlementInternal(
     return { error: countError.message }
   }
 
-  const plan = mapStripePriceIdToGenerationPlan(profile?.stripe_price_id ?? null)
+  const plan = mapStripePriceIdToGenerationPlan(
+    profile?.stripe_price_id ?? null
+  )
   const entitlement = getGenerationEntitlementFromPlan(plan, count ?? 0)
   return { entitlement }
 }
 
-export async function generateAndApplyContent(businessId: string, name: string, category: string) {
+export async function generateAndApplyContent(
+  businessId: string,
+  name: string,
+  category: string
+) {
   const supabase = await createClient()
-  
+
   // 1. Generate content
-  const { description, services } = await generateBusinessContent(name, category)
+  const { description, services } = await generateBusinessContent(
+    name,
+    category
+  )
 
   // 2. Update business description
   const { error: updateError } = await supabase
@@ -224,16 +252,16 @@ export async function generateAndApplyContent(businessId: string, name: string, 
 
   // 3. Create services if any
   if (services && services.length > 0) {
-    const { error: servicesError } = await supabase
-      .from('services')
-      .insert(services.map(s => ({
+    const { error: servicesError } = await supabase.from('services').insert(
+      services.map((s) => ({
         business_id: businessId,
         name: s.name,
         description: s.description,
         price: s.price,
-        duration: s.duration
-      })))
-    
+        duration: s.duration,
+      }))
+    )
+
     if (servicesError) return { error: servicesError.message }
   }
 
@@ -243,7 +271,9 @@ export async function generateAndApplyContent(businessId: string, name: string, 
 
 export async function getGenerationEntitlement(userId?: string) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -262,7 +292,9 @@ export async function buildBusinessSourcePreview(input: {
   sourcePayload: unknown
 }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -278,7 +310,9 @@ export async function consumeGenerationQuota(
   sourceType: SourceType
 ) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Not authenticated', allowed: false as const }
@@ -300,7 +334,10 @@ export async function consumeGenerationQuota(
   }
 
   if (!business) {
-    return { error: 'No tienes permisos sobre este negocio.', allowed: false as const }
+    return {
+      error: 'No tienes permisos sobre este negocio.',
+      allowed: false as const,
+    }
   }
 
   const entitlementResult = await getGenerationEntitlementInternal(user.id)
@@ -354,7 +391,9 @@ export async function applyBusinessSourceGeneration(input: {
   previewPayload: BusinessSourcePreview
 }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -380,7 +419,11 @@ export async function applyBusinessSourceGeneration(input: {
     return { error: 'No tienes permisos sobre este negocio.' }
   }
 
-  const quotaResult = await consumeGenerationQuota(user.id, input.businessId, input.sourceType)
+  const quotaResult = await consumeGenerationQuota(
+    user.id,
+    input.businessId,
+    input.sourceType
+  )
   if (!quotaResult.allowed) {
     return {
       error: quotaResult.error ?? 'No se pudo consumir cuota de generación.',
@@ -467,18 +510,16 @@ export async function applyBusinessSourceGeneration(input: {
   }
 
   if (selectedBlocks.includes('hours') && preview.hours.length > 0) {
-    const { error: hoursError } = await supabase
-      .from('working_hours')
-      .upsert(
-        preview.hours.map((hour) => ({
-          business_id: input.businessId,
-          day_of_week: hour.day_of_week,
-          open_time: hour.is_closed ? null : hour.open_time,
-          close_time: hour.is_closed ? null : hour.close_time,
-          is_closed: hour.is_closed,
-        })),
-        { onConflict: 'business_id, day_of_week' }
-      )
+    const { error: hoursError } = await supabase.from('working_hours').upsert(
+      preview.hours.map((hour) => ({
+        business_id: input.businessId,
+        day_of_week: hour.day_of_week,
+        open_time: hour.is_closed ? null : hour.open_time,
+        close_time: hour.is_closed ? null : hour.close_time,
+        is_closed: hour.is_closed,
+      })),
+      { onConflict: 'business_id, day_of_week' }
+    )
 
     if (hoursError) {
       return { error: hoursError.message }
@@ -526,13 +567,17 @@ export async function signup(formData: FormData) {
 
 export async function getUser() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   return user
 }
 
 export async function getProfile() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return null
@@ -546,12 +591,18 @@ export async function getProfile() {
 
   return profile
     ? { ...profile, email: user.email }
-    : { id: user.id, full_name: user.user_metadata?.full_name || null, email: user.email }
+    : {
+        id: user.id,
+        full_name: user.user_metadata?.full_name || null,
+        email: user.email,
+      }
 }
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -606,14 +657,22 @@ export async function logout() {
 
 export async function createBusinessFromGoogle(placeData: any) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
   }
 
-  const slug = placeData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Math.floor(Math.random() * 1000)
-  
+  const slug =
+    placeData.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') +
+    '-' +
+    Math.floor(Math.random() * 1000)
+
   // 1. Create Business
   const { data: business, error: businessError } = await supabase
     .from('businesses')
@@ -621,7 +680,9 @@ export async function createBusinessFromGoogle(placeData: any) {
       user_id: user.id,
       name: placeData.name,
       slug: slug,
-      description: placeData.editorial_summary?.overview || `Bienvenido a ${placeData.name}`,
+      description:
+        placeData.editorial_summary?.overview ||
+        `Bienvenido a ${placeData.name}`,
       category: placeData.types?.[0] || 'Negocio Local',
       address: placeData.formatted_address,
       phone: placeData.formatted_phone_number,
@@ -643,34 +704,41 @@ export async function createBusinessFromGoogle(placeData: any) {
       order_index: 0,
       content: {
         title: placeData.name,
-        subtitle: placeData.types?.[0] ? `El mejor servicio de ${placeData.types[0].replace(/_/g, ' ')}` : 'Tu negocio local de confianza',
+        subtitle: placeData.types?.[0]
+          ? `El mejor servicio de ${placeData.types[0].replace(/_/g, ' ')}`
+          : 'Tu negocio local de confianza',
         ctaText: 'Contactar ahora',
-        image: placeData.photos?.[0]?.photo_reference // In real app we would proxy this
-      }
+        image: placeData.photos?.[0]?.photo_reference, // In real app we would proxy this
+      },
     },
     {
       type: 'about',
       order_index: 1,
       content: {
         title: 'Sobre nosotros',
-        text: placeData.editorial_summary?.overview || `En ${placeData.name} nos dedicamos a ofrecer el mejor servicio a nuestros clientes.`
-      }
+        text:
+          placeData.editorial_summary?.overview ||
+          `En ${placeData.name} nos dedicamos a ofrecer el mejor servicio a nuestros clientes.`,
+      },
     },
     {
       type: 'services',
       order_index: 2,
       content: {
         title: 'Nuestros Servicios',
-        services: (placeData.types || []).slice(0, 6).map((t: string) => ({ name: t.replace(/_/g, ' '), description: '' }))
-      }
+        services: (placeData.types || []).slice(0, 6).map((t: string) => ({
+          name: t.replace(/_/g, ' '),
+          description: '',
+        })),
+      },
     },
     {
       type: 'reviews',
       order_index: 3,
       content: {
         title: 'Lo que dicen nuestros clientes',
-        reviews: (placeData.reviews || []).slice(0, 3)
-      }
+        reviews: (placeData.reviews || []).slice(0, 3),
+      },
     },
     {
       type: 'contact',
@@ -679,14 +747,14 @@ export async function createBusinessFromGoogle(placeData: any) {
         title: 'Contacta con nosotros',
         address: placeData.formatted_address,
         phone: placeData.formatted_phone_number,
-        email: ''
-      }
-    }
+        email: '',
+      },
+    },
   ]
 
   const { error: sectionsError } = await supabase
     .from('business_sections')
-    .insert(sections.map(s => ({ ...s, business_id: businessId })))
+    .insert(sections.map((s) => ({ ...s, business_id: businessId })))
 
   if (sectionsError) console.error('Error creating sections', sectionsError)
 
@@ -696,31 +764,31 @@ export async function createBusinessFromGoogle(placeData: any) {
       business_id: businessId,
       day_of_week: p.open.day,
       open_time: `${p.open.time.slice(0, 2)}:${p.open.time.slice(2)}`,
-      close_time: p.close ? `${p.close.time.slice(0, 2)}:${p.close.time.slice(2)}` : null,
-      is_closed: false
+      close_time: p.close
+        ? `${p.close.time.slice(0, 2)}:${p.close.time.slice(2)}`
+        : null,
+      is_closed: false,
     }))
-    
+
     // Fill missing days as closed? Or just insert what we have.
     // Let's insert what we have.
     const { error: hoursError } = await supabase
       .from('working_hours')
       .insert(hours)
-    
+
     if (hoursError) console.error('Error creating hours', hoursError)
   }
 
   const onboardingCompletedAt = new Date().toISOString()
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .upsert(
-      {
-        id: user.id,
-        onboarding_completed: true,
-        onboarding_completed_at: onboardingCompletedAt,
-        updated_at: onboardingCompletedAt,
-      },
-      { onConflict: 'id' }
-    )
+  const { error: profileError } = await supabase.from('profiles').upsert(
+    {
+      id: user.id,
+      onboarding_completed: true,
+      onboarding_completed_at: onboardingCompletedAt,
+      updated_at: onboardingCompletedAt,
+    },
+    { onConflict: 'id' }
+  )
 
   if (profileError) {
     console.error('Error marking onboarding as completed:', profileError)
@@ -732,7 +800,9 @@ export async function createBusinessFromGoogle(placeData: any) {
 
 export async function createBusiness(formData: FormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -757,37 +827,33 @@ export async function createBusiness(formData: FormData) {
     }
   }
 
-  const { error } = await supabase
-    .from('businesses')
-    .insert({
-      user_id: user.id,
-      name,
-      slug,
-      description,
-      category,
-      address,
-      phone,
-      website,
-      google_place_id: googlePlaceId,
-      place_data: placeData,
-    })
+  const { error } = await supabase.from('businesses').insert({
+    user_id: user.id,
+    name,
+    slug,
+    description,
+    category,
+    address,
+    phone,
+    website,
+    google_place_id: googlePlaceId,
+    place_data: placeData,
+  })
 
   if (error) {
     return { error: error.message }
   }
 
   const onboardingCompletedAt = new Date().toISOString()
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .upsert(
-      {
-        id: user.id,
-        onboarding_completed: true,
-        onboarding_completed_at: onboardingCompletedAt,
-        updated_at: onboardingCompletedAt,
-      },
-      { onConflict: 'id' }
-    )
+  const { error: profileError } = await supabase.from('profiles').upsert(
+    {
+      id: user.id,
+      onboarding_completed: true,
+      onboarding_completed_at: onboardingCompletedAt,
+      updated_at: onboardingCompletedAt,
+    },
+    { onConflict: 'id' }
+  )
 
   if (profileError) {
     return { error: profileError.message }
@@ -799,7 +865,9 @@ export async function createBusiness(formData: FormData) {
 
 export async function getBusinesses() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return []
@@ -813,9 +881,11 @@ export async function getBusinesses() {
 
   const { data: teamMemberships } = await supabase
     .from('team_members')
-    .select(`
+    .select(
+      `
       businesses!inner (*)
-    `)
+    `
+    )
     .eq('user_id', user.id)
     .eq('status', 'active')
 
@@ -824,7 +894,9 @@ export async function getBusinesses() {
     .filter(Boolean)
 
   const allBusinesses = [...(ownedBusinesses || []), ...teamBusinesses]
-  const deduped = Array.from(new Map(allBusinesses.map((business) => [business.id, business])).values())
+  const deduped = Array.from(
+    new Map(allBusinesses.map((business) => [business.id, business])).values()
+  )
   const businessIds = deduped.map((business) => business.id)
 
   let domainByBusinessId = new Map<
@@ -861,13 +933,17 @@ export async function getBusinesses() {
       }
     })
     .sort(
-    (a, b) => new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime()
-  )
+      (a, b) =>
+        new Date(b.created_at || '').getTime() -
+        new Date(a.created_at || '').getTime()
+    )
 }
 
 export async function getBusinessBySlug(slug: string) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return null
@@ -900,7 +976,9 @@ export async function getBusinessBySlug(slug: string) {
 
 export async function getBusinessDomain(slug: string) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return null
@@ -952,7 +1030,9 @@ function computeActivatedAt(
 
 export async function connectBusinessDomain(slug: string, formData: FormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Debes iniciar sesión para conectar un dominio.' }
@@ -961,11 +1041,16 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
   const hostnameInput = String(formData.get('hostname') || '')
   const hostname = normalizeHostname(hostnameInput)
   if (!hostname) {
-    return { error: 'Introduce un dominio válido (por ejemplo: www.tunegocio.com).' }
+    return {
+      error: 'Introduce un dominio válido (por ejemplo: www.tunegocio.com).',
+    }
   }
 
   if (isPlatformHost(hostname)) {
-    return { error: 'Ese dominio pertenece a la plataforma y no puede asignarse a un negocio.' }
+    return {
+      error:
+        'Ese dominio pertenece a la plataforma y no puede asignarse a un negocio.',
+    }
   }
 
   const ownedBusiness = await getOwnedBusinessBySlug(slug, user.id)
@@ -1008,7 +1093,9 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
     try {
       cloudflareDomain = await createCloudflareCustomHostname(hostname)
     } catch (error) {
-      const existingInCloudflare = await findCloudflareCustomHostnameByHostname(hostname).catch(() => null)
+      const existingInCloudflare = await findCloudflareCustomHostnameByHostname(
+        hostname
+      ).catch(() => null)
       if (!existingInCloudflare?.id) {
         throw error
       }
@@ -1016,17 +1103,26 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
     }
 
     if (!cloudflareDomain?.id) {
-      const existingInCloudflare = await findCloudflareCustomHostnameByHostname(hostname)
+      const existingInCloudflare =
+        await findCloudflareCustomHostnameByHostname(hostname)
       if (!existingInCloudflare?.id) {
-        return { error: 'Cloudflare no devolvió un identificador para el dominio.' }
+        return {
+          error: 'Cloudflare no devolvió un identificador para el dominio.',
+        }
       }
       cloudflareDomain = existingInCloudflare
     }
 
     const mappedStatus = mapCloudflareStatus(cloudflareDomain)
-    const verificationRecord = extractOwnershipVerificationRecord(cloudflareDomain)
-    const verificationMethod = cloudflareDomain.ssl?.method === 'http' ? 'http' : 'txt'
-    logCloudflareValidationDebug('connectBusinessDomain', hostname, cloudflareDomain)
+    const verificationRecord =
+      extractOwnershipVerificationRecord(cloudflareDomain)
+    const verificationMethod =
+      cloudflareDomain.ssl?.method === 'http' ? 'http' : 'txt'
+    logCloudflareValidationDebug(
+      'connectBusinessDomain',
+      hostname,
+      cloudflareDomain
+    )
 
     const payload = {
       business_id: business.id,
@@ -1036,15 +1132,20 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
       cloudflare_custom_hostname_id: cloudflareDomain.id,
       cloudflare_ssl_status: cloudflareDomain.ssl?.status ?? null,
       cloudflare_ssl_method: cloudflareDomain.ssl?.method ?? null,
-      cloudflare_ownership_verification: cloudflareDomain.ownership_verification ?? {},
-      cloudflare_ssl_validation_records: cloudflareDomain.ssl?.validation_records ?? [],
+      cloudflare_ownership_verification:
+        cloudflareDomain.ownership_verification ?? {},
+      cloudflare_ssl_validation_records:
+        cloudflareDomain.ssl?.validation_records ?? [],
       cloudflare_verification_errors: [
         ...(cloudflareDomain.verification_errors ?? []),
         ...(cloudflareDomain.ssl?.validation_errors ?? []),
       ],
       verification_record_name: verificationRecord.name,
       verification_record_value: verificationRecord.value,
-      activated_at: computeActivatedAt(mappedStatus, previousDomain?.activated_at ?? null),
+      activated_at: computeActivatedAt(
+        mappedStatus,
+        previousDomain?.activated_at ?? null
+      ),
       last_checked_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }
@@ -1066,7 +1167,9 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
       previousDomain.cloudflare_custom_hostname_id !== cloudflareDomain.id
     ) {
       try {
-        await deleteCloudflareCustomHostname(previousDomain.cloudflare_custom_hostname_id)
+        await deleteCloudflareCustomHostname(
+          previousDomain.cloudflare_custom_hostname_id
+        )
       } catch (error) {
         cleanupWarning =
           error instanceof Error
@@ -1086,17 +1189,24 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
       warning: cleanupWarning,
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'No se pudo conectar el dominio en Cloudflare.'
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'No se pudo conectar el dominio en Cloudflare.'
     return { error: message }
   }
 }
 
 export async function refreshBusinessDomainStatus(slug: string) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
-    return { error: 'Debes iniciar sesión para actualizar el estado del dominio.' }
+    return {
+      error: 'Debes iniciar sesión para actualizar el estado del dominio.',
+    }
   }
 
   const ownedBusiness = await getOwnedBusinessBySlug(slug, user.id)
@@ -1122,7 +1232,9 @@ export async function refreshBusinessDomainStatus(slug: string) {
 
   try {
     const cloudflareDomain = currentDomain.cloudflare_custom_hostname_id
-      ? await getCloudflareCustomHostname(currentDomain.cloudflare_custom_hostname_id)
+      ? await getCloudflareCustomHostname(
+          currentDomain.cloudflare_custom_hostname_id
+        )
       : await findCloudflareCustomHostnameByHostname(currentDomain.hostname)
 
     if (!cloudflareDomain) {
@@ -1131,7 +1243,9 @@ export async function refreshBusinessDomainStatus(slug: string) {
         .update({
           status: 'error',
           cloudflare_ssl_validation_records: [],
-          cloudflare_verification_errors: [{ message: 'Cloudflare no encontró este custom hostname.' }],
+          cloudflare_verification_errors: [
+            { message: 'Cloudflare no encontró este custom hostname.' },
+          ],
           last_checked_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
@@ -1147,8 +1261,13 @@ export async function refreshBusinessDomainStatus(slug: string) {
     }
 
     const mappedStatus = mapCloudflareStatus(cloudflareDomain)
-    const verificationRecord = extractOwnershipVerificationRecord(cloudflareDomain)
-    logCloudflareValidationDebug('refreshBusinessDomainStatus', currentDomain.hostname, cloudflareDomain)
+    const verificationRecord =
+      extractOwnershipVerificationRecord(cloudflareDomain)
+    logCloudflareValidationDebug(
+      'refreshBusinessDomainStatus',
+      currentDomain.hostname,
+      cloudflareDomain
+    )
 
     const { data: updatedDomain, error: updateError } = await supabase
       .from('business_domains')
@@ -1158,15 +1277,20 @@ export async function refreshBusinessDomainStatus(slug: string) {
         cloudflare_custom_hostname_id: cloudflareDomain.id,
         cloudflare_ssl_status: cloudflareDomain.ssl?.status ?? null,
         cloudflare_ssl_method: cloudflareDomain.ssl?.method ?? null,
-        cloudflare_ownership_verification: cloudflareDomain.ownership_verification ?? {},
-        cloudflare_ssl_validation_records: cloudflareDomain.ssl?.validation_records ?? [],
+        cloudflare_ownership_verification:
+          cloudflareDomain.ownership_verification ?? {},
+        cloudflare_ssl_validation_records:
+          cloudflareDomain.ssl?.validation_records ?? [],
         cloudflare_verification_errors: [
           ...(cloudflareDomain.verification_errors ?? []),
           ...(cloudflareDomain.ssl?.validation_errors ?? []),
         ],
         verification_record_name: verificationRecord.name,
         verification_record_value: verificationRecord.value,
-        activated_at: computeActivatedAt(mappedStatus, currentDomain.activated_at),
+        activated_at: computeActivatedAt(
+          mappedStatus,
+          currentDomain.activated_at
+        ),
         last_checked_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -1188,14 +1312,19 @@ export async function refreshBusinessDomainStatus(slug: string) {
       dnsTarget: getCloudflareCnameTarget(),
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'No se pudo consultar el estado en Cloudflare.'
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'No se pudo consultar el estado en Cloudflare.'
     return { error: message }
   }
 }
 
 export async function disconnectBusinessDomain(slug: string) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Debes iniciar sesión para desconectar un dominio.' }
@@ -1225,9 +1354,14 @@ export async function disconnectBusinessDomain(slug: string) {
 
   if (currentDomain.cloudflare_custom_hostname_id) {
     try {
-      await deleteCloudflareCustomHostname(currentDomain.cloudflare_custom_hostname_id)
+      await deleteCloudflareCustomHostname(
+        currentDomain.cloudflare_custom_hostname_id
+      )
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'No se pudo eliminar el custom hostname en Cloudflare.'
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'No se pudo eliminar el custom hostname en Cloudflare.'
       return { error: message }
     }
   }
@@ -1250,7 +1384,9 @@ export async function disconnectBusinessDomain(slug: string) {
 
 export async function updateBusiness(slug: string, formData: FormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -1288,7 +1424,7 @@ export async function getServices(businessId: string) {
     .select('*')
     .eq('business_id', businessId)
     .order('created_at', { ascending: true })
-  
+
   return services || []
 }
 
@@ -1299,15 +1435,13 @@ export async function createService(businessId: string, formData: FormData) {
   const price = formData.get('price') as string
   const duration = formData.get('duration') as string
 
-  const { error } = await supabase
-    .from('services')
-    .insert({
-      business_id: businessId,
-      name,
-      description,
-      price: price ? parseFloat(price) : null,
-      duration: duration ? parseInt(duration, 10) : null,
-    })
+  const { error } = await supabase.from('services').insert({
+    business_id: businessId,
+    name,
+    description,
+    price: price ? parseFloat(price) : null,
+    duration: duration ? parseInt(duration, 10) : null,
+  })
 
   if (error) {
     return { error: error.message }
@@ -1319,16 +1453,16 @@ export async function createService(businessId: string, formData: FormData) {
 
 export async function createServicesBatch(businessId: string, services: any[]) {
   const supabase = await createClient()
-  
-  const { error } = await supabase
-    .from('services')
-    .insert(services.map(s => ({
+
+  const { error } = await supabase.from('services').insert(
+    services.map((s) => ({
       business_id: businessId,
       name: s.name,
       description: s.description,
       price: s.price,
-      duration: s.duration
-    })))
+      duration: s.duration,
+    }))
+  )
 
   if (error) return { error: error.message }
   return { success: true }
@@ -1342,13 +1476,21 @@ export async function getCalendarEvents(businessId: string) {
     .select('*')
     .eq('business_id', businessId)
     .order('start_time', { ascending: true })
-  
+
   return events || []
 }
 
-export async function createCalendarEvent(businessId: string, title: string, start: Date, end: Date, type: string) {
+export async function createCalendarEvent(
+  businessId: string,
+  title: string,
+  start: Date,
+  end: Date,
+  type: string
+) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return { error: 'Debes iniciar sesión para crear eventos.' }
@@ -1358,16 +1500,14 @@ export async function createCalendarEvent(businessId: string, title: string, sta
     return { error: 'El título del evento es obligatorio.' }
   }
 
-  const { error } = await supabase
-    .from('calendar_events')
-    .insert({
-      business_id: businessId,
-      title: title.trim(),
-      start_time: start.toISOString(),
-      end_time: end.toISOString(),
-      type: type.trim() || 'general',
-      created_by: user.id
-    })
+  const { error } = await supabase.from('calendar_events').insert({
+    business_id: businessId,
+    title: title.trim(),
+    start_time: start.toISOString(),
+    end_time: end.toISOString(),
+    type: type.trim() || 'general',
+    created_by: user.id,
+  })
 
   if (error) return { error: error.message }
 
@@ -1380,14 +1520,16 @@ export async function getAuditLogs(businessId: string) {
   const supabase = await createClient()
   const { data: logs } = await supabase
     .from('audit_logs')
-    .select(`
+    .select(
+      `
       *,
       profiles:user_id (full_name)
-    `)
+    `
+    )
     .eq('business_id', businessId)
     .order('created_at', { ascending: false })
     .limit(50)
-  
+
   return logs || []
 }
 
@@ -1399,19 +1541,21 @@ export async function getSections(businessId: string) {
     .select('*')
     .eq('business_id', businessId)
     .order('order_index', { ascending: true })
-  
+
   return sections || []
 }
 
 export async function updateSectionStatus(sectionId: string, status: string) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   const { error } = await supabase
     .from('business_sections')
-    .update({ 
+    .update({
       status,
-      last_edited_by: user?.id
+      last_edited_by: user?.id,
     })
     .eq('id', sectionId)
 
@@ -1426,18 +1570,26 @@ export async function getTeamMembers(businessId: string) {
   const supabase = await createClient()
   const { data: members } = await supabase
     .from('team_members')
-    .select(`
+    .select(
+      `
       *,
       profiles:user_id (full_name, avatar_url)
-    `)
+    `
+    )
     .eq('business_id', businessId)
 
   return members || []
 }
 
-export async function inviteTeamMember(businessId: string, email: string, role: string) {
+export async function inviteTeamMember(
+  businessId: string,
+  email: string,
+  role: string
+) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   const normalizedEmail = email.trim().toLowerCase()
   const normalizedRole = role.trim().toLowerCase()
   const allowedRoles = ['admin', 'editor', 'viewer']
@@ -1462,7 +1614,9 @@ export async function inviteTeamMember(businessId: string, email: string, role: 
     .maybeSingle()
 
   if (!business) {
-    return { error: 'No tienes permisos para invitar miembros en este negocio.' }
+    return {
+      error: 'No tienes permisos para invitar miembros en este negocio.',
+    }
   }
 
   const userLookup = await findUserIdByEmail(normalizedEmail)
@@ -1471,7 +1625,10 @@ export async function inviteTeamMember(businessId: string, email: string, role: 
   }
 
   if (!userLookup.userId) {
-    return { error: 'El usuario debe registrarse primero para poder ser añadido al equipo.' }
+    return {
+      error:
+        'El usuario debe registrarse primero para poder ser añadido al equipo.',
+    }
   }
 
   const { data: existing } = await supabase
@@ -1517,7 +1674,10 @@ export async function removeTeamMember(memberId: string) {
     return { error: 'No se puede eliminar al propietario del negocio.' }
   }
 
-  const { error } = await supabase.from('team_members').delete().eq('id', memberId)
+  const { error } = await supabase
+    .from('team_members')
+    .delete()
+    .eq('id', memberId)
   if (error) return { error: error.message }
 
   revalidatePath('/dashboard')
@@ -1531,7 +1691,7 @@ export async function getAnalyticsSummary(_businessId: string) {
     visits: Math.floor(Math.random() * 1000),
     unique_visitors: Math.floor(Math.random() * 800),
     avg_duration: '2m 15s',
-    bounce_rate: '45%'
+    bounce_rate: '45%',
   }
 }
 
@@ -1550,15 +1710,13 @@ export async function submitLead(formData: FormData) {
   const phone = formData.get('phone') as string
   const message = formData.get('message') as string
 
-  const { error } = await supabase
-    .from('leads')
-    .insert({
-      business_id: businessId,
-      name,
-      email,
-      phone,
-      message,
-    })
+  const { error } = await supabase.from('leads').insert({
+    business_id: businessId,
+    name,
+    email,
+    phone,
+    message,
+  })
 
   if (error) {
     return { error: error.message }
@@ -1575,7 +1733,7 @@ export async function getLeads(businessId: string) {
     .select('*')
     .eq('business_id', businessId)
     .order('created_at', { ascending: false })
-  
+
   return leads || []
 }
 
@@ -1587,25 +1745,23 @@ export async function getWorkingHours(businessId: string) {
     .select('*')
     .eq('business_id', businessId)
     .order('day_of_week', { ascending: true })
-  
+
   return hours || []
 }
 
 export async function saveWorkingHours(businessId: string, hours: any[]) {
   const supabase = await createClient()
-  
-  const { error } = await supabase
-    .from('working_hours')
-    .upsert(
-      hours.map(h => ({
-        business_id: businessId,
-        day_of_week: h.day_of_week,
-        open_time: h.is_closed ? null : h.open_time,
-        close_time: h.is_closed ? null : h.close_time,
-        is_closed: h.is_closed
-      })),
-      { onConflict: 'business_id, day_of_week' }
-    )
+
+  const { error } = await supabase.from('working_hours').upsert(
+    hours.map((h) => ({
+      business_id: businessId,
+      day_of_week: h.day_of_week,
+      open_time: h.is_closed ? null : h.open_time,
+      close_time: h.is_closed ? null : h.close_time,
+      is_closed: h.is_closed,
+    })),
+    { onConflict: 'business_id, day_of_week' }
+  )
 
   if (error) return { error: error.message }
 

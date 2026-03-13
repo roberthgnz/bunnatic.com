@@ -29,7 +29,9 @@ type DomainRecord = {
     http_body?: string
     cname?: string
   }> | null
-  cloudflare_verification_errors?: Array<{ message?: string; error?: string } | string> | null
+  cloudflare_verification_errors?: Array<
+    { message?: string; error?: string } | string
+  > | null
   activated_at: string | null
   last_checked_at: string | null
 }
@@ -42,16 +44,19 @@ function formatDateTime(value: string | null, locale: 'es' | 'ca') {
     return '—'
   }
 
-  const formatter = new Intl.DateTimeFormat(locale === 'ca' ? 'ca-ES' : 'es-ES', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-    timeZone: 'Europe/Madrid',
-  })
+  const formatter = new Intl.DateTimeFormat(
+    locale === 'ca' ? 'ca-ES' : 'es-ES',
+    {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+      timeZone: 'Europe/Madrid',
+    }
+  )
 
   return formatter.format(date)
 }
@@ -110,7 +115,8 @@ export default function DomainSettingsCard({
   const t = {
     es: {
       heading: 'Dominio personalizado',
-      subheading: 'Conecta tu dominio y gestiona la validación DNS/SSL desde aquí.',
+      subheading:
+        'Conecta tu dominio y gestiona la validación DNS/SSL desde aquí.',
       hostnameLabel: 'Dominio',
       hostnameHint: 'Ejemplo: www.tunegocio.com',
       connect: 'Conectar dominio',
@@ -120,12 +126,15 @@ export default function DomainSettingsCard({
       disconnect: 'Desconectar',
       noDomain: 'Aún no hay dominio conectado.',
       dnsTitle: 'Configura estos registros DNS',
-      dnsSubtitle: 'Copia exactamente estos valores en el panel DNS de tu proveedor.',
+      dnsSubtitle:
+        'Copia exactamente estos valores en el panel DNS de tu proveedor.',
       step1: 'Paso 1 (solo una vez): crea/actualiza el CNAME principal',
       step2: 'Paso 2: valida propiedad del dominio (Ownership)',
       step3: 'Paso 3: valida certificado SSL (DCV)',
-      multipleTxtHint: 'Si ves varias filas TXT con el mismo host, crea todas (una por valor).',
-      activeDnsInfo: 'Dominio activo. No necesitas crear más registros DNS salvo cambios futuros.',
+      multipleTxtHint:
+        'Si ves varias filas TXT con el mismo host, crea todas (una por valor).',
+      activeDnsInfo:
+        'Dominio activo. No necesitas crear más registros DNS salvo cambios futuros.',
       cname: 'CNAME',
       txt: 'TXT de validación',
       ownershipTxt: 'TXT Ownership',
@@ -133,7 +142,8 @@ export default function DomainSettingsCard({
       sslHttp: 'HTTP SSL (DCV)',
       url: 'URL',
       body: 'Body',
-      noSslValidationRecords: 'Cloudflare aún no devolvió registros SSL/DCV para este dominio.',
+      noSslValidationRecords:
+        'Cloudflare aún no devolvió registros SSL/DCV para este dominio.',
       host: 'Host',
       target: 'Target',
       value: 'Valor',
@@ -142,19 +152,23 @@ export default function DomainSettingsCard({
       copyError: 'No se pudo copiar al portapapeles.',
       status: 'Estado',
       validationErrors: 'Errores de validación',
-      noValidationErrorDetails: 'Cloudflare marcó error, pero no devolvió detalle adicional.',
+      noValidationErrorDetails:
+        'Cloudflare marcó error, pero no devolvió detalle adicional.',
       sslStatus: 'Estado SSL',
       lastCheck: 'Última comprobación',
       activatedAt: 'Activado el',
       liveUrl: 'URL activa',
-      successConnect: 'Dominio conectado. Completa DNS y vuelve a actualizar estado.',
+      successConnect:
+        'Dominio conectado. Completa DNS y vuelve a actualizar estado.',
       successRefresh: 'Estado del dominio actualizado.',
       successDisconnect: 'Dominio desconectado correctamente.',
-      copyHint: 'Puedes tardar algunos minutos hasta que Cloudflare lo marque como activo.',
+      copyHint:
+        'Puedes tardar algunos minutos hasta que Cloudflare lo marque como activo.',
     },
     ca: {
       heading: 'Domini personalitzat',
-      subheading: 'Connecta el teu domini i gestiona la validació DNS/SSL des d’aquí.',
+      subheading:
+        'Connecta el teu domini i gestiona la validació DNS/SSL des d’aquí.',
       hostnameLabel: 'Domini',
       hostnameHint: 'Exemple: www.elteunegoci.com',
       connect: 'Connectar domini',
@@ -164,12 +178,15 @@ export default function DomainSettingsCard({
       disconnect: 'Desconnectar',
       noDomain: 'Encara no hi ha cap domini connectat.',
       dnsTitle: 'Configura aquests registres DNS',
-      dnsSubtitle: 'Copia exactament aquests valors al panell DNS del teu proveïdor.',
+      dnsSubtitle:
+        'Copia exactament aquests valors al panell DNS del teu proveïdor.',
       step1: 'Pas 1 (només una vegada): crea/actualitza el CNAME principal',
       step2: 'Pas 2: valida propietat del domini (Ownership)',
       step3: 'Pas 3: valida el certificat SSL (DCV)',
-      multipleTxtHint: 'Si veus diverses files TXT amb el mateix host, crea-les totes (una per valor).',
-      activeDnsInfo: 'Domini actiu. No necessites crear més registres DNS excepte si hi ha canvis futurs.',
+      multipleTxtHint:
+        'Si veus diverses files TXT amb el mateix host, crea-les totes (una per valor).',
+      activeDnsInfo:
+        'Domini actiu. No necessites crear més registres DNS excepte si hi ha canvis futurs.',
       cname: 'CNAME',
       txt: 'TXT de validació',
       ownershipTxt: 'TXT Ownership',
@@ -177,7 +194,8 @@ export default function DomainSettingsCard({
       sslHttp: 'HTTP SSL (DCV)',
       url: 'URL',
       body: 'Body',
-      noSslValidationRecords: 'Cloudflare encara no ha retornat registres SSL/DCV per aquest domini.',
+      noSslValidationRecords:
+        'Cloudflare encara no ha retornat registres SSL/DCV per aquest domini.',
       host: 'Host',
       target: 'Target',
       value: 'Valor',
@@ -186,15 +204,18 @@ export default function DomainSettingsCard({
       copyError: 'No s’ha pogut copiar al porta-retalls.',
       status: 'Estat',
       validationErrors: 'Errors de validació',
-      noValidationErrorDetails: 'Cloudflare ha marcat error, però no ha retornat cap detall addicional.',
+      noValidationErrorDetails:
+        'Cloudflare ha marcat error, però no ha retornat cap detall addicional.',
       sslStatus: 'Estat SSL',
       lastCheck: 'Darrera comprovació',
       activatedAt: 'Activat el',
       liveUrl: 'URL activa',
-      successConnect: 'Domini connectat. Completa DNS i torna a actualitzar l’estat.',
+      successConnect:
+        'Domini connectat. Completa DNS i torna a actualitzar l’estat.',
       successRefresh: 'Estat del domini actualitzat.',
       successDisconnect: 'Domini desconnectat correctament.',
-      copyHint: 'Poden passar uns minuts fins que Cloudflare el marqui com a actiu.',
+      copyHint:
+        'Poden passar uns minuts fins que Cloudflare el marqui com a actiu.',
     },
   }[safeLocale]
 
@@ -204,7 +225,9 @@ export default function DomainSettingsCard({
   }, [domain, safeLocale])
 
   const canConnect = hostname.trim().length > 3
-  const isReplacing = Boolean(domain && domain.hostname !== hostname.trim().toLowerCase())
+  const isReplacing = Boolean(
+    domain && domain.hostname !== hostname.trim().toLowerCase()
+  )
   const normalizedRootDomain = rootDomain?.trim().toLowerCase() || null
   const validationErrors = (domain?.cloudflare_verification_errors || [])
     .map((item) => {
@@ -212,8 +235,15 @@ export default function DomainSettingsCard({
       return item?.message || item?.error || ''
     })
     .filter(Boolean)
-  const sslValidationRecords = (domain?.cloudflare_ssl_validation_records || [])
-    .filter((item): item is NonNullable<DomainRecord['cloudflare_ssl_validation_records']>[number] => Boolean(item))
+  const sslValidationRecords = (
+    domain?.cloudflare_ssl_validation_records || []
+  ).filter(
+    (
+      item
+    ): item is NonNullable<
+      DomainRecord['cloudflare_ssl_validation_records']
+    >[number] => Boolean(item)
+  )
   const needsDnsSetup = domain?.status !== 'active'
 
   function formatDnsHost(host: string | null | undefined) {
@@ -297,23 +327,26 @@ export default function DomainSettingsCard({
     }
   }
 
-  const dnsSectionCardClass = 'rounded-md border border-slate-200 bg-white p-3 space-y-2'
+  const dnsSectionCardClass =
+    'rounded-md border border-slate-200 bg-white p-3 space-y-2'
   const dnsSectionTitleClass = 'text-xs font-semibold text-slate-900'
   const dnsFieldLabelClass = 'text-slate-700'
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
-        <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
           <Globe className="h-4 w-4 text-slate-600" />
           {t.heading}
         </h3>
         <p className="mt-0.5 text-xs text-slate-500">{t.subheading}</p>
       </div>
 
-      <div className="px-6 py-6 space-y-5">
+      <div className="space-y-5 px-6 py-6">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-900">{t.hostnameLabel}</label>
+          <label className="text-sm font-medium text-slate-900">
+            {t.hostnameLabel}
+          </label>
           <Input
             value={hostname}
             onChange={(event) => setHostname(event.target.value)}
@@ -333,7 +366,9 @@ export default function DomainSettingsCard({
             disabled={isPending || !canConnect}
             size="sm"
           >
-            {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+            {isPending ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : null}
             {domain ? (isReplacing ? t.replace : t.connect) : t.connect}
           </Button>
 
@@ -344,7 +379,11 @@ export default function DomainSettingsCard({
             variant="outline"
             size="sm"
           >
-            {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCcw className="h-3.5 w-3.5" />}
+            {isPending ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <RefreshCcw className="h-3.5 w-3.5" />
+            )}
             {isPending ? t.refreshing : t.refresh}
           </Button>
 
@@ -354,7 +393,7 @@ export default function DomainSettingsCard({
             disabled={isPending || !domain}
             variant="ghost"
             size="sm"
-            className="text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+            className="text-rose-600 hover:bg-rose-50 hover:text-rose-700"
           >
             <Trash2 className="h-3.5 w-3.5" />
             {t.disconnect}
@@ -365,9 +404,15 @@ export default function DomainSettingsCard({
           <p className="text-sm text-slate-500">{t.noDomain}</p>
         ) : (
           <div className="space-y-4 rounded-lg border border-slate-100 bg-slate-50/40 p-4">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <p className="text-sm font-medium text-slate-900">{domain.hostname}</p>
-              {statusMeta ? <Badge variant="outline" className={statusMeta.className}>{statusMeta.label}</Badge> : null}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm font-medium text-slate-900">
+                {domain.hostname}
+              </p>
+              {statusMeta ? (
+                <Badge variant="outline" className={statusMeta.className}>
+                  {statusMeta.label}
+                </Badge>
+              ) : null}
             </div>
 
             {domain.status === 'active' ? (
@@ -381,7 +426,7 @@ export default function DomainSettingsCard({
               </a>
             ) : null}
 
-            <div className="grid gap-3 md:grid-cols-2 text-xs text-slate-600">
+            <div className="grid gap-3 text-xs text-slate-600 md:grid-cols-2">
               <div>
                 <p className="font-medium text-slate-700">{t.status}</p>
                 <p>{domain.status}</p>
@@ -402,23 +447,29 @@ export default function DomainSettingsCard({
 
             {domain.status === 'error' ? (
               <div className="rounded-md border border-rose-200 bg-rose-50 p-3">
-                <p className="text-xs font-semibold text-rose-900 mb-2">{t.validationErrors}</p>
+                <p className="mb-2 text-xs font-semibold text-rose-900">
+                  {t.validationErrors}
+                </p>
                 {validationErrors.length > 0 ? (
-                  <ul className="space-y-1 text-xs text-rose-800 list-disc pl-4">
+                  <ul className="list-disc space-y-1 pl-4 text-xs text-rose-800">
                     {validationErrors.map((errorMessage, index) => (
                       <li key={`${errorMessage}-${index}`}>{errorMessage}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-xs text-rose-800">{t.noValidationErrorDetails}</p>
+                  <p className="text-xs text-rose-800">
+                    {t.noValidationErrorDetails}
+                  </p>
                 )}
               </div>
             ) : null}
 
             <div className="space-y-3 border-t border-slate-200 pt-3">
               <div>
-                <p className="text-sm font-semibold text-slate-900">{t.dnsTitle}</p>
-                <p className="text-xs text-slate-600 mt-0.5">{t.dnsSubtitle}</p>
+                <p className="text-sm font-semibold text-slate-900">
+                  {t.dnsTitle}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-600">{t.dnsSubtitle}</p>
               </div>
 
               {!needsDnsSetup ? (
@@ -433,15 +484,26 @@ export default function DomainSettingsCard({
                     <div className="flex items-center justify-between gap-2">
                       <span className={dnsFieldLabelClass}>{t.host}</span>
                       <div className="flex items-center gap-2">
-                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">{formatDnsHost(domain.hostname)}</code>
+                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
+                          {formatDnsHost(domain.hostname)}
+                        </code>
                         <Button
                           type="button"
                           size="sm"
                           variant="outline"
                           className="h-7 px-2 text-[11px]"
-                          onClick={() => copyValue(formatDnsHost(domain.hostname), 'cname-host')}
+                          onClick={() =>
+                            copyValue(
+                              formatDnsHost(domain.hostname),
+                              'cname-host'
+                            )
+                          }
                         >
-                          {copiedKey === 'cname-host' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          {copiedKey === 'cname-host' ? (
+                            <Check className="h-3.5 w-3.5" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
                           {copiedKey === 'cname-host' ? t.copied : t.copy}
                         </Button>
                       </div>
@@ -450,7 +512,9 @@ export default function DomainSettingsCard({
                     <div className="flex items-center justify-between gap-2">
                       <span className={dnsFieldLabelClass}>{t.target}</span>
                       <div className="flex items-center gap-2">
-                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">{dnsTarget}</code>
+                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
+                          {dnsTarget}
+                        </code>
                         <Button
                           type="button"
                           size="sm"
@@ -458,7 +522,11 @@ export default function DomainSettingsCard({
                           className="h-7 px-2 text-[11px]"
                           onClick={() => copyValue(dnsTarget, 'cname-target')}
                         >
-                          {copiedKey === 'cname-target' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          {copiedKey === 'cname-target' ? (
+                            <Check className="h-3.5 w-3.5" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
                           {copiedKey === 'cname-target' ? t.copied : t.copy}
                         </Button>
                       </div>
@@ -467,7 +535,9 @@ export default function DomainSettingsCard({
                 </div>
               ) : null}
 
-              {needsDnsSetup && domain.verification_record_name && domain.verification_record_value ? (
+              {needsDnsSetup &&
+              domain.verification_record_name &&
+              domain.verification_record_value ? (
                 <div className={dnsSectionCardClass}>
                   <p className={dnsSectionTitleClass}>{t.step2}</p>
                   <p className="text-xs text-slate-500">{t.ownershipTxt}</p>
@@ -475,15 +545,26 @@ export default function DomainSettingsCard({
                     <div className="flex items-center justify-between gap-2">
                       <span className={dnsFieldLabelClass}>{t.host}</span>
                       <div className="flex items-center gap-2">
-                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">{formatDnsHost(domain.verification_record_name)}</code>
+                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
+                          {formatDnsHost(domain.verification_record_name)}
+                        </code>
                         <Button
                           type="button"
                           size="sm"
                           variant="outline"
                           className="h-7 px-2 text-[11px]"
-                          onClick={() => copyValue(formatDnsHost(domain.verification_record_name), 'txt-host')}
+                          onClick={() =>
+                            copyValue(
+                              formatDnsHost(domain.verification_record_name),
+                              'txt-host'
+                            )
+                          }
                         >
-                          {copiedKey === 'txt-host' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          {copiedKey === 'txt-host' ? (
+                            <Check className="h-3.5 w-3.5" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
                           {copiedKey === 'txt-host' ? t.copied : t.copy}
                         </Button>
                       </div>
@@ -492,15 +573,26 @@ export default function DomainSettingsCard({
                     <div className="flex items-center justify-between gap-2">
                       <span className={dnsFieldLabelClass}>{t.value}</span>
                       <div className="flex items-center gap-2">
-                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">{domain.verification_record_value}</code>
+                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
+                          {domain.verification_record_value}
+                        </code>
                         <Button
                           type="button"
                           size="sm"
                           variant="outline"
                           className="h-7 px-2 text-[11px]"
-                          onClick={() => copyValue(domain.verification_record_value || '', 'txt-value')}
+                          onClick={() =>
+                            copyValue(
+                              domain.verification_record_value || '',
+                              'txt-value'
+                            )
+                          }
                         >
-                          {copiedKey === 'txt-value' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          {copiedKey === 'txt-value' ? (
+                            <Check className="h-3.5 w-3.5" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
                           {copiedKey === 'txt-value' ? t.copied : t.copy}
                         </Button>
                       </div>
@@ -518,7 +610,10 @@ export default function DomainSettingsCard({
                     const hasHttp = Boolean(record.http_url && record.http_body)
 
                     return (
-                      <div key={`ssl-validation-${index}`} className={dnsSectionCardClass}>
+                      <div
+                        key={`ssl-validation-${index}`}
+                        className={dnsSectionCardClass}
+                      >
                         <p className={dnsSectionTitleClass}>
                           {hasTxt ? t.sslTxt : hasHttp ? t.sslHttp : t.txt}
                         </p>
@@ -526,35 +621,65 @@ export default function DomainSettingsCard({
                         {hasTxt ? (
                           <div className="grid gap-2 text-xs">
                             <div className="flex items-center justify-between gap-2">
-                              <span className={dnsFieldLabelClass}>{t.host}</span>
+                              <span className={dnsFieldLabelClass}>
+                                {t.host}
+                              </span>
                               <div className="flex items-center gap-2">
-                                <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">{formatDnsHost(record.txt_name)}</code>
+                                <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
+                                  {formatDnsHost(record.txt_name)}
+                                </code>
                                 <Button
                                   type="button"
                                   size="sm"
                                   variant="outline"
                                   className="h-7 px-2 text-[11px]"
-                                  onClick={() => copyValue(formatDnsHost(record.txt_name), `ssl-txt-host-${index}`)}
+                                  onClick={() =>
+                                    copyValue(
+                                      formatDnsHost(record.txt_name),
+                                      `ssl-txt-host-${index}`
+                                    )
+                                  }
                                 >
-                                  {copiedKey === `ssl-txt-host-${index}` ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                                  {copiedKey === `ssl-txt-host-${index}` ? t.copied : t.copy}
+                                  {copiedKey === `ssl-txt-host-${index}` ? (
+                                    <Check className="h-3.5 w-3.5" />
+                                  ) : (
+                                    <Copy className="h-3.5 w-3.5" />
+                                  )}
+                                  {copiedKey === `ssl-txt-host-${index}`
+                                    ? t.copied
+                                    : t.copy}
                                 </Button>
                               </div>
                             </div>
 
                             <div className="flex items-center justify-between gap-2">
-                              <span className={dnsFieldLabelClass}>{t.value}</span>
+                              <span className={dnsFieldLabelClass}>
+                                {t.value}
+                              </span>
                               <div className="flex items-center gap-2">
-                                <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">{record.txt_value}</code>
+                                <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
+                                  {record.txt_value}
+                                </code>
                                 <Button
                                   type="button"
                                   size="sm"
                                   variant="outline"
                                   className="h-7 px-2 text-[11px]"
-                                  onClick={() => copyValue(record.txt_value || '', `ssl-txt-value-${index}`)}
+                                  onClick={() =>
+                                    copyValue(
+                                      record.txt_value || '',
+                                      `ssl-txt-value-${index}`
+                                    )
+                                  }
                                 >
-                                  {copiedKey === `ssl-txt-value-${index}` ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                                  {copiedKey === `ssl-txt-value-${index}` ? t.copied : t.copy}
+                                  {copiedKey === `ssl-txt-value-${index}` ? (
+                                    <Check className="h-3.5 w-3.5" />
+                                  ) : (
+                                    <Copy className="h-3.5 w-3.5" />
+                                  )}
+                                  {copiedKey === `ssl-txt-value-${index}`
+                                    ? t.copied
+                                    : t.copy}
                                 </Button>
                               </div>
                             </div>
@@ -564,35 +689,65 @@ export default function DomainSettingsCard({
                         {hasHttp ? (
                           <div className="grid gap-2 text-xs">
                             <div className="flex items-center justify-between gap-2">
-                              <span className={dnsFieldLabelClass}>{t.url}</span>
+                              <span className={dnsFieldLabelClass}>
+                                {t.url}
+                              </span>
                               <div className="flex items-center gap-2">
-                                <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900 break-all">{record.http_url}</code>
+                                <code className="rounded bg-white/80 px-2 py-1 font-mono break-all text-slate-900">
+                                  {record.http_url}
+                                </code>
                                 <Button
                                   type="button"
                                   size="sm"
                                   variant="outline"
                                   className="h-7 px-2 text-[11px]"
-                                  onClick={() => copyValue(record.http_url || '', `ssl-http-url-${index}`)}
+                                  onClick={() =>
+                                    copyValue(
+                                      record.http_url || '',
+                                      `ssl-http-url-${index}`
+                                    )
+                                  }
                                 >
-                                  {copiedKey === `ssl-http-url-${index}` ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                                  {copiedKey === `ssl-http-url-${index}` ? t.copied : t.copy}
+                                  {copiedKey === `ssl-http-url-${index}` ? (
+                                    <Check className="h-3.5 w-3.5" />
+                                  ) : (
+                                    <Copy className="h-3.5 w-3.5" />
+                                  )}
+                                  {copiedKey === `ssl-http-url-${index}`
+                                    ? t.copied
+                                    : t.copy}
                                 </Button>
                               </div>
                             </div>
 
                             <div className="flex items-center justify-between gap-2">
-                              <span className={dnsFieldLabelClass}>{t.body}</span>
+                              <span className={dnsFieldLabelClass}>
+                                {t.body}
+                              </span>
                               <div className="flex items-center gap-2">
-                                <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900 break-all">{record.http_body}</code>
+                                <code className="rounded bg-white/80 px-2 py-1 font-mono break-all text-slate-900">
+                                  {record.http_body}
+                                </code>
                                 <Button
                                   type="button"
                                   size="sm"
                                   variant="outline"
                                   className="h-7 px-2 text-[11px]"
-                                  onClick={() => copyValue(record.http_body || '', `ssl-http-body-${index}`)}
+                                  onClick={() =>
+                                    copyValue(
+                                      record.http_body || '',
+                                      `ssl-http-body-${index}`
+                                    )
+                                  }
                                 >
-                                  {copiedKey === `ssl-http-body-${index}` ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                                  {copiedKey === `ssl-http-body-${index}` ? t.copied : t.copy}
+                                  {copiedKey === `ssl-http-body-${index}` ? (
+                                    <Check className="h-3.5 w-3.5" />
+                                  ) : (
+                                    <Copy className="h-3.5 w-3.5" />
+                                  )}
+                                  {copiedKey === `ssl-http-body-${index}`
+                                    ? t.copied
+                                    : t.copy}
                                 </Button>
                               </div>
                             </div>
@@ -603,7 +758,9 @@ export default function DomainSettingsCard({
                   })}
                 </div>
               ) : needsDnsSetup ? (
-                <p className="text-xs text-slate-600">{t.noSslValidationRecords}</p>
+                <p className="text-xs text-slate-600">
+                  {t.noSslValidationRecords}
+                </p>
               ) : null}
             </div>
           </div>

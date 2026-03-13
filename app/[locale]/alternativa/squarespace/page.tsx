@@ -1,29 +1,31 @@
-import type { Metadata } from "next";
-import AlternativeLanding from "../_components/AlternativeLanding";
-import { getAlternativeSlug } from "@/lib/pageSlugs";
-import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+import type { Metadata } from 'next'
+import AlternativeLanding from '../_components/AlternativeLanding'
+import { getAlternativeSlug } from '@/lib/pageSlugs'
+import { buildPageMetadata, type SeoLocale } from '@/lib/seo'
 
 type AlternativePageProps = {
-  params: Promise<{ locale: string }>;
-};
+  params: Promise<{ locale: string }>
+}
 
-export async function generateMetadata({ params }: AlternativePageProps): Promise<Metadata> {
-  const { locale } = await params;
-  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+export async function generateMetadata({
+  params,
+}: AlternativePageProps): Promise<Metadata> {
+  const { locale } = await params
+  const safeLocale: SeoLocale = locale === 'ca' ? 'ca' : 'es'
 
   return buildPageMetadata({
     locale: safeLocale,
     title:
-      safeLocale === "ca"
-        ? "Alternativa a Squarespace per negocis locals | Bunnatic"
-        : "Alternativa a Squarespace para negocios locales | Bunnatic",
+      safeLocale === 'ca'
+        ? 'Alternativa a Squarespace per negocis locals | Bunnatic'
+        : 'Alternativa a Squarespace para negocios locales | Bunnatic',
     description:
-      safeLocale === "ca"
-        ? "Una web enfocada a conversió i captació, no només a disseny visual."
-        : "Una web enfocada a conversión y captación, no solo a diseño visual.",
-    esPath: `/alternativa/${getAlternativeSlug("squarespace", "es")}`,
-    caPath: `/alternativa/${getAlternativeSlug("squarespace", "ca")}`,
-  });
+      safeLocale === 'ca'
+        ? 'Una web enfocada a conversió i captació, no només a disseny visual.'
+        : 'Una web enfocada a conversión y captación, no solo a diseño visual.',
+    esPath: `/alternativa/${getAlternativeSlug('squarespace', 'es')}`,
+    caPath: `/alternativa/${getAlternativeSlug('squarespace', 'ca')}`,
+  })
 }
 
 export default function AlternativeSquarespacePage() {
@@ -32,130 +34,138 @@ export default function AlternativeSquarespacePage() {
       slug="squarespace"
       copy={{
         es: {
-          badge: "Diseño útil para vender, no solo para verse bonito",
-          title: "La alternativa a Squarespace para negocios locales",
+          badge: 'Diseño útil para vender, no solo para verse bonito',
+          title: 'La alternativa a Squarespace para negocios locales',
           subtitle:
-            "Squarespace puede verse bien, pero Bunnatic está pensada para rendimiento comercial: mensajes claros, captación y facilidad de edición diaria.",
-          urgencyText: "Una web bonita sin conversión no impacta en caja.",
-          ctaPrimary: "Crear cuenta gratis",
-          ctaSecondary: "Ver cómo funciona",
-          trustLine: "Más enfoque en resultados de negocio y menos complejidad de diseño.",
-          competitorCardTitle: "Con Squarespace",
+            'Squarespace puede verse bien, pero Bunnatic está pensada para rendimiento comercial: mensajes claros, captación y facilidad de edición diaria.',
+          urgencyText: 'Una web bonita sin conversión no impacta en caja.',
+          ctaPrimary: 'Crear cuenta gratis',
+          ctaSecondary: 'Ver cómo funciona',
+          trustLine:
+            'Más enfoque en resultados de negocio y menos complejidad de diseño.',
+          competitorCardTitle: 'Con Squarespace',
           competitorItems: [
-            "Más orientado a portfolios que a captación local.",
-            "Curva de aprendizaje para que quede realmente optimizado.",
-            "Tiempo invertido en diseño en lugar de estrategia comercial.",
+            'Más orientado a portfolios que a captación local.',
+            'Curva de aprendizaje para que quede realmente optimizado.',
+            'Tiempo invertido en diseño en lugar de estrategia comercial.',
           ],
-          novaCardTitle: "Con Bunnatic",
+          novaCardTitle: 'Con Bunnatic',
           novaItems: [
-            "Estructura centrada en convertir visitas en contactos.",
-            "Editor visual simple para mover campañas rápido.",
-            "Modelo pensado para negocio local y servicios recurrentes.",
+            'Estructura centrada en convertir visitas en contactos.',
+            'Editor visual simple para mover campañas rápido.',
+            'Modelo pensado para negocio local y servicios recurrentes.',
           ],
-          switchTitle: "Enfoque práctico para crecer",
+          switchTitle: 'Enfoque práctico para crecer',
           switchSteps: [
             {
-              title: "Define tu oferta ganadora",
-              description: "Priorizamos servicios con mayor margen y mejor cierre.",
+              title: 'Define tu oferta ganadora',
+              description:
+                'Priorizamos servicios con mayor margen y mejor cierre.',
             },
             {
-              title: "Publica landing de conversión",
-              description: "Activas secciones de prueba social, objeciones y CTA claros.",
+              title: 'Publica landing de conversión',
+              description:
+                'Activas secciones de prueba social, objeciones y CTA claros.',
             },
             {
-              title: "Escala con mejoras continuas",
-              description: "Iteras mensajes con IA según lo que mejor convierte.",
+              title: 'Escala con mejoras continuas',
+              description:
+                'Iteras mensajes con IA según lo que mejor convierte.',
             },
           ],
-          proofTitle: "Experiencia de clientes",
+          proofTitle: 'Experiencia de clientes',
           testimonials: [
             {
               quote:
-                "Nuestra web ahora explica mejor el valor y recibimos más consultas de calidad.",
-              author: "Mónica J.",
-              role: "Centro de salud",
+                'Nuestra web ahora explica mejor el valor y recibimos más consultas de calidad.',
+              author: 'Mónica J.',
+              role: 'Centro de salud',
             },
             {
               quote:
-                "Dejamos de pelearnos con diseño y nos centramos en convertir.",
-              author: "Albert K.",
-              role: "Consultoría local",
+                'Dejamos de pelearnos con diseño y nos centramos en convertir.',
+              author: 'Albert K.',
+              role: 'Consultoría local',
             },
           ],
-          planTitle: "Plan recomendado para crecimiento local",
-          planPrice: "19€/mes",
+          planTitle: 'Plan recomendado para crecimiento local',
+          planPrice: '19€/mes',
           planItems: [
-            "Estructura CRO lista para publicar",
-            "Editor visual con recomendaciones de IA para mejorar conversión y soporte prioritario",
-            "SEO local integrado",
+            'Estructura CRO lista para publicar',
+            'Editor visual con recomendaciones de IA para mejorar conversión y soporte prioritario',
+            'SEO local integrado',
           ],
-          finalTitle: "Convierte diseño en resultados de negocio",
+          finalTitle: 'Convierte diseño en resultados de negocio',
           finalSubtitle:
-            "Regístrate y lanza una web pensada para vender, no solo para decorar tu marca.",
+            'Regístrate y lanza una web pensada para vender, no solo para decorar tu marca.',
         },
         ca: {
-          badge: "Disseny útil per vendre, no només per quedar bonic",
+          badge: 'Disseny útil per vendre, no només per quedar bonic',
           title: "L'alternativa a Squarespace per negocis locals",
           subtitle:
             "Squarespace pot veure's bé, però Bunnatic està pensada per rendiment comercial: missatges clars, captació i facilitat d'edició diària.",
-          urgencyText: "Una web bonica sense conversió no impacta a caixa.",
-          ctaPrimary: "Crear compte gratis",
-          ctaSecondary: "Veure com funciona",
-          trustLine: "Més enfocament en resultats de negoci i menys complexitat de disseny.",
-          competitorCardTitle: "Amb Squarespace",
+          urgencyText: 'Una web bonica sense conversió no impacta a caixa.',
+          ctaPrimary: 'Crear compte gratis',
+          ctaSecondary: 'Veure com funciona',
+          trustLine:
+            'Més enfocament en resultats de negoci i menys complexitat de disseny.',
+          competitorCardTitle: 'Amb Squarespace',
           competitorItems: [
-            "Més orientat a portfolis que a captació local.",
+            'Més orientat a portfolis que a captació local.',
             "Corba d'aprenentatge perquè quedi realment optimitzat.",
             "Temps invertit en disseny en lloc d'estratègia comercial.",
           ],
-          novaCardTitle: "Amb Bunnatic",
+          novaCardTitle: 'Amb Bunnatic',
           novaItems: [
-            "Estructura centrada a convertir visites en contactes.",
-            "Editor visual simple per moure campanyes ràpid.",
-            "Model pensat per negoci local i serveis recurrents.",
+            'Estructura centrada a convertir visites en contactes.',
+            'Editor visual simple per moure campanyes ràpid.',
+            'Model pensat per negoci local i serveis recurrents.',
           ],
-          switchTitle: "Enfocament pràctic per créixer",
+          switchTitle: 'Enfocament pràctic per créixer',
           switchSteps: [
             {
-              title: "Defineix la teva oferta guanyadora",
-              description: "Prioritzem serveis amb més marge i millor tancament.",
+              title: 'Defineix la teva oferta guanyadora',
+              description:
+                'Prioritzem serveis amb més marge i millor tancament.',
             },
             {
-              title: "Publica landing de conversió",
-              description: "Actives seccions de prova social, objeccions i CTA clars.",
+              title: 'Publica landing de conversió',
+              description:
+                'Actives seccions de prova social, objeccions i CTA clars.',
             },
             {
-              title: "Escala amb millores contínues",
-              description: "Iteres missatges amb IA segons el que millor converteix.",
+              title: 'Escala amb millores contínues',
+              description:
+                'Iteres missatges amb IA segons el que millor converteix.',
             },
           ],
-          proofTitle: "Experiència de clients",
+          proofTitle: 'Experiència de clients',
           testimonials: [
             {
               quote:
-                "La nostra web ara explica millor el valor i rebem més consultes de qualitat.",
-              author: "Mónica J.",
-              role: "Centre de salut",
+                'La nostra web ara explica millor el valor i rebem més consultes de qualitat.',
+              author: 'Mónica J.',
+              role: 'Centre de salut',
             },
             {
               quote:
-                "Vam deixar de barallar-nos amb disseny i ens vam centrar a convertir.",
-              author: "Albert K.",
-              role: "Consultoria local",
+                'Vam deixar de barallar-nos amb disseny i ens vam centrar a convertir.',
+              author: 'Albert K.',
+              role: 'Consultoria local',
             },
           ],
-          planTitle: "Pla recomanat per creixement local",
-          planPrice: "19€/mes",
+          planTitle: 'Pla recomanat per creixement local',
+          planPrice: '19€/mes',
           planItems: [
-            "Estructura CRO llesta per publicar",
+            'Estructura CRO llesta per publicar',
             "Editor visual amb recomanacions d'IA per millorar la conversió i suport prioritari",
-            "SEO local integrat",
+            'SEO local integrat',
           ],
-          finalTitle: "Converteix disseny en resultats de negoci",
+          finalTitle: 'Converteix disseny en resultats de negoci',
           finalSubtitle:
             "Registra't i llança una web pensada per vendre, no només per decorar la teva marca.",
         },
       }}
     />
-  );
+  )
 }

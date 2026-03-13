@@ -118,8 +118,15 @@ export default function DashboardShell({
   const { language } = useLanguage()
   const t = dashboardContent[language]
   const pathname = usePathname()
-  const [userProfile, setUserProfile] = useState<{ full_name?: string | null; email?: string | null; avatar_url?: string | null; plan?: string } | null>(null)
-  const [businesses, setBusinesses] = useState<Array<{ id: string; name: string; slug: string }>>([])
+  const [userProfile, setUserProfile] = useState<{
+    full_name?: string | null
+    email?: string | null
+    avatar_url?: string | null
+    plan?: string
+  } | null>(null)
+  const [businesses, setBusinesses] = useState<
+    Array<{ id: string; name: string; slug: string }>
+  >([])
 
   const localePrefix = `/${language}`
 
@@ -211,19 +218,19 @@ export default function DashboardShell({
   const teamSwitcherItems =
     businesses.length > 0
       ? businesses.map((business) => ({
-        name: business.name,
-        logo: Building2,
-        plan: getPlanName(userProfile?.plan),
-        href: `${localePrefix}/dashboard/businesses/${business.slug}`,
-      }))
-      : [
-        {
-          name: t.title,
+          name: business.name,
           logo: Building2,
-          plan: t.enterprise,
-          href: `${localePrefix}/dashboard/businesses`,
-        },
-      ]
+          plan: getPlanName(userProfile?.plan),
+          href: `${localePrefix}/dashboard/businesses/${business.slug}`,
+        }))
+      : [
+          {
+            name: t.title,
+            logo: Building2,
+            plan: t.enterprise,
+            href: `${localePrefix}/dashboard/businesses`,
+          },
+        ]
 
   const dashboardRoot = `${localePrefix}/dashboard`
   const currentPath = pathname.startsWith(dashboardRoot)
@@ -268,8 +275,8 @@ export default function DashboardShell({
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon" className="border-r border-sidebar-border/70">
-        <SidebarHeader className="border-b border-sidebar-border">
+      <Sidebar collapsible="icon" className="border-sidebar-border/70 border-r">
+        <SidebarHeader className="border-sidebar-border border-b">
           <TeamSwitcher
             teams={teamSwitcherItems}
             teamLabel={t.businesses}
@@ -314,7 +321,7 @@ export default function DashboardShell({
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="border-t border-sidebar-border">
+        <SidebarFooter className="border-sidebar-border border-t">
           <NavUser
             user={{
               name: userProfile?.full_name || 'Usuario',
@@ -351,7 +358,9 @@ export default function DashboardShell({
                 {breadcrumbParentLabel ? (
                   <>
                     <BreadcrumbItem className="hidden md:block">
-                      <BreadcrumbLink href={`${localePrefix}/dashboard/businesses`}>
+                      <BreadcrumbLink
+                        href={`${localePrefix}/dashboard/businesses`}
+                      >
                         {breadcrumbParentLabel}
                       </BreadcrumbLink>
                     </BreadcrumbItem>
@@ -367,7 +376,12 @@ export default function DashboardShell({
           <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="button" variant="outline" size="sm" className="gap-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1"
+                >
                   <MessageSquarePlus className="size-4" />
                   {t.menu.giveFeedback}
                   <ChevronDown className="size-4" />
@@ -375,13 +389,17 @@ export default function DashboardShell({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem asChild>
-                  <Link href={`mailto:hello@bunnatic.com?subject=${encodeURIComponent(t.menu.feedbackIssue)}`}>
+                  <Link
+                    href={`mailto:hello@bunnatic.com?subject=${encodeURIComponent(t.menu.feedbackIssue)}`}
+                  >
                     <Bug className="size-4" />
                     {t.menu.feedbackIssue}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href={`mailto:hello@bunnatic.com?subject=${encodeURIComponent(t.menu.feedbackIdea)}`}>
+                  <Link
+                    href={`mailto:hello@bunnatic.com?subject=${encodeURIComponent(t.menu.feedbackIdea)}`}
+                  >
                     <Lightbulb className="size-4" />
                     {t.menu.feedbackIdea}
                   </Link>
@@ -390,9 +408,7 @@ export default function DashboardShell({
             </DropdownMenu>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">
-          {children}
-        </div>
+        <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   )

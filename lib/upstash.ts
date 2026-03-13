@@ -1,17 +1,17 @@
-import { Redis } from "@upstash/redis";
+import { Redis } from '@upstash/redis'
 
-let redisClient: Redis | null = null;
+let redisClient: Redis | null = null
 
 export function getUpstashRedis(): Redis | null {
-  if (redisClient) return redisClient;
+  if (redisClient) return redisClient
 
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
 
   if (!url || !token) {
-    return null;
+    return null
   }
 
-  redisClient = new Redis({ url, token });
-  return redisClient;
+  redisClient = new Redis({ url, token })
+  return redisClient
 }

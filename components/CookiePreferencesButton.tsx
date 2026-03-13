@@ -1,12 +1,12 @@
-'use client';
+'use client'
 
-import {Button} from '@/components/ui/button';
-import {useLanguage} from '@/components/LanguageProvider';
-import {openCookiePreferences} from '@/lib/cookieConsent';
-import {Cookie} from 'lucide-react';
+import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/components/LanguageProvider'
+import { openCookiePreferences } from '@/lib/cookieConsent'
+import { Cookie } from 'lucide-react'
 
 export function CookiePreferencesButton() {
-  const {language} = useLanguage();
+  const { language } = useLanguage()
 
   return (
     <Button
@@ -16,7 +16,9 @@ export function CookiePreferencesButton() {
       onClick={() => openCookiePreferences()}
     >
       <Cookie className="mr-2 h-4 w-4" />
-      {language === 'ca' ? 'Preferències de cookies' : 'Preferencias de cookies'}
+      {language === 'ca'
+        ? 'Preferències de cookies'
+        : 'Preferencias de cookies'}
     </Button>
-  );
+  )
 }

@@ -24,6 +24,7 @@ UPSTASH_REDIS_REST_TOKEN="YOUR_UPSTASH_TOKEN"
 ```
 
 Para obtener estas credenciales:
+
 1. Crea una cuenta en [Upstash Console](https://console.upstash.com/)
 2. Crea una nueva base de datos Redis
 3. Copia las credenciales REST API (URL y Token)
@@ -43,6 +44,7 @@ Se crearon versiones con rate limit de los endpoints existentes:
 - `/api/demo/places/crawl` - Análisis de sitios web con Firecrawl
 
 Todos los endpoints:
+
 - Verifican el rate limit antes de procesar la petición
 - Retornan status 429 cuando se excede el límite
 - Incluyen headers `X-RateLimit-*` con información del límite
@@ -77,6 +79,7 @@ Cuando un usuario alcanza el límite, se muestra:
 ```
 
 Headers incluidos:
+
 - `X-RateLimit-Limit: 5`
 - `X-RateLimit-Remaining: 0`
 - `X-RateLimit-Reset: 1234567890000`
@@ -105,6 +108,7 @@ Para probar el rate limiting:
 5. En la 6ta búsqueda deberías ver el mensaje de límite alcanzado
 
 Para resetear el límite manualmente (testing):
+
 ```bash
 # Usando Upstash CLI o Redis CLI
 redis-cli -u $UPSTASH_REDIS_REST_URL DEL "ratelimit:demo:YOUR_IP"
@@ -113,6 +117,7 @@ redis-cli -u $UPSTASH_REDIS_REST_URL DEL "ratelimit:demo:YOUR_IP"
 ## Monitoreo
 
 Puedes monitorear el uso del rate limit en:
+
 - Upstash Console: Ver comandos ejecutados, latencia, etc.
 - Logs de la aplicación: Errores de rate limit se loguean
 

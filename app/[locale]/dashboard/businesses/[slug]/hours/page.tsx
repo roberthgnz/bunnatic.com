@@ -16,5 +16,11 @@ export default async function BusinessHoursPage({
 
   const hours = await getWorkingHours(business.id)
 
-  return <HoursManager businessId={business.id} initialHours={hours} locale={locale} />
+  return (
+    <HoursManager
+      businessId={business.id}
+      initialHours={hours}
+      locale={locale}
+    />
+  )
 }

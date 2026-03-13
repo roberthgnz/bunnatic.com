@@ -1,26 +1,30 @@
-"use client";
+'use client'
 
-import { content } from "@/lib/content";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { useLanguage } from "./LanguageProvider";
-import { usePathname } from "next/navigation";
-import { trackFunnelEvent } from "@/lib/funnelEvents";
+import { content } from '@/lib/content'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
+import { useLanguage } from './LanguageProvider'
+import { usePathname } from 'next/navigation'
+import { trackFunnelEvent } from '@/lib/funnelEvents'
 
 export default function Hero() {
-  const { language } = useLanguage();
-  const t = content[language];
-  const pathname = usePathname() ?? "/";
-  const locale = pathname.split("/").filter(Boolean)[0];
-  const hasLocale = locale === "es" || locale === "ca";
-  const targetPath = hasLocale ? `/${locale}/crear-pagina-web-negocio` : "/crear-pagina-web-negocio";
+  const { language } = useLanguage()
+  const t = content[language]
+  const pathname = usePathname() ?? '/'
+  const locale = pathname.split('/').filter(Boolean)[0]
+  const hasLocale = locale === 'es' || locale === 'ca'
+  const targetPath = hasLocale
+    ? `/${locale}/crear-pagina-web-negocio`
+    : '/crear-pagina-web-negocio'
 
   return (
     <section className="border-b border-slate-200 bg-white px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-5xl text-center">
         <span className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-xs font-semibold text-emerald-800 sm:text-sm">
           <span className="h-2 w-2 rounded-full bg-emerald-600" />
-          <span className="leading-tight">{t.hero.badge.replace("✦ ", "")}</span>
+          <span className="leading-tight">
+            {t.hero.badge.replace('✦ ', '')}
+          </span>
         </span>
 
         <h1 className="mt-7 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-[5rem] lg:leading-[1.05]">
@@ -36,15 +40,22 @@ export default function Hero() {
         <div className="mt-10 flex flex-col items-center justify-center gap-4">
           <Link
             href={targetPath}
-            onClick={() => trackFunnelEvent("landing_cta_click", { placement: "hero", locale: language })}
+            onClick={() =>
+              trackFunnelEvent('landing_cta_click', {
+                placement: 'hero',
+                locale: language,
+              })
+            }
             className="inline-flex items-center gap-2 rounded-full bg-emerald-700 px-7 py-3 text-base font-semibold text-white transition-colors hover:bg-emerald-800 sm:px-8 sm:py-4 sm:text-lg"
           >
-            {t.hero.cta.replace(" →", "")}
+            {t.hero.cta.replace(' →', '')}
             <ArrowRight className="h-5 w-5" />
           </Link>
-          <p className="text-sm font-medium text-slate-500">{t.hero.trustText}</p>
+          <p className="text-sm font-medium text-slate-500">
+            {t.hero.trustText}
+          </p>
         </div>
       </div>
     </section>
-  );
+  )
 }

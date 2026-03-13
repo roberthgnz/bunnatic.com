@@ -1,15 +1,23 @@
-"use client";
+'use client'
 
-import { content } from "@/lib/content";
-import { CheckCircle2, Globe, MapPin, MessageCircle, Search } from "lucide-react";
-import { useLanguage } from "./LanguageProvider";
-import { Card, CardContent } from "@/components/ui/card";
+import { content } from '@/lib/content'
+import {
+  CheckCircle2,
+  Globe,
+  MapPin,
+  MessageCircle,
+  Search,
+} from 'lucide-react'
+import { useLanguage } from './LanguageProvider'
+import { Card, CardContent } from '@/components/ui/card'
 
 export default function HowItWorks() {
-  const { language } = useLanguage();
-  const t = content[language];
-  const steps = [...t.howItWorks.steps].sort((a, b) => Number(a.number) - Number(b.number));
-  const stepAccent = ["bg-emerald-700", "bg-slate-700", "bg-slate-700"];
+  const { language } = useLanguage()
+  const t = content[language]
+  const steps = [...t.howItWorks.steps].sort(
+    (a, b) => Number(a.number) - Number(b.number)
+  )
+  const stepAccent = ['bg-emerald-700', 'bg-slate-700', 'bg-slate-700']
 
   return (
     <section className="border-b border-slate-200 bg-white py-16 sm:py-24 lg:py-28">
@@ -26,12 +34,15 @@ export default function HowItWorks() {
         <div className="mx-auto mt-10 max-w-2xl sm:mt-14 lg:mt-16 lg:max-w-none">
           <dl className="grid max-w-xl grid-cols-1 gap-4 sm:gap-6 lg:max-w-none lg:grid-cols-3 lg:gap-8">
             {steps.map((step, index) => (
-              <Card key={step.title} className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <Card
+                key={step.title}
+                className="rounded-2xl border border-slate-200 bg-white shadow-sm"
+              >
                 <CardContent className="p-5 sm:p-7">
-                  <dt className="flex items-center gap-x-3 text-base font-bold leading-7 text-slate-900 sm:text-lg">
+                  <dt className="flex items-center gap-x-3 text-base leading-7 font-bold text-slate-900 sm:text-lg">
                     <span
                       className={`flex h-9 w-9 items-center justify-center rounded-md text-sm text-white sm:h-10 sm:w-10 sm:text-base ${
-                        stepAccent[index] ?? "bg-emerald-700"
+                        stepAccent[index] ?? 'bg-emerald-700'
                       }`}
                     >
                       {step.number}
@@ -83,7 +94,7 @@ export default function HowItWorks() {
                               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-700 sm:h-9 sm:w-9">
                                 <MessageCircle className="h-4 w-4" />
                               </div>
-                              <p className="text-xs font-medium leading-snug text-slate-700 sm:text-sm">
+                              <p className="text-xs leading-snug font-medium text-slate-700 sm:text-sm">
                                 {step.mockup?.chat}
                               </p>
                             </div>
@@ -99,5 +110,5 @@ export default function HowItWorks() {
         </div>
       </div>
     </section>
-  );
+  )
 }

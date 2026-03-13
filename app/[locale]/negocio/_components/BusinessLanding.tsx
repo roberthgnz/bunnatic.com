@@ -1,10 +1,10 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { useLanguage } from "@/components/LanguageProvider";
-import DemoLinkButton from "@/components/DemoLinkButton";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+import Link from 'next/link'
+import { useLanguage } from '@/components/LanguageProvider'
+import DemoLinkButton from '@/components/DemoLinkButton'
+import Footer from '@/components/Footer'
+import Navbar from '@/components/Navbar'
 import {
   ArrowRight,
   Building2,
@@ -12,60 +12,60 @@ import {
   Clock3,
   MessageSquareQuote,
   ShieldCheck,
-} from "lucide-react";
+} from 'lucide-react'
 
-type Locale = "es" | "ca";
+type Locale = 'es' | 'ca'
 
 type Step = {
-  title: string;
-  description: string;
-};
+  title: string
+  description: string
+}
 
 type Testimonial = {
-  quote: string;
-  author: string;
-  role: string;
-};
+  quote: string
+  author: string
+  role: string
+}
 
 type BusinessCopy = {
-  badge: string;
-  title: string;
-  subtitle: string;
-  urgencyText: string;
-  trustLine: string;
-  benefitsTitle: string;
-  benefits: string[];
-  processTitle: string;
-  process: Step[];
-  proofTitle: string;
-  testimonials: Testimonial[];
-  planTitle: string;
-  planPrice: string;
-  planItems: string[];
-  finalTitle: string;
-  finalSubtitle: string;
-  ctaPrimary: string;
-  ctaSecondary: string;
-};
+  badge: string
+  title: string
+  subtitle: string
+  urgencyText: string
+  trustLine: string
+  benefitsTitle: string
+  benefits: string[]
+  processTitle: string
+  process: Step[]
+  proofTitle: string
+  testimonials: Testimonial[]
+  planTitle: string
+  planPrice: string
+  planItems: string[]
+  finalTitle: string
+  finalSubtitle: string
+  ctaPrimary: string
+  ctaSecondary: string
+}
 
 type BusinessLandingProps = {
-  slug: string;
-  copy: Record<Locale, BusinessCopy>;
-};
+  slug: string
+  copy: Record<Locale, BusinessCopy>
+}
 
 export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
-  const { language } = useLanguage();
-  const locale: Locale = language === "ca" ? "ca" : "es";
-  const t = copy[locale];
-  const localePrefix = `/${locale}`;
-  const signupHref = `${localePrefix}/signup?redirect=/checkout&source=negocio-${slug}`;
-  const planHref = `${localePrefix}/signup?redirect=/checkout&plan=pro&source=negocio-${slug}`;
+  const { language } = useLanguage()
+  const locale: Locale = language === 'ca' ? 'ca' : 'es'
+  const t = copy[locale]
+  const localePrefix = `/${locale}`
+  const signupHref = `${localePrefix}/signup?redirect=/checkout&source=negocio-${slug}`
+  const planHref = `${localePrefix}/signup?redirect=/checkout&plan=pro&source=negocio-${slug}`
 
   return (
     <main className="min-h-screen bg-white text-gray-900">
       <Navbar useDemoCta />
 
-      <section className="overflow-hidden border-b border-slate-200 px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-16 lg:px-8 lg:pb-20 lg:pt-24">
+      <section className="overflow-hidden border-b border-slate-200 px-4 pt-10 pb-14 sm:px-6 sm:pt-16 sm:pb-16 lg:px-8 lg:pt-24 lg:pb-20">
         <div className="relative mx-auto grid max-w-7xl gap-6 sm:gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:gap-10">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100 sm:px-4 sm:py-2 sm:text-sm">
@@ -75,33 +75,47 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
             <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:mt-6 sm:text-5xl lg:text-6xl">
               {t.title}
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-gray-600 sm:mt-6 sm:text-lg">{t.subtitle}</p>
-            <p className="mt-3 text-xs font-semibold text-gray-500 sm:mt-4 sm:text-sm">{t.urgencyText}</p>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-gray-600 sm:mt-6 sm:text-lg">
+              {t.subtitle}
+            </p>
+            <p className="mt-3 text-xs font-semibold text-gray-500 sm:mt-4 sm:text-sm">
+              {t.urgencyText}
+            </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <DemoLinkButton
-                label={locale === "es" ? "Probar demo gratis" : "Provar demo gratuïta"}
+                label={
+                  locale === 'es'
+                    ? 'Probar demo gratis'
+                    : 'Provar demo gratuïta'
+                }
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-800 sm:w-auto sm:px-6 sm:text-base"
               />
               <Link
                 href={`${localePrefix}/#pricing`}
                 className="inline-flex w-full items-center justify-center rounded-full border border-gray-300 px-5 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50 sm:w-auto sm:px-6 sm:text-base"
               >
-                {locale === "es" ? "Ver precios" : "Veure preus"}
+                {locale === 'es' ? 'Ver precios' : 'Veure preus'}
               </Link>
             </div>
-            <p className="mt-4 text-xs font-medium text-gray-500 sm:mt-5 sm:text-sm">{t.trustLine}</p>
+            <p className="mt-4 text-xs font-medium text-gray-500 sm:mt-5 sm:text-sm">
+              {t.trustLine}
+            </p>
           </div>
 
           <div className="rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm sm:p-6">
             <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 sm:mb-5 sm:h-14 sm:w-14">
               <Building2 className="h-5 w-5 text-emerald-600 sm:h-7 sm:w-7" />
             </div>
-            <h2 className="text-lg font-extrabold sm:text-xl">{t.benefitsTitle}</h2>
+            <h2 className="text-lg font-extrabold sm:text-xl">
+              {t.benefitsTitle}
+            </h2>
             <ul className="mt-4 space-y-3 sm:mt-5 sm:space-y-4">
               {t.benefits.map((item) => (
                 <li key={item} className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
-                  <span className="text-xs font-medium text-gray-700 sm:text-sm">{item}</span>
+                  <span className="text-xs font-medium text-gray-700 sm:text-sm">
+                    {item}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -111,13 +125,24 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
 
       <section className="bg-slate-50 py-14 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-extrabold sm:text-3xl">{t.processTitle}</h2>
+          <h2 className="text-2xl font-extrabold sm:text-3xl">
+            {t.processTitle}
+          </h2>
           <div className="mt-6 grid gap-4 sm:mt-10 sm:gap-6 md:grid-cols-3">
             {t.process.map((step, index) => (
-              <article key={step.title} className="rounded-3xl bg-white p-5 ring-1 ring-gray-200 sm:p-6">
-                <p className="text-xs font-bold text-emerald-600 sm:text-sm">0{index + 1}</p>
-                <h3 className="mt-2 text-lg font-bold sm:mt-3 sm:text-xl">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600 sm:mt-3">{step.description}</p>
+              <article
+                key={step.title}
+                className="rounded-3xl bg-white p-5 ring-1 ring-gray-200 sm:p-6"
+              >
+                <p className="text-xs font-bold text-emerald-600 sm:text-sm">
+                  0{index + 1}
+                </p>
+                <h3 className="mt-2 text-lg font-bold sm:mt-3 sm:text-xl">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600 sm:mt-3">
+                  {step.description}
+                </p>
               </article>
             ))}
           </div>
@@ -127,25 +152,43 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
       <section className="py-14 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:gap-8 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
-            <h2 className="text-xl font-extrabold sm:text-2xl">{t.proofTitle}</h2>
+            <h2 className="text-xl font-extrabold sm:text-2xl">
+              {t.proofTitle}
+            </h2>
             <div className="mt-6 space-y-4">
               {t.testimonials.map((item) => (
-                <article key={item.author} className="rounded-2xl bg-slate-50 p-4 sm:p-5">
+                <article
+                  key={item.author}
+                  className="rounded-2xl bg-slate-50 p-4 sm:p-5"
+                >
                   <MessageSquareQuote className="h-5 w-5 text-emerald-600" />
-                  <p className="mt-3 text-sm leading-relaxed text-gray-700">{item.quote}</p>
-                  <p className="mt-3 text-sm font-bold text-gray-900">{item.author}</p>
-                  <p className="text-xs font-medium text-gray-500">{item.role}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-gray-700">
+                    {item.quote}
+                  </p>
+                  <p className="mt-3 text-sm font-bold text-gray-900">
+                    {item.author}
+                  </p>
+                  <p className="text-xs font-medium text-gray-500">
+                    {item.role}
+                  </p>
                 </article>
               ))}
             </div>
           </div>
 
           <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-8">
-            <h3 className="text-lg font-extrabold text-gray-900 sm:text-xl">{t.planTitle}</h3>
-            <p className="mt-1 text-3xl font-extrabold text-gray-900 sm:text-4xl">{t.planPrice}</p>
+            <h3 className="text-lg font-extrabold text-gray-900 sm:text-xl">
+              {t.planTitle}
+            </h3>
+            <p className="mt-1 text-3xl font-extrabold text-gray-900 sm:text-4xl">
+              {t.planPrice}
+            </p>
             <ul className="mt-5 space-y-3">
               {t.planItems.map((item) => (
-                <li key={item} className="flex items-start gap-2 text-sm font-medium text-gray-700">
+                <li
+                  key={item}
+                  className="flex items-start gap-2 text-sm font-medium text-gray-700"
+                >
                   <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                   {item}
                 </li>
@@ -155,7 +198,9 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
               href={planHref}
               className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-gray-900 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-gray-800"
             >
-              {locale === "es" ? "Crear cuenta y empezar" : "Crear compte i començar"}
+              {locale === 'es'
+                ? 'Crear cuenta y empezar'
+                : 'Crear compte i començar'}
             </Link>
           </div>
         </div>
@@ -163,8 +208,12 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
 
       <section className="border-t border-gray-100 bg-slate-50 py-14 sm:py-16">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-          <h2 className="text-2xl font-extrabold tracking-tight sm:text-4xl">{t.finalTitle}</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-base text-gray-600 sm:mt-4 sm:text-lg">{t.finalSubtitle}</p>
+          <h2 className="text-2xl font-extrabold tracking-tight sm:text-4xl">
+            {t.finalTitle}
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-base text-gray-600 sm:mt-4 sm:text-lg">
+            {t.finalSubtitle}
+          </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href={signupHref}
@@ -183,5 +232,5 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
 
       <Footer />
     </main>
-  );
+  )
 }

@@ -1,5 +1,11 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { ChevronRight, CreditCard, ShieldCheck, UserCircle } from 'lucide-react'
 import Link from 'next/link'
 
@@ -54,7 +60,9 @@ export default async function DashboardSettingsPage({
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{t.title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          {t.title}
+        </h1>
         <p className="text-sm text-slate-600">{t.subtitle}</p>
       </div>
 
@@ -68,7 +76,11 @@ export default async function DashboardSettingsPage({
             <CardDescription>{t.profile.description}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild variant="outline" className="w-full justify-between">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full justify-between"
+            >
               <Link href={`/${locale}/dashboard/profile`}>
                 {t.profileLink}
                 <ChevronRight className="h-4 w-4" />
@@ -86,7 +98,11 @@ export default async function DashboardSettingsPage({
             <CardDescription>{t.subscription.description}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild variant="outline" className="w-full justify-between">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full justify-between"
+            >
               <Link href={`/${locale}/dashboard/subscription`}>
                 {t.subscriptionLink}
                 <ChevronRight className="h-4 w-4" />

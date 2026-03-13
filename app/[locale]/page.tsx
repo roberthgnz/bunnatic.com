@@ -1,60 +1,72 @@
-import type { Metadata } from "next";
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import Ticker from "@/components/Ticker";
-import HowItWorks from "@/components/HowItWorks";
-import Pricing from "@/components/Pricing";
-import Comparison from "@/components/Comparison";
-import AIDemo from "@/components/AIDemo";
-import FAQ from "@/components/FAQ";
-import FinalCTA from "@/components/FinalCTA";
-import Footer from "@/components/Footer";
-import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+import type { Metadata } from 'next'
+import Navbar from '@/components/Navbar'
+import Hero from '@/components/Hero'
+import Ticker from '@/components/Ticker'
+import HowItWorks from '@/components/HowItWorks'
+import Pricing from '@/components/Pricing'
+import Comparison from '@/components/Comparison'
+import AIDemo from '@/components/AIDemo'
+import FAQ from '@/components/FAQ'
+import FinalCTA from '@/components/FinalCTA'
+import Footer from '@/components/Footer'
+import { buildPageMetadata, type SeoLocale } from '@/lib/seo'
 
 type HomePageProps = {
   params: Promise<{
-    locale: string;
-  }>;
+    locale: string
+  }>
   searchParams?: Promise<{
-    alternative?: string;
-    alternativeId?: string;
-  }>;
-};
+    alternative?: string
+    alternativeId?: string
+  }>
+}
 
-export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
-  const { locale } = await params;
-  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+export async function generateMetadata({
+  params,
+}: HomePageProps): Promise<Metadata> {
+  const { locale } = await params
+  const safeLocale: SeoLocale = locale === 'ca' ? 'ca' : 'es'
 
   const metadataByLocale = {
     es: {
-      title: "Bunnatic | Crea tu web con IA para captar clientes locales",
+      title: 'Bunnatic | Crea tu web con IA para captar clientes locales',
       description:
-        "Crea una web profesional con IA en minutos. Optimizada para SEO local, formularios y WhatsApp para convertir visitas en clientes.",
+        'Crea una web profesional con IA en minutos. Optimizada para SEO local, formularios y WhatsApp para convertir visitas en clientes.',
     },
     ca: {
-      title: "Bunnatic | Crea la teva web amb IA per captar clients locals",
+      title: 'Bunnatic | Crea la teva web amb IA per captar clients locals',
       description:
-        "Crea una web professional amb IA en minuts. Optimitzada per SEO local, formularis i WhatsApp per convertir visites en clients.",
+        'Crea una web professional amb IA en minuts. Optimitzada per SEO local, formularis i WhatsApp per convertir visites en clients.',
     },
-  } as const;
+  } as const
 
   return buildPageMetadata({
     locale: safeLocale,
     title: metadataByLocale[safeLocale].title,
     description: metadataByLocale[safeLocale].description,
-    esPath: "/",
-    caPath: "/",
+    esPath: '/',
+    caPath: '/',
     keywords:
-      safeLocale === "ca"
-        ? ["crear web amb IA", "seo local", "web per negocis locals", "captació de clients"]
-        : ["crear web con IA", "seo local", "web para negocios locales", "captación de clientes"],
-  });
+      safeLocale === 'ca'
+        ? [
+            'crear web amb IA',
+            'seo local',
+            'web per negocis locals',
+            'captació de clients',
+          ]
+        : [
+            'crear web con IA',
+            'seo local',
+            'web para negocios locales',
+            'captación de clientes',
+          ],
+  })
 }
 
 export default async function Home({ searchParams }: HomePageProps) {
-  const resolvedSearchParams = (await searchParams) ?? {};
+  const resolvedSearchParams = (await searchParams) ?? {}
   const comparisonAlternative =
-    resolvedSearchParams.alternative ?? resolvedSearchParams.alternativeId;
+    resolvedSearchParams.alternative ?? resolvedSearchParams.alternativeId
 
   return (
     <main className="min-h-screen bg-white font-sans text-gray-900 selection:bg-emerald-200 selection:text-emerald-900">
@@ -69,5 +81,5 @@ export default async function Home({ searchParams }: HomePageProps) {
       <FinalCTA />
       <Footer />
     </main>
-  );
+  )
 }

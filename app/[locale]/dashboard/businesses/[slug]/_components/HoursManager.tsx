@@ -47,7 +47,9 @@ export default function HoursManager({
   locale: string
 }) {
   const [loading, setLoading] = useState(false)
-  const [validationErrors, setValidationErrors] = useState<Record<number, string>>({})
+  const [validationErrors, setValidationErrors] = useState<
+    Record<number, string>
+  >({})
   const router = useRouter()
 
   const days = [0, 1, 2, 3, 4, 5, 6]
@@ -66,7 +68,15 @@ export default function HoursManager({
       title: 'Horario de apertura',
       description: 'Define cuándo está abierto tu negocio.',
       save: 'Guardar horario',
-      days: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+      days: [
+        'Domingo',
+        'Lunes',
+        'Martes',
+        'Miércoles',
+        'Jueves',
+        'Viernes',
+        'Sábado',
+      ],
       closed: 'Cerrado',
       from: 'Abre',
       to: 'Cierra',
@@ -80,7 +90,15 @@ export default function HoursManager({
       title: "Horari d'obertura",
       description: 'Defineix quan està obert el teu negoci.',
       save: 'Desar horari',
-      days: ['Diumenge', 'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte'],
+      days: [
+        'Diumenge',
+        'Dilluns',
+        'Dimarts',
+        'Dimecres',
+        'Dijous',
+        'Divendres',
+        'Dissabte',
+      ],
       closed: 'Tancat',
       from: 'Obre',
       to: 'Tanca',
@@ -92,8 +110,14 @@ export default function HoursManager({
     },
   }[locale === 'ca' ? 'ca' : 'es']
 
-  function updateDay(index: number, field: keyof HoursRow, value: string | boolean) {
-    setHoursState((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)))
+  function updateDay(
+    index: number,
+    field: keyof HoursRow,
+    value: string | boolean
+  ) {
+    setHoursState((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    )
     setValidationErrors((prev) => {
       const next = { ...prev }
       delete next[index]
@@ -131,14 +155,14 @@ export default function HoursManager({
   const hasErrors = Object.keys(validationErrors).length > 0
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       {/* Header */}
       <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
         <h3 className="text-sm font-semibold text-slate-900">{t.title}</h3>
         <p className="mt-0.5 text-xs text-slate-500">{t.description}</p>
       </div>
 
-      <div className="px-6 py-5 space-y-2">
+      <div className="space-y-2 px-6 py-5">
         {hoursState.map((day, index) => {
           const hasError = !!validationErrors[index]
           return (
@@ -148,12 +172,14 @@ export default function HoursManager({
                 hasError
                   ? 'border-red-200 bg-red-50/40'
                   : day.is_closed
-                  ? 'border-slate-100 bg-slate-50/40'
-                  : 'border-slate-200 bg-white'
+                    ? 'border-slate-100 bg-slate-50/40'
+                    : 'border-slate-200 bg-white'
               }`}
             >
               {/* Day name */}
-              <p className={`text-sm font-medium ${day.is_closed ? 'text-slate-400' : 'text-slate-800'}`}>
+              <p
+                className={`text-sm font-medium ${day.is_closed ? 'text-slate-400' : 'text-slate-800'}`}
+              >
                 {t.days[day.day_of_week]}
               </p>
 
@@ -162,7 +188,9 @@ export default function HoursManager({
                 <Switch
                   id={`closed-${day.day_of_week}`}
                   checked={day.is_closed}
-                  onCheckedChange={(checked) => updateDay(index, 'is_closed', checked)}
+                  onCheckedChange={(checked) =>
+                    updateDay(index, 'is_closed', checked)
+                  }
                 />
                 <Label
                   htmlFor={`closed-${day.day_of_week}`}
@@ -179,22 +207,30 @@ export default function HoursManager({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs text-slate-400 w-9 shrink-0">{t.from}</span>
+                      <span className="w-9 shrink-0 text-xs text-slate-400">
+                        {t.from}
+                      </span>
                       <Input
                         type="time"
                         value={day.open_time}
-                        onChange={(e) => updateDay(index, 'open_time', e.target.value)}
+                        onChange={(e) =>
+                          updateDay(index, 'open_time', e.target.value)
+                        }
                         aria-invalid={hasError}
                         className="h-8 w-28 text-sm"
                       />
                     </div>
                     <span className="text-slate-300">→</span>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs text-slate-400 w-9 shrink-0">{t.to}</span>
+                      <span className="w-9 shrink-0 text-xs text-slate-400">
+                        {t.to}
+                      </span>
                       <Input
                         type="time"
                         value={day.close_time}
-                        onChange={(e) => updateDay(index, 'close_time', e.target.value)}
+                        onChange={(e) =>
+                          updateDay(index, 'close_time', e.target.value)
+                        }
                         aria-invalid={hasError}
                         className="h-8 w-28 text-sm"
                       />
@@ -218,13 +254,12 @@ export default function HoursManager({
         <p className="text-xs text-slate-400">
           {hasErrors ? '● Hay errores pendientes de corregir' : ''}
         </p>
-        <Button
-          onClick={handleSave}
-          disabled={loading}
-          size="sm"
-          
-        >
-          {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+        <Button onClick={handleSave} disabled={loading} size="sm">
+          {loading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Save className="h-3.5 w-3.5" />
+          )}
           {t.save}
         </Button>
       </div>

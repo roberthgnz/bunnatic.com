@@ -1,17 +1,17 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 export type SignupValidationMessages = {
-  nameRequired: string;
-  nameMin: string;
-  nameMax: string;
-  emailRequired: string;
-  emailInvalid: string;
-  passwordRequired: string;
-  passwordMin: string;
-  passwordUppercase: string;
-  passwordLowercase: string;
-  passwordNumber: string;
-};
+  nameRequired: string
+  nameMin: string
+  nameMax: string
+  emailRequired: string
+  emailInvalid: string
+  passwordRequired: string
+  passwordMin: string
+  passwordUppercase: string
+  passwordLowercase: string
+  passwordNumber: string
+}
 
 export function createSignupSchema(messages: SignupValidationMessages) {
   return z.object({
@@ -33,7 +33,7 @@ export function createSignupSchema(messages: SignupValidationMessages) {
       .regex(/[A-Z]/, messages.passwordUppercase)
       .regex(/[a-z]/, messages.passwordLowercase)
       .regex(/[0-9]/, messages.passwordNumber),
-  });
+  })
 }
 
-export type SignupFormValues = z.infer<ReturnType<typeof createSignupSchema>>;
+export type SignupFormValues = z.infer<ReturnType<typeof createSignupSchema>>

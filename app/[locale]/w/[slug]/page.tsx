@@ -20,7 +20,9 @@ export async function generateMetadata({
 
   return {
     title: `${business.name} | ${business.category}`,
-    description: business.description || `Bienvenido a la web de ${business.name}, ${business.category}.`,
+    description:
+      business.description ||
+      `Bienvenido a la web de ${business.name}, ${business.category}.`,
   }
 }
 

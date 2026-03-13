@@ -1,29 +1,31 @@
-import type { Metadata } from "next";
-import AlternativeLanding from "../_components/AlternativeLanding";
-import { getAlternativeSlug } from "@/lib/pageSlugs";
-import { buildPageMetadata, type SeoLocale } from "@/lib/seo";
+import type { Metadata } from 'next'
+import AlternativeLanding from '../_components/AlternativeLanding'
+import { getAlternativeSlug } from '@/lib/pageSlugs'
+import { buildPageMetadata, type SeoLocale } from '@/lib/seo'
 
 type AlternativePageProps = {
-  params: Promise<{ locale: string }>;
-};
+  params: Promise<{ locale: string }>
+}
 
-export async function generateMetadata({ params }: AlternativePageProps): Promise<Metadata> {
-  const { locale } = await params;
-  const safeLocale: SeoLocale = locale === "ca" ? "ca" : "es";
+export async function generateMetadata({
+  params,
+}: AlternativePageProps): Promise<Metadata> {
+  const { locale } = await params
+  const safeLocale: SeoLocale = locale === 'ca' ? 'ca' : 'es'
 
   return buildPageMetadata({
     locale: safeLocale,
     title:
-      safeLocale === "ca"
-        ? "Alternativa a Instagram per convertir seguidors | Bunnatic"
-        : "Alternativa a Instagram para convertir seguidores | Bunnatic",
+      safeLocale === 'ca'
+        ? 'Alternativa a Instagram per convertir seguidors | Bunnatic'
+        : 'Alternativa a Instagram para convertir seguidores | Bunnatic',
     description:
-      safeLocale === "ca"
-        ? "Converteix trànsit social en clients amb una web dissenyada per captar contactes."
-        : "Convierte tráfico social en clientes con una web diseñada para captar contactos.",
-    esPath: `/alternativa/${getAlternativeSlug("instagram", "es")}`,
-    caPath: `/alternativa/${getAlternativeSlug("instagram", "ca")}`,
-  });
+      safeLocale === 'ca'
+        ? 'Converteix trànsit social en clients amb una web dissenyada per captar contactes.'
+        : 'Convierte tráfico social en clientes con una web diseñada para captar contactos.',
+    esPath: `/alternativa/${getAlternativeSlug('instagram', 'es')}`,
+    caPath: `/alternativa/${getAlternativeSlug('instagram', 'ca')}`,
+  })
 }
 
 export default function AlternativeInstagramPage() {
@@ -32,124 +34,135 @@ export default function AlternativeInstagramPage() {
       slug="instagram"
       copy={{
         es: {
-          badge: "Más allá del link en bio",
-          title: "La alternativa a Instagram para convertir seguidores en clientes",
+          badge: 'Más allá del link en bio',
+          title:
+            'La alternativa a Instagram para convertir seguidores en clientes',
           subtitle:
-            "Instagram te da alcance visual, pero una web te da estructura para cerrar: servicios claros, prueba social y formularios de contacto.",
-          urgencyText: "Si todo depende del perfil, pierdes oportunidades fuera de la app.",
-          ctaPrimary: "Crear cuenta gratis",
-          ctaSecondary: "Crear mi demo",
-          trustLine: "Convierte tráfico social en registros con una landing pensada para decisión.",
-          competitorCardTitle: "Solo con Instagram",
+            'Instagram te da alcance visual, pero una web te da estructura para cerrar: servicios claros, prueba social y formularios de contacto.',
+          urgencyText:
+            'Si todo depende del perfil, pierdes oportunidades fuera de la app.',
+          ctaPrimary: 'Crear cuenta gratis',
+          ctaSecondary: 'Crear mi demo',
+          trustLine:
+            'Convierte tráfico social en registros con una landing pensada para decisión.',
+          competitorCardTitle: 'Solo con Instagram',
           competitorItems: [
-            "Información clave dispersa entre posts y stories.",
-            "Limitación de enlaces y recorrido de usuario corto.",
-            "Difícil transmitir propuesta completa de valor.",
+            'Información clave dispersa entre posts y stories.',
+            'Limitación de enlaces y recorrido de usuario corto.',
+            'Difícil transmitir propuesta completa de valor.',
           ],
-          novaCardTitle: "Con Bunnatic",
+          novaCardTitle: 'Con Bunnatic',
           novaItems: [
-            "Página estructurada por servicios, beneficios y precios.",
-            "CTAs visibles para reserva, llamada o solicitud de presupuesto.",
-            "Canal propio que también capta clientes desde Google.",
+            'Página estructurada por servicios, beneficios y precios.',
+            'CTAs visibles para reserva, llamada o solicitud de presupuesto.',
+            'Canal propio que también capta clientes desde Google.',
           ],
-          switchTitle: "Cómo pasar de seguidores a contactos",
+          switchTitle: 'Cómo pasar de seguidores a contactos',
           switchSteps: [
             {
-              title: "Crea una web orientada a acción",
-              description: "La IA organiza tu oferta para que el usuario sepa qué hacer en segundos.",
+              title: 'Crea una web orientada a acción',
+              description:
+                'La IA organiza tu oferta para que el usuario sepa qué hacer en segundos.',
             },
             {
-              title: "Enlaza desde bio y stories",
-              description: "Todo el tráfico social aterriza en una página que sí convierte.",
+              title: 'Enlaza desde bio y stories',
+              description:
+                'Todo el tráfico social aterriza en una página que sí convierte.',
             },
             {
-              title: "Mide y mejora semanalmente",
-              description: "Ajustas mensajes y bloques para subir la tasa de registro.",
+              title: 'Mide y mejora semanalmente',
+              description:
+                'Ajustas mensajes y bloques para subir la tasa de registro.',
             },
           ],
-          proofTitle: "Casos reales de mejora",
+          proofTitle: 'Casos reales de mejora',
           testimonials: [
             {
               quote:
-                "Con el mismo tráfico de Instagram empezamos a recibir más formularios.",
-              author: "Nadia R.",
-              role: "Estudio de uñas",
+                'Con el mismo tráfico de Instagram empezamos a recibir más formularios.',
+              author: 'Nadia R.',
+              role: 'Estudio de uñas',
             },
             {
               quote:
-                "El cambio fue pasar del perfil a una página con oferta clara y contacto directo.",
-              author: "David C.",
-              role: "Entrenador personal",
+                'El cambio fue pasar del perfil a una página con oferta clara y contacto directo.',
+              author: 'David C.',
+              role: 'Entrenador personal',
             },
           ],
-          planTitle: "Plan recomendado para tráfico social",
-          planPrice: "19€/mes",
+          planTitle: 'Plan recomendado para tráfico social',
+          planPrice: '19€/mes',
           planItems: [
-            "Diseño web optimizado para móvil",
-            "Formularios y CTAs de alta visibilidad",
-            "Editor visual para actualizar campañas rápido",
+            'Diseño web optimizado para móvil',
+            'Formularios y CTAs de alta visibilidad',
+            'Editor visual para actualizar campañas rápido',
           ],
-          finalTitle: "Haz que cada visita desde Instagram cuente",
+          finalTitle: 'Haz que cada visita desde Instagram cuente',
           finalSubtitle:
-            "Regístrate y convierte tu comunidad en un canal de captación estable.",
+            'Regístrate y convierte tu comunidad en un canal de captación estable.',
         },
         ca: {
-          badge: "Més enllà del link de la bio",
+          badge: 'Més enllà del link de la bio',
           title: "L'alternativa a Instagram per convertir seguidors en clients",
           subtitle:
-            "Instagram et dona abast visual, però una web et dona estructura per tancar: serveis clars, prova social i formularis de contacte.",
-          urgencyText: "Si tot depèn del perfil, perds oportunitats fora de l'app.",
-          ctaPrimary: "Crear compte gratis",
-          ctaSecondary: "Crear la meva demo",
-          trustLine: "Converteix trànsit social en registres amb una landing pensada per decisió.",
-          competitorCardTitle: "Només amb Instagram",
+            'Instagram et dona abast visual, però una web et dona estructura per tancar: serveis clars, prova social i formularis de contacte.',
+          urgencyText:
+            "Si tot depèn del perfil, perds oportunitats fora de l'app.",
+          ctaPrimary: 'Crear compte gratis',
+          ctaSecondary: 'Crear la meva demo',
+          trustLine:
+            'Converteix trànsit social en registres amb una landing pensada per decisió.',
+          competitorCardTitle: 'Només amb Instagram',
           competitorItems: [
-            "Informació clau dispersa entre posts i stories.",
+            'Informació clau dispersa entre posts i stories.',
             "Limitació d'enllaços i recorregut d'usuari curt.",
-            "Difícil transmetre proposta completa de valor.",
+            'Difícil transmetre proposta completa de valor.',
           ],
-          novaCardTitle: "Amb Bunnatic",
+          novaCardTitle: 'Amb Bunnatic',
           novaItems: [
-            "Pàgina estructurada per serveis, beneficis i preus.",
-            "CTAs visibles per reserva, trucada o sol·licitud de pressupost.",
-            "Canal propi que també capta clients des de Google.",
+            'Pàgina estructurada per serveis, beneficis i preus.',
+            'CTAs visibles per reserva, trucada o sol·licitud de pressupost.',
+            'Canal propi que també capta clients des de Google.',
           ],
-          switchTitle: "Com passar de seguidors a contactes",
+          switchTitle: 'Com passar de seguidors a contactes',
           switchSteps: [
             {
-              title: "Crea una web orientada a acció",
-              description: "La IA organitza la teva oferta perquè l'usuari sàpiga què fer en segons.",
+              title: 'Crea una web orientada a acció',
+              description:
+                "La IA organitza la teva oferta perquè l'usuari sàpiga què fer en segons.",
             },
             {
-              title: "Enllaça des de bio i stories",
-              description: "Tot el trànsit social aterra en una pàgina que sí converteix.",
+              title: 'Enllaça des de bio i stories',
+              description:
+                'Tot el trànsit social aterra en una pàgina que sí converteix.',
             },
             {
-              title: "Mesura i millora setmanalment",
-              description: "Ajustes missatges i blocs per pujar la taxa de registre.",
+              title: 'Mesura i millora setmanalment',
+              description:
+                'Ajustes missatges i blocs per pujar la taxa de registre.',
             },
           ],
-          proofTitle: "Casos reals de millora",
+          proofTitle: 'Casos reals de millora',
           testimonials: [
             {
               quote:
                 "Amb el mateix trànsit d'Instagram vam començar a rebre més formularis.",
-              author: "Nadia R.",
+              author: 'Nadia R.',
               role: "Estudi d'ungles",
             },
             {
               quote:
-                "El canvi va ser passar del perfil a una pàgina amb oferta clara i contacte directe.",
-              author: "David C.",
-              role: "Entrenador personal",
+                'El canvi va ser passar del perfil a una pàgina amb oferta clara i contacte directe.',
+              author: 'David C.',
+              role: 'Entrenador personal',
             },
           ],
-          planTitle: "Pla recomanat per trànsit social",
-          planPrice: "19€/mes",
+          planTitle: 'Pla recomanat per trànsit social',
+          planPrice: '19€/mes',
           planItems: [
-            "Disseny web optimitzat per mòbil",
+            'Disseny web optimitzat per mòbil',
             "Formularis i CTAs d'alta visibilitat",
-            "Editor visual per actualitzar campanyes ràpid",
+            'Editor visual per actualitzar campanyes ràpid',
           ],
           finalTitle: "Fes que cada visita des d'Instagram compti",
           finalSubtitle:
@@ -157,5 +170,5 @@ export default function AlternativeInstagramPage() {
         },
       }}
     />
-  );
+  )
 }

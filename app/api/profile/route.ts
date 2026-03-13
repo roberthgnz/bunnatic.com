@@ -5,7 +5,9 @@ import { mapStripePriceIdToGenerationPlan } from '@/lib/businessSourceGeneration
 export async function GET() {
   try {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -17,7 +19,9 @@ export async function GET() {
       .eq('id', user.id)
       .single()
 
-    const plan = mapStripePriceIdToGenerationPlan(profile?.stripe_price_id ?? null)
+    const plan = mapStripePriceIdToGenerationPlan(
+      profile?.stripe_price_id ?? null
+    )
 
     return NextResponse.json({
       full_name: profile?.full_name || user.user_metadata?.full_name || null,
@@ -27,6 +31,9 @@ export async function GET() {
     })
   } catch (error) {
     console.error('Profile fetch error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
   }
 }

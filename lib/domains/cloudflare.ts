@@ -1,8 +1,16 @@
-import { getCloudflareCustomOriginServer, getCloudflareSslMethod } from '@/lib/domains/config'
+import {
+  getCloudflareCustomOriginServer,
+  getCloudflareSslMethod,
+} from '@/lib/domains/config'
 
 const CLOUDFLARE_API_BASE = 'https://api.cloudflare.com/client/v4'
 
-export type DomainConnectionStatus = 'pending_dns' | 'pending_ssl' | 'active' | 'moved' | 'error'
+export type DomainConnectionStatus =
+  | 'pending_dns'
+  | 'pending_ssl'
+  | 'active'
+  | 'moved'
+  | 'error'
 
 type CloudflareError = {
   code?: number
@@ -53,15 +61,23 @@ function getCloudflareConfig(): CloudflareConfig {
   const zoneId = process.env.CLOUDFLARE_ZONE_ID?.trim()
 
   if (!token || !zoneId) {
-    throw new Error('Cloudflare no está configurado. Define CLOUDFLARE_API_TOKEN y CLOUDFLARE_ZONE_ID.')
+    throw new Error(
+      'Cloudflare no está configurado. Define CLOUDFLARE_API_TOKEN y CLOUDFLARE_ZONE_ID.'
+    )
   }
 
   return { token, zoneId }
 }
 
-function buildCloudflareError(prefix: string, payload: CloudflareResponse<unknown>) {
+function buildCloudflareError(
+  prefix: string,
+  payload: CloudflareResponse<unknown>
+) {
   const details = (payload.errors || [])
-    .map((error) => `${error.code ?? 'unknown'}: ${error.message ?? 'error no especificado'}`)
+    .map(
+      (error) =>
+        `${error.code ?? 'unknown'}: ${error.message ?? 'error no especificado'}`
+    )
     .join(' | ')
 
   return details ? `${prefix} (${details})` : prefix
@@ -93,7 +109,9 @@ async function cloudflareRequest<T>(
   return payload.result
 }
 
-export function mapCloudflareStatus(record: CloudflareCustomHostname): DomainConnectionStatus {
+export function mapCloudflareStatus(
+  record: CloudflareCustomHostname
+): DomainConnectionStatus {
   const customHostnameStatus = record.status?.toLowerCase()
   const sslStatus = record.ssl?.status?.toLowerCase()
   const hasVerificationErrors = (record.verification_errors?.length || 0) > 0
@@ -121,7 +139,9 @@ export function mapCloudflareStatus(record: CloudflareCustomHostname): DomainCon
   return 'pending_ssl'
 }
 
-export function extractOwnershipVerificationRecord(record: CloudflareCustomHostname) {
+export function extractOwnershipVerificationRecord(
+  record: CloudflareCustomHostname
+) {
   const verification = record.ownership_verification
   if (!verification) {
     return { name: null, value: null }
@@ -149,10 +169,13 @@ export async function createCloudflareCustomHostname(hostname: string) {
     body.custom_origin_server = customOriginServer
   }
 
-  return cloudflareRequest<CloudflareCustomHostname>(`/zones/${zoneId}/custom_hostnames`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-  })
+  return cloudflareRequest<CloudflareCustomHostname>(
+    `/zones/${zoneId}/custom_hostnames`,
+    {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }
+  )
 }
 
 export async function getCloudflareCustomHostname(id: string) {
@@ -177,13 +200,20 @@ export async function findCloudflareCustomHostnameByHostname(hostname: string) {
     }
   )
 
-  return list.find((entry) => entry.hostname?.toLowerCase() === hostname.toLowerCase()) ?? null
+  return (
+    list.find(
+      (entry) => entry.hostname?.toLowerCase() === hostname.toLowerCase()
+    ) ?? null
+  )
 }
 
 export async function deleteCloudflareCustomHostname(id: string) {
   const { zoneId } = getCloudflareConfig()
 
-  await cloudflareRequest<{ id: string }>(`/zones/${zoneId}/custom_hostnames/${id}`, {
-    method: 'DELETE',
-  })
+  await cloudflareRequest<{ id: string }>(
+    `/zones/${zoneId}/custom_hostnames/${id}`,
+    {
+      method: 'DELETE',
+    }
+  )
 }

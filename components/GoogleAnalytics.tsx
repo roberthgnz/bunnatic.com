@@ -1,64 +1,64 @@
-'use client';
+'use client'
 
-import {Suspense, useEffect, useRef, useState} from 'react';
-import {usePathname, useSearchParams} from 'next/navigation';
-import Script from 'next/script';
-import {COOKIE_CONSENT_EVENT, hasAnalyticsConsent} from '@/lib/cookieConsent';
+import { Suspense, useEffect, useRef, useState } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
+import Script from 'next/script'
+import { COOKIE_CONSENT_EVENT, hasAnalyticsConsent } from '@/lib/cookieConsent'
 
 declare global {
   interface Window {
-    ga?: (...args: unknown[]) => void;
-    gtag?: (...args: unknown[]) => void;
-    dataLayer?: unknown[];
+    ga?: (...args: unknown[]) => void
+    gtag?: (...args: unknown[]) => void
+    dataLayer?: unknown[]
   }
 }
 
 type GoogleAnalyticsProps = {
-  trackingId: string;
-};
+  trackingId: string
+}
 
 export function GoogleAnalytics(props: GoogleAnalyticsProps) {
   return (
     <Suspense fallback={null}>
       <GoogleAnalyticsContent {...props} />
     </Suspense>
-  );
+  )
 }
 
-function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const initializedRef = useRef(false);
-  const consentDefaultSetRef = useRef(false);
-  const [hasConsent, setHasConsent] = useState(false);
-  const [scriptLoaded, setScriptLoaded] = useState(false);
-  const isGa4 = trackingId.startsWith('G-');
+function GoogleAnalyticsContent({ trackingId }: GoogleAnalyticsProps) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const initializedRef = useRef(false)
+  const consentDefaultSetRef = useRef(false)
+  const [hasConsent, setHasConsent] = useState(false)
+  const [scriptLoaded, setScriptLoaded] = useState(false)
+  const isGa4 = trackingId.startsWith('G-')
 
   const ensureGtagStub = () => {
     if (typeof window === 'undefined') {
-      return;
+      return
     }
 
-    window.dataLayer = window.dataLayer ?? [];
+    window.dataLayer = window.dataLayer ?? []
 
     if (typeof window.gtag !== 'function') {
       window.gtag = (...args: unknown[]) => {
-        window.dataLayer?.push(args);
-      };
+        window.dataLayer?.push(args)
+      }
     }
-  };
+  }
 
   useEffect(() => {
     const syncConsent = () => {
-      const consentGranted = hasAnalyticsConsent();
-      setHasConsent(consentGranted);
+      const consentGranted = hasAnalyticsConsent()
+      setHasConsent(consentGranted)
 
       if (typeof window !== 'undefined') {
-        const windowFlags = window as unknown as Record<string, unknown>;
-        windowFlags[`ga-disable-${trackingId}`] = !consentGranted;
+        const windowFlags = window as unknown as Record<string, unknown>
+        windowFlags[`ga-disable-${trackingId}`] = !consentGranted
 
         if (isGa4) {
-          ensureGtagStub();
+          ensureGtagStub()
           if (!consentDefaultSetRef.current) {
             window.gtag?.('consent', 'default', {
               ad_storage: 'denied',
@@ -66,8 +66,8 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
               ad_personalization: 'denied',
               analytics_storage: 'denied',
               wait_for_update: 500,
-            });
-            consentDefaultSetRef.current = true;
+            })
+            consentDefaultSetRef.current = true
           }
 
           window.gtag?.('consent', 'update', {
@@ -75,55 +75,55 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
             ad_user_data: 'denied',
             ad_personalization: 'denied',
             analytics_storage: consentGranted ? 'granted' : 'denied',
-          });
+          })
         } else {
           if (consentGranted) {
-            ensureGtagStub();
+            ensureGtagStub()
           } else {
-            initializedRef.current = false;
+            initializedRef.current = false
           }
         }
       }
-    };
+    }
 
-    syncConsent();
-    window.addEventListener(COOKIE_CONSENT_EVENT, syncConsent);
+    syncConsent()
+    window.addEventListener(COOKIE_CONSENT_EVENT, syncConsent)
 
     return () => {
-      window.removeEventListener(COOKIE_CONSENT_EVENT, syncConsent);
-    };
-  }, [isGa4, trackingId]);
+      window.removeEventListener(COOKIE_CONSENT_EVENT, syncConsent)
+    }
+  }, [isGa4, trackingId])
 
   useEffect(() => {
     if (typeof window === 'undefined') {
-      return;
+      return
     }
 
     if (initializedRef.current) {
-      return;
+      return
     }
 
-    const windowFlags = window as unknown as Record<string, unknown>;
-    windowFlags[`ga-disable-${trackingId}`] = !hasConsent;
+    const windowFlags = window as unknown as Record<string, unknown>
+    windowFlags[`ga-disable-${trackingId}`] = !hasConsent
 
     if (isGa4) {
-      ensureGtagStub();
-      initializedRef.current = true;
-      return;
+      ensureGtagStub()
+      initializedRef.current = true
+      return
     } else {
       if (!scriptLoaded) {
-        return;
+        return
       }
 
       if (typeof window.ga !== 'function') {
-        return;
+        return
       }
 
-      window.ga('create', trackingId, 'auto');
+      window.ga('create', trackingId, 'auto')
     }
 
-    initializedRef.current = true;
-  }, [hasConsent, isGa4, scriptLoaded, trackingId]);
+    initializedRef.current = true
+  }, [hasConsent, isGa4, scriptLoaded, trackingId])
 
   useEffect(() => {
     if (
@@ -131,24 +131,24 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
       !initializedRef.current ||
       typeof window === 'undefined'
     ) {
-      return;
+      return
     }
 
-    const query = searchParams.toString();
-    const page = query ? `${pathname}?${query}` : pathname;
+    const query = searchParams.toString()
+    const page = query ? `${pathname}?${query}` : pathname
 
     if (isGa4) {
-      window.gtag?.('event', 'page_view', {page_path: page});
-      return;
+      window.gtag?.('event', 'page_view', { page_path: page })
+      return
     }
 
     if (typeof window.ga !== 'function') {
-      return;
+      return
     }
 
-    window.ga('set', 'page', page);
-    window.ga('send', 'pageview');
-  }, [isGa4, pathname, scriptLoaded, searchParams]);
+    window.ga('set', 'page', page)
+    window.ga('send', 'pageview')
+  }, [isGa4, pathname, scriptLoaded, searchParams])
 
   if (isGa4) {
     return (
@@ -168,7 +168,7 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
           onLoad={() => setScriptLoaded(true)}
         />
       </>
-    );
+    )
   }
 
   return (
@@ -178,5 +178,5 @@ function GoogleAnalyticsContent({trackingId}: GoogleAnalyticsProps) {
       src="https://www.google-analytics.com/analytics.js"
       onLoad={() => setScriptLoaded(true)}
     />
-  );
+  )
 }

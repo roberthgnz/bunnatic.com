@@ -1,22 +1,34 @@
-"use client";
+'use client'
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
-import { ArrowLeft, ArrowRight, CircleCheck, Eye, EyeOff, MapPin, Sparkles, Zap } from "lucide-react";
-import { useLanguage } from "@/components/LanguageProvider";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { createSignupSchema, type SignupFormValues } from "@/lib/validations/signup";
-import { cn } from "@/lib/utils";
-import { signup } from "@/lib/supabase/actions";
-import { toast } from "sonner";
-import { trackFunnelEvent } from "@/lib/funnelEvents";
+import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
+import {
+  ArrowLeft,
+  ArrowRight,
+  CircleCheck,
+  Eye,
+  EyeOff,
+  MapPin,
+  Sparkles,
+  Zap,
+} from 'lucide-react'
+import { useLanguage } from '@/components/LanguageProvider'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useMemo, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  createSignupSchema,
+  type SignupFormValues,
+} from '@/lib/validations/signup'
+import { cn } from '@/lib/utils'
+import { signup } from '@/lib/supabase/actions'
+import { toast } from 'sonner'
+import { trackFunnelEvent } from '@/lib/funnelEvents'
 
-import { createClient } from "@/lib/supabase/client";
-import { routing } from "@/i18n/routing";
+import { createClient } from '@/lib/supabase/client'
+import { routing } from '@/i18n/routing'
 
 const GoogleLogo = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
@@ -37,99 +49,110 @@ const GoogleLogo = () => (
       fill="#EA4335"
     />
   </svg>
-);
+)
 
 const signUpContent = {
   es: {
     navbar: {
-      logo: "Bunnatic",
+      logo: 'Bunnatic',
     },
     crear: {
-      back: "Volver",
+      back: 'Volver',
     },
     signup: {
-      title: "Crear cuenta",
-      subtitle: "Empieza a gestionar tu negocio online.",
-      existingAccountText: "Iniciar sesión",
-      or: "¿Ya tienes cuenta?",
-      nameLabel: "Nombre completo",
-      emailLabel: "Correo electrónico",
-      passwordLabel: "Contraseña",
-      showPassword: "Mostrar contraseña",
-      hidePassword: "Ocultar contraseña",
-      nameHint: "Tu nombre real.",
-      emailHint: "Para notificaciones importantes.",
-      passwordHint: "8+ caracteres, mayúscula y número.",
-      signupButton: "Crear cuenta",
-      signupButtonLoading: "Creando...",
-      securityNote: "Datos seguros y cifrados.",
-      stepBadge: "Registro",
-      socialGoogle: "Continuar con Google",
-      orDivider: "O regístrate con correo",
+      title: 'Crear cuenta',
+      subtitle: 'Empieza a gestionar tu negocio online.',
+      existingAccountText: 'Iniciar sesión',
+      or: '¿Ya tienes cuenta?',
+      nameLabel: 'Nombre completo',
+      emailLabel: 'Correo electrónico',
+      passwordLabel: 'Contraseña',
+      showPassword: 'Mostrar contraseña',
+      hidePassword: 'Ocultar contraseña',
+      nameHint: 'Tu nombre real.',
+      emailHint: 'Para notificaciones importantes.',
+      passwordHint: '8+ caracteres, mayúscula y número.',
+      signupButton: 'Crear cuenta',
+      signupButtonLoading: 'Creando...',
+      securityNote: 'Datos seguros y cifrados.',
+      stepBadge: 'Registro',
+      socialGoogle: 'Continuar con Google',
+      orDivider: 'O regístrate con correo',
       validation: {
-        nameRequired: "Requerido",
-        nameMin: "Mínimo 2 caracteres",
-        nameMax: "Máximo 80 caracteres",
-        emailRequired: "Requerido",
-        emailInvalid: "Correo inválido",
-        passwordRequired: "Requerida",
-        passwordMin: "Mínimo 8 caracteres",
-        passwordUppercase: "Falta mayúscula",
-        passwordLowercase: "Falta minúscula",
-        passwordNumber: "Falta número",
+        nameRequired: 'Requerido',
+        nameMin: 'Mínimo 2 caracteres',
+        nameMax: 'Máximo 80 caracteres',
+        emailRequired: 'Requerido',
+        emailInvalid: 'Correo inválido',
+        passwordRequired: 'Requerida',
+        passwordMin: 'Mínimo 8 caracteres',
+        passwordUppercase: 'Falta mayúscula',
+        passwordLowercase: 'Falta minúscula',
+        passwordNumber: 'Falta número',
       },
     },
   },
   ca: {
     navbar: {
-      logo: "Bunnatic",
+      logo: 'Bunnatic',
     },
     crear: {
-      back: "Tornar",
+      back: 'Tornar',
     },
     signup: {
-      title: "Crear compte",
-      subtitle: "Comença a gestionar el teu negoci online.",
-      existingAccountText: "Iniciar sessió",
-      or: "Ja tens compte?",
-      nameLabel: "Nom complet",
-      emailLabel: "Correu electrònic",
-      passwordLabel: "Contrasenya",
-      showPassword: "Mostra la contrasenya",
-      hidePassword: "Amaga la contrasenya",
-      nameHint: "El teu nom real.",
-      emailHint: "Per notificacions importants.",
-      passwordHint: "8+ caràcters, majúscula i número.",
-      signupButton: "Crear compte",
-      signupButtonLoading: "Creant...",
-      securityNote: "Dades segures i xifrades.",
-      stepBadge: "Registre",
-      socialGoogle: "Continua amb Google",
+      title: 'Crear compte',
+      subtitle: 'Comença a gestionar el teu negoci online.',
+      existingAccountText: 'Iniciar sessió',
+      or: 'Ja tens compte?',
+      nameLabel: 'Nom complet',
+      emailLabel: 'Correu electrònic',
+      passwordLabel: 'Contrasenya',
+      showPassword: 'Mostra la contrasenya',
+      hidePassword: 'Amaga la contrasenya',
+      nameHint: 'El teu nom real.',
+      emailHint: 'Per notificacions importants.',
+      passwordHint: '8+ caràcters, majúscula i número.',
+      signupButton: 'Crear compte',
+      signupButtonLoading: 'Creant...',
+      securityNote: 'Dades segures i xifrades.',
+      stepBadge: 'Registre',
+      socialGoogle: 'Continua amb Google',
       orDivider: "O registra't amb correu",
       validation: {
-        nameRequired: "Requerit",
-        nameMin: "Mínim 2 caràcters",
-        nameMax: "Màxim 80 caràcters",
-        emailRequired: "Requerit",
-        emailInvalid: "Correu invàlid",
-        passwordRequired: "Requerida",
-        passwordMin: "Mínim 8 caràcters",
-        passwordUppercase: "Falta majúscula",
-        passwordLowercase: "Falta minúscula",
-        passwordNumber: "Falta número",
+        nameRequired: 'Requerit',
+        nameMin: 'Mínim 2 caràcters',
+        nameMax: 'Màxim 80 caràcters',
+        emailRequired: 'Requerit',
+        emailInvalid: 'Correu invàlid',
+        passwordRequired: 'Requerida',
+        passwordMin: 'Mínim 8 caràcters',
+        passwordUppercase: 'Falta majúscula',
+        passwordLowercase: 'Falta minúscula',
+        passwordNumber: 'Falta número',
       },
     },
   },
-} as const;
+} as const
 
-const REDIRECT_KEYS = new Set(["redirect", "next", "returnTo", "to"]);
-const CONTEXT_KEYS = ["plan", "planSuggested", "source", "draftId", "sector", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;
+const REDIRECT_KEYS = new Set(['redirect', 'next', 'returnTo', 'to'])
+const CONTEXT_KEYS = [
+  'plan',
+  'planSuggested',
+  'source',
+  'draftId',
+  'sector',
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_term',
+  'utm_content',
+] as const
 
 function normalizeInternalPath(path: string) {
-  if (!path || !path.startsWith("/") || path.startsWith("//")) {
-    return "/onboarding";
+  if (!path || !path.startsWith('/') || path.startsWith('//')) {
+    return '/onboarding'
   }
-  return path;
+  return path
 }
 
 export default function SignUpPage() {
@@ -137,71 +160,79 @@ export default function SignUpPage() {
     <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
       <SignUpContent />
     </Suspense>
-  );
+  )
 }
 
 function SignUpContent() {
-  const { language } = useLanguage();
-  const t = signUpContent[language];
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [showPassword, setShowPassword] = useState(false);
+  const { language } = useLanguage()
+  const t = signUpContent[language]
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [showPassword, setShowPassword] = useState(false)
 
   const localePrefix = useMemo(() => {
-    return language === routing.defaultLocale ? "" : `/${language}`;
-  }, [language]);
-  const homeHref = localePrefix || "/";
+    return language === routing.defaultLocale ? '' : `/${language}`
+  }, [language])
+  const homeHref = localePrefix || '/'
 
   const flow = useMemo(() => {
     const redirectRaw =
-      searchParams.get("redirect") ??
-      searchParams.get("next") ??
-      searchParams.get("returnTo") ??
-      searchParams.get("to") ??
-      "/onboarding?step=checkout";
+      searchParams.get('redirect') ??
+      searchParams.get('next') ??
+      searchParams.get('returnTo') ??
+      searchParams.get('to') ??
+      '/onboarding?step=checkout'
 
-    const [targetPathRaw, targetQueryRaw = ""] = redirectRaw.split("?");
-    const safeTargetPath = normalizeInternalPath(targetPathRaw || "/onboarding");
-    const normalizedTargetPath = safeTargetPath === "/checkout" ? "/onboarding" : safeTargetPath;
-    const targetQuery = new URLSearchParams(targetQueryRaw);
+    const [targetPathRaw, targetQueryRaw = ''] = redirectRaw.split('?')
+    const safeTargetPath = normalizeInternalPath(targetPathRaw || '/onboarding')
+    const normalizedTargetPath =
+      safeTargetPath === '/checkout' ? '/onboarding' : safeTargetPath
+    const targetQuery = new URLSearchParams(targetQueryRaw)
 
     for (const [key, value] of searchParams.entries()) {
       if (REDIRECT_KEYS.has(key)) {
-        continue;
+        continue
       }
       if (!targetQuery.has(key)) {
-        targetQuery.set(key, value);
+        targetQuery.set(key, value)
       }
     }
 
-    const plan = searchParams.get("plan") ?? searchParams.get("planSuggested");
-    const source = searchParams.get("source");
+    const plan = searchParams.get('plan') ?? searchParams.get('planSuggested')
+    const source = searchParams.get('source')
 
-    if (normalizedTargetPath === "/onboarding" && !targetQuery.has("step")) {
-      targetQuery.set("step", "checkout");
+    if (normalizedTargetPath === '/onboarding' && !targetQuery.has('step')) {
+      targetQuery.set('step', 'checkout')
     }
 
-    if (normalizedTargetPath === "/onboarding" && plan && !targetQuery.has("plan")) {
-      targetQuery.set("plan", plan);
+    if (
+      normalizedTargetPath === '/onboarding' &&
+      plan &&
+      !targetQuery.has('plan')
+    ) {
+      targetQuery.set('plan', plan)
     }
 
-    const serialized = targetQuery.toString();
-    const targetWithQuery = `${normalizedTargetPath}${serialized ? `?${serialized}` : ""}`;
+    const serialized = targetQuery.toString()
+    const targetWithQuery = `${normalizedTargetPath}${serialized ? `?${serialized}` : ''}`
     const destination = targetWithQuery.startsWith(`/${language}/`)
       ? targetWithQuery
-      : `${localePrefix}${targetWithQuery}`;
+      : `${localePrefix}${targetWithQuery}`
 
-    return { destination, safeTargetPath: normalizedTargetPath, plan, source };
-  }, [localePrefix, language, searchParams]);
+    return { destination, safeTargetPath: normalizedTargetPath, plan, source }
+  }, [localePrefix, language, searchParams])
 
   const signinHref = useMemo(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    const qs = params.toString();
-    return `${localePrefix}/signin${qs ? `?${qs}` : ""}`;
-  }, [localePrefix, searchParams]);
+    const params = new URLSearchParams(searchParams.toString())
+    const qs = params.toString()
+    return `${localePrefix}/signin${qs ? `?${qs}` : ''}`
+  }, [localePrefix, searchParams])
 
-  const schema = useMemo(() => createSignupSchema(t.signup.validation), [t.signup.validation]);
+  const schema = useMemo(
+    () => createSignupSchema(t.signup.validation),
+    [t.signup.validation]
+  )
 
   const {
     control,
@@ -210,92 +241,108 @@ function SignUpContent() {
     formState: { errors, isValid, isSubmitting },
   } = useForm<SignupFormValues>({
     resolver: zodResolver(schema),
-    mode: "onChange",
-    reValidateMode: "onChange",
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
+      name: '',
+      email: '',
+      password: '',
     },
-  });
+  })
 
-  const passwordValue = useWatch({ control, name: "password" }) ?? "";
+  const passwordValue = useWatch({ control, name: 'password' }) ?? ''
   const passwordChecks = [
-    { label: t.signup.validation.passwordMin, valid: passwordValue.length >= 8 },
-    { label: t.signup.validation.passwordUppercase, valid: /[A-Z]/.test(passwordValue) },
-    { label: t.signup.validation.passwordLowercase, valid: /[a-z]/.test(passwordValue) },
-    { label: t.signup.validation.passwordNumber, valid: /[0-9]/.test(passwordValue) },
-  ];
+    {
+      label: t.signup.validation.passwordMin,
+      valid: passwordValue.length >= 8,
+    },
+    {
+      label: t.signup.validation.passwordUppercase,
+      valid: /[A-Z]/.test(passwordValue),
+    },
+    {
+      label: t.signup.validation.passwordLowercase,
+      valid: /[a-z]/.test(passwordValue),
+    },
+    {
+      label: t.signup.validation.passwordNumber,
+      valid: /[0-9]/.test(passwordValue),
+    },
+  ]
 
   useEffect(() => {
-    trackFunnelEvent("signup_started", {
+    trackFunnelEvent('signup_started', {
       locale: language,
-      source: flow.source ?? "",
-      plan: flow.plan ?? "",
-      has_draft: Boolean(searchParams.get("draftId")),
-    });
-  }, [flow.plan, flow.source, language, searchParams]);
+      source: flow.source ?? '',
+      plan: flow.plan ?? '',
+      has_draft: Boolean(searchParams.get('draftId')),
+    })
+  }, [flow.plan, flow.source, language, searchParams])
 
   async function onSubmit(data: SignupFormValues) {
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("password", data.password);
-    formData.append("name", data.name);
+    const formData = new FormData()
+    formData.append('email', data.email)
+    formData.append('password', data.password)
+    formData.append('name', data.name)
 
-    const result = await signup(formData);
+    const result = await signup(formData)
 
     if (result?.error) {
-      toast.error(result.error);
+      toast.error(result.error)
     } else {
-      trackFunnelEvent("signup_completed", {
+      trackFunnelEvent('signup_completed', {
         locale: language,
-        source: flow.source ?? "",
-        plan: flow.plan ?? "",
-      });
-      router.push(flow.destination);
+        source: flow.source ?? '',
+        plan: flow.plan ?? '',
+      })
+      router.push(flow.destination)
     }
   }
 
   const handleSocialLogin = async () => {
-    const supabase = createClient();
+    const supabase = createClient()
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(flow.destination)}`,
       },
-    });
+    })
 
     if (error) {
-      toast.error(error.message);
+      toast.error(error.message)
     }
-  };
+  }
 
   return (
-    <main className="min-h-screen bg-slate-50 font-sans text-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <main className="flex min-h-screen flex-col justify-center bg-slate-50 py-12 font-sans text-gray-900 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link href={homeHref} className="flex items-center justify-center gap-2 mb-6">
+        <Link
+          href={homeHref}
+          className="mb-6 flex items-center justify-center gap-2"
+        >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 shadow-sm">
             <Zap className="h-6 w-6 fill-emerald-600 text-emerald-600" />
           </div>
-          <span className="text-2xl font-bold tracking-tight text-gray-900">{t.navbar.logo}</span>
+          <span className="text-2xl font-bold tracking-tight text-gray-900">
+            {t.navbar.logo}
+          </span>
         </Link>
-        
-        <h2 className="mt-2 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+
+        <h2 className="mt-2 text-center text-2xl leading-9 font-bold tracking-tight text-gray-900">
           {t.signup.title}
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600 max-w-sm mx-auto">
+        <p className="mx-auto mt-2 max-w-sm text-center text-sm text-gray-600">
           {t.signup.subtitle}
         </p>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[420px]">
-        <div className="bg-white px-6 py-8 shadow-sm sm:rounded-3xl sm:px-10 border border-slate-200">
-          
+        <div className="border border-slate-200 bg-white px-6 py-8 shadow-sm sm:rounded-3xl sm:px-10">
           <div className="mb-8">
             <Button
               variant="outline"
               type="button"
-              className="w-full h-12 gap-3 text-base font-medium text-slate-700 hover:bg-slate-50 border-slate-200 rounded-xl transition-colors hover:border-slate-300"
+              className="h-12 w-full gap-3 rounded-xl border-slate-200 text-base font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
               onClick={handleSocialLogin}
             >
               <GoogleLogo />
@@ -304,63 +351,99 @@ function SignUpContent() {
           </div>
 
           <div className="relative mb-8">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div
+              className="absolute inset-0 flex items-center"
+              aria-hidden="true"
+            >
               <div className="w-full border-t border-slate-200" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-slate-400 font-medium tracking-wide">
+              <span className="bg-white px-3 font-medium tracking-wide text-slate-400">
                 {t.signup.orDivider}
               </span>
             </div>
           </div>
 
-          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
+          <form
+            className="space-y-5"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+          >
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="name" className="text-sm font-medium text-gray-900 ml-1">{t.signup.nameLabel}</label>
+                <label
+                  htmlFor="name"
+                  className="ml-1 text-sm font-medium text-gray-900"
+                >
+                  {t.signup.nameLabel}
+                </label>
                 <Input
                   id="name"
                   type="text"
                   autoComplete="name"
-                  {...register("name")}
+                  {...register('name')}
                   className={cn(
-                    "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
-                    errors.name ? "border-rose-300 focus:border-rose-300 focus:ring-rose-500/20" : "focus:border-emerald-500"
+                    'h-11 rounded-xl border-slate-200 bg-slate-50 px-4 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20',
+                    errors.name
+                      ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-500/20'
+                      : 'focus:border-emerald-500'
                   )}
                   placeholder={t.signup.nameLabel}
                   aria-invalid={Boolean(errors.name)}
                 />
-                {errors.name ? <p className="text-xs font-medium text-rose-600 ml-1">{errors.name.message}</p> : null}
+                {errors.name ? (
+                  <p className="ml-1 text-xs font-medium text-rose-600">
+                    {errors.name.message}
+                  </p>
+                ) : null}
               </div>
-              
+
               <div className="space-y-1.5">
-                <label htmlFor="email-address" className="text-sm font-medium text-gray-900 ml-1">{t.signup.emailLabel}</label>
+                <label
+                  htmlFor="email-address"
+                  className="ml-1 text-sm font-medium text-gray-900"
+                >
+                  {t.signup.emailLabel}
+                </label>
                 <Input
                   id="email-address"
                   type="email"
                   autoComplete="email"
-                  {...register("email")}
+                  {...register('email')}
                   className={cn(
-                    "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
-                    errors.email ? "border-rose-300 focus:border-rose-300 focus:ring-rose-500/20" : "focus:border-emerald-500"
+                    'h-11 rounded-xl border-slate-200 bg-slate-50 px-4 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20',
+                    errors.email
+                      ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-500/20'
+                      : 'focus:border-emerald-500'
                   )}
                   placeholder={t.signup.emailLabel}
                   aria-invalid={Boolean(errors.email)}
                 />
-                {errors.email ? <p className="text-xs font-medium text-rose-600 ml-1">{errors.email.message}</p> : null}
+                {errors.email ? (
+                  <p className="ml-1 text-xs font-medium text-rose-600">
+                    {errors.email.message}
+                  </p>
+                ) : null}
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="password" className="text-sm font-medium text-gray-900 ml-1">{t.signup.passwordLabel}</label>
+                <label
+                  htmlFor="password"
+                  className="ml-1 text-sm font-medium text-gray-900"
+                >
+                  {t.signup.passwordLabel}
+                </label>
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     autoComplete="new-password"
-                    {...register("password")}
+                    {...register('password')}
                     className={cn(
-                      "h-11 rounded-xl bg-slate-50 border-slate-200 px-4 pr-11 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20",
-                      errors.password ? "border-rose-300 focus:border-rose-300 focus:ring-rose-500/20" : "focus:border-emerald-500"
+                      'h-11 rounded-xl border-slate-200 bg-slate-50 px-4 pr-11 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20',
+                      errors.password
+                        ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-500/20'
+                        : 'focus:border-emerald-500'
                     )}
                     placeholder={t.signup.passwordLabel}
                     aria-invalid={Boolean(errors.password)}
@@ -370,40 +453,56 @@ function SignUpContent() {
                     variant="ghost"
                     size="icon"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600 hover:bg-transparent"
-                    aria-label={showPassword ? t.signup.hidePassword : t.signup.showPassword}
+                    className="absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2 text-gray-400 hover:bg-transparent hover:text-gray-600"
+                    aria-label={
+                      showPassword
+                        ? t.signup.hidePassword
+                        : t.signup.showPassword
+                    }
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
-                
-                <div className="grid gap-x-4 gap-y-1 grid-cols-2 pt-1 px-1">
+
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 px-1 pt-1">
                   {passwordChecks.map((rule) => (
                     <div
                       key={rule.label}
                       className={cn(
-                        "flex items-center gap-1.5 text-[10px] transition-colors duration-200",
-                        rule.valid ? "text-emerald-600 font-medium" : "text-gray-400"
+                        'flex items-center gap-1.5 text-[10px] transition-colors duration-200',
+                        rule.valid
+                          ? 'font-medium text-emerald-600'
+                          : 'text-gray-400'
                       )}
                     >
-                      <div className={cn(
-                        "h-1 w-1 rounded-full transition-colors duration-200",
-                        rule.valid ? "bg-emerald-500" : "bg-gray-300"
-                      )} />
+                      <div
+                        className={cn(
+                          'h-1 w-1 rounded-full transition-colors duration-200',
+                          rule.valid ? 'bg-emerald-500' : 'bg-gray-300'
+                        )}
+                      />
                       {rule.label}
                     </div>
                   ))}
                 </div>
-                {errors.password ? <p className="text-xs font-medium text-rose-600 ml-1">{errors.password.message}</p> : null}
+                {errors.password ? (
+                  <p className="ml-1 text-xs font-medium text-rose-600">
+                    {errors.password.message}
+                  </p>
+                ) : null}
               </div>
             </div>
 
             {CONTEXT_KEYS.map((key) => {
-              const value = searchParams.get(key);
+              const value = searchParams.get(key)
               if (!value) {
-                return null;
+                return null
               }
-              return <input key={key} type="hidden" name={key} value={value} />;
+              return <input key={key} type="hidden" name={key} value={value} />
             })}
 
             <div className="pt-2">
@@ -412,10 +511,10 @@ function SignUpContent() {
                 type="submit"
                 disabled={!isValid || isSubmitting}
                 className={cn(
-                  "group relative flex w-full h-12 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-colors",
+                  'group relative flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-colors',
                   !isValid || isSubmitting
-                    ? "cursor-not-allowed bg-emerald-300"
-                    : "bg-emerald-700 hover:bg-emerald-800"
+                    ? 'cursor-not-allowed bg-emerald-300'
+                    : 'bg-emerald-700 hover:bg-emerald-800'
                 )}
               >
                 {isSubmitting ? (
@@ -431,20 +530,23 @@ function SignUpContent() {
                 )}
               </Button>
             </div>
-            
-            <p className="text-center text-xs text-slate-500 mt-4">
+
+            <p className="mt-4 text-center text-xs text-slate-500">
               {t.signup.securityNote}
             </p>
           </form>
 
           <p className="mt-8 text-center text-sm text-gray-500">
-            {t.signup.or}{" "}
-            <Link href={signinHref} className="font-semibold text-emerald-600 hover:text-emerald-500 hover:underline underline-offset-4">
+            {t.signup.or}{' '}
+            <Link
+              href={signinHref}
+              className="font-semibold text-emerald-600 underline-offset-4 hover:text-emerald-500 hover:underline"
+            >
               {t.signup.existingAccountText}
             </Link>
           </p>
         </div>
       </div>
     </main>
-  );
+  )
 }

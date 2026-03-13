@@ -44,11 +44,13 @@ export default async function ProfilePage({
   return (
     <div className="max-w-3xl space-y-5">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{t.title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          {t.title}
+        </h1>
         <p className="text-sm text-slate-600">{t.subtitle}</p>
       </div>
 
-      <div className="rounded-xl border bg-card text-card-foreground">
+      <div className="bg-card text-card-foreground rounded-xl border">
         <div className="p-6 pt-6">
           <div className="mb-6 flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">

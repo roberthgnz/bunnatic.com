@@ -28,14 +28,27 @@ type PublicBusinessSiteProps = {
   }>
 }
 
-export default function PublicBusinessSite({ business, locale, services, hours }: PublicBusinessSiteProps) {
+export default function PublicBusinessSite({
+  business,
+  locale,
+  services,
+  hours,
+}: PublicBusinessSiteProps) {
   const t = {
     es: {
       services: 'Nuestros Servicios',
       contact: 'Contáctanos',
       hours: 'Horario',
       closed: 'Cerrado',
-      days: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+      days: [
+        'Domingo',
+        'Lunes',
+        'Martes',
+        'Miércoles',
+        'Jueves',
+        'Viernes',
+        'Sábado',
+      ],
       poweredBy: 'Web creada con Bunnatic',
       hoursUnavailable: 'Horario no disponible',
       addressUnavailable: 'Dirección no disponible',
@@ -48,7 +61,15 @@ export default function PublicBusinessSite({ business, locale, services, hours }
       contact: 'Contacta amb nosaltres',
       hours: 'Horari',
       closed: 'Tancat',
-      days: ['Diumenge', 'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte'],
+      days: [
+        'Diumenge',
+        'Dilluns',
+        'Dimarts',
+        'Dimecres',
+        'Dijous',
+        'Divendres',
+        'Dissabte',
+      ],
       poweredBy: 'Web creada amb Bunnatic',
       hoursUnavailable: 'Horari no disponible',
       addressUnavailable: 'Adreça no disponible',
@@ -59,41 +80,60 @@ export default function PublicBusinessSite({ business, locale, services, hours }
   }[locale === 'ca' ? 'ca' : 'es']
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
-      <header className="bg-slate-900 text-white py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-emerald-400 font-medium mb-2 uppercase tracking-wide text-sm">{business.category}</p>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">{business.name}</h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto whitespace-pre-wrap">{business.description}</p>
+    <div className="flex min-h-screen flex-col font-sans">
+      <header className="bg-slate-900 px-4 py-16 text-white">
+        <div className="mx-auto max-w-4xl text-center">
+          <p className="mb-2 text-sm font-medium tracking-wide text-emerald-400 uppercase">
+            {business.category}
+          </p>
+          <h1 className="mb-6 text-4xl font-bold md:text-5xl">
+            {business.name}
+          </h1>
+          <p className="mx-auto max-w-2xl text-lg whitespace-pre-wrap text-slate-300">
+            {business.description}
+          </p>
         </div>
       </header>
 
-      <main className="flex-1 bg-slate-50 py-12 px-4 space-y-16">
+      <main className="flex-1 space-y-16 bg-slate-50 px-4 py-12">
         {services.length > 0 && (
-          <section className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-8 text-slate-900">{t.services}</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
+          <section className="mx-auto max-w-4xl">
+            <h2 className="mb-8 text-center text-2xl font-bold text-slate-900">
+              {t.services}
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2">
               {services.map((service) => (
-                <div key={service.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-lg">{service.name}</h3>
+                <div
+                  key={service.id}
+                  className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+                >
+                  <div className="mb-2 flex items-start justify-between">
+                    <h3 className="text-lg font-semibold">{service.name}</h3>
                     {service.price && (
-                      <span className="bg-emerald-100 text-emerald-800 text-sm font-bold px-2 py-1 rounded">
+                      <span className="rounded bg-emerald-100 px-2 py-1 text-sm font-bold text-emerald-800">
                         {service.price}€
                       </span>
                     )}
                   </div>
-                  {service.description && <p className="text-slate-600 text-sm mb-2">{service.description}</p>}
-                  {service.duration && <p className="text-slate-400 text-xs">{service.duration} min</p>}
+                  {service.description && (
+                    <p className="mb-2 text-sm text-slate-600">
+                      {service.description}
+                    </p>
+                  )}
+                  {service.duration && (
+                    <p className="text-xs text-slate-400">
+                      {service.duration} min
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
           </section>
         )}
 
-        <section className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+        <section className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
+          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+            <h2 className="mb-6 flex items-center gap-2 text-xl font-bold">
               <Mail className="h-5 w-5 text-emerald-600" />
               {t.contact}
             </h2>
@@ -101,37 +141,50 @@ export default function PublicBusinessSite({ business, locale, services, hours }
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+              <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
                 <Clock className="h-5 w-5 text-emerald-600" />
                 {t.hours}
               </h2>
               <ul className="space-y-2 text-sm">
                 {hours.map((h) => (
-                  <li key={h.day_of_week} className="flex justify-between py-1 border-b border-slate-50 last:border-0">
-                    <span className="font-medium text-slate-700">{t.days[h.day_of_week]}</span>
+                  <li
+                    key={h.day_of_week}
+                    className="flex justify-between border-b border-slate-50 py-1 last:border-0"
+                  >
+                    <span className="font-medium text-slate-700">
+                      {t.days[h.day_of_week]}
+                    </span>
                     <span className="text-slate-500">
-                      {h.is_closed ? t.closed : `${h.open_time?.slice(0, 5)} - ${h.close_time?.slice(0, 5)}`}
+                      {h.is_closed
+                        ? t.closed
+                        : `${h.open_time?.slice(0, 5)} - ${h.close_time?.slice(0, 5)}`}
                     </span>
                   </li>
                 ))}
-                {hours.length === 0 && <p className="text-slate-500 italic">{t.hoursUnavailable}</p>}
+                {hours.length === 0 && (
+                  <p className="text-slate-500 italic">{t.hoursUnavailable}</p>
+                )}
               </ul>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+            <div className="space-y-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
               <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-emerald-600 mt-0.5" />
+                <MapPin className="mt-0.5 h-5 w-5 text-emerald-600" />
                 <div>
                   <p className="font-medium text-slate-900">{t.location}</p>
-                  <p className="text-slate-600 text-sm">{business.address || t.addressUnavailable}</p>
+                  <p className="text-sm text-slate-600">
+                    {business.address || t.addressUnavailable}
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Phone className="h-5 w-5 text-emerald-600 mt-0.5" />
+                <Phone className="mt-0.5 h-5 w-5 text-emerald-600" />
                 <div>
                   <p className="font-medium text-slate-900">{t.phone}</p>
-                  <p className="text-slate-600 text-sm">{business.phone || t.phoneUnavailable}</p>
+                  <p className="text-sm text-slate-600">
+                    {business.phone || t.phoneUnavailable}
+                  </p>
                 </div>
               </div>
             </div>
@@ -139,7 +192,7 @@ export default function PublicBusinessSite({ business, locale, services, hours }
         </section>
       </main>
 
-      <footer className="bg-white border-t py-8 text-center text-sm text-slate-500">
+      <footer className="border-t bg-white py-8 text-center text-sm text-slate-500">
         <p>
           {t.poweredBy}{' '}
           <Link href="/" className="font-bold text-emerald-600 hover:underline">

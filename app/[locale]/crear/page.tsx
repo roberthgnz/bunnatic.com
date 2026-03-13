@@ -1,1 +1,1 @@
-export { default } from "../crear-pagina-web-negocio/page";
+export { default } from '../crear-pagina-web-negocio/page'

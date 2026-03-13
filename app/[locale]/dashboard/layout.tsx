@@ -17,7 +17,9 @@ export default async function DashboardLayout({
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect(`${localePrefix}/signin?next=${encodeURIComponent(`${localePrefix}/dashboard`)}`)
+    redirect(
+      `${localePrefix}/signin?next=${encodeURIComponent(`${localePrefix}/dashboard`)}`
+    )
   }
 
   const { data: profile } = await supabase

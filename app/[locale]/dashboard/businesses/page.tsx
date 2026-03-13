@@ -1,8 +1,20 @@
 import { getBusinesses } from '@/lib/supabase/actions'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Building2, CheckCircle2, CircleDashed, ExternalLink, Plus } from 'lucide-react'
+import {
+  Building2,
+  CheckCircle2,
+  CircleDashed,
+  ExternalLink,
+  Plus,
+} from 'lucide-react'
 import Link from 'next/link'
 
 export default async function BusinessesPage({
@@ -19,7 +31,8 @@ export default async function BusinessesPage({
       subtitle: 'Gestiona cada negocio y su web pública desde un solo lugar.',
       create: 'Crear negocio',
       noData: 'Todavía no tienes negocios registrados.',
-      noDataHint: 'Crea el primero para empezar a configurar servicios, horario y contenido.',
+      noDataHint:
+        'Crea el primero para empezar a configurar servicios, horario y contenido.',
       open: 'Abrir panel',
       slug: 'Slug',
       domain: 'Dominio',
@@ -35,7 +48,8 @@ export default async function BusinessesPage({
       subtitle: 'Gestiona cada negoci i el seu web públic des d’un sol lloc.',
       create: 'Crear negoci',
       noData: 'Encara no tens negocis registrats.',
-      noDataHint: 'Crea el primer per començar a configurar serveis, horari i contingut.',
+      noDataHint:
+        'Crea el primer per començar a configurar serveis, horari i contingut.',
       open: 'Obrir panell',
       slug: 'Slug',
       domain: 'Domini',
@@ -74,7 +88,9 @@ export default async function BusinessesPage({
     <div className="space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{t.title}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+            {t.title}
+          </h1>
           <p className="text-sm text-slate-600">{t.subtitle}</p>
         </div>
         <Button asChild>
@@ -102,15 +118,17 @@ export default async function BusinessesPage({
         <div className="grid gap-4 md:grid-cols-2">
           {businesses.map((business) => (
             <Card key={business.id} className="border-slate-200 shadow-sm">
-              <CardContent className="p-5 space-y-4">
+              <CardContent className="space-y-4 p-5">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 min-w-0">
+                  <div className="flex min-w-0 items-start gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
                       {business.name?.[0]?.toUpperCase() || 'B'}
                     </div>
                     <div className="min-w-0">
-                      <CardTitle className="line-clamp-1 text-lg">{business.name}</CardTitle>
-                      <CardDescription className="line-clamp-1 mt-0.5 font-mono text-xs">
+                      <CardTitle className="line-clamp-1 text-lg">
+                        {business.name}
+                      </CardTitle>
+                      <CardDescription className="mt-0.5 line-clamp-1 font-mono text-xs">
                         {business.custom_domain
                           ? business.custom_domain
                           : `${platformHost}/${locale}/w/${business.slug}`}
@@ -128,7 +146,10 @@ export default async function BusinessesPage({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="border-slate-200 bg-slate-100 text-slate-700">
+                  <Badge
+                    variant="outline"
+                    className="border-slate-200 bg-slate-100 text-slate-700"
+                  >
                     {business.custom_domain
                       ? business.custom_domain_status === 'active'
                         ? t.customDomain
@@ -137,10 +158,16 @@ export default async function BusinessesPage({
                           : t.pendingDomain
                       : t.platformDomain}
                   </Badge>
-                  <Badge variant="outline" className="border-slate-200 bg-slate-100 text-slate-700">
+                  <Badge
+                    variant="outline"
+                    className="border-slate-200 bg-slate-100 text-slate-700"
+                  >
                     {business.category || '—'}
                   </Badge>
-                  <Badge variant="outline" className="border-slate-200 bg-slate-100 text-slate-700 font-mono">
+                  <Badge
+                    variant="outline"
+                    className="border-slate-200 bg-slate-100 font-mono text-slate-700"
+                  >
                     {business.slug}
                   </Badge>
                 </div>
@@ -155,14 +182,17 @@ export default async function BusinessesPage({
                   </p>
                   <div className="flex items-center gap-2">
                     <Button asChild size="sm" variant="outline">
-                      <Link href={`/${locale}/dashboard/businesses/${business.slug}`}>
+                      <Link
+                        href={`/${locale}/dashboard/businesses/${business.slug}`}
+                      >
                         {t.open}
                       </Link>
                     </Button>
                     <Button asChild size="sm" variant="ghost">
                       <Link
                         href={
-                          business.custom_domain && business.custom_domain_status === 'active'
+                          business.custom_domain &&
+                          business.custom_domain_status === 'active'
                             ? `https://${business.custom_domain}`
                             : `/${locale}/w/${business.slug}`
                         }

@@ -89,8 +89,7 @@ export default function BusinessSettingsForm({
     },
   })
 
-  const err = (key: string) =>
-    t.errors[key as keyof typeof t.errors] ?? key
+  const err = (key: string) => t.errors[key as keyof typeof t.errors] ?? key
 
   async function onSubmit(values: FormValues) {
     const formData = new FormData()
@@ -109,7 +108,7 @@ export default function BusinessSettingsForm({
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       {/* Header */}
       <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
         <h3 className="text-sm font-semibold text-slate-900">{t.heading}</h3>
@@ -117,7 +116,7 @@ export default function BusinessSettingsForm({
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="px-6 py-6 space-y-5">
+        <div className="space-y-5 px-6 py-6">
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField
               label={t.nameLabel}
@@ -135,7 +134,9 @@ export default function BusinessSettingsForm({
             <FormField
               label={t.categoryLabel}
               hint={t.categoryHint}
-              error={errors.category ? err(errors.category.message!) : undefined}
+              error={
+                errors.category ? err(errors.category.message!) : undefined
+              }
               required
             >
               <Input
@@ -149,7 +150,9 @@ export default function BusinessSettingsForm({
           <FormField
             label={t.descLabel}
             hint={t.descHint}
-            error={errors.description ? err(errors.description.message!) : undefined}
+            error={
+              errors.description ? err(errors.description.message!) : undefined
+            }
           >
             <Textarea
               {...register('description')}
@@ -165,12 +168,7 @@ export default function BusinessSettingsForm({
           <p className="text-xs text-slate-400">
             {isDirty ? '● Cambios sin guardar' : ''}
           </p>
-          <Button
-            type="submit"
-            disabled={isSubmitting || !isDirty}
-            size="sm"
-            
-          >
+          <Button type="submit" disabled={isSubmitting || !isDirty} size="sm">
             {isSubmitting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (

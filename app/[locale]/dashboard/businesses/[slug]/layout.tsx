@@ -1,9 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import {
-  ArrowLeft,
-  ExternalLink,
-} from 'lucide-react'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -44,8 +41,8 @@ export default async function BusinessDetailLayout({
   const activeDays = workingHours.filter((hour) => !hour.is_closed).length
   const hasProfile = Boolean(
     business.name?.trim() &&
-      business.category?.trim() &&
-      business.description?.trim()
+    business.category?.trim() &&
+    business.description?.trim()
   )
   const hasContact =
     Boolean(business.phone?.trim()) || Boolean(business.email?.trim())
@@ -53,7 +50,9 @@ export default async function BusinessDetailLayout({
   const hasServices = services.length > 0
   const hasHours = activeDays > 0
   // Simplified logic, considering the essentials for minimum readiness. We remove check for team.
-  const hasPublishedContent = sections.some((section) => section.status === 'published')
+  const hasPublishedContent = sections.some(
+    (section) => section.status === 'published'
+  )
 
   const setupChecklist = [
     hasProfile,
@@ -64,8 +63,15 @@ export default async function BusinessDetailLayout({
     hasPublishedContent,
   ]
   const setupCompletedCount = setupChecklist.filter(Boolean).length
-  const setupCompletion = Math.round((setupCompletedCount / setupChecklist.length) * 100)
-  const setupStatus = setupCompletion === 100 ? 'complete' : setupCompletion >= 60 ? 'inProgress' : 'early'
+  const setupCompletion = Math.round(
+    (setupCompletedCount / setupChecklist.length) * 100
+  )
+  const setupStatus =
+    setupCompletion === 100
+      ? 'complete'
+      : setupCompletion >= 60
+        ? 'inProgress'
+        : 'early'
 
   const t = {
     es: {
@@ -101,74 +107,93 @@ export default async function BusinessDetailLayout({
   return (
     <div className="space-y-6">
       {/* Slim Header - Navigation & Base Information */}
-      <Card className="border-slate-200 shadow-sm rounded-xl overflow-hidden bg-white">
-        <CardContent className="p-4 sm:px-6 sm:py-3 flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
-            {/* Left side: Navigation / Name */}
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" asChild className="h-8 w-8 text-slate-500 hover:text-slate-900 flex-shrink-0">
-                <Link href={`/${locale}/dashboard/businesses`}>
-                  <ArrowLeft className="h-4 w-4" />
-                  <span className="sr-only">{t.back}</span>
-                </Link>
-              </Button>
-              <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-sm sm:text-base font-semibold text-slate-900 tracking-tight leading-none truncate max-w-[200px] sm:max-w-[400px] lg:max-w-xl">
-                      {business.name}
-                  </h1>
-                   {business.category && (
-                      <Badge variant="secondary" className="font-normal text-[10px] leading-none px-1.5 py-0.5 rounded-sm">
-                          {business.category}
-                      </Badge>
-                  )}
-              </div>
+      <Card className="overflow-hidden rounded-xl border-slate-200 bg-white shadow-sm">
+        <CardContent className="flex flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center sm:px-6 sm:py-3">
+          {/* Left side: Navigation / Name */}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="h-8 w-8 flex-shrink-0 text-slate-500 hover:text-slate-900"
+            >
+              <Link href={`/${locale}/dashboard/businesses`}>
+                <ArrowLeft className="h-4 w-4" />
+                <span className="sr-only">{t.back}</span>
+              </Link>
+            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="max-w-[200px] truncate text-sm leading-none font-semibold tracking-tight text-slate-900 sm:max-w-[400px] sm:text-base lg:max-w-xl">
+                {business.name}
+              </h1>
+              {business.category && (
+                <Badge
+                  variant="secondary"
+                  className="rounded-sm px-1.5 py-0.5 text-[10px] leading-none font-normal"
+                >
+                  {business.category}
+                </Badge>
+              )}
             </div>
-            
-            {/* Right side: Tools / Setup Progress */}
-            <div className="flex items-center gap-4 pl-11 sm:pl-0">
-              {/* Micro progress bar */}
-              <div className="flex items-center gap-2 hidden sm:flex">
-                 <div className="flex flex-col gap-1 w-24">
-                   <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full bg-emerald-500 rounded-full transition-all`} 
-                        style={{ width: `${setupCompletion}%`}}
-                      />
-                   </div>
-                 </div>
-                 <Badge variant="outline" className={`text-[10px] font-medium leading-none px-1.5 py-0.5 rounded-sm border-transparent mix-blend-multiply ${statusClasses}`}>
-                    {statusLabel}
-                 </Badge>
-              </div>
+          </div>
 
-              {/* Public link action */}
-              <Button variant="outline" size="sm" asChild className="h-7 text-xs px-2 sm:px-3 text-slate-600 hidden md:flex">
-                <Link href={publicHref} target="_blank">
-                  {t.viewPublic}
-                  <ExternalLink className="ml-1.5 h-3 w-3" />
-                </Link>
-              </Button>
-               {/* Mobile variant */}
-               <Button variant="outline" size="icon" asChild className="h-7 w-7 text-slate-600 md:hidden ml-auto">
-                <Link href={publicHref} target="_blank">
-                  <ExternalLink className="h-3 w-3" />
-                  <span className="sr-only">{t.viewPublic}</span>
-                </Link>
-              </Button>
+          {/* Right side: Tools / Setup Progress */}
+          <div className="flex items-center gap-4 pl-11 sm:pl-0">
+            {/* Micro progress bar */}
+            <div className="flex hidden items-center gap-2 sm:flex">
+              <div className="flex w-24 flex-col gap-1">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className={`h-full rounded-full bg-emerald-500 transition-all`}
+                    style={{ width: `${setupCompletion}%` }}
+                  />
+                </div>
+              </div>
+              <Badge
+                variant="outline"
+                className={`rounded-sm border-transparent px-1.5 py-0.5 text-[10px] leading-none font-medium mix-blend-multiply ${statusClasses}`}
+              >
+                {statusLabel}
+              </Badge>
             </div>
+
+            {/* Public link action */}
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="hidden h-7 px-2 text-xs text-slate-600 sm:px-3 md:flex"
+            >
+              <Link href={publicHref} target="_blank">
+                {t.viewPublic}
+                <ExternalLink className="ml-1.5 h-3 w-3" />
+              </Link>
+            </Button>
+            {/* Mobile variant */}
+            <Button
+              variant="outline"
+              size="icon"
+              asChild
+              className="ml-auto h-7 w-7 text-slate-600 md:hidden"
+            >
+              <Link href={publicHref} target="_blank">
+                <ExternalLink className="h-3 w-3" />
+                <span className="sr-only">{t.viewPublic}</span>
+              </Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
       {/* Main Content Area Layout */}
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col gap-8 md:flex-row">
         {/* Left Sidebar */}
-        <aside className="w-full md:w-56 lg:w-64 shrink-0">
+        <aside className="w-full shrink-0 md:w-56 lg:w-64">
           <BusinessSectionNav locale={locale} slug={slug} />
         </aside>
 
         {/* Right Content */}
-        <main className="flex-1 min-w-0">
-          {children}
-        </main>
+        <main className="min-w-0 flex-1">{children}</main>
       </div>
     </div>
   )

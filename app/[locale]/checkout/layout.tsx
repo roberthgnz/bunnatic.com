@@ -1,58 +1,59 @@
-"use client";
+'use client'
 
-import { Zap } from "lucide-react";
-import Link from "next/link";
-import { useLanguage } from "@/components/LanguageProvider";
-import { usePathname } from "next/navigation";
+import { Zap } from 'lucide-react'
+import Link from 'next/link'
+import { useLanguage } from '@/components/LanguageProvider'
+import { usePathname } from 'next/navigation'
 
 export default function CheckoutLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const { language } = useLanguage();
-  const pathname = usePathname() ?? "/";
-  const locale = pathname.split("/").filter(Boolean)[0];
-  const hasLocale = locale === "es" || locale === "ca";
-  const localePrefix = hasLocale ? `/${locale}` : "";
+  const { language } = useLanguage()
+  const pathname = usePathname() ?? '/'
+  const locale = pathname.split('/').filter(Boolean)[0]
+  const hasLocale = locale === 'es' || locale === 'ca'
+  const localePrefix = hasLocale ? `/${locale}` : ''
 
   const t = {
     es: {
-      help: "¿Necesitas ayuda?",
-      contact: "Contáctanos",
-      copyright: "© 2024 Bunnatic. Todos los derechos reservados.",
-      terms: "Términos",
-      privacy: "Privacidad",
+      help: '¿Necesitas ayuda?',
+      contact: 'Contáctanos',
+      copyright: '© 2024 Bunnatic. Todos los derechos reservados.',
+      terms: 'Términos',
+      privacy: 'Privacidad',
     },
     ca: {
-      help: "Necessites ajuda?",
+      help: 'Necessites ajuda?',
       contact: "Contacta'ns",
-      copyright: "© 2024 Bunnatic. Tots els drets reservats.",
-      terms: "Termes",
-      privacy: "Privacitat",
+      copyright: '© 2024 Bunnatic. Tots els drets reservats.',
+      terms: 'Termes',
+      privacy: 'Privacitat',
     },
-  }[language === "ca" ? "ca" : "es"];
+  }[language === 'ca' ? 'ca' : 'es']
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="flex min-h-screen flex-col bg-white">
       {/* Simple Navbar */}
       <nav className="border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <Link href={localePrefix || "/"} className="flex items-center gap-2">
+            <Link
+              href={localePrefix || '/'}
+              className="flex items-center gap-2"
+            >
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
                 <Zap className="h-5 w-5 fill-emerald-600 text-emerald-600" />
               </div>
-              <span className="text-lg font-bold text-gray-900">
-                Bunnatic
-              </span>
+              <span className="text-lg font-bold text-gray-900">Bunnatic</span>
             </Link>
-            
-            <div className="text-xs sm:text-sm text-gray-500">
-              {t.help}{" "}
-              <a 
-                href="mailto:hello@bunnatic.com" 
-                className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+
+            <div className="text-xs text-gray-500 sm:text-sm">
+              {t.help}{' '}
+              <a
+                href="mailto:hello@bunnatic.com"
+                className="font-medium text-emerald-600 transition-colors hover:text-emerald-700"
               >
                 {t.contact}
               </a>
@@ -62,25 +63,23 @@ export default function CheckoutLayout({
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
 
       {/* Simple Footer */}
       <footer className="border-t border-gray-200 bg-white py-6">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-gray-500">
+          <div className="flex flex-col items-center justify-between gap-4 text-xs text-gray-500 sm:flex-row sm:text-sm">
             <p>{t.copyright}</p>
             <div className="flex gap-4 sm:gap-6">
-              <Link 
+              <Link
                 href={`${localePrefix}/aviso-legal`}
-                className="hover:text-gray-900 transition-colors"
+                className="transition-colors hover:text-gray-900"
               >
                 {t.terms}
               </Link>
-              <Link 
+              <Link
                 href={`${localePrefix}/politica-privacidad`}
-                className="hover:text-gray-900 transition-colors"
+                className="transition-colors hover:text-gray-900"
               >
                 {t.privacy}
               </Link>
@@ -89,5 +88,5 @@ export default function CheckoutLayout({
         </div>
       </footer>
     </div>
-  );
+  )
 }

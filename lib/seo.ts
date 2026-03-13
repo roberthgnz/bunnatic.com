@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next'
 
-export type SeoLocale = "es" | "ca";
+export type SeoLocale = 'es' | 'ca'
 
-const DEFAULT_BASE_URL = "http://localhost:3000";
+const DEFAULT_BASE_URL = 'http://localhost:3000'
 
 function normalizeBaseUrl(value: string): string | null {
   try {
-    const url = new URL(value);
-    if (!["http:", "https:"].includes(url.protocol)) {
-      return null;
+    const url = new URL(value)
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      return null
     }
 
-    return url.toString().endsWith("/") ? url.toString() : `${url.toString()}/`;
+    return url.toString().endsWith('/') ? url.toString() : `${url.toString()}/`
   } catch {
-    return null;
+    return null
   }
 }
 
@@ -22,43 +22,43 @@ export function getBaseUrl(): string {
     process.env.NEXT_PUBLIC_SITE_URL,
     process.env.NEXT_PUBLIC_APP_URL,
     process.env.APP_URL,
-  ];
+  ]
 
   for (const candidate of candidates) {
     if (!candidate) {
-      continue;
+      continue
     }
 
-    const normalized = normalizeBaseUrl(candidate);
+    const normalized = normalizeBaseUrl(candidate)
     if (normalized) {
-      return normalized;
+      return normalized
     }
   }
 
-  return `${DEFAULT_BASE_URL}/`;
+  return `${DEFAULT_BASE_URL}/`
 }
 
 function withLocalePath(pathname: string, locale: SeoLocale): string {
-  if (locale === "es") {
-    return pathname;
+  if (locale === 'es') {
+    return pathname
   }
 
-  return pathname === "/" ? "/ca" : `/ca${pathname}`;
+  return pathname === '/' ? '/ca' : `/ca${pathname}`
 }
 
 function absoluteUrl(pathname: string, locale: SeoLocale): string {
-  return new URL(withLocalePath(pathname, locale), getBaseUrl()).toString();
+  return new URL(withLocalePath(pathname, locale), getBaseUrl()).toString()
 }
 
 type BuildPageMetadataInput = {
-  locale: SeoLocale;
-  title: string;
-  description: string;
-  esPath: string;
-  caPath: string;
-  keywords?: string[];
-  noindex?: boolean;
-};
+  locale: SeoLocale
+  title: string
+  description: string
+  esPath: string
+  caPath: string
+  keywords?: string[]
+  noindex?: boolean
+}
 
 export function buildPageMetadata({
   locale,
@@ -69,8 +69,8 @@ export function buildPageMetadata({
   keywords,
   noindex = false,
 }: BuildPageMetadataInput): Metadata {
-  const canonicalPath = locale === "ca" ? caPath : esPath;
-  const canonicalUrl = absoluteUrl(canonicalPath, locale);
+  const canonicalPath = locale === 'ca' ? caPath : esPath
+  const canonicalUrl = absoluteUrl(canonicalPath, locale)
 
   return {
     metadataBase: new URL(getBaseUrl()),
@@ -80,20 +80,20 @@ export function buildPageMetadata({
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        es: absoluteUrl(esPath, "es"),
-        ca: absoluteUrl(caPath, "ca"),
+        es: absoluteUrl(esPath, 'es'),
+        ca: absoluteUrl(caPath, 'ca'),
       },
     },
     openGraph: {
       title,
       description,
       url: canonicalUrl,
-      siteName: "Bunnatic",
-      locale: locale === "ca" ? "ca_ES" : "es_ES",
-      type: "website",
+      siteName: 'Bunnatic',
+      locale: locale === 'ca' ? 'ca_ES' : 'es_ES',
+      type: 'website',
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title,
       description,
     },
@@ -101,5 +101,5 @@ export function buildPageMetadata({
       index: !noindex,
       follow: !noindex,
     },
-  };
+  }
 }

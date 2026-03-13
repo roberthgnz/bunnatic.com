@@ -3,6 +3,7 @@
 ## 🚀 Instalación Rápida (5 minutos)
 
 ### 1. Instalar dependencias
+
 ```bash
 pnpm install
 ```
@@ -72,14 +73,17 @@ Para cambiar estos valores, edita la función `checkRateLimit()`.
 ## ❓ Problemas Comunes
 
 **No funciona el rate limit**
+
 - Verifica que las variables de entorno estén configuradas
 - Reinicia el servidor después de añadir las variables
 - Revisa los logs para ver errores de conexión
 
 **Quiero probar sin límites**
+
 - Usa `pnpm ratelimit:reset YOUR_IP` para resetear tu límite
 - O comenta temporalmente la verificación en los endpoints
 
 **¿Cómo sé mi IP?**
+
 - En desarrollo local, probablemente sea `::1` o `127.0.0.1`
 - Usa `pnpm ratelimit:list` para ver todas las IPs con límite activo

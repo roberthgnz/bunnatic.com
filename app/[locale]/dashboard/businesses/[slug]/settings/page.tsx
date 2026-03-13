@@ -43,7 +43,9 @@ export default async function BusinessSettingsPage({
         locale={locale}
         initialDomain={domain}
         dnsTarget={getCloudflareCnameTarget()}
-        rootDomain={process.env.PLATFORM_ROOT_DOMAIN?.trim().toLowerCase() || null}
+        rootDomain={
+          process.env.PLATFORM_ROOT_DOMAIN?.trim().toLowerCase() || null
+        }
       />
     </div>
   )

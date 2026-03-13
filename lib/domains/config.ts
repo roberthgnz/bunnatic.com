@@ -25,13 +25,10 @@ export function getPlatformHosts() {
   const configuredHosts = splitCsv(process.env.PLATFORM_HOSTS)
   const appHost = parseHostFromUrl(process.env.APP_URL)
   const appPublicHost = parseHostFromUrl(process.env.NEXT_PUBLIC_APP_URL)
-  const rootDomain = process.env.PLATFORM_ROOT_DOMAIN?.trim().toLowerCase() || null
+  const rootDomain =
+    process.env.PLATFORM_ROOT_DOMAIN?.trim().toLowerCase() || null
 
-  const hosts = new Set<string>([
-    'localhost',
-    '127.0.0.1',
-    ...configuredHosts,
-  ])
+  const hosts = new Set<string>(['localhost', '127.0.0.1', ...configuredHosts])
 
   if (appHost) hosts.add(appHost)
   if (appPublicHost) hosts.add(appPublicHost)
@@ -75,11 +72,13 @@ export function getCloudflareCnameTarget() {
 }
 
 export function getCloudflareSslMethod() {
-  const method = process.env.CLOUDFLARE_CUSTOM_HOSTNAME_SSL_METHOD?.trim().toLowerCase()
+  const method =
+    process.env.CLOUDFLARE_CUSTOM_HOSTNAME_SSL_METHOD?.trim().toLowerCase()
   return method === 'http' ? 'http' : 'txt'
 }
 
 export function getCloudflareCustomOriginServer() {
-  const value = process.env.CLOUDFLARE_CUSTOM_ORIGIN_SERVER?.trim().toLowerCase()
+  const value =
+    process.env.CLOUDFLARE_CUSTOM_ORIGIN_SERVER?.trim().toLowerCase()
   return value || null
 }

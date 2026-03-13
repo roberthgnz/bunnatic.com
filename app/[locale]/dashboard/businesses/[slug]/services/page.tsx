@@ -16,5 +16,11 @@ export default async function BusinessServicesPage({
 
   const services = await getServices(business.id)
 
-  return <ServicesManager businessId={business.id} initialServices={services} locale={locale} />
+  return (
+    <ServicesManager
+      businessId={business.id}
+      initialServices={services}
+      locale={locale}
+    />
+  )
 }

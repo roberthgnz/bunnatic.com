@@ -53,6 +53,8 @@ async function testRedisGenerationState() {
             selectedBlocks: ['profile'],
             selectedBusinessId: 'test-business-id',
             googleQuery: 'test restaurant',
+            crawlJobId: null,
+            crawlUrl: null,
         }
 
         await redis.set(testKey, testState, { ex: 60 }) // 60 seconds TTL for test
@@ -91,7 +93,38 @@ async function testRedisGenerationState() {
             process.exit(1)
         }
 
-        console.log('\n✅ All tests passed! Redis generation state persistence is working correctly.')
+        console.log('\n✅ All basic tests passed!')
+
+        // Test 6: Test crawl state persistence
+        console.log('\n6️⃣  Testing crawl state persistence...')
+        const crawlState = {
+            ...testState,
+            sourceType: 'url' as const,
+            crawlJobId: 'test-job-123',
+            crawlUrl: 'https://example.com',
+        }
+
+        await redis.set(testKey, crawlState, { ex: 60 })
+        const retrievedCrawlState = await redis.get(testKey)
+
+        if (
+            retrievedCrawlState &&
+            typeof retrievedCrawlState === 'object' &&
+            'crawlJobId' in retrievedCrawlState &&
+            retrievedCrawlState.crawlJobId === 'test-job-123'
+        ) {
+            console.log('   ✅ Crawl state persisted correctly')
+            console.log(`   📦 JobId: ${retrievedCrawlState.crawlJobId}`)
+            console.log(`   📦 URL: ${retrievedCrawlState.crawlUrl}`)
+        } else {
+            console.error('   ❌ Crawl state not persisted correctly')
+            process.exit(1)
+        }
+
+        // Cleanup
+        await redis.del(testKey)
+
+        console.log('\n✅ All tests passed including crawl persistence!')
     } catch (error) {
         console.error('\n❌ Test failed:', error)
         process.exit(1)

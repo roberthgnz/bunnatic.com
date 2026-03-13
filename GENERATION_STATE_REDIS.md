@@ -55,9 +55,11 @@ El estado se elimina automáticamente cuando:
 - Se aplica exitosamente la información a un negocio
 - Se crea exitosamente un nuevo negocio
 - Se completa o falla un crawl
+
+### 5. TTL (Time To Live)
 Los estados guardados expiran automáticamente después de 24 horas.
 
-### 5. Seguridad
+### 6. Seguridad
 - Solo usuarios autenticados pueden acceder a su estado
 - Cada usuario solo puede acceder a su propio estado
 - La clave en Redis incluye el ID del usuario: `generation_state:{user_id}`
@@ -73,6 +75,7 @@ UPSTASH_REDIS_REST_TOKEN="YOUR_UPSTASH_TOKEN"
 
 ## Flujo de Datos
 
+### Flujo Normal
 ```
 1. Usuario carga /dashboard/generation
    ↓
@@ -89,6 +92,25 @@ UPSTASH_REDIS_REST_TOKEN="YOUR_UPSTASH_TOKEN"
 7. Al completar o resetear, se llama DELETE /api/generation-state
 ```
 
+### Flujo de Reanudación de Crawl
+```
+1. Usuario inicia crawl de URL
+   ↓
+2. Se obtiene jobId del servidor
+   ↓
+3. jobId y URL se guardan en Redis inmediatamente
+   ↓
+4. Comienza polling del estado del crawl
+   ↓
+5. [Usuario recarga la página]
+   ↓
+6. Al cargar, se detecta crawl en progreso
+   ↓
+7. Se reanuda automáticamente el polling con el jobId guardado
+   ↓
+8. Al completar, se limpia jobId y URL del estado
+```
+
 ## Ventajas sobre sessionStorage
 
 1. **Persistencia entre dispositivos**: El usuario puede continuar en otro dispositivo
@@ -96,6 +118,7 @@ UPSTASH_REDIS_REST_TOKEN="YOUR_UPSTASH_TOKEN"
 3. **Seguridad**: El estado está en el servidor, no expuesto en el cliente
 4. **Escalabilidad**: Redis maneja múltiples usuarios concurrentes eficientemente
 5. **TTL automático**: Los estados antiguos se limpian automáticamente
+6. **Reanudación de crawls**: Los crawls en progreso se pueden reanudar después de recargar
 
 ## Manejo de Errores
 
@@ -108,13 +131,25 @@ Si Redis no está disponible o falla:
 
 Para probar la funcionalidad:
 
+### Test 1: Persistencia básica
 1. Inicia una búsqueda en Google o ingresa una URL
 2. Genera un preview
 3. Selecciona bloques y un negocio
 4. Recarga la página
 5. Verifica que el estado se haya restaurado correctamente
 
-## Monitoreo
+### Test 2: Reanudación de crawl
+1. Ingresa una URL para crawl
+2. Haz clic en "Analizar URL"
+3. Mientras el crawl está en progreso, recarga la página
+4. Verifica que el crawl continúe automáticamente
+5. Espera a que complete y verifica que el preview se genere
+
+### Test 3: Verificación de Redis
+```bash
+# Verificar conexión a Redis
+npx tsx scripts/test-redis-generation-state.ts
+```
 
 Puedes verificar los estados guardados en la consola de Upstash:
 - Clave: `generation_state:{user_id}`

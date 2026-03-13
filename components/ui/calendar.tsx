@@ -4,7 +4,7 @@ import * as React from "react"
 import {
   DayPicker,
   getDefaultClassNames,
-  type DayButton,
+  DayButton,
   type Locale,
 } from "react-day-picker"
 
@@ -39,7 +39,7 @@ function Calendar({
       captionLayout={captionLayout}
       locale={locale}
       formatters={{
-        formatMonthDropdown: (date) =>
+        formatMonthDropdown: (date: Date) =>
           date.toLocaleString(locale?.code, { month: "short" }),
         ...formatters,
       }}
@@ -134,7 +134,11 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }) => {
+        Root: ({
+          className,
+          rootRef,
+          ...props
+        }: React.HTMLAttributes<HTMLDivElement> & { rootRef?: React.Ref<HTMLDivElement> }) => {
           return (
             <div
               data-slot="calendar"
@@ -144,7 +148,11 @@ function Calendar({
             />
           )
         },
-        Chevron: ({ className, orientation, ...props }) => {
+        Chevron: ({
+          className,
+          orientation,
+          ...props
+        }: React.SVGProps<SVGSVGElement> & { orientation?: "left" | "right" | "down" }) => {
           if (orientation === "left") {
             return (
               <ChevronLeftIcon className={cn("size-4", className)} {...props} />
@@ -164,7 +172,10 @@ function Calendar({
         DayButton: ({ ...props }) => (
           <CalendarDayButton locale={locale} {...props} />
         ),
-        WeekNumber: ({ children, ...props }) => {
+        WeekNumber: ({
+          children,
+          ...props
+        }: React.TdHTMLAttributes<HTMLTableCellElement> & { children?: React.ReactNode }) => {
           return (
             <td {...props}>
               <div className="flex size-(--cell-size) items-center justify-center text-center">

@@ -323,7 +323,9 @@ export async function GET(request: Request) {
     }
 
     const fallbackUrl =
-      pages.map((page) => getPageUrl(page)).find((value) => typeof value === "string") ?? "";
+      pages
+        .map((page: Document) => getPageUrl(page))
+        .find((value: string | undefined) => typeof value === "string") ?? "";
     const effectiveUrl = sourceUrl && isValidHttpUrl(sourceUrl) ? sourceUrl : fallbackUrl;
 
     if (!effectiveUrl) {

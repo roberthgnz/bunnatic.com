@@ -281,7 +281,7 @@ export default function NewSitePage() {
       }
 
       toast.success(t.createSuccess)
-      router.push(`/${locale}/dashboard/businesses/${result.slug}`)
+      router.push(`/dashboard/businesses/${result.slug}`)
     } catch (error) {
       console.error(error)
       toast.error(error instanceof Error ? error.message : t.createError)
@@ -299,7 +299,7 @@ export default function NewSitePage() {
           <p className="text-sm text-slate-600">{t.subtitle}</p>
         </div>
         <Button asChild variant="outline">
-          <Link href={`/${locale}/dashboard`}>
+          <Link href={`/dashboard`}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t.back}
           </Link>

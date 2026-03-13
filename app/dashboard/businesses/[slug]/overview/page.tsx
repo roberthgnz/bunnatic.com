@@ -116,7 +116,7 @@ export default function BusinessOverviewPage() {
   return (
     <div className="flex w-full flex-col gap-6 pb-10">
       {/* Top Section - Production Deployment Style */}
-      <Card className="overflow-hidden rounded-xl border-slate-200 shadow-sm">
+      <Card className="overflow-hidden rounded-xl border-slate-200 !py-0 shadow-sm">
         {/* Header */}
         <div className="flex flex-col justify-between gap-4 border-b border-slate-200 bg-white px-6 py-4 sm:flex-row sm:items-center">
           <div className="font-medium text-slate-900">{t.profile}</div>
@@ -127,13 +127,13 @@ export default function BusinessOverviewPage() {
               size="sm"
               className="hidden h-8 text-xs font-medium sm:flex"
             >
-              <Link href={`/${locale}/dashboard/businesses/${slug}/settings`}>
+              <Link href={`/dashboard/businesses/${slug}/settings`}>
                 <Settings className="mr-2 h-3.5 w-3.5" />
                 {t.configure}
               </Link>
             </Button>
             <Button asChild size="sm" className="h-8 text-xs font-medium">
-              <Link href={`/${locale}/w/${slug}`} target="_blank">
+              <Link href={`/w/${slug}`} target="_blank">
                 Visit
                 <ExternalLink className="ml-2 h-3.5 w-3.5" />
               </Link>
@@ -191,7 +191,7 @@ export default function BusinessOverviewPage() {
         {/* Footer Row */}
         <div className="flex items-center gap-3 border-t border-slate-200 bg-slate-50/50 px-6 py-3">
           <Link
-            href={`/${locale}/dashboard/businesses/${slug}/settings`}
+            href={`/dashboard/businesses/${slug}/settings`}
             className="flex items-center gap-1 text-sm font-medium text-slate-700 transition-colors hover:text-slate-900"
           >
             <ChevronRight className="h-4 w-4 text-slate-400" />
@@ -351,9 +351,7 @@ export default function BusinessOverviewPage() {
                     className="hidden h-8 w-8 p-0 sm:flex"
                     asChild
                   >
-                    <Link
-                      href={`/${locale}/dashboard/businesses/${slug}/settings`}
-                    >
+                    <Link href={`/dashboard/businesses/${slug}/settings`}>
                       <Settings className="h-4 w-4" />
                       <span className="sr-only">Edit</span>
                     </Link>

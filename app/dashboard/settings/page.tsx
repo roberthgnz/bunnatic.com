@@ -81,7 +81,7 @@ export default async function DashboardSettingsPage({
               variant="outline"
               className="w-full justify-between"
             >
-              <Link href={`/${locale}/dashboard/profile`}>
+              <Link href={`/dashboard/profile`}>
                 {t.profileLink}
                 <ChevronRight className="h-4 w-4" />
               </Link>
@@ -103,7 +103,7 @@ export default async function DashboardSettingsPage({
               variant="outline"
               className="w-full justify-between"
             >
-              <Link href={`/${locale}/dashboard/subscription`}>
+              <Link href={`/dashboard/subscription`}>
                 {t.subscriptionLink}
                 <ChevronRight className="h-4 w-4" />
               </Link>
@@ -121,7 +121,7 @@ export default async function DashboardSettingsPage({
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline" className="w-full">
-              <Link href={`/${locale}/signin`}>{t.goTo}</Link>
+              <Link href={`/signin`}>{t.goTo}</Link>
             </Button>
           </CardContent>
         </Card>

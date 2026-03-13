@@ -12,6 +12,7 @@ import {
   Settings,
   HelpCircle,
   Search,
+  Sparkles,
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -19,31 +20,37 @@ import { DashboardContent } from './dashboard-constants'
 
 export function SidebarMainItems({ t }: { t: DashboardContent }) {
   const pathname = usePathname()
-  const localePrefix = ''
 
   const mainNavItems = [
     {
       id: 'dashboard',
-      href: `${localePrefix}/dashboard`,
+      href: `/dashboard`,
       icon: Home,
       label: t.menu.dashboard,
-      active: pathname === `${localePrefix}/dashboard`,
+      active: pathname === `/dashboard`,
     },
     {
       id: 'businesses',
-      href: `${localePrefix}/dashboard/businesses`,
+      href: `/dashboard/businesses`,
       icon: Building2,
       label: t.menu.businesses,
       active:
-        pathname === `${localePrefix}/dashboard/businesses` ||
-        pathname.startsWith(`${localePrefix}/dashboard/businesses/`),
+        pathname === `/dashboard/businesses` ||
+        pathname.startsWith(`/dashboard/businesses/`),
     },
     {
       id: 'new',
-      href: `${localePrefix}/dashboard/new`,
+      href: `/dashboard/new`,
       icon: PlusCircle,
       label: t.menu.newBusiness,
-      active: pathname === `${localePrefix}/dashboard/new`,
+      active: pathname === `/dashboard/new`,
+    },
+    {
+      id: 'generation',
+      href: `/dashboard/generation`,
+      icon: Sparkles,
+      label: t.menu.generation,
+      active: pathname === `/dashboard/generation`,
     },
   ]
 
@@ -65,15 +72,14 @@ export function SidebarMainItems({ t }: { t: DashboardContent }) {
 
 export function SidebarTopItems({ t }: { t: DashboardContent }) {
   const pathname = usePathname()
-  const localePrefix = ''
 
   const topNavItems = [
     {
       id: 'settings',
-      href: `${localePrefix}/dashboard/settings`,
+      href: `/dashboard/settings`,
       icon: Settings,
       label: t.menu.settings,
-      active: pathname === `${localePrefix}/dashboard/settings`,
+      active: pathname === `/dashboard/settings`,
     },
     {
       id: 'help',

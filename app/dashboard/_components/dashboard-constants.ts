@@ -8,6 +8,7 @@ export const dashboardContent = {
     dashboard: 'Inicio',
     businesses: 'Mis negocios',
     newBusiness: 'Crear negocio',
+    generation: 'Generación IA',
     settings: 'Configuración',
     getHelp: 'Obtener ayuda',
     search: 'Buscar',

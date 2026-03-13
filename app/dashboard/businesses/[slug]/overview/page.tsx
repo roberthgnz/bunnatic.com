@@ -1,5 +1,6 @@
+'use client'
+
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 import {
   CheckCircle2,
   Circle,
@@ -11,28 +12,14 @@ import {
   Settings,
   ChevronRight,
 } from 'lucide-react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { getBusinessBySlug } from '@/lib/supabase/actions'
+import { useBusiness } from '../_components/BusinessContext'
 
-export default async function BusinessOverviewPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
-  const { slug } = await params
-  const business = await getBusinessBySlug(slug)
-
-  if (!business) {
-    notFound()
-  }
-
+export default function BusinessOverviewPage() {
+  const { business } = useBusiness()
+  const slug = business.slug
   const locale: string = 'es'
 
   const t = {
@@ -322,7 +309,7 @@ export default async function BusinessOverviewPage({
       </div>
 
       {/* Bottom Section - Active Branches Style */}
-      <div className="mt-4">
+      <div className="mt-4" id="setup-checklist">
         <h3 className="mb-4 text-lg font-semibold tracking-tight text-slate-900">
           {t.setup}
         </h3>

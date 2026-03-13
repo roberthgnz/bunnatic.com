@@ -132,8 +132,8 @@ export default function BusinessSectionNav({
                   : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 border-l-[3px] border-transparent'
                 : ''
               const classes = item.featured
-                ? `flex w-full items-center justify-between rounded-r-lg px-3 py-2 text-sm font-medium transition-all ${featuredClasses}`
-                : `flex w-full items-center rounded-r-lg px-3 py-2 text-sm font-medium transition-all border-l-[3px] ${
+                ? `flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-all ${featuredClasses}`
+                : `flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-all border-l-[3px] ${
                     isActive
                       ? 'bg-slate-100 text-slate-900 border-slate-900 shadow-sm'
                       : 'border-transparent text-slate-600 hover:bg-slate-100/50 hover:text-slate-900'

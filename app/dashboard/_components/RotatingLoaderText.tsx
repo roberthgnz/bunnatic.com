@@ -27,7 +27,7 @@ export function RotatingLoaderText({
   }, [messages.length, interval])
 
   return (
-    <div className={`relative h-5 min-w-[200px] overflow-hidden ${className}`}>
+    <div className={`relative h-6 min-w-[200px] overflow-hidden ${className}`}>
       <AnimatePresence mode="wait">
         <motion.div
           key={index}

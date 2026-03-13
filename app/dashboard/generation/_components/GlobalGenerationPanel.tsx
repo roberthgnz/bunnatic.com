@@ -23,12 +23,13 @@ import { trackFunnelEvent } from '@/lib/funnelEvents'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Loader2,
   MapPin,
@@ -519,25 +520,25 @@ export default function GlobalGenerationPanel({
     label: string
     desc: string
   }[] = [
-    {
-      key: 'profile',
-      icon: <User className="h-4 w-4" />,
-      label: t.blockProfile,
-      desc: t.blockProfileDesc,
-    },
-    {
-      key: 'services',
-      icon: <Briefcase className="h-4 w-4" />,
-      label: t.blockServices,
-      desc: t.blockServicesDesc,
-    },
-    {
-      key: 'hours',
-      icon: <Clock className="h-4 w-4" />,
-      label: t.blockHours,
-      desc: t.blockHoursDesc,
-    },
-  ]
+      {
+        key: 'profile',
+        icon: <User className="h-4 w-4" />,
+        label: t.blockProfile,
+        desc: t.blockProfileDesc,
+      },
+      {
+        key: 'services',
+        icon: <Briefcase className="h-4 w-4" />,
+        label: t.blockServices,
+        desc: t.blockServicesDesc,
+      },
+      {
+        key: 'hours',
+        icon: <Clock className="h-4 w-4" />,
+        label: t.blockHours,
+        desc: t.blockHoursDesc,
+      },
+    ]
 
   const isBlockDisabled = (key: SourceBlock) => {
     if (!preview) return true
@@ -621,11 +622,10 @@ export default function GlobalGenerationPanel({
             <button
               type="button"
               onClick={() => handleSourceChange('google')}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                sourceType === 'google'
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${sourceType === 'google'
                   ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
                   : 'text-slate-500 hover:text-slate-700'
-              }`}
+                }`}
             >
               <MapPin className="h-3.5 w-3.5" />
               {t.sourceGoogle}
@@ -633,11 +633,10 @@ export default function GlobalGenerationPanel({
             <button
               type="button"
               onClick={() => handleSourceChange('url')}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                sourceType === 'url'
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${sourceType === 'url'
                   ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
                   : 'text-slate-500 hover:text-slate-700'
-              }`}
+                }`}
             >
               <Globe className="h-3.5 w-3.5" />
               {t.sourceUrl}
@@ -790,7 +789,7 @@ export default function GlobalGenerationPanel({
 
         {/* Building preview loader */}
         {(isBuildingPreview || isCrawling) && (
-          <div className="animate-in fade-in flex items-center justify-center gap-3 rounded-xl border border-blue-100 bg-blue-50 py-5 duration-300">
+          <div className="animate-in fade-in flex items-center justify-center gap-3 rounded-xl border border-blue-100 bg-blue-50 py-10 duration-300">
             <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
             <RotatingLoaderText messages={t.generatingMessages} />
           </div>
@@ -844,13 +843,12 @@ export default function GlobalGenerationPanel({
                           type="button"
                           disabled={disabled}
                           onClick={() => toggleBlock(key)}
-                          className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${
-                            disabled
+                          className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${disabled
                               ? 'cursor-not-allowed border-slate-200 bg-slate-50 opacity-40'
                               : isSelected
                                 ? 'border-blue-300 bg-blue-50 ring-1 ring-blue-200'
                                 : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                          }`}
+                            }`}
                         >
                           <div
                             className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${isSelected && !disabled ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}`}

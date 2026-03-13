@@ -703,7 +703,7 @@ export default function SourceGenerationPanel({
 
         {/* Building preview loader */}
         {(isBuildingPreview || isCrawling) && (
-          <div className="animate-in fade-in flex items-center justify-center gap-3 rounded-xl border border-blue-100 bg-blue-50 py-5 duration-300">
+          <div className="animate-in fade-in flex items-center justify-center gap-3 rounded-xl border border-blue-100 bg-blue-50 py-10 duration-300">
             <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
             <RotatingLoaderText messages={t.generatingMessages} />
           </div>

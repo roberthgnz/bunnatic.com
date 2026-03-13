@@ -1,4 +1,3 @@
-
 type Step = {
   title: string
   description: string
@@ -37,9 +36,7 @@ export type BusinessLandingEntry = {
   copy: BusinessCopy
 }
 
-const rawBusinessLandingEntries: Array<
-  Omit<BusinessLandingEntry, 'slug'>
-> = [
+const rawBusinessLandingEntries: Array<Omit<BusinessLandingEntry, 'slug'>> = [
   {
     legacySlug: 'dentistas',
     copy: {
@@ -61,8 +58,7 @@ const rawBusinessLandingEntries: Array<
       process: [
         {
           title: 'Ordena tu oferta clínica',
-          description:
-            'Implantes, ortodoncia y estética con mensajes claros.',
+          description: 'Implantes, ortodoncia y estética con mensajes claros.',
         },
         {
           title: 'Activa credenciales y confianza',
@@ -95,8 +91,7 @@ const rawBusinessLandingEntries: Array<
         'Editor visual de promociones y campañas',
       ],
       finalTitle: 'Convierte búsquedas en pacientes reales',
-      finalSubtitle:
-        'Regístrate y activa tu web dental enfocada a captación.',
+      finalSubtitle: 'Regístrate y activa tu web dental enfocada a captación.',
       ctaPrimary: 'Crear cuenta gratis',
       ctaSecondary: 'Ver en acción',
     },
@@ -215,8 +210,7 @@ const rawBusinessLandingEntries: Array<
         'SEO local para búsquedas urgentes',
       ],
       finalTitle: 'Haz que te encuentren y te contacten más rápido',
-      finalSubtitle:
-        'Crea tu cuenta y publica una web útil para tus clientes.',
+      finalSubtitle: 'Crea tu cuenta y publica una web útil para tus clientes.',
       ctaPrimary: 'Crear cuenta gratis',
       ctaSecondary: 'Publicar mi web',
     },
@@ -242,8 +236,7 @@ const rawBusinessLandingEntries: Array<
       process: [
         {
           title: 'Estructura tu oferta',
-          description:
-            'Bodas, retrato, eventos o marca personal por separado.',
+          description: 'Bodas, retrato, eventos o marca personal por separado.',
         },
         {
           title: 'Guía la decisión',
@@ -257,8 +250,7 @@ const rawBusinessLandingEntries: Array<
       proofTitle: 'Fotógrafos que ya mejoraron conversión',
       testimonials: [
         {
-          quote:
-            'Con la nueva página recibimos presupuestos mejor definidos.',
+          quote: 'Con la nueva página recibimos presupuestos mejor definidos.',
           author: 'Laia C.',
           role: 'Fotografía de bodas',
         },
@@ -276,8 +268,7 @@ const rawBusinessLandingEntries: Array<
         'Editor visual para campañas estacionales',
       ],
       finalTitle: 'Convierte tu portfolio en un canal de ventas',
-      finalSubtitle:
-        'Crea tu cuenta y empieza a recibir mejores solicitudes.',
+      finalSubtitle: 'Crea tu cuenta y empieza a recibir mejores solicitudes.',
       ctaPrimary: 'Crear cuenta gratis',
       ctaSecondary: 'Ver demo',
     },
@@ -289,8 +280,7 @@ const rawBusinessLandingEntries: Array<
       title: 'Web para gimnasios enfocada en registros y pruebas',
       subtitle:
         'Presenta planes, horarios y clases con una estructura que empuja a pedir prueba o apuntarse hoy.',
-      urgencyText:
-        'Sin una oferta clara online, el lead se enfría en minutos.',
+      urgencyText: 'Sin una oferta clara online, el lead se enfría en minutos.',
       trustLine:
         'Más altas con CTAs de prueba, contacto inmediato y propuesta de valor visible.',
       benefitsTitle: 'Resultados que puedes activar rápido',
@@ -366,8 +356,7 @@ const rawBusinessLandingEntries: Array<
         },
         {
           title: 'Activa formularios específicos',
-          description:
-            'Captación de propietarios y compradores por separado.',
+          description: 'Captación de propietarios y compradores por separado.',
         },
         {
           title: 'Optimiza mensajes',
@@ -383,8 +372,7 @@ const rawBusinessLandingEntries: Array<
           role: 'Agencia inmobiliaria',
         },
         {
-          quote:
-            'Llegan leads mejor filtrados para compradores e inversores.',
+          quote: 'Llegan leads mejor filtrados para compradores e inversores.',
           author: 'Álex T.',
           role: 'Broker local',
         },
@@ -431,8 +419,7 @@ const rawBusinessLandingEntries: Array<
         },
         {
           title: 'Ajusta según demanda',
-          description:
-            'Edita ofertas por temporada sin depender de terceros.',
+          description: 'Edita ofertas por temporada sin depender de terceros.',
         },
       ],
       proofTitle: 'Casos de peluquerías locales',
@@ -484,8 +471,7 @@ const rawBusinessLandingEntries: Array<
       process: [
         {
           title: 'Sube menú y propuesta',
-          description:
-            'Destacamos platos estrella y diferenciales del local.',
+          description: 'Destacamos platos estrella y diferenciales del local.',
         },
         {
           title: 'Activa reservas/contacto',
@@ -560,8 +546,7 @@ const rawBusinessLandingEntries: Array<
       proofTitle: 'Talleres que ya mejoraron captación',
       testimonials: [
         {
-          quote:
-            'Subieron llamadas en la primera semana con la nueva página.',
+          quote: 'Subieron llamadas en la primera semana con la nueva página.',
           author: 'Rubén G.',
           role: 'Taller multimarca',
         },
@@ -678,8 +663,14 @@ export function getBusinessLandingBySlug(
   slug: string
 ): BusinessLandingEntry | undefined {
   return businessLandingEntries.find(
-    (entry) =>
-      entry.slug === slug ||
-      entry.legacySlug === slug
+    (entry) => entry.slug === slug || entry.legacySlug === slug
   )
+}
+
+export function getBusinessSlugByLocale(
+  entry: BusinessLandingEntry,
+  locale: string
+): string {
+  // Currently we only have one slug per entry, but this function allows for future localization
+  return entry.slug
 }

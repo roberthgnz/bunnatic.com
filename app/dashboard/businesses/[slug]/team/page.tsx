@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import TeamManager from '../_components/TeamManager'
-import { getBusinessBySlug, getTeamMembers } from '@/lib/supabase/actions'
+import { getBusinessBySlug, getPublicTeamMembers } from '@/lib/supabase/actions'
 
 export default async function BusinessTeamPage({
   params,
@@ -14,13 +14,12 @@ export default async function BusinessTeamPage({
     notFound()
   }
 
-  const members = await getTeamMembers(business.id)
+  const members = await getPublicTeamMembers(business.id)
 
   return (
     <TeamManager
       businessId={business.id}
-      initialMembers={members}
-      
+      initialTeam={members}
     />
   )
 }

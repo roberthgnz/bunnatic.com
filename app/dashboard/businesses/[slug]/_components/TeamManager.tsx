@@ -82,7 +82,7 @@ export default function TeamManager({
   async function handleDelete(id: string) {
     if (!confirm(t.confirmDelete)) return
     setDeletingId(id)
-    const res = await deleteTeamMember(id)
+    const res = await deleteTeamMember(businessId, id)
     if (res?.error) {
       toast.error(res.error)
     } else {

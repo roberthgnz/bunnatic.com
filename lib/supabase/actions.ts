@@ -1515,6 +1515,116 @@ export async function createCalendarEvent(
   return { success: true }
 }
 
+// Public Team Management (stored in business_sections)
+export async function getPublicTeamMembers(businessId: string) {
+  const supabase = await createClient()
+  const { data: section } = await supabase
+    .from('business_sections')
+    .select('content')
+    .eq('business_id', businessId)
+    .eq('type', 'team')
+    .maybeSingle()
+
+  if (
+    !section ||
+    !section.content ||
+    !Array.isArray((section.content as any).members)
+  ) {
+    return []
+  }
+
+  return (section.content as any).members
+}
+
+export async function createTeamMember(businessId: string, formData: FormData) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const name = formData.get('name') as string
+  const role = formData.get('role') as string
+  const imageUrl = formData.get('image_url') as string
+
+  // Get existing section
+  const { data: section } = await supabase
+    .from('business_sections')
+    .select('*')
+    .eq('business_id', businessId)
+    .eq('type', 'team')
+    .maybeSingle()
+
+  const members = (section?.content as any)?.members || []
+  const newMember = {
+    id: crypto.randomUUID(),
+    name,
+    role,
+    image_url: imageUrl || null,
+  }
+
+  const updatedMembers = [...members, newMember]
+
+  if (section) {
+    const { error } = await supabase
+      .from('business_sections')
+      .update({
+        content: { ...(section.content as object), members: updatedMembers },
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', section.id)
+
+    if (error) return { error: error.message }
+  } else {
+    const { error } = await supabase.from('business_sections').insert({
+      business_id: businessId,
+      type: 'team',
+      order_index: 10,
+      content: { members: updatedMembers },
+    })
+
+    if (error) return { error: error.message }
+  }
+
+  revalidatePath('/dashboard')
+  return { success: true }
+}
+
+export async function deleteTeamMember(businessId: string, memberId: string) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: section } = await supabase
+    .from('business_sections')
+    .select('*')
+    .eq('business_id', businessId)
+    .eq('type', 'team')
+    .maybeSingle()
+
+  if (!section) return { error: 'Section not found' }
+
+  const members = (section.content as any)?.members || []
+  const updatedMembers = members.filter((m: any) => m.id !== memberId)
+
+  const { error } = await supabase
+    .from('business_sections')
+    .update({
+      content: { ...(section.content as object), members: updatedMembers },
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', section.id)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/dashboard')
+  return { success: true }
+}
+
 // Audit Logs
 export async function getAuditLogs(businessId: string) {
   const supabase = await createClient()

@@ -3,13 +3,14 @@ import { buildPageMetadata, type SeoLocale } from '@/lib/seo'
 
 type CreateLayoutProps = {
   children: React.ReactNode
-  params: Promise<{ locale: string }>
+  params: Promise<any>
 }
 
 export async function generateMetadata({
   params,
 }: CreateLayoutProps): Promise<Metadata> {
-  const { locale } = await params
+  const resolvedParams = await params
+  const locale = resolvedParams?.locale || 'es'
   const safeLocale: SeoLocale = locale === 'ca' ? 'ca' : 'es'
 
   return buildPageMetadata({

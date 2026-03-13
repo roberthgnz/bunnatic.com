@@ -30,7 +30,7 @@ export async function generateMetadata({
     })
   }
 
-  const localizedCopy = entry.copy['es']
+  const localizedCopy = entry.copy // Assuming single locale for now
 
   return buildPageMetadata({
     locale: 'es',

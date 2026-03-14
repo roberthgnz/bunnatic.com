@@ -89,7 +89,14 @@ export function clearAnalyticsCookies() {
   document.cookie.split('; ').forEach((entry) => {
     const [name] = entry.split('=')
 
-    if (name === '_gid' || name === '_gat' || name.startsWith('_ga')) {
+    if (
+      name === '_gid' ||
+      name === '_gat' ||
+      name.startsWith('_ga') ||
+      name === '_clck' ||
+      name === '_clsk' ||
+      name.startsWith('_cl')
+    ) {
       deleteCookie(name)
     }
   })

@@ -6,6 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from 'sonner'
 import { GoogleAnalytics } from '@/components/GoogleAnalytics'
 import { CookieConsent } from '@/components/CookieConsent'
+import { MicrosoftClarity } from '@/components/MicrosoftClarity'
 import { getOrganizationSchema, getWebSiteSchema } from '@/lib/structured-data'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
@@ -88,6 +89,7 @@ export default function RootLayout({
       <body className="font-sans antialiased" suppressHydrationWarning>
         <TooltipProvider>
           {gaTrackingId ? <GoogleAnalytics trackingId={gaTrackingId} /> : null}
+          <MicrosoftClarity />
           {children}
           <CookieConsent />
           <Toaster position="top-center" richColors />

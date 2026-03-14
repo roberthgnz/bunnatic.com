@@ -110,13 +110,6 @@ export default function DashboardPricing({
 
   const currentTierId = planToTierId[currentPlan] || 'tier-starter'
 
-  // Determine if current subscription is annual
-  const isCurrentAnnual = currentPriceId
-    ? Object.values(STRIPE_PRICES).some(
-      (prices) => prices.yearly === currentPriceId
-    )
-    : false
-
   // Calculate days remaining in trial
   const trialDaysRemaining = trialEndsAt
     ? Math.ceil(

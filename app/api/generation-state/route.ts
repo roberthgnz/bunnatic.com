@@ -21,7 +21,7 @@ type GenerationState = {
 }
 
 // GET: Retrieve generation state
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         const supabase = await createClient()
         const {
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 }
 
 // DELETE: Clear generation state
-export async function DELETE(request: NextRequest) {
+export async function DELETE() {
     try {
         const supabase = await createClient()
         const {

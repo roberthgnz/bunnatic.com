@@ -286,10 +286,8 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
             })
 
             if ('error' in result && result.error) {
-                if (result.limitBlocked)
-                    trackFunnelEvent('limit_blocked', { source_type: sourceType, locale })
                 toast.error(result.error)
-                if (result.entitlement) setEntitlement(result.entitlement)
+                if ('entitlement' in result && result.entitlement) setEntitlement(result.entitlement)
                 return
             }
 

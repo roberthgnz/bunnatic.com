@@ -1,4 +1,4 @@
-import type { BusinessSourcePreview, SourceBlock, SourceType } from '@/lib/businessSourceGeneration'
+import type { BusinessSourcePreview, SourceType } from '@/lib/businessSourceGeneration'
 
 export type PlaceSearchResult = {
     place_id: string

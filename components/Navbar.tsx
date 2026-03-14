@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronDown, Zap, LogOut, User, Settings, LayoutDashboard } from 'lucide-react'
+import { Zap, LogOut, User, Settings, LayoutDashboard, Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { getFeatureSlug } from '@/lib/pageSlugs'
@@ -44,6 +44,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   const router = useRouter()
   const paramsText = searchParams.toString()
   const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -124,31 +125,32 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
           </span>
         </Link>
         <div className="flex items-center gap-3 sm:gap-6">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="hidden items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 sm:flex"
+          <div className="hidden items-center gap-4 lg:flex">
+            {t.navbar.coreFeatures.map((feature) => (
+              <Link
+                key={feature.id}
+                href={`/caracteristicas/${getFeatureSlug(feature.id, 'es')}`}
+                className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
               >
-                {t.navbar.coreFeaturesLabel}
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-72">
-              {t.navbar.coreFeatures.map((feature) => (
-                <DropdownMenuItem key={feature.id} asChild>
-                  <Link
-                    href={`/caracteristicas/${getFeatureSlug(feature.id, 'es')}`}
-                    className="block rounded-md px-2 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
-                  >
-                    {feature.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {feature.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Mobile menu button */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </Button>
 
           {user ? (
             <div className="flex items-center gap-2">
@@ -225,6 +227,35 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
           )}
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="border-t border-slate-200 bg-white lg:hidden">
+          <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
+            <div className="flex flex-col gap-3">
+              {t.navbar.coreFeatures.map((feature) => (
+                <Link
+                  key={feature.id}
+                  href={`/caracteristicas/${getFeatureSlug(feature.id, 'es')}`}
+                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {feature.label}
+                </Link>
+              ))}
+              {user && (
+                <Link
+                  href={dashboardPath}
+                  className="mt-2 rounded-md bg-slate-900 px-3 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-slate-800 sm:hidden"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {dashboardLabel}
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }

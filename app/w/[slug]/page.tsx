@@ -40,7 +40,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      type: 'business.business',
+      type: 'website',
       siteName: 'Bunnatic',
       locale: 'es_ES',
     },

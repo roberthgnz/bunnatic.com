@@ -111,6 +111,7 @@ async function testRedisGenerationState() {
             retrievedCrawlState &&
             typeof retrievedCrawlState === 'object' &&
             'crawlJobId' in retrievedCrawlState &&
+            'crawlUrl' in retrievedCrawlState &&
             retrievedCrawlState.crawlJobId === 'test-job-123'
         ) {
             console.log('   ✅ Crawl state persisted correctly')

@@ -13,8 +13,7 @@ export type Business = {
   phone: string | null
   email: string | null
   website: string | null
-  // Add other fields as they are encountered
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type Service = {
@@ -23,7 +22,7 @@ export type Service = {
   description: string | null
   price: number | null
   duration: number | null
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type WorkingHour = {
@@ -31,13 +30,13 @@ export type WorkingHour = {
   open_time: string | null
   close_time: string | null
   is_closed: boolean
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type Section = {
   id: string
   status: 'draft' | 'review' | 'published'
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type BusinessDomain = {

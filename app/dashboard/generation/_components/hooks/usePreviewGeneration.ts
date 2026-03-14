@@ -11,7 +11,7 @@ export function usePreviewGeneration(locale: string, errorMessage: string) {
     const buildPreview = async (
         sourceType: SourceType,
         sourcePayload: unknown,
-        onSuccess: (preview: BusinessSourcePreview, entitlement?: GenerationEntitlement) => void
+        onSuccess: (preview: BusinessSourcePreview | null, entitlement?: GenerationEntitlement) => void
     ) => {
         setIsBuildingPreview(true)
 
@@ -26,7 +26,7 @@ export function usePreviewGeneration(locale: string, errorMessage: string) {
                     toast.error(result.error)
                     // Return entitlement if available to update UI
                     if (result.entitlement) {
-                        onSuccess(null as any, result.entitlement)
+                        onSuccess(null, result.entitlement)
                     }
                     return
                 }

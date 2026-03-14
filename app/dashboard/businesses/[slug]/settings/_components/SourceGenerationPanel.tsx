@@ -414,9 +414,11 @@ export default function SourceGenerationPanel({
         previewPayload: preview,
       })
 
-      if ('error' in result && result.error) {
+      if ('error' in result) {
         toast.error(result.error)
-        if ('entitlement' in result && result.entitlement) setEntitlement(result.entitlement)
+        if ('entitlement' in result && result.entitlement) {
+          setEntitlement(result.entitlement)
+        }
         return
       }
 
@@ -426,7 +428,7 @@ export default function SourceGenerationPanel({
         locale: safeLocale,
         blocks_count: blocks.length,
       })
-      if (result.entitlement) setEntitlement(result.entitlement)
+      if ('entitlement' in result && result.entitlement) setEntitlement(result.entitlement)
       else await loadEntitlement()
       router.refresh()
     } catch (error) {
@@ -530,8 +532,8 @@ export default function SourceGenerationPanel({
               type="button"
               onClick={() => handleSourceChange('google')}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${sourceType === 'google'
-                  ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                  : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
+                : 'text-slate-500 hover:text-slate-700'
                 }`}
             >
               <MapPin className="h-3.5 w-3.5" />
@@ -541,8 +543,8 @@ export default function SourceGenerationPanel({
               type="button"
               onClick={() => handleSourceChange('url')}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${sourceType === 'url'
-                  ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                  : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
+                : 'text-slate-500 hover:text-slate-700'
                 }`}
             >
               <Globe className="h-3.5 w-3.5" />
@@ -723,10 +725,10 @@ export default function SourceGenerationPanel({
                           disabled={disabled}
                           onClick={() => toggleBlock(key)}
                           className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${disabled
-                              ? 'cursor-not-allowed border-slate-200 bg-slate-50 opacity-40'
-                              : isSelected
-                                ? 'border-blue-300 bg-blue-50 ring-1 ring-blue-200'
-                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                            ? 'cursor-not-allowed border-slate-200 bg-slate-50 opacity-40'
+                            : isSelected
+                              ? 'border-blue-300 bg-blue-50 ring-1 ring-blue-200'
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                             }`}
                         >
                           <div

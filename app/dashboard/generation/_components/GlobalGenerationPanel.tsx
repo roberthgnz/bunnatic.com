@@ -285,9 +285,11 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
                 previewPayload: previewGen.preview,
             })
 
-            if ('error' in result && result.error) {
+            if ('error' in result) {
                 toast.error(result.error)
-                if ('entitlement' in result && result.entitlement) setEntitlement(result.entitlement)
+                if ('entitlement' in result && result.entitlement) {
+                    setEntitlement(result.entitlement)
+                }
                 return
             }
 
@@ -297,7 +299,7 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
                 locale,
                 blocks_count: blocks.length,
             })
-            if (result.entitlement) setEntitlement(result.entitlement)
+            if ('entitlement' in result && result.entitlement) setEntitlement(result.entitlement)
             else await loadEntitlement()
 
             // Clear all state after successful application

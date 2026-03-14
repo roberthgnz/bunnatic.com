@@ -17,14 +17,29 @@ export async function generateMetadata({
     locale: safeLocale,
     title:
       safeLocale === 'ca'
-        ? 'Alternativa a dependre només de Google My Business | Bunnatic'
-        : 'Alternativa a depender solo de Google My Business | Bunnatic',
+        ? 'Alternativa a Dependre Només de Google My Business | Bunnatic'
+        : 'Alternativa a Depender Solo de Google My Business | Bunnatic',
     description:
       safeLocale === 'ca'
-        ? 'Combina visibilitat a Google Maps amb una web que converteix en contactes i vendes.'
-        : 'Combina visibilidad en Google Maps con una web que convierte en contactos y ventas.',
+        ? 'Combina visibilitat a Google Maps amb una web pròpia que converteix visites en contactes i vendes. Controla el teu missatge comercial.'
+        : 'Combina visibilidad en Google Maps con una web propia que convierte visitas en contactos y ventas. Controla tu mensaje comercial.',
     esPath: `/alternativa/${getAlternativeSlug('google-my-business', 'es')}`,
     caPath: `/alternativa/${getAlternativeSlug('google-my-business', 'ca')}`,
+    keywords:
+      safeLocale === 'ca'
+        ? [
+          'google my business',
+          'fitxa google',
+          'web google maps',
+          'negoci local google',
+        ]
+        : [
+          'google my business',
+          'ficha google',
+          'web google maps',
+          'negocio local google',
+          'google business profile',
+        ],
   })
 }
 

@@ -14,15 +14,52 @@ export async function generateMetadata({
 
   if (!business) {
     return {
-      title: 'Negocio no encontrado',
+      title: 'Negocio no encontrado | Bunnatic',
+      description: 'El negocio que buscas no está disponible.',
+      robots: {
+        index: false,
+        follow: false,
+      },
     }
   }
 
+  const title = `${business.name} - ${business.category}`
+  const description =
+    business.description ||
+    `Descubre ${business.name}, ${business.category}. ${business.address || 'Negocio local'}.`
+
   return {
-    title: `${business.name} | ${business.category}`,
-    description:
-      business.description ||
-      `Bienvenido a la web de ${business.name}, ${business.category}.`,
+    title,
+    description,
+    keywords: [
+      business.name,
+      business.category,
+      business.city || '',
+      'negocio local',
+    ].filter(Boolean),
+    openGraph: {
+      title,
+      description,
+      type: 'business.business',
+      siteName: 'Bunnatic',
+      locale: 'es_ES',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
   }
 }
 

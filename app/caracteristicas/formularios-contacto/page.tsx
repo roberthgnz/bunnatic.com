@@ -6,11 +6,19 @@ import { buildPageMetadata } from '@/lib/seo'
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Formularios de contacto para captar clientes | Bunnatic',
+    title: 'Formularios de Contacto y WhatsApp - Capta Clientes | Bunnatic',
     description:
-      'Convierte visitas en oportunidades con formularios, WhatsApp y llamadas a la acción optimizadas.',
+      'Convierte visitas en clientes con formularios optimizados, botón de WhatsApp y llamadas a la acción estratégicas. Recibe leads cualificados al instante.',
     esPath: `/caracteristicas/${getFeatureSlug('formularios-contacto')}`,
     caPath: `/caracteristicas/${getFeatureSlug('formularios-contacto')}`,
+    keywords: [
+      'formularios de contacto',
+      'captación de clientes',
+      'botón whatsapp web',
+      'generación de leads',
+      'formulario presupuesto',
+      'conversión web',
+    ],
   })
 }
 

@@ -59,6 +59,8 @@ type BuildPageMetadataInput = {
   caPath: string
   keywords?: string[]
   noindex?: boolean
+  image?: string
+  imageAlt?: string
 }
 
 export function buildPageMetadata({
@@ -69,15 +71,25 @@ export function buildPageMetadata({
   caPath,
   keywords,
   noindex = false,
+  image,
+  imageAlt,
 }: BuildPageMetadataInput): Metadata {
   const canonicalPath = locale === 'ca' ? caPath : esPath
   const canonicalUrl = absoluteUrl(canonicalPath, locale)
+  const baseUrl = getBaseUrl()
+
+  // Default OG image if not provided
+  const ogImage = image || `${baseUrl}/og-image.png`
+  const ogImageAlt = imageAlt || 'Bunnatic - Crea tu web con IA para captar clientes locales'
 
   return {
-    metadataBase: new URL(getBaseUrl()),
+    metadataBase: new URL(baseUrl),
     title,
     description,
     keywords,
+    authors: [{ name: 'Bunnatic' }],
+    creator: 'Bunnatic',
+    publisher: 'Bunnatic',
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -92,15 +104,36 @@ export function buildPageMetadata({
       siteName: 'Bunnatic',
       locale: locale === 'ca' ? 'ca_ES' : 'es_ES',
       type: 'website',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: ogImageAlt,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [ogImage],
+      creator: '@bunnatic',
+      site: '@bunnatic',
     },
     robots: {
       index: !noindex,
       follow: !noindex,
+      googleBot: {
+        index: !noindex,
+        follow: !noindex,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
     },
   }
 }

@@ -17,14 +17,29 @@ export async function generateMetadata({
     locale: safeLocale,
     title:
       safeLocale === 'ca'
-        ? 'Alternativa a Squarespace per negocis locals | Bunnatic'
-        : 'Alternativa a Squarespace para negocios locales | Bunnatic',
+        ? 'Alternativa a Squarespace per Negocis Locals | Bunnatic'
+        : 'Alternativa a Squarespace para Negocios Locales | Bunnatic',
     description:
       safeLocale === 'ca'
-        ? 'Una web enfocada a conversió i captació, no només a disseny visual.'
-        : 'Una web enfocada a conversión y captación, no solo a diseño visual.',
+        ? "Una web enfocada a conversió i captació de clients, no només a disseny visual. Més resultats, menys complexitat."
+        : 'Una web enfocada a conversión y captación de clientes, no solo a diseño visual. Más resultados, menos complejidad.',
     esPath: `/alternativa/${getAlternativeSlug('squarespace', 'es')}`,
     caPath: `/alternativa/${getAlternativeSlug('squarespace', 'ca')}`,
+    keywords:
+      safeLocale === 'ca'
+        ? [
+          'alternativa squarespace',
+          'millor que squarespace',
+          'web conversió',
+          'squarespace negocis',
+        ]
+        : [
+          'alternativa squarespace',
+          'mejor que squarespace',
+          'web conversión',
+          'squarespace negocios',
+          'squarespace españa',
+        ],
   })
 }
 

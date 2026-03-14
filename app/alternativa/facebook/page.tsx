@@ -17,14 +17,29 @@ export async function generateMetadata({
     locale: safeLocale,
     title:
       safeLocale === 'ca'
-        ? 'Alternativa a Facebook Pages per captar clients | Bunnatic'
-        : 'Alternativa a Facebook Pages para captar clientes | Bunnatic',
+        ? 'Alternativa a Facebook Pages per Captar Clients | Bunnatic'
+        : 'Alternativa a Facebook Pages para Captar Clientes | Bunnatic',
     description:
       safeLocale === 'ca'
-        ? "Passa de dependre de l'algoritme a convertir visites en contactes amb una web pròpia."
-        : 'Pasa de depender del algoritmo a convertir visitas en contactos con una web propia.',
+        ? "Passa de dependre de l'algoritme de Facebook a convertir visites en contactes amb una web pròpia optimitzada per SEO local."
+        : 'Pasa de depender del algoritmo de Facebook a convertir visitas en contactos con una web propia optimizada para SEO local.',
     esPath: `/alternativa/${getAlternativeSlug('facebook', 'es')}`,
     caPath: `/alternativa/${getAlternativeSlug('facebook', 'ca')}`,
+    keywords:
+      safeLocale === 'ca'
+        ? [
+          'alternativa facebook',
+          'web pròpia',
+          'facebook business',
+          'pàgina facebook',
+        ]
+        : [
+          'alternativa facebook',
+          'web propia',
+          'facebook business',
+          'página facebook',
+          'mejor que facebook',
+        ],
   })
 }
 

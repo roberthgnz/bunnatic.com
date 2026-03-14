@@ -24,10 +24,11 @@ export async function generateMetadata({
     title: `${legalContent[safeLocale]['aviso-legal'].title} | Bunnatic`,
     description:
       safeLocale === 'ca'
-        ? "Consulta l'avís legal de Bunnatic i les condicions d'ús del lloc web."
-        : 'Consulta el aviso legal de Bunnatic y las condiciones de uso del sitio web.',
+        ? "Consulta l'avís legal de Bunnatic amb informació sobre la titularitat, condicions d'ús i responsabilitats del lloc web."
+        : 'Consulta el aviso legal de Bunnatic con información sobre la titularidad, condiciones de uso y responsabilidades del sitio web.',
     esPath: `/${getLegalSlug('aviso-legal', 'es')}`,
     caPath: `/${getLegalSlug('aviso-legal', 'ca')}`,
+    noindex: true,
   })
 }
 

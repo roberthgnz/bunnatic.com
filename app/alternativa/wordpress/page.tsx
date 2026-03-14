@@ -17,14 +17,29 @@ export async function generateMetadata({
     locale: safeLocale,
     title:
       safeLocale === 'ca'
-        ? 'Alternativa a WordPress sense complexitat tècnica | Bunnatic'
-        : 'Alternativa a WordPress sin complejidad técnica | Bunnatic',
+        ? 'Alternativa a WordPress sense Complexitat Tècnica | Bunnatic'
+        : 'Alternativa a WordPress sin Complejidad Técnica | Bunnatic',
     description:
       safeLocale === 'ca'
-        ? 'Publica i edita la teva web sense plugins ni manteniment tècnic constant.'
-        : 'Publica y edita tu web sin plugins ni mantenimiento técnico constante.',
+        ? 'Publica i edita la teva web sense plugins, actualitzacions ni manteniment tècnic constant. Més simple, més ràpid, més enfocada a captar clients.'
+        : 'Publica y edita tu web sin plugins, actualizaciones ni mantenimiento técnico constante. Más simple, más rápido, más enfocada a captar clientes.',
     esPath: `/alternativa/${getAlternativeSlug('wordpress', 'es')}`,
     caPath: `/alternativa/${getAlternativeSlug('wordpress', 'ca')}`,
+    keywords:
+      safeLocale === 'ca'
+        ? [
+          'alternativa wordpress',
+          'web sense plugins',
+          'cms simple',
+          'wordpress fàcil',
+        ]
+        : [
+          'alternativa wordpress',
+          'web sin plugins',
+          'cms simple',
+          'wordpress fácil',
+          'mejor que wordpress',
+        ],
   })
 }
 

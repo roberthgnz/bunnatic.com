@@ -17,14 +17,29 @@ export async function generateMetadata({
     locale: safeLocale,
     title:
       safeLocale === 'ca'
-        ? 'Alternativa a Instagram per convertir seguidors | Bunnatic'
-        : 'Alternativa a Instagram para convertir seguidores | Bunnatic',
+        ? 'Alternativa a Instagram per Convertir Seguidors en Clients | Bunnatic'
+        : 'Alternativa a Instagram para Convertir Seguidores en Clientes | Bunnatic',
     description:
       safeLocale === 'ca'
-        ? 'Converteix trànsit social en clients amb una web dissenyada per captar contactes.'
-        : 'Convierte tráfico social en clientes con una web diseñada para captar contactos.',
+        ? "Converteix trànsit social en clients amb una web dissenyada per captar contactes. Més enllà del link de la bio."
+        : 'Convierte tráfico social en clientes con una web diseñada para captar contactos. Más allá del link en bio.',
     esPath: `/alternativa/${getAlternativeSlug('instagram', 'es')}`,
     caPath: `/alternativa/${getAlternativeSlug('instagram', 'ca')}`,
+    keywords:
+      safeLocale === 'ca'
+        ? [
+          'link bio instagram',
+          'web per instagram',
+          'convertir seguidors',
+          'landing instagram',
+        ]
+        : [
+          'link en bio',
+          'web para instagram',
+          'convertir seguidores',
+          'landing instagram',
+          'linktree alternativa',
+        ],
   })
 }
 

@@ -6,11 +6,19 @@ import { buildPageMetadata } from '@/lib/seo'
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Edición asistida para tu web | Bunnatic',
+    title: 'Editor Web Visual con IA - Actualiza sin Programar | Bunnatic',
     description:
-      'Actualiza servicios, horarios y promociones sin depender de programadores.',
+      'Edita tu web sin código con nuestro editor visual asistido por IA. Cambia textos, ofertas y horarios en segundos. Sin depender de programadores ni diseñadores.',
     esPath: `/caracteristicas/${getFeatureSlug('edicion-asistida')}`,
     caPath: `/caracteristicas/${getFeatureSlug('edicion-asistida')}`,
+    keywords: [
+      'editor web visual',
+      'editar web sin código',
+      'editor asistido IA',
+      'actualizar web fácil',
+      'cms visual',
+      'editor drag and drop',
+    ],
   })
 }
 

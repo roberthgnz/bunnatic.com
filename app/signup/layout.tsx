@@ -8,9 +8,9 @@ type SignUpLayoutProps = {
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Crear cuenta | Bunnatic',
+    title: 'Crear Cuenta Gratis en Bunnatic - Web con IA en 5 Minutos',
     description:
-      'Crea tu cuenta de Bunnatic y activa una web preparada para captar clientes locales.',
+      'Crea tu cuenta gratuita en Bunnatic y genera una web profesional con IA. Sin tarjeta, sin técnicos. Empieza a captar clientes locales hoy mismo.',
     esPath: '/signup',
     caPath: '/signup',
     noindex: true,

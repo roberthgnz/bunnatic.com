@@ -21,16 +21,20 @@ type HomePageProps = {
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Bunnatic | Crea tu web con IA para captar clientes locales',
+    title: 'Bunnatic | Crea tu Web con IA en 5 Minutos - SEO Local Incluido',
     description:
-      'Crea una web profesional con IA en minutos. Optimizada para SEO local, formularios y WhatsApp para convertir visitas en clientes.',
+      'Crea una web profesional para tu negocio local con IA en minutos. Optimizada para SEO local, con formularios de contacto y WhatsApp. Convierte visitas en clientes. Prueba gratis sin tarjeta.',
     esPath: '/',
     caPath: '/',
     keywords: [
       'crear web con IA',
-      'seo local',
       'web para negocios locales',
+      'seo local',
       'captación de clientes',
+      'generador de páginas web',
+      'web profesional',
+      'diseño web automático',
+      'web con inteligencia artificial',
     ],
   })
 }

@@ -17,14 +17,24 @@ export async function generateMetadata({
     locale: safeLocale,
     title:
       safeLocale === 'ca'
-        ? 'Alternativa a Wix per publicar més ràpid | Bunnatic'
-        : 'Alternativa a Wix para publicar más rápido | Bunnatic',
+        ? 'Alternativa a Wix per Publicar Més Ràpid amb IA | Bunnatic'
+        : 'Alternativa a Wix para Publicar Más Rápido con IA | Bunnatic',
     description:
       safeLocale === 'ca'
-        ? 'Deixa de construir des de zero i activa una web que converteix en minuts.'
-        : 'Deja de construir desde cero y activa una web que convierte en minutos.',
+        ? "Deixa de construir des de zero. Activa una web que converteix en minuts amb IA. Més ràpid que Wix, més enfocada a resultats."
+        : 'Deja de construir desde cero. Activa una web que convierte en minutos con IA. Más rápido que Wix, más enfocada a resultados.',
     esPath: `/alternativa/${getAlternativeSlug('wix', 'es')}`,
     caPath: `/alternativa/${getAlternativeSlug('wix', 'ca')}`,
+    keywords:
+      safeLocale === 'ca'
+        ? ['alternativa wix', 'millor que wix', 'web ràpida', 'wix ia']
+        : [
+          'alternativa wix',
+          'mejor que wix',
+          'web rápida',
+          'wix con ia',
+          'crear web más rápido',
+        ],
   })
 }
 

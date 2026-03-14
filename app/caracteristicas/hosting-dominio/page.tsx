@@ -6,11 +6,19 @@ import { buildPageMetadata } from '@/lib/seo'
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Hosting y dominio incluidos | Bunnatic',
+    title: 'Hosting y Dominio Incluido - Web Rápida y Segura | Bunnatic',
     description:
-      'Publica tu web con infraestructura segura, rápida y preparada para captar clientes.',
+      'Hosting profesional con SSL, dominio personalizado y velocidad optimizada incluidos. Infraestructura segura y estable para que tu web esté siempre disponible.',
     esPath: `/caracteristicas/${getFeatureSlug('hosting-dominio')}`,
     caPath: `/caracteristicas/${getFeatureSlug('hosting-dominio')}`,
+    keywords: [
+      'hosting incluido',
+      'dominio web',
+      'hosting rápido',
+      'ssl gratis',
+      'alojamiento web',
+      'hosting seguro',
+    ],
   })
 }
 

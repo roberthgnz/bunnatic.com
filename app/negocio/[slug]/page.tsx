@@ -22,26 +22,29 @@ export async function generateMetadata({
   if (!entry) {
     return buildPageMetadata({
       locale: 'es',
-      title: 'Web para negocios locales | Bunnatic',
-      description: 'Crea una web optimizada para captar clientes locales.',
+      title: 'Web para Negocios Locales con IA | Bunnatic',
+      description:
+        'Crea una web optimizada para tu tipo de negocio y empieza a captar clientes locales con IA.',
       esPath: '/negocio',
       caPath: '/negocio',
       noindex: true,
     })
   }
 
-  const localizedCopy = entry.copy // Assuming single locale for now
+  const localizedCopy = entry.copy
 
   return buildPageMetadata({
     locale: 'es',
     title: `${localizedCopy.title} | Bunnatic`,
     description: localizedCopy.subtitle,
     esPath: `/negocio/${getBusinessSlugByLocale(entry, 'es')}`,
-    caPath: `/negocio/${getBusinessSlugByLocale(entry, 'es')}`, // Fallback to es
+    caPath: `/negocio/${getBusinessSlugByLocale(entry, 'es')}`,
     keywords: [
       'web para negocios locales',
       'seo local',
       'captación de clientes',
+      localizedCopy.title.toLowerCase(),
+      entry.legacySlug,
     ],
   })
 }

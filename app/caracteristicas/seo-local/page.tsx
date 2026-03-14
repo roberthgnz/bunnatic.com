@@ -6,11 +6,19 @@ import { buildPageMetadata } from '@/lib/seo'
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'SEO local para negocios | Bunnatic',
+    title: 'SEO Local para Negocios - Atrae Clientes de tu Zona | Bunnatic',
     description:
-      'Mejora tu visibilidad local en Google y convierte búsquedas en contactos.',
+      'Mejora tu visibilidad en Google para búsquedas locales. Optimización SEO técnica y contenido orientado a conversión para que tu negocio aparezca cuando te buscan en tu ciudad.',
     esPath: `/caracteristicas/${getFeatureSlug('seo-local')}`,
     caPath: `/caracteristicas/${getFeatureSlug('seo-local')}`,
+    keywords: [
+      'seo local',
+      'posicionamiento local',
+      'aparecer en google maps',
+      'seo para negocios locales',
+      'optimización búsquedas locales',
+      'google my business',
+    ],
   })
 }
 

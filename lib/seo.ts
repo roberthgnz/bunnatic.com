@@ -11,7 +11,8 @@ function normalizeBaseUrl(value: string): string | null {
       return null
     }
 
-    return url.toString().endsWith('/') ? url.toString() : `${url.toString()}/`
+    // Remove trailing slash to avoid double slashes
+    return url.toString().replace(/\/$/, '')
   } catch {
     return null
   }
@@ -35,7 +36,7 @@ export function getBaseUrl(): string {
     }
   }
 
-  return `${DEFAULT_BASE_URL}/`
+  return DEFAULT_BASE_URL
 }
 
 function withLocalePath(pathname: string, locale: SeoLocale): string {

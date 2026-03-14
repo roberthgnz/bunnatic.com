@@ -112,7 +112,7 @@ export function BusinessProvider({
   const setupCompletion = Math.round(
     (setupCompletedCount / setupChecklist.length) * 100
   )
-  const setupStatus =
+  const setupStatus: 'complete' | 'inProgress' | 'early' =
     setupCompletion === 100
       ? 'complete'
       : setupCompletion >= 60

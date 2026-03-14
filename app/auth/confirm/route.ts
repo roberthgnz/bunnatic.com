@@ -33,7 +33,8 @@ export async function GET(request: Request) {
     })
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      // Redirigir al dashboard después de confirmar el correo
+      return NextResponse.redirect(`${origin}/dashboard`)
     }
   }
 

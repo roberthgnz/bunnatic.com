@@ -237,8 +237,7 @@ function SignUpContent() {
         source: flow.source ?? '',
         plan: flow.plan ?? '',
       })
-      router.refresh()
-      router.push(flow.destination)
+      router.push('/auth/check-email')
     }
   }
 

@@ -84,9 +84,15 @@ const STRIPE_PRICES = {
 export default function DashboardPricing({
   currentPlan = 'starter',
   currentPriceId = null,
+  hasActiveSubscription = false,
+  isTrialActive = false,
+  trialEndsAt = null,
 }: {
   currentPlan?: string
   currentPriceId?: string | null
+  hasActiveSubscription?: boolean
+  isTrialActive?: boolean
+  trialEndsAt?: string | null
 }) {
   const t = content
   const [isAnnual, setIsAnnual] = useState(false)
@@ -104,23 +110,75 @@ export default function DashboardPricing({
 
   const currentTierId = planToTierId[currentPlan] || 'tier-starter'
 
-  const getButtonText = (tierId: string) => {
-    if (tierId === currentTierId) {
+  // Determine if current subscription is annual
+  const isCurrentAnnual = currentPriceId
+    ? Object.values(STRIPE_PRICES).some(
+      (prices) => prices.yearly === currentPriceId
+    )
+    : false
+
+  // Calculate days remaining in trial
+  const trialDaysRemaining = trialEndsAt
+    ? Math.ceil(
+      (new Date(trialEndsAt).getTime() - new Date().getTime()) /
+      (1000 * 60 * 60 * 24)
+    )
+    : 0
+
+  const getButtonText = (tierId: string, selectedIsAnnual: boolean) => {
+    const selectedPriceId =
+      STRIPE_PRICES[tierId as keyof typeof STRIPE_PRICES]?.[
+      selectedIsAnnual ? 'yearly' : 'monthly'
+      ]
+
+    // Check if this is the exact current plan (same tier and frequency)
+    if (selectedPriceId === currentPriceId) {
       return 'Plan actual'
+    }
+
+    // Check if it's the same tier but different frequency
+    if (tierId === currentTierId && hasActiveSubscription) {
+      return selectedIsAnnual ? 'Cambiar a anual' : 'Cambiar a mensual'
     }
 
     const tierOrder = ['tier-starter', 'tier-pro', 'tier-agency', 'tier-scale']
     const currentIndex = tierOrder.indexOf(currentTierId)
     const targetIndex = tierOrder.indexOf(tierId)
 
-    if (targetIndex > currentIndex) {
-      return 'Mejorar plan'
-    } else {
-      return 'Cambiar plan'
+    // If user has active subscription
+    if (hasActiveSubscription) {
+      if (targetIndex > currentIndex) {
+        return 'Mejorar plan'
+      } else if (targetIndex < currentIndex) {
+        return 'Cambiar a este plan'
+      }
     }
+
+    // User is on free tier (starter without subscription)
+    if (!hasActiveSubscription && currentTierId === 'tier-starter') {
+      // If trying to select starter plan while already on free tier
+      if (tierId === 'tier-starter') {
+        return 'Plan gratuito'
+      }
+      // If trial is active, show trial info
+      if (isTrialActive) {
+        return `Prueba gratis (${trialDaysRemaining} días)`
+      }
+      // Trial expired or no trial
+      return 'Comenzar plan'
+    }
+
+    // Fallback
+    return 'Seleccionar plan'
   }
 
-  const isCurrentPlan = (tierId: string) => tierId === currentTierId
+  const isCurrentPlanAndFrequency = (tierId: string, selectedIsAnnual: boolean) => {
+    const selectedPriceId =
+      STRIPE_PRICES[tierId as keyof typeof STRIPE_PRICES]?.[
+      selectedIsAnnual ? 'yearly' : 'monthly'
+      ]
+    return selectedPriceId === currentPriceId
+  }
 
   const handleSubscribe = async (tierId: string) => {
     try {
@@ -131,44 +189,59 @@ export default function DashboardPricing({
         isAnnual ? 'yearly' : 'monthly'
         ]
 
-      console.log('=== FRONTEND DEBUG ===')
-      console.log('Tier ID:', tierId)
-      console.log('Is Annual:', isAnnual)
-      console.log('Selected priceId:', priceId)
-      console.log('All STRIPE_PRICES:', STRIPE_PRICES)
-      console.log('Environment variables:')
-      console.log('STARTER_MONTHLY:', process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER_MONTHLY)
-      console.log('STARTER_YEARLY:', process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER_YEARLY)
-
       if (!priceId) {
         toast.error('Price not configured for this plan')
         return
       }
 
-      const response = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          priceId,
-          returnUrl: window.location.href,
-        }),
-      })
+      // If user has active subscription, update it instead of creating new checkout
+      if (hasActiveSubscription) {
+        const response = await fetch('/api/stripe/update-subscription', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ priceId }),
+        })
 
-      if (!response.ok) {
-        throw new Error('Failed to create checkout session')
-      }
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(errorText || 'Failed to update subscription')
+        }
 
-      const { url } = await response.json()
-      if (url) {
-        window.location.href = url
+        toast.success('Suscripción actualizada correctamente')
+
+        // Reload page to reflect changes
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
       } else {
-        throw new Error('No checkout URL returned')
+        // Create new checkout session for first-time subscribers
+        const response = await fetch('/api/stripe/checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            priceId,
+            returnUrl: window.location.href,
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to create checkout session')
+        }
+
+        const { url } = await response.json()
+        if (url) {
+          window.location.href = url
+        } else {
+          throw new Error('No checkout URL returned')
+        }
       }
     } catch (error) {
       console.error(error)
-      toast.error('Something went wrong. Please try again.')
+      toast.error('Algo salió mal. Por favor, inténtalo de nuevo.')
     } finally {
       setLoadingPriceId(null)
     }
@@ -222,6 +295,29 @@ export default function DashboardPricing({
             {t.pricing.subtitle}
           </p>
 
+          {/* Trial Banner */}
+          {isTrialActive && trialDaysRemaining > 0 && (
+            <div className="mt-4 rounded-lg bg-blue-50 border border-blue-200 p-4">
+              <p className="text-sm font-semibold text-blue-900">
+                🎉 Prueba gratuita activa: {trialDaysRemaining} día{trialDaysRemaining !== 1 ? 's' : ''} restante{trialDaysRemaining !== 1 ? 's' : ''}
+              </p>
+              <p className="mt-1 text-xs text-blue-700">
+                Disfruta de todas las funciones sin costo hasta que expire tu prueba
+              </p>
+            </div>
+          )}
+
+          {!isTrialActive && trialEndsAt && !hasActiveSubscription && (
+            <div className="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-4">
+              <p className="text-sm font-semibold text-amber-900">
+                ⚠️ Tu prueba gratuita ha expirado
+              </p>
+              <p className="mt-1 text-xs text-amber-700">
+                Selecciona un plan para continuar disfrutando de todas las funciones
+              </p>
+            </div>
+          )}
+
           <Button
             type="button"
             onClick={() => setIsAnnual((prev) => !prev)}
@@ -249,7 +345,7 @@ export default function DashboardPricing({
           {t.pricing.tiers.slice(0, 3).map((tier) => {
             const isStarter = tier.id === 'tier-starter'
             const isLoading = loadingPriceId === tier.id
-            const isCurrent = isCurrentPlan(tier.id)
+            const isCurrent = isCurrentPlanAndFrequency(tier.id, isAnnual)
 
             return (
               <Card
@@ -312,8 +408,8 @@ export default function DashboardPricing({
                   <div className="mt-6">
                     <Button
                       onClick={() => handleSubscribe(tier.id)}
-                      disabled={isLoading || isCurrent}
-                      className={`h-10 w-full rounded-lg px-5 text-sm font-semibold ${isCurrent
+                      disabled={isLoading || isCurrent || (tier.id === 'tier-starter' && !hasActiveSubscription)}
+                      className={`h-10 w-full rounded-lg px-5 text-sm font-semibold ${isCurrent || (tier.id === 'tier-starter' && !hasActiveSubscription)
                         ? 'bg-slate-300 text-slate-600 cursor-not-allowed'
                         : isStarter
                           ? 'bg-emerald-600 text-white hover:bg-emerald-700'
@@ -326,7 +422,7 @@ export default function DashboardPricing({
                           Procesando...
                         </>
                       ) : (
-                        getButtonText(tier.id)
+                        getButtonText(tier.id, isAnnual)
                       )}
                     </Button>
                   </div>

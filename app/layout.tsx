@@ -7,9 +7,15 @@ import { Toaster } from 'sonner'
 import { GoogleAnalytics } from '@/components/GoogleAnalytics'
 import { CookieConsent } from '@/components/CookieConsent'
 import { MicrosoftClarity } from '@/components/MicrosoftClarity'
+import { ResourcePreload } from '@/components/ResourcePreload'
 import { getOrganizationSchema, getWebSiteSchema } from '@/lib/structured-data'
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
+const geist = Geist({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+  preload: true,
+})
 const gaTrackingId = process.env.NEXT_PUBLIC_GA_TRACKING_ID
 
 export const metadata: Metadata = {
@@ -73,6 +79,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <ResourcePreload />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

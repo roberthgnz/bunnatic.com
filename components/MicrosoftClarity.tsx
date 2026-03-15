@@ -10,16 +10,16 @@ export function MicrosoftClarity() {
       const consent = getCookieConsent()
       if (typeof window !== 'undefined' && 'clarity' in window) {
         if (consent?.analytics) {
-          ;(window as any).clarity('consentv2', {
+          ; (window as any).clarity('consentv2', {
             ad_Storage: 'granted',
             analytics_Storage: 'granted',
           })
         } else {
-          ;(window as any).clarity('consentv2', {
+          ; (window as any).clarity('consentv2', {
             ad_Storage: 'denied',
             analytics_Storage: 'denied',
           })
-          ;(window as any).clarity('consent', false) // Explicitly erase clarity session
+            ; (window as any).clarity('consent', false) // Explicitly erase clarity session
         }
       }
     }
@@ -38,7 +38,7 @@ export function MicrosoftClarity() {
   return (
     <Script
       id="microsoft-clarity-init"
-      strategy="afterInteractive"
+      strategy="lazyOnload"
       dangerouslySetInnerHTML={{
         __html: `
             (function(c,l,a,r,i,t,y){

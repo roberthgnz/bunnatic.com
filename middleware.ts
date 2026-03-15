@@ -50,7 +50,15 @@ export default async function middleware(request: NextRequest) {
   if (customDomainRewritePath) {
     const rewriteUrl = new URL(request.url)
     rewriteUrl.pathname = customDomainRewritePath
-    return NextResponse.rewrite(rewriteUrl)
+    const response = NextResponse.rewrite(rewriteUrl)
+
+    // Add performance headers
+    response.headers.set('X-DNS-Prefetch-Control', 'on')
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN')
+    response.headers.set('X-Content-Type-Options', 'nosniff')
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+
+    return response
   }
 
   // First, update the Supabase session
@@ -59,6 +67,12 @@ export default async function middleware(request: NextRequest) {
     user,
     onboardingCompleted,
   } = await updateSession(request)
+
+  // Add performance headers to all responses
+  supabaseResponse.headers.set('X-DNS-Prefetch-Control', 'on')
+  supabaseResponse.headers.set('X-Frame-Options', 'SAMEORIGIN')
+  supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff')
+  supabaseResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
 
   const guestOnlyAuthPagesMatch = pathname.match(
     /^\/(signin|signup)(?:\/|$)/
@@ -74,6 +88,13 @@ export default async function middleware(request: NextRequest) {
     }
     const response = NextResponse.redirect(url)
     copyResponseCookies(supabaseResponse, response)
+
+    // Add performance headers
+    response.headers.set('X-DNS-Prefetch-Control', 'on')
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN')
+    response.headers.set('X-Content-Type-Options', 'nosniff')
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+
     return response
   }
 
@@ -85,6 +106,13 @@ export default async function middleware(request: NextRequest) {
     url.pathname = `/dashboard`
     const response = NextResponse.redirect(url)
     copyResponseCookies(supabaseResponse, response)
+
+    // Add performance headers
+    response.headers.set('X-DNS-Prefetch-Control', 'on')
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN')
+    response.headers.set('X-Content-Type-Options', 'nosniff')
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+
     return response
   }
 

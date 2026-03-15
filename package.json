@@ -13,7 +13,11 @@
     "ratelimit:check": "tsx scripts/manage-ratelimit.ts check",
     "ratelimit:reset": "tsx scripts/manage-ratelimit.ts reset",
     "ratelimit:list": "tsx scripts/manage-ratelimit.ts list",
-    "resend:create-confirm-sign-up-template": "tsx scripts/create-confirm-sign-up-template.tsx"
+    "resend:create-confirm-sign-up-template": "tsx scripts/create-confirm-sign-up-template.tsx",
+    "lighthouse": "lighthouse https://www.bunnatic.com/ --view",
+    "lighthouse:local": "lighthouse http://localhost:3000/ --view",
+    "test:perf": "node -e \"console.log('Run: .\\\\scripts\\\\test-performance.ps1 (Windows) or bash scripts/test-performance.sh (Unix)')\"",
+    "analyze": "cross-env ANALYZE=true next build"
   },
   "dependencies": {
     "@google/genai": "^1.17.0",

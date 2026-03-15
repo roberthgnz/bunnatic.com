@@ -1,15 +1,26 @@
 import type { Metadata } from 'next'
+import dynamic from 'next/dynamic'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
 import Ticker from '@/components/Ticker'
 import HowItWorks from '@/components/HowItWorks'
 import Pricing from '@/components/Pricing'
-import Comparison from '@/components/Comparison'
-import AIDemo from '@/components/AIDemo'
-import FAQ from '@/components/FAQ'
-import FinalCTA from '@/components/FinalCTA'
 import Footer from '@/components/Footer'
 import { buildPageMetadata } from '@/lib/seo'
+
+// Lazy load components below the fold
+const Comparison = dynamic(() => import('@/components/Comparison'), {
+  loading: () => <div className="h-96" />,
+})
+const AIDemo = dynamic(() => import('@/components/AIDemo'), {
+  loading: () => <div className="h-96" />,
+})
+const FAQ = dynamic(() => import('@/components/FAQ'), {
+  loading: () => <div className="h-96" />,
+})
+const FinalCTA = dynamic(() => import('@/components/FinalCTA'), {
+  loading: () => <div className="h-64" />,
+})
 
 type HomePageProps = {
   searchParams?: Promise<{

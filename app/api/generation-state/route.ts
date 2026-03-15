@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getUpstashRedis } from '@/lib/upstash'
 import { createClient } from '@/lib/supabase/server'
 
+export const runtime = 'edge'
+
 const GENERATION_STATE_TTL = 60 * 60 * 24 // 24 hours in seconds
 
 type GenerationState = {

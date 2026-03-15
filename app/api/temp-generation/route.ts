@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getUpstashRedis } from '@/lib/upstash'
 
+export const runtime = 'edge'
+
 const TEMP_GENERATION_TTL_SECONDS = 60 * 60 * 24 * 7 // 7 days
 
 type PlaceLikePayload = {

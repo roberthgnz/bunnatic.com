@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 
+export const runtime = 'edge'
+
 export async function GET(request: Request) {
   // Check rate limit
   const clientIp = getClientIp(request)

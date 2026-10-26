@@ -7,7 +7,7 @@ const highlights = [
 export default function Highlights() {
   return (
     <section
-      aria-label="Bunnatic en cifras"
+      aria-label="Locavo en cifras"
       className="border-b border-(--home-line)"
     >
       <dl className="home-container grid divide-y divide-(--home-line) sm:grid-cols-3 sm:divide-x sm:divide-y-0">

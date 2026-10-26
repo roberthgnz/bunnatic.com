@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { buildBusinessSourcePreview as buildBusinessSourcePreviewAction } from '@/lib/supabase/actions'
+import { buildBusinessSourcePreview as buildBusinessSourcePreviewAction } from '@/lib/db/actions'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
 import type {
   BusinessSourcePreview,

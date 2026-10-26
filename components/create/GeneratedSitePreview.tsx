@@ -349,7 +349,7 @@ export default function GeneratedSitePreview({
 
         <div className="flex items-center justify-between gap-3 border-t border-current/10 px-5 py-5 text-[10px] opacity-70 @xl:px-8">
           <span className="truncate">© {name}</span>
-          <span className="shrink-0">Hecho con Bunnatic</span>
+          <span className="shrink-0">Hecho con Locavo</span>
         </div>
       </div>
     </div>

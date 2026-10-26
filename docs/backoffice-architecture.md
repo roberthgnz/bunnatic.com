@@ -2,7 +2,7 @@
 
 ## Capas y límites
 
-Las páginas de `app/dashboard` componen la interfaz y llaman a consultas del servidor. `lib/backoffice/session.ts` verifica la identidad con Supabase y comparte el resultado durante una petición mediante `React.cache`. `access.ts` obtiene el negocio y comprueba propietario o pertenencia activa antes de permitir una operación. Cada consulta y cada acción verifica su acceso: el layout y la navegación no son controles de seguridad suficientes.
+Las páginas de `app/dashboard` componen la interfaz y llaman a consultas del servidor. `lib/backoffice/session.ts` verifica la identidad con NextAuth y D1 y comparte el resultado durante una petición mediante `React.cache`. `access.ts` obtiene el negocio y comprueba propietario o pertenencia activa antes de permitir una operación. Cada consulta y cada acción verifica su acceso: el layout y la navegación no son controles de seguridad suficientes.
 
 `policy.ts` define las capacidades. `queries.ts` agrupa lecturas y reutiliza consultas en el layout, la cabecera y las páginas. `actions/` contiene las mutaciones de servicios, horarios, calendario, publicación, ajustes y retirada de accesos. `schemas.ts` valida los datos recibidos en el servidor, aunque ya se hayan validado en un formulario. `revalidate.ts` actualiza el panel, el listado y las páginas públicas tras guardar.
 
@@ -12,12 +12,12 @@ Los módulos de sesión, consultas y acceso llevan `server-only`. Los tipos, la 
 
 - El propietario se obtiene de `businesses.user_id`. Una fila de equipo con rol `owner` no concede propiedad.
 - Solo una pertenencia activa de la misma persona y el mismo negocio permite leer el espacio compartido.
-- El propietario modifica contenido, ajustes, dominios y accesos. Se conserva la política de escritura existente en Supabase.
+- El propietario modifica contenido, ajustes, dominios y accesos. Los predicados de D1 conservan los permisos de escritura anteriores.
 - Los administradores y editores activos pueden crear eventos del calendario. Los lectores no pueden hacerlo.
 - Los contactos de clientes se reservan al propietario. La navegación los oculta para colaboradores, la consulta los rechaza y la analítica compartida muestra un dato no disponible en lugar de un cero ficticio.
 - La interfaz de lectura deshabilita formularios; los permisos se vuelven a comprobar al ejecutar la acción. Ocultar botones no sustituye ese control.
 
-Cambiar las capacidades de los roles requiere actualizar juntos `policy.ts`, las políticas SQL y las pruebas. No se han ampliado permisos de escritura de contenido a colaboradores.
+Cambiar las capacidades de los roles requiere actualizar juntos `policy.ts`, los predicados de `lib/db/query.ts` y las pruebas. No se han ampliado permisos de escritura de contenido a colaboradores.
 
 ## Datos e interfaz
 
@@ -31,19 +31,19 @@ La analítica cuenta eventos `page_view` y `click`, y contactos reales de `leads
 
 ## Compatibilidad y trabajo restante
 
-`lib/supabase/actions.ts` mantiene las firmas anteriores como fachada para consumidores existentes. Las páginas y formularios migrados importan las consultas o acciones de su módulo directamente. La generación IA, el aprovisionamiento de dominios, las altas de negocio y parte de la gestión de equipo conservan sus implementaciones anteriores; las escrituras heredadas de contenido reciben ahora el control de acceso común. Esta separación permite migrarlas por dominio sin mezclar cambios de Stripe, Cloudflare o cuotas en este refactor.
+`lib/db/actions.ts` conserva las firmas de las operaciones de negocio. Las páginas y formularios importan las consultas o acciones de su módulo directamente. Las acciones de autenticación están en `lib/auth/actions.ts` y usan NextAuth. Las operaciones de datos usan un cliente D1 por petición, con predicados de acceso y consultas parametrizadas.
 
-La migración `20261026_harden_backoffice_permissions.sql` alinea las políticas de acceso directo de Supabase: restringe borradores públicos, excluye equipos inactivos y evita que lectores escriban en el calendario. Está preparada para revisión y **no se aplica automáticamente a una base de datos remota**. Hasta aplicarla, las comprobaciones del servidor están activas, pero las políticas antiguas de acceso directo siguen existiendo. Los datos públicos de negocio, servicios y horarios mantienen su lectura pública necesaria para las webs.
+`migrations/0001_cloudflare.sql` crea el esquema SQLite de D1, las tablas de NextAuth y los índices. El acceso al binding D1 queda limitado al servidor. Las migraciones PostgreSQL anteriores se conservan como historial en `supabase/migrations`; no se ejecutan sobre D1. Los datos públicos de negocio, servicios y horarios mantienen su lectura pública necesaria para las webs.
 
 ## Verificación
 
 ```sh
 pnpm exec tsx scripts/check-backoffice.ts
 pnpm exec tsx scripts/check-auth-redirects.ts
-python scripts/check-backoffice-rls.py
+pnpm exec tsx scripts/check-cloudflare.ts
 pnpm exec tsc --noEmit
 pnpm lint
 pnpm build
 ```
 
-Las pruebas de TypeScript cubren aislamiento entre negocios, pertenencias pendientes/inactivas, roles falsificados, capacidades, datos inválidos, búsqueda, ordenación, estado de configuración y mensajes de error. La prueba SQL crea una instancia temporal de PostgreSQL en loopback, aplica las migraciones base y el endurecimiento, y comprueba acceso anónimo, de propietario, editor, lector y miembros pendientes/inactivos. Después detiene la instancia y elimina sus datos. Requiere binarios locales de PostgreSQL; se puede indicar su ubicación con `--pg-bin`. Ninguna de estas pruebas se conecta a Supabase ni aplica migraciones a una base de datos remota.
+Las pruebas de TypeScript cubren pertenencias pendientes/inactivas, roles falsificados, capacidades, datos inválidos, búsqueda, ordenación, estado de configuración y errores. La prueba de Cloudflare ejecuta consultas contra D1 local: aislamiento entre negocios, permisos de escritura, campos protegidos, upserts, JSON, rollback e importación. Las antiguas pruebas SQL se conservan solo para el esquema PostgreSQL histórico. Ninguna prueba aplica migraciones a una base remota.

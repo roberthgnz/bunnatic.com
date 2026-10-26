@@ -1,4 +1,4 @@
-import { getProfile, updateProfile } from '@/lib/supabase/actions'
+import { getProfile, updateProfile } from '@/lib/db/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -29,7 +29,7 @@ export default async function ProfilePage({
         'Gestiona tu información personal y cómo te ven los miembros de tu equipo.',
       cardTitle: 'Información personal',
       cardDescription:
-        'Estos datos se usan en tu cuenta y en las comunicaciones de Bunnatic.',
+        'Estos datos se usan en tu cuenta y en las comunicaciones de Locavo.',
       fullName: 'Nombre completo',
       fullNamePlaceholder: 'Ej. Laura Martínez',
       username: 'Nombre de usuario',
@@ -52,7 +52,7 @@ export default async function ProfilePage({
         'Gestiona la teva informació personal i com et veuen els membres del teu equip.',
       cardTitle: 'Informació personal',
       cardDescription:
-        "Aquestes dades s'utilitzen al teu compte i a les comunicacions de Bunnatic.",
+        "Aquestes dades s'utilitzen al teu compte i a les comunicacions de Locavo.",
       fullName: 'Nom complet',
       fullNamePlaceholder: 'Ex. Laura Martínez',
       username: "Nom d'usuari",

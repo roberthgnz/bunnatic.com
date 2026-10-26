@@ -6,7 +6,7 @@ import { buildPageMetadata } from '@/lib/seo'
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Generación Web con IA - Crea tu Sitio en Minutos | Bunnatic',
+    title: 'Generación Web con IA - Crea tu Sitio en Minutos | Locavo',
     description:
       'La IA genera una web completa con textos de venta, estructura optimizada y diseño profesional en minutos. Sin programadores, sin diseñadores. Empieza a captar clientes hoy.',
     esPath: `/caracteristicas/${getFeatureSlug('generacion-ia')}`,

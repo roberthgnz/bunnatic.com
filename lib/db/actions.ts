@@ -1,5 +1,7 @@
 'use server'
 
+import { getCurrentUser } from '@/lib/auth/session'
+
 import { revalidatePath } from 'next/cache'
 import * as backofficeQueries from '@/lib/backoffice/queries'
 import * as serviceActions from '@/lib/backoffice/actions/services'
@@ -17,9 +19,8 @@ import {
 } from '@/lib/backoffice/access'
 import { updateSectionStatus as updateContentStatus } from '@/lib/backoffice/actions/content'
 import type { ServiceInput, WorkingHoursInput } from '@/lib/backoffice/types'
-import { normalizeInternalRedirect } from '@/lib/authRedirect'
-import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/db/server'
+import { env } from 'cloudflare:workers'
 
 import { generateBusinessContent } from '@/lib/ai'
 import {
@@ -169,7 +170,7 @@ function logCloudflareValidationDebug(
 }
 
 const BUSINESS_DOMAINS_TABLE_MISSING_MESSAGE =
-  'Falta la migración de dominios en Supabase. Ejecuta las migraciones y vuelve a intentar.'
+  'Falta la migración de dominios en D1. Ejecuta las migraciones y vuelve a intentar.'
 
 function isBusinessDomainsTableMissing(
   error: { code?: string; message?: string } | null | undefined
@@ -180,7 +181,7 @@ function isBusinessDomainsTableMissing(
 
   return (
     error.code === 'PGRST205' ||
-    error.message?.includes('public.business_domains') === true
+    error.message?.includes('business_domains') === true
   )
 }
 
@@ -196,8 +197,8 @@ function getDomainQueryErrorMessage(error: {
 }
 
 async function getOwnedBusinessBySlug(slug: string, userId: string) {
-  const supabase = await createClient()
-  const { data: business, error } = await supabase
+  const db = await createClient()
+  const { data: business, error } = await db
     .from('businesses')
     .select('id, slug')
     .eq('slug', slug)
@@ -217,47 +218,13 @@ async function getOwnedBusinessBySlug(slug: string, userId: string) {
   return { business }
 }
 
-function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-  if (!url || !serviceRoleKey) {
-    return null
-  }
-
-  return createSupabaseAdminClient(url, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  })
-}
-
-async function findUserIdByEmail(email: string) {
-  const admin = createAdminClient()
-  if (!admin) {
-    return { error: 'No se pudo inicializar el servicio de invitaciones.' }
-  }
-
-  let page = 1
-  const perPage = 200
-
-  while (page <= 10) {
-    const { data, error } = await admin.auth.admin.listUsers({ page, perPage })
-    if (error) {
-      return { error: error.message }
-    }
-
-    const match = data.users.find((user) => user.email?.toLowerCase() === email)
-    if (match?.id) {
-      return { userId: match.id }
-    }
-
-    if (data.users.length < perPage) break
-    page += 1
-  }
-
-  return {}
+async function findUserIdByEmail(
+  email: string
+): Promise<{ userId?: string; error?: string }> {
+  const user = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
+    .bind(email)
+    .first<{ id: string }>()
+  return user ? { userId: user.id } : {}
 }
 
 function getMonthBoundsIso() {
@@ -278,10 +245,10 @@ function getMonthBoundsIso() {
 async function getGenerationEntitlementInternal(
   userId: string
 ): Promise<{ entitlement: GenerationEntitlement } | { error: string }> {
-  const supabase = await createClient()
+  const db = await createClient()
   const { monthStartIso, nextMonthStartIso } = getMonthBoundsIso()
 
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile, error: profileError } = await db
     .from('profiles')
     .select('stripe_price_id')
     .eq('id', userId)
@@ -291,7 +258,7 @@ async function getGenerationEntitlementInternal(
     return { error: profileError.message }
   }
 
-  const { count, error: countError } = await supabase
+  const { count, error: countError } = await db
     .from('business_generation_usage')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
@@ -316,7 +283,7 @@ export async function generateAndApplyContent(
 ) {
   const guard = await authorizeBusinessMutation(businessId, 'content.write')
   if ('error' in guard) return { error: guard.error }
-  const supabase = await createClient()
+  const db = await createClient()
 
   // 1. Generate content
   const { description, services } = await generateBusinessContent(
@@ -325,7 +292,7 @@ export async function generateAndApplyContent(
   )
 
   // 2. Update business description
-  const { error: updateError } = await supabase
+  const { error: updateError } = await db
     .from('businesses')
     .update({ description })
     .eq('id', businessId)
@@ -334,7 +301,7 @@ export async function generateAndApplyContent(
 
   // 3. Create services if any
   if (services && services.length > 0) {
-    const { error: servicesError } = await supabase.from('services').insert(
+    const { error: servicesError } = await db.from('services').insert(
       services.map((s) => ({
         business_id: businessId,
         name: s.name,
@@ -352,10 +319,7 @@ export async function generateAndApplyContent(
 }
 
 export async function getGenerationEntitlement(userId?: string) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -373,10 +337,8 @@ export async function buildBusinessSourcePreview(input: {
   sourceType: SourceType
   sourcePayload: unknown
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -401,7 +363,7 @@ export async function buildBusinessSourcePreview(input: {
   const preview = buildBusinessSourcePreviewPayload(input)
 
   // Consume quota by recording the preview generation
-  const { error: insertError } = await supabase
+  const { error: insertError } = await db
     .from('business_generation_usage')
     .insert({
       user_id: user.id,
@@ -432,10 +394,8 @@ export async function consumeGenerationQuota(
   businessId: string,
   sourceType: SourceType
 ) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
 
   if (!user) {
     return { error: 'Not authenticated', allowed: false as const }
@@ -445,7 +405,7 @@ export async function consumeGenerationQuota(
     return { error: 'Unauthorized', allowed: false as const }
   }
 
-  const { data: business, error: businessError } = await supabase
+  const { data: business, error: businessError } = await db
     .from('businesses')
     .select('id')
     .eq('id', businessId)
@@ -479,7 +439,7 @@ export async function consumeGenerationQuota(
     }
   }
 
-  const { error: insertError } = await supabase
+  const { error: insertError } = await db
     .from('business_generation_usage')
     .insert({
       user_id: user.id,
@@ -513,10 +473,8 @@ export async function applyBusinessSourceGeneration(input: {
   selectedBlocks: SourceBlock[]
   previewPayload: BusinessSourcePreview
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -527,7 +485,7 @@ export async function applyBusinessSourceGeneration(input: {
     return { error: 'Selecciona al menos un bloque para aplicar.' }
   }
 
-  const { data: business, error: businessError } = await supabase
+  const { data: business, error: businessError } = await db
     .from('businesses')
     .select('id, slug')
     .eq('id', input.businessId)
@@ -580,7 +538,7 @@ export async function applyBusinessSourceGeneration(input: {
       profileUpdates.google_place_id = preview.profile.googlePlaceId
     }
 
-    const { error: profileError } = await supabase
+    const { error: profileError } = await db
       .from('businesses')
       .update(profileUpdates)
       .eq('id', input.businessId)
@@ -594,7 +552,7 @@ export async function applyBusinessSourceGeneration(input: {
   }
 
   if (selectedBlocks.includes('services')) {
-    const { error: deleteServicesError } = await supabase
+    const { error: deleteServicesError } = await db
       .from('services')
       .delete()
       .eq('business_id', input.businessId)
@@ -604,17 +562,15 @@ export async function applyBusinessSourceGeneration(input: {
     }
 
     if (preview.services.length > 0) {
-      const { error: insertServicesError } = await supabase
-        .from('services')
-        .insert(
-          preview.services.map((service) => ({
-            business_id: input.businessId,
-            name: service.name,
-            description: service.description || null,
-            price: null,
-            duration: null,
-          }))
-        )
+      const { error: insertServicesError } = await db.from('services').insert(
+        preview.services.map((service) => ({
+          business_id: input.businessId,
+          name: service.name,
+          description: service.description || null,
+          price: null,
+          duration: null,
+        }))
+      )
 
       if (insertServicesError) {
         return { error: insertServicesError.message }
@@ -625,7 +581,7 @@ export async function applyBusinessSourceGeneration(input: {
   }
 
   if (selectedBlocks.includes('hours') && preview.hours.length > 0) {
-    const { error: hoursError } = await supabase.from('working_hours').upsert(
+    const { error: hoursError } = await db.from('working_hours').upsert(
       preview.hours.map((hour) => ({
         business_id: input.businessId,
         day_of_week: hour.day_of_week,
@@ -658,10 +614,8 @@ export async function createBusinessFromPreview(input: {
   sourceType: SourceType
   preview: BusinessSourcePreview
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -678,7 +632,7 @@ export async function createBusinessFromPreview(input: {
     Math.floor(Math.random() * 1000)
 
   // 1. Create Business
-  const { data: business, error: businessError } = await supabase
+  const { data: business, error: businessError } = await db
     .from('businesses')
     .insert({
       user_id: user.id,
@@ -701,7 +655,7 @@ export async function createBusinessFromPreview(input: {
 
   // 2. Create Services
   if (preview.services.length > 0) {
-    const { error: servicesError } = await supabase.from('services').insert(
+    const { error: servicesError } = await db.from('services').insert(
       preview.services.map((s) => ({
         business_id: businessId,
         name: s.name,
@@ -713,7 +667,7 @@ export async function createBusinessFromPreview(input: {
 
   // 3. Create Hours
   if (preview.hours.length > 0) {
-    const { error: hoursError } = await supabase.from('working_hours').insert(
+    const { error: hoursError } = await db.from('working_hours').insert(
       preview.hours.map((h) => ({
         business_id: businessId,
         day_of_week: h.day_of_week,
@@ -771,7 +725,7 @@ export async function createBusinessFromPreview(input: {
     },
   ]
 
-  const { error: sectionsError } = await supabase
+  const { error: sectionsError } = await db
     .from('business_sections')
     .insert(sections.map((s) => ({ ...s, business_id: businessId })))
 
@@ -779,39 +733,6 @@ export async function createBusinessFromPreview(input: {
 
   revalidatePath('/dashboard')
   return { success: true, slug }
-}
-
-export async function signup(formData: FormData) {
-  const supabase = await createClient()
-
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-  const name = formData.get('name') as string
-  const destination = normalizeInternalRedirect(
-    formData.get('redirect'),
-    '/onboarding?step=checkout'
-  )
-  const appUrl = process.env.APP_URL
-
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: appUrl
-        ? new URL(destination, appUrl).toString()
-        : undefined,
-      data: {
-        full_name: name,
-      },
-    },
-  })
-
-  if (error) {
-    return { error: error.message }
-  }
-
-  revalidatePath('/', 'layout')
-  return { success: true }
 }
 
 export async function getUser() {
@@ -823,10 +744,8 @@ export async function getProfile() {
 }
 
 export async function updateProfile(formData: FormData) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -836,7 +755,7 @@ export async function updateProfile(formData: FormData) {
   const username = formData.get('username') as string
   const website = formData.get('website') as string
 
-  const { error } = await supabase
+  const { error } = await db
     .from('profiles')
     .update({
       full_name: fullName,
@@ -854,36 +773,9 @@ export async function updateProfile(formData: FormData) {
   return { success: true }
 }
 
-export async function login(formData: FormData) {
-  const supabase = await createClient()
-
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-
-  if (error) {
-    return { error: error.message }
-  }
-
-  revalidatePath('/', 'layout')
-  return { success: true }
-}
-
-export async function logout() {
-  const supabase = await createClient()
-  await supabase.auth.signOut()
-  revalidatePath('/', 'layout')
-}
-
 export async function createBusinessFromGoogle(placeData: GooglePlaceData) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -898,7 +790,7 @@ export async function createBusinessFromGoogle(placeData: GooglePlaceData) {
     Math.floor(Math.random() * 1000)
 
   // 1. Create Business
-  const { data: business, error: businessError } = await supabase
+  const { data: business, error: businessError } = await db
     .from('businesses')
     .insert({
       user_id: user.id,
@@ -976,7 +868,7 @@ export async function createBusinessFromGoogle(placeData: GooglePlaceData) {
     },
   ]
 
-  const { error: sectionsError } = await supabase
+  const { error: sectionsError } = await db
     .from('business_sections')
     .insert(sections.map((s) => ({ ...s, business_id: businessId })))
 
@@ -998,15 +890,13 @@ export async function createBusinessFromGoogle(placeData: GooglePlaceData) {
 
     // Fill missing days as closed? Or just insert what we have.
     // Let's insert what we have.
-    const { error: hoursError } = await supabase
-      .from('working_hours')
-      .insert(hours)
+    const { error: hoursError } = await db.from('working_hours').insert(hours)
 
     if (hoursError) console.error('Error creating hours', hoursError)
   }
 
   const onboardingCompletedAt = new Date().toISOString()
-  const { error: profileError } = await supabase.from('profiles').upsert(
+  const { error: profileError } = await db.from('profiles').upsert(
     {
       id: user.id,
       onboarding_completed: true,
@@ -1025,10 +915,8 @@ export async function createBusinessFromGoogle(placeData: GooglePlaceData) {
 }
 
 export async function createBusiness(formData: FormData) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
 
   if (!user) {
     return { error: 'Not authenticated' }
@@ -1053,7 +941,7 @@ export async function createBusiness(formData: FormData) {
     }
   }
 
-  const { error } = await supabase.from('businesses').insert({
+  const { error } = await db.from('businesses').insert({
     user_id: user.id,
     name,
     slug,
@@ -1071,7 +959,7 @@ export async function createBusiness(formData: FormData) {
   }
 
   const onboardingCompletedAt = new Date().toISOString()
-  const { error: profileError } = await supabase.from('profiles').upsert(
+  const { error: profileError } = await db.from('profiles').upsert(
     {
       id: user.id,
       onboarding_completed: true,
@@ -1121,10 +1009,8 @@ function computeActivatedAt(
 }
 
 export async function connectBusinessDomain(slug: string, formData: FormData) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
 
   if (!user) {
     return { error: 'Debes iniciar sesión para conectar un dominio.' }
@@ -1152,7 +1038,7 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
 
   const business = ownedBusiness.business
 
-  const { data: collision, error: collisionError } = await supabase
+  const { data: collision, error: collisionError } = await db
     .from('business_domains')
     .select('id, business_id, hostname')
     .eq('hostname', hostname)
@@ -1167,7 +1053,7 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
     return { error: 'Este dominio ya está conectado a otro negocio.' }
   }
 
-  const { data: existingDomain, error: existingError } = await supabase
+  const { data: existingDomain, error: existingError } = await db
     .from('business_domains')
     .select('*')
     .eq('business_id', business.id)
@@ -1242,7 +1128,7 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
       updated_at: new Date().toISOString(),
     }
 
-    const { data: domain, error: upsertError } = await supabase
+    const { data: domain, error: upsertError } = await db
       .from('business_domains')
       .upsert(payload, { onConflict: 'business_id' })
       .select('*')
@@ -1290,10 +1176,8 @@ export async function connectBusinessDomain(slug: string, formData: FormData) {
 }
 
 export async function refreshBusinessDomainStatus(slug: string) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
 
   if (!user) {
     return {
@@ -1307,7 +1191,7 @@ export async function refreshBusinessDomainStatus(slug: string) {
   }
 
   const business = ownedBusiness.business
-  const { data: domain, error: domainError } = await supabase
+  const { data: domain, error: domainError } = await db
     .from('business_domains')
     .select('*')
     .eq('business_id', business.id)
@@ -1330,7 +1214,7 @@ export async function refreshBusinessDomainStatus(slug: string) {
       : await findCloudflareCustomHostnameByHostname(currentDomain.hostname)
 
     if (!cloudflareDomain) {
-      const { data: updatedDomain, error: updateError } = await supabase
+      const { data: updatedDomain, error: updateError } = await db
         .from('business_domains')
         .update({
           status: 'error',
@@ -1361,7 +1245,7 @@ export async function refreshBusinessDomainStatus(slug: string) {
       cloudflareDomain
     )
 
-    const { data: updatedDomain, error: updateError } = await supabase
+    const { data: updatedDomain, error: updateError } = await db
       .from('business_domains')
       .update({
         hostname: cloudflareDomain.hostname.toLowerCase(),
@@ -1413,10 +1297,8 @@ export async function refreshBusinessDomainStatus(slug: string) {
 }
 
 export async function disconnectBusinessDomain(slug: string) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
 
   if (!user) {
     return { error: 'Debes iniciar sesión para desconectar un dominio.' }
@@ -1429,7 +1311,7 @@ export async function disconnectBusinessDomain(slug: string) {
 
   const business = ownedBusiness.business
 
-  const { data: domain, error: domainError } = await supabase
+  const { data: domain, error: domainError } = await db
     .from('business_domains')
     .select('*')
     .eq('business_id', business.id)
@@ -1458,7 +1340,7 @@ export async function disconnectBusinessDomain(slug: string) {
     }
   }
 
-  const { error: deleteError } = await supabase
+  const { error: deleteError } = await db
     .from('business_domains')
     .delete()
     .eq('id', currentDomain.id)
@@ -1518,8 +1400,8 @@ export async function createCalendarEvent(
 // Public Team Management (stored in business_sections)
 export async function getPublicTeamMembers(businessId: string) {
   await requireBusinessAccess(businessId)
-  const supabase = await createClient()
-  const { data: section } = await supabase
+  const db = await createClient()
+  const { data: section } = await db
     .from('business_sections')
     .select('content')
     .eq('business_id', businessId)
@@ -1536,11 +1418,9 @@ export async function getPublicTeamMembers(businessId: string) {
 export async function createTeamMember(businessId: string, formData: FormData) {
   const guard = await authorizeBusinessMutation(businessId, 'content.write')
   if ('error' in guard) return { error: guard.error }
-  const supabase = await createClient()
+  const db = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
   const name = formData.get('name') as string
@@ -1548,7 +1428,7 @@ export async function createTeamMember(businessId: string, formData: FormData) {
   const imageUrl = formData.get('image_url') as string
 
   // Get existing section
-  const { data: section } = await supabase
+  const { data: section } = await db
     .from('business_sections')
     .select('*')
     .eq('business_id', businessId)
@@ -1566,7 +1446,7 @@ export async function createTeamMember(businessId: string, formData: FormData) {
   const updatedMembers = [...members, newMember]
 
   if (section) {
-    const { error } = await supabase
+    const { error } = await db
       .from('business_sections')
       .update({
         content: { ...(section.content as object), members: updatedMembers },
@@ -1576,7 +1456,7 @@ export async function createTeamMember(businessId: string, formData: FormData) {
 
     if (error) return { error: error.message }
   } else {
-    const { error } = await supabase.from('business_sections').insert({
+    const { error } = await db.from('business_sections').insert({
       business_id: businessId,
       type: 'team',
       order_index: 10,
@@ -1593,14 +1473,12 @@ export async function createTeamMember(businessId: string, formData: FormData) {
 export async function deleteTeamMember(businessId: string, memberId: string) {
   const guard = await authorizeBusinessMutation(businessId, 'content.write')
   if ('error' in guard) return { error: guard.error }
-  const supabase = await createClient()
+  const db = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
-  const { data: section } = await supabase
+  const { data: section } = await db
     .from('business_sections')
     .select('*')
     .eq('business_id', businessId)
@@ -1612,7 +1490,7 @@ export async function deleteTeamMember(businessId: string, memberId: string) {
   const members = parseTeamMembers(section.content)
   const updatedMembers = members.filter((member) => member.id !== memberId)
 
-  const { error } = await supabase
+  const { error } = await db
     .from('business_sections')
     .update({
       content: { ...(section.content as object), members: updatedMembers },
@@ -1629,8 +1507,8 @@ export async function deleteTeamMember(businessId: string, memberId: string) {
 // Audit Logs
 export async function getAuditLogs(businessId: string) {
   await requireBusinessAccess(businessId)
-  const supabase = await createClient()
-  const { data: logs } = await supabase
+  const db = await createClient()
+  const { data: logs } = await db
     .from('audit_logs')
     .select(
       `
@@ -1657,8 +1535,8 @@ export async function updateSectionStatus(sectionId: string, status: string) {
 // Team Members
 export async function getTeamMembers(businessId: string) {
   await requireBusinessAccess(businessId)
-  const supabase = await createClient()
-  const { data: members } = await supabase
+  const db = await createClient()
+  const { data: members } = await db
     .from('team_members')
     .select(
       `
@@ -1676,10 +1554,8 @@ export async function inviteTeamMember(
   email: string,
   role: string
 ) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const db = await createClient()
+  const user = await getCurrentUser()
   const normalizedEmail = email.trim().toLowerCase()
   const normalizedRole = role.trim().toLowerCase()
   const allowedRoles = ['admin', 'editor', 'viewer']
@@ -1696,7 +1572,7 @@ export async function inviteTeamMember(
     return { error: 'Rol no válido.' }
   }
 
-  const { data: business } = await supabase
+  const { data: business } = await db
     .from('businesses')
     .select('id')
     .eq('id', businessId)
@@ -1721,7 +1597,7 @@ export async function inviteTeamMember(
     }
   }
 
-  const { data: existing } = await supabase
+  const { data: existing } = await db
     .from('team_members')
     .select('id, status')
     .eq('business_id', businessId)
@@ -1741,8 +1617,15 @@ export async function inviteTeamMember(
   }
 
   const { error } = existing
-    ? await supabase.from('team_members').update(payload).eq('id', existing.id)
-    : await supabase.from('team_members').insert(payload)
+    ? await db
+        .from('team_members')
+        .update({
+          invited_email: normalizedEmail,
+          role: normalizedRole,
+          status: 'active',
+        })
+        .eq('id', existing.id)
+    : await db.from('team_members').insert(payload)
 
   if (error) {
     return { error: error.message }
@@ -1766,14 +1649,14 @@ export async function deleteService(serviceId: string) {
 }
 
 export async function submitLead(formData: FormData) {
-  const supabase = await createClient()
+  const db = await createClient()
   const businessId = formData.get('businessId') as string
   const name = formData.get('name') as string
   const email = formData.get('email') as string
   const phone = formData.get('phone') as string
   const message = formData.get('message') as string
 
-  const { error } = await supabase.from('leads').insert({
+  const { error } = await db.from('leads').insert({
     business_id: businessId,
     name,
     email,

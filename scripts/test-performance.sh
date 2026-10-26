@@ -3,7 +3,7 @@
 # Performance Testing Script
 # Run Lighthouse audits and compare results
 
-echo "🚀 Bunnatic Performance Testing"
+echo "🚀 Locavo Performance Testing"
 echo "================================"
 echo ""
 
@@ -14,7 +14,7 @@ if ! command -v lighthouse &> /dev/null; then
 fi
 
 # URLs to test
-PROD_URL="https://www.bunnatic.com/"
+PROD_URL="https://www.locavo.com/"
 LOCAL_URL="http://localhost:3000/"
 
 # Create reports directory
@@ -43,7 +43,7 @@ run_lighthouse() {
 
 # Main menu
 echo "Select test option:"
-echo "1) Test Production (www.bunnatic.com)"
+echo "1) Test Production (www.locavo.com)"
 echo "2) Test Local (localhost:3000)"
 echo "3) Test Both and Compare"
 echo ""

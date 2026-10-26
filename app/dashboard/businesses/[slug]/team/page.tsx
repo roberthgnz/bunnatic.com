@@ -2,7 +2,7 @@ import { findBusinessAccessBySlug } from '@/lib/backoffice/access'
 import { hasBusinessPermission } from '@/lib/backoffice/policy'
 import { notFound } from 'next/navigation'
 import TeamManager from '../_components/TeamManager'
-import { getPublicTeamMembers } from '@/lib/supabase/actions'
+import { getPublicTeamMembers } from '@/lib/db/actions'
 
 export default async function BusinessTeamPage({
   params,

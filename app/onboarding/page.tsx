@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { createBusiness } from '@/lib/supabase/actions'
+import { createBusiness } from '@/lib/db/actions'
 import { toast } from 'sonner'
 import {
   ArrowLeft,
@@ -230,7 +230,7 @@ function OnboardingContent() {
     submitting: 'Creando negocio…',
     previewLabel: 'Vista previa',
     previewTitle: 'Tu negocio',
-    previewUrl: 'tunegocio.bunnatic.com',
+    previewUrl: 'tunegocio.locavo.com',
     previewCta: 'Contactar',
   }
 
@@ -398,7 +398,7 @@ function OnboardingContent() {
     ? formData.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '') + '.bunnatic.com'
+        .replace(/(^-|-$)/g, '') + '.locavo.com'
     : t.previewUrl
 
   return (

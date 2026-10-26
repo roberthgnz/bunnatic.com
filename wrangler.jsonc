@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "locavo",
+  "main": "vinext/server/app-router-entry",
+  "compatibility_date": "2026-10-26",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "not_found_handling": "none" },
+  "observability": { "enabled": true, "traces": { "enabled": true } },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "locavo",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "kv_namespaces": [{ "binding": "GENERATION_STATE" }],
+}

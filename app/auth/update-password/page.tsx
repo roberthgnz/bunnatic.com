@@ -1,5 +1,6 @@
 'use client'
 
+
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
@@ -10,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { AuthShell } from '@/components/auth/AuthShell'
 import { FieldError } from '@/components/auth/FieldError'
-import { createClient } from '@/lib/supabase/client'
+import { canUpdatePassword, updatePassword } from '@/lib/auth/actions'
 import { normalizeInternalRedirect } from '@/lib/authRedirect'
 import { cn } from '@/lib/utils'
 
@@ -46,7 +47,7 @@ export default function UpdatePasswordPage() {
 function UpdatePasswordContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const tokenHash = searchParams.get('token_hash')
+  const tokenHash = searchParams.get('token')
   const next = normalizeInternalRedirect(searchParams.get('next'))
 
   const [status, setStatus] = useState<Status>('verifying')
@@ -59,22 +60,9 @@ function UpdatePasswordContent() {
 
   useEffect(() => {
     let cancelled = false
-    const supabase = createClient()
-
     async function verify() {
-      if (tokenHash) {
-        const { error: otpError } = await supabase.auth.verifyOtp({
-          type: 'recovery',
-          token_hash: tokenHash,
-        })
-        if (!cancelled) setStatus(otpError ? 'invalid' : 'ready')
-        return
-      }
-      // No token: allow signed-in users to change their password directly.
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!cancelled) setStatus(user ? 'ready' : 'invalid')
+      const allowed = await canUpdatePassword(tokenHash)
+      if (!cancelled) setStatus(allowed ? 'ready' : 'invalid')
     }
 
     verify()
@@ -99,21 +87,12 @@ function UpdatePasswordContent() {
     setConfirmError(undefined)
     setSubmitting(true)
 
-    const supabase = createClient()
-    const { error: updateError } = await supabase.auth.updateUser({ password })
+    const result = await updatePassword(password, tokenHash)
     setSubmitting(false)
-
-    if (updateError) {
-      setError(
-        updateError.code === 'same_password'
-          ? 'La nueva contraseña debe ser distinta de la anterior.'
-          : 'No hemos podido guardar la contraseña. Inténtalo de nuevo.'
-      )
-      return
-    }
+    if (result.error) { setError(result.error); return }
 
     toast.success('Contraseña actualizada')
-    router.replace(next)
+    router.replace(`/signin?next=${encodeURIComponent(next)}`)
     router.refresh()
   }
 

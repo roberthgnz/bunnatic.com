@@ -1,7 +1,7 @@
 # Performance Testing Script for Windows PowerShell
 # Run Lighthouse audits and compare results
 
-Write-Host "🚀 Bunnatic Performance Testing" -ForegroundColor Cyan
+Write-Host "🚀 Locavo Performance Testing" -ForegroundColor Cyan
 Write-Host "================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -13,7 +13,7 @@ if (-not $lighthouseInstalled) {
 }
 
 # URLs to test
-$PROD_URL = "https://www.bunnatic.com/"
+$PROD_URL = "https://www.locavo.com/"
 $LOCAL_URL = "http://localhost:3000/"
 
 # Create reports directory
@@ -48,7 +48,7 @@ function Run-Lighthouse {
 
 # Main menu
 Write-Host "Select test option:" -ForegroundColor Yellow
-Write-Host "1) Test Production (www.bunnatic.com)"
+Write-Host "1) Test Production (www.locavo.com)"
 Write-Host "2) Test Local (localhost:3000)"
 Write-Host "3) Test Both and Compare"
 Write-Host ""

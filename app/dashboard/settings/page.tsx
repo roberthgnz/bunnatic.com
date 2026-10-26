@@ -94,7 +94,7 @@ export default async function DashboardSettingsPage({
       },
       securityGroup: {
         title: 'Seguridad',
-        description: 'Controla cómo accedes a Bunnatic.',
+        description: 'Controla cómo accedes a Locavo.',
       },
       profile: {
         title: 'Perfil',
@@ -123,7 +123,7 @@ export default async function DashboardSettingsPage({
       },
       securityGroup: {
         title: 'Seguretat',
-        description: 'Controla com accedeixes a Bunnatic.',
+        description: 'Controla com accedeixes a Locavo.',
       },
       profile: {
         title: 'Perfil',

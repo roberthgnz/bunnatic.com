@@ -16,9 +16,10 @@ import {
   createSigninSchema,
   type SigninFormValues,
 } from '@/lib/validations/signin'
-import { login } from '@/lib/supabase/actions'
+import { login } from '@/lib/auth/actions'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
+import { signIn } from 'next-auth/react'
+import { normalizeInternalRedirect } from '@/lib/authRedirect'
 
 const signInContent = {
   signin: {
@@ -69,7 +70,7 @@ function SignInContent() {
       searchParams.get('to') ??
       '/dashboard'
 
-    return redirectRaw
+    return normalizeInternalRedirect(redirectRaw)
   }, [searchParams])
 
   const signupHref = useMemo(() => {
@@ -112,17 +113,7 @@ function SignInContent() {
   }
 
   const handleSocialLogin = async () => {
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(flow)}`,
-      },
-    })
-
-    if (error) {
-      toast.error(error.message)
-    }
+    await signIn('google', { redirectTo: flow })
   }
 
   const switchLink = (

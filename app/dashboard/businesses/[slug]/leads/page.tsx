@@ -21,5 +21,5 @@ export default async function BusinessLeadsPage({
 
   const leads = await getLeads(business.id)
 
-  return <LeadsViewer leads={leads} />
+  return <LeadsViewer leads={leads.map(lead => ({ ...lead, message: lead.message ?? '' }))} />
 }

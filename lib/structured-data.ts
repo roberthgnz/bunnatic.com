@@ -61,12 +61,12 @@ export function getOrganizationSchema(): OrganizationSchema {
     return {
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: 'Bunnatic',
+        name: 'Locavo',
         url: baseUrl,
         logo: `${baseUrl}/logo.png`,
         sameAs: [
-            'https://twitter.com/bunnatic',
-            'https://www.linkedin.com/company/bunnatic',
+            'https://twitter.com/locavo',
+            'https://www.linkedin.com/company/locavo',
         ],
         contactPoint: {
             '@type': 'ContactPoint',
@@ -81,7 +81,7 @@ export function getWebSiteSchema(): WebSiteSchema {
     return {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        name: 'Bunnatic',
+        name: 'Locavo',
         url: baseUrl,
         description:
             'Crea una web profesional para tu negocio local con IA en minutos. Optimizada para SEO local y captación de clientes.',

@@ -6,7 +6,7 @@ import { buildPageMetadata } from '@/lib/seo'
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Formularios de Contacto y WhatsApp - Capta Clientes | Bunnatic',
+    title: 'Formularios de Contacto y WhatsApp - Capta Clientes | Locavo',
     description:
       'Convierte visitas en clientes con formularios optimizados, botón de WhatsApp y llamadas a la acción estratégicas. Recibe leads cualificados al instante.',
     esPath: `/caracteristicas/${getFeatureSlug('formularios-contacto')}`,

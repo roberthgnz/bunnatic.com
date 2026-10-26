@@ -35,7 +35,7 @@ export function AuthShell({ variant, headerAction, children }: AuthShellProps) {
         </main>
 
         <footer className="text-muted-foreground flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs">
-          <p>© {new Date().getFullYear()} Bunnatic</p>
+          <p>© {new Date().getFullYear()} Locavo</p>
           <nav aria-label="Enlaces legales" className="flex gap-5">
             <Link
               href="/aviso-legal"
@@ -95,11 +95,11 @@ const panelCopy: Record<
 function AuthBrandPanel({ variant }: { variant: AuthVariant }) {
   const copy = panelCopy[variant]
   const example = siteExamples[0]
-  const domain = `${example.name.toLowerCase().replaceAll(' ', '')}.bunnatic.com`
+  const domain = `${example.name.toLowerCase().replaceAll(' ', '')}.locavo.com`
 
   return (
     <aside
-      aria-label="Por qué Bunnatic"
+      aria-label="Por qué Locavo"
       className="relative hidden p-3 lg:block"
     >
       <div className="bg-primary text-primary-foreground sticky top-3 flex h-[calc(100svh-1.5rem)] flex-col overflow-hidden rounded-[28px] px-10 py-10 xl:px-14 xl:py-12">

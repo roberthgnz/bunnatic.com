@@ -1,5 +1,6 @@
 'use client'
 
+
 import { content } from '@/lib/content'
 import { Button } from '@/components/ui/button'
 import {
@@ -23,12 +24,11 @@ import {
 import Link from 'next/link'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { getFeatureSlug } from '@/lib/pageSlugs'
-import { createClient } from '@/lib/supabase/client'
+import { getSession, signOut } from 'next-auth/react'
 import { Suspense, useEffect, useState } from 'react'
-import { logout } from '@/lib/supabase/actions'
 import { toast } from 'sonner'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
+import type { Session } from 'next-auth'
 
 type NavbarProps = {
   useDemoCta?: boolean
@@ -52,7 +52,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const paramsText = searchParams.toString()
-  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [user, setUser] = useState<Session['user'] | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigationLinks =
     pathname === '/'
@@ -80,26 +80,16 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   }, [mobileMenuOpen])
 
   useEffect(() => {
-    const supabase = createClient()
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
-    }
-    getUser()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
+    let active = true
+    const refresh = async () => { const session = await getSession(); if (active) setUser(session?.user ?? null) }
+    void refresh()
+    window.addEventListener('focus', refresh)
+    return () => { active = false; window.removeEventListener('focus', refresh) }
   }, [])
 
   async function handleLogout() {
-    await logout()
+    await signOut({ redirect: false })
+    setUser(null)
     toast.success('Has cerrado sesión')
     router.refresh()
   }
@@ -137,7 +127,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   const logoutLabel = 'Cerrar sesión'
 
   // Get user initials for avatar
-  const getUserInitials = (email: string | undefined) => {
+  const getUserInitials = (email: string | null | undefined) => {
     if (!email) return 'U'
     const parts = email.split('@')[0].split('.')
     if (parts.length >= 2) {

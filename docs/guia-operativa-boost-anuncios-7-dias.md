@@ -465,7 +465,7 @@ Motivo:
 Usa esta base y luego cambia el concepto central:
 
 ```text
-Create a static Instagram sponsored ad for a SaaS product called Bunnatic aimed at restaurant owners in Spain. This is a paid social performance marketing ad, not an editorial social post. 4:5 vertical layout for Instagram feed, 1080x1350, clean white or warm cream background, high contrast, direct response design, clear advertising hierarchy, large empty headline area at the top, central product mockup area, clean CTA button area at the bottom, realistic website preview on a phone or browser frame, trustworthy, simple, commercial, conversion-focused, no stock-photo people, no lifestyle influencer aesthetic, no magazine look, no dark luxury style, no neon, no clutter, no watermark, no unreadable text. Leave clean empty zones for adding Spanish headline, labels and CTA later in Canva.
+Create a static Instagram sponsored ad for a SaaS product called Locavo aimed at restaurant owners in Spain. This is a paid social performance marketing ad, not an editorial social post. 4:5 vertical layout for Instagram feed, 1080x1350, clean white or warm cream background, high contrast, direct response design, clear advertising hierarchy, large empty headline area at the top, central product mockup area, clean CTA button area at the bottom, realistic website preview on a phone or browser frame, trustworthy, simple, commercial, conversion-focused, no stock-photo people, no lifestyle influencer aesthetic, no magazine look, no dark luxury style, no neon, no clutter, no watermark, no unreadable text. Leave clean empty zones for adding Spanish headline, labels and CTA later in Canva.
 ```
 
 ### Prompt Dia 1 - Dolor
@@ -475,7 +475,7 @@ Usalo para la imagen:
 - `Te encuentran, pero no te reservan`
 
 ```text
-Create a static Instagram sponsored ad for Bunnatic, a SaaS that helps local businesses create conversion-focused websites. Target audience: restaurant owners in Spain. This must look like a paid social ad for lead generation, not a branded editorial post. 4:5 vertical ad layout, white or light cream background, bold headline area at the top left, split-screen composition in the center: on the left a realistic but weak Google Business Profile or Instagram business profile for a restaurant with unclear call-to-action, on the right a cleaner, more professional website preview with clear booking/contact structure. Add small visual cues like simple warning tags on the left and cleaner conversion cues on the right. Strong direct-response layout, high contrast, commercial feel, realistic UI, mobile-first composition, clear bottom area reserved for CTA button. No people, no food photography hero shots, no decorative clutter, no unreadable text, no fake logos, no purple neon, no editorial fashion style.
+Create a static Instagram sponsored ad for Locavo, a SaaS that helps local businesses create conversion-focused websites. Target audience: restaurant owners in Spain. This must look like a paid social ad for lead generation, not a branded editorial post. 4:5 vertical ad layout, white or light cream background, bold headline area at the top left, split-screen composition in the center: on the left a realistic but weak Google Business Profile or Instagram business profile for a restaurant with unclear call-to-action, on the right a cleaner, more professional website preview with clear booking/contact structure. Add small visual cues like simple warning tags on the left and cleaner conversion cues on the right. Strong direct-response layout, high contrast, commercial feel, realistic UI, mobile-first composition, clear bottom area reserved for CTA button. No people, no food photography hero shots, no decorative clutter, no unreadable text, no fake logos, no purple neon, no editorial fashion style.
 ```
 
 Texto que luego pondras en Canva:
@@ -491,7 +491,7 @@ Usalo para la imagen:
 - `De ficha suelta a web clara`
 
 ```text
-Create a static Instagram sponsored ad for Bunnatic, aimed at restaurant owners in Spain. Make it clearly look like a paid Meta ad designed for clicks. 4:5 vertical format, clean bright background, simple direct-response design, large text-safe area at the top, strong before-and-after comparison in the center. Left side: weak online presence, such as a bare restaurant profile or outdated simple page. Right side: a polished conversion-oriented website preview with clear CTA, contact block, reservation section and structured layout. Use obvious visual contrast between before and after. Include small empty label zones for "Antes" and "Despues" and a clean CTA space at the bottom. Commercial, sharp, trustworthy, high clarity, no lifestyle photography, no editorial art direction, no clutter, no unreadable text, no busy background.
+Create a static Instagram sponsored ad for Locavo, aimed at restaurant owners in Spain. Make it clearly look like a paid Meta ad designed for clicks. 4:5 vertical format, clean bright background, simple direct-response design, large text-safe area at the top, strong before-and-after comparison in the center. Left side: weak online presence, such as a bare restaurant profile or outdated simple page. Right side: a polished conversion-oriented website preview with clear CTA, contact block, reservation section and structured layout. Use obvious visual contrast between before and after. Include small empty label zones for "Antes" and "Despues" and a clean CTA space at the bottom. Commercial, sharp, trustworthy, high clarity, no lifestyle photography, no editorial art direction, no clutter, no unreadable text, no busy background.
 ```
 
 Texto que luego pondras en Canva:
@@ -508,7 +508,7 @@ Usalo para la imagen:
 - `Estas perdiendo reservas`
 
 ```text
-Create a static Instagram sponsored ad for Bunnatic, targeting restaurant owners in Spain. The image must feel like a direct-response ad focused on conversion loss. 4:5 vertical paid social ad, clean background, bold empty headline area at the top, one main central screenshot of a weak restaurant online presence, with three small warning badge zones around it to highlight missing conversion elements like no visible booking, no clear CTA, no fast contact. At the bottom, leave space for a short urgency sentence and a CTA button. High contrast, commercial ad design, mobile-first, serious business tone, realistic UI, no people, no stock imagery, no lifestyle content, no complex illustrations, no unreadable text, no luxury branding style.
+Create a static Instagram sponsored ad for Locavo, targeting restaurant owners in Spain. The image must feel like a direct-response ad focused on conversion loss. 4:5 vertical paid social ad, clean background, bold empty headline area at the top, one main central screenshot of a weak restaurant online presence, with three small warning badge zones around it to highlight missing conversion elements like no visible booking, no clear CTA, no fast contact. At the bottom, leave space for a short urgency sentence and a CTA button. High contrast, commercial ad design, mobile-first, serious business tone, realistic UI, no people, no stock imagery, no lifestyle content, no complex illustrations, no unreadable text, no luxury branding style.
 ```
 
 Texto que luego pondras en Canva:
@@ -523,7 +523,7 @@ Texto que luego pondras en Canva:
 Usalo para repetir la idea que mejor funcione.
 
 ```text
-Create a static Instagram sponsored ad for Bunnatic, a website SaaS for local businesses in Spain. This is a performance marketing ad variant for A/B testing, not a brand awareness visual. 4:5 vertical layout, clean light background, strong direct-response structure, large top area reserved for a new headline, center area showing a website improvement concept for a restaurant business, bottom CTA area. The design should feel like a conversion-focused paid ad with a simple hierarchy, bold contrast, modern sans serif style and obvious product clarity. Keep the visual structure similar to a winning Meta ad creative but change the central example and balance so it feels like a new variant. No people, no influencer feel, no editorial design, no excessive decoration, no unreadable text.
+Create a static Instagram sponsored ad for Locavo, a website SaaS for local businesses in Spain. This is a performance marketing ad variant for A/B testing, not a brand awareness visual. 4:5 vertical layout, clean light background, strong direct-response structure, large top area reserved for a new headline, center area showing a website improvement concept for a restaurant business, bottom CTA area. The design should feel like a conversion-focused paid ad with a simple hierarchy, bold contrast, modern sans serif style and obvious product clarity. Keep the visual structure similar to a winning Meta ad creative but change the central example and balance so it feels like a new variant. No people, no influencer feel, no editorial design, no excessive decoration, no unreadable text.
 ```
 
 Texto que luego pondras en Canva:
@@ -542,7 +542,7 @@ Usalo para la imagen:
 - `Asi podria quedar tu negocio`
 
 ```text
-Create a static Instagram sponsored ad for Bunnatic aimed at restaurant owners in Spain. Make it look like a paid social ad that showcases the final result of the product. 4:5 vertical format, clean white or warm neutral background, large top text-safe area, one dominant central website preview mockup filling most of the composition, clear room for a small honesty label such as real example or simulation, bottom area for three short benefit bullets and a CTA button. The overall style must be practical, trustworthy, conversion-focused and clearly commercial. No decorative noise, no stock people, no editorial mood, no dark dramatic lighting, no unreadable text. The website preview should feel realistic and useful for a local restaurant business.
+Create a static Instagram sponsored ad for Locavo aimed at restaurant owners in Spain. Make it look like a paid social ad that showcases the final result of the product. 4:5 vertical format, clean white or warm neutral background, large top text-safe area, one dominant central website preview mockup filling most of the composition, clear room for a small honesty label such as real example or simulation, bottom area for three short benefit bullets and a CTA button. The overall style must be practical, trustworthy, conversion-focused and clearly commercial. No decorative noise, no stock people, no editorial mood, no dark dramatic lighting, no unreadable text. The website preview should feel realistic and useful for a local restaurant business.
 ```
 
 Texto que luego pondras en Canva:
@@ -563,7 +563,7 @@ Formato:
 #### Story 1
 
 ```text
-Create an Instagram Story sponsored ad background for Bunnatic, targeting restaurant owners in Spain. This is a paid story ad for message generation, not a lifestyle story. Vertical 9:16, clean high-contrast layout, bold empty text area in the center, subtle business/website context in the background, simple ad composition, no people, no clutter, no unreadable text, no influencer aesthetic. Leave space for a big question and a poll sticker.
+Create an Instagram Story sponsored ad background for Locavo, targeting restaurant owners in Spain. This is a paid story ad for message generation, not a lifestyle story. Vertical 9:16, clean high-contrast layout, bold empty text area in the center, subtle business/website context in the background, simple ad composition, no people, no clutter, no unreadable text, no influencer aesthetic. Leave space for a big question and a poll sticker.
 ```
 
 Texto que luego pondras:
@@ -573,7 +573,7 @@ Texto que luego pondras:
 #### Story 2
 
 ```text
-Create an Instagram Story sponsored ad background for Bunnatic showing a realistic website preview improvement for a restaurant business in Spain. This is a paid social story ad designed to start DMs. 9:16 vertical, clean light background, central product preview, clear text-safe area for a short advisory sentence, simple direct-response composition, no editorial style, no people, no clutter, no unreadable text.
+Create an Instagram Story sponsored ad background for Locavo showing a realistic website preview improvement for a restaurant business in Spain. This is a paid social story ad designed to start DMs. 9:16 vertical, clean light background, central product preview, clear text-safe area for a short advisory sentence, simple direct-response composition, no editorial style, no people, no clutter, no unreadable text.
 ```
 
 Texto que luego pondras:
@@ -583,7 +583,7 @@ Texto que luego pondras:
 #### Story 3
 
 ```text
-Create an Instagram Story sponsored ad background for Bunnatic, optimized for direct message response. 9:16 vertical paid story ad, bold CTA area in the center, clean minimal background, strong contrast, simple conversion-focused layout, no people, no lifestyle feel, no editorial style, no clutter, no unreadable text. Leave clear space for a short CTA sentence.
+Create an Instagram Story sponsored ad background for Locavo, optimized for direct message response. 9:16 vertical paid story ad, bold CTA area in the center, clean minimal background, strong contrast, simple conversion-focused layout, no people, no lifestyle feel, no editorial style, no clutter, no unreadable text. Leave clear space for a short CTA sentence.
 ```
 
 Texto que luego pondras:

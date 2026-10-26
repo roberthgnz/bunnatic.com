@@ -1,20 +1,20 @@
+
+import { getCurrentUser } from '@/lib/auth/session'
 import DashboardPricing from '@/components/DashboardPricing'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db/server'
 import { mapStripePriceIdToGenerationPlan } from '@/lib/businessSourceGeneration'
 
 export const metadata: Metadata = {
-  title: 'Suscripción - Bunnatic',
+  title: 'Suscripción - Locavo',
   description: 'Gestiona tu plan de suscripción.',
 }
 
 export default async function SubscriptionPage() {
-  const supabase = await createClient()
+  const db = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
 
   let currentPlan = 'starter'
   let currentPriceId = null
@@ -23,7 +23,7 @@ export default async function SubscriptionPage() {
   let isTrialActive = false
 
   if (user) {
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select(
         'stripe_price_id, stripe_subscription_id, trial_ends_at, stripe_current_period_end'

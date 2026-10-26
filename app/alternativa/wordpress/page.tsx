@@ -17,8 +17,8 @@ export async function generateMetadata({
     locale: safeLocale,
     title:
       safeLocale === 'ca'
-        ? 'Alternativa a WordPress sense Complexitat Tècnica | Bunnatic'
-        : 'Alternativa a WordPress sin Complejidad Técnica | Bunnatic',
+        ? 'Alternativa a WordPress sense Complexitat Tècnica | Locavo'
+        : 'Alternativa a WordPress sin Complejidad Técnica | Locavo',
     description:
       safeLocale === 'ca'
         ? 'Publica i edita la teva web sense plugins, actualitzacions ni manteniment tècnic constant. Més simple, més ràpid, més enfocada a captar clients.'
@@ -65,7 +65,7 @@ export default function AlternativeWordpressPage() {
             'Riesgo técnico si algo rompe tras una actualización.',
             'Necesidad de proveedor externo para cambios rápidos.',
           ],
-          novaCardTitle: 'Con Bunnatic',
+          novaCardTitle: 'Con Locavo',
           novaItems: [
             'Configuración inicial en minutos y sin curva técnica.',
             'Editor visual con recomendaciones de IA para mejorar textos y secciones comerciales al instante.',
@@ -132,7 +132,7 @@ export default function AlternativeWordpressPage() {
             "Risc tècnic si alguna cosa es trenca després d'actualitzar.",
             'Necessitat de proveïdor extern per canvis ràpids.',
           ],
-          novaCardTitle: 'Amb Bunnatic',
+          novaCardTitle: 'Amb Locavo',
           novaItems: [
             'Configuració inicial en minuts i sense corba tècnica.',
             "Editor visual amb recomanacions d'IA per millorar textos i seccions comercials a l'instant.",

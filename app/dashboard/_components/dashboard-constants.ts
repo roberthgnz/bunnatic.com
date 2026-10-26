@@ -1,5 +1,5 @@
 export const dashboardContent = {
-  title: 'Bunnatic',
+  title: 'Locavo',
   enterprise: 'Enterprise',
   platform: 'Plataforma',
   businesses: 'Negocios',

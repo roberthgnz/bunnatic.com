@@ -13,7 +13,7 @@ export async function createCalendarEvent(
   type: string
 ): Promise<ActionResult> {
   try {
-    const { supabase, business, user } = await requireBusinessAccess(
+    const { db, business, user } = await requireBusinessAccess(
       businessId,
       'calendar.write'
     )
@@ -29,7 +29,7 @@ export async function createCalendarEvent(
           'Revisa el título y las fechas del evento. El fin debe ser posterior al inicio.',
       }
     const event = parsed.data
-    const { error } = await supabase.from('calendar_events').insert({
+    const { error } = await db.from('calendar_events').insert({
       business_id: businessId,
       title: event.title,
       start_time: event.start.toISOString(),

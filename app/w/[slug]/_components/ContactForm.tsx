@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { submitLead } from '@/lib/supabase/actions'
+import { submitLead } from '@/lib/db/actions'
 import { AlertCircle, CheckCircle2, Loader2, Send } from 'lucide-react'
 
 type FieldName = 'name' | 'email' | 'phone' | 'message'

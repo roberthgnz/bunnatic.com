@@ -1,6 +1,6 @@
 export const content = {
   navbar: {
-    logo: 'Bunnatic',
+    logo: 'Locavo',
     platformLabel: 'Características',
     coreFeaturesLabel: 'Características',
     coreFeatures: [
@@ -35,7 +35,7 @@ export const content = {
       '🏘 Inmobiliarias',
       '🔧 Talleres',
     ],
-    text1: 'Más de 1,200 negocios ya tienen su web con novaweb',
+    text1: 'Más de 1,200 negocios ya tienen su web con locavo',
     text2:
       'Hostal El Pueblo · Carlos R Apuntería · Anni R Veterinaria · Jose · Librería · Joana · Ofimac · Loli D Ofimac',
   },
@@ -163,8 +163,8 @@ export const content = {
             'Tus clientes se distraen con otras publicaciones',
           ],
         },
-        novaweb: {
-          title: 'Con Bunnatic',
+        locavo: {
+          title: 'Con Locavo',
           items: [
             'Eres dueño de tu presencia online',
             'SEO local para aparecer en Google',
@@ -189,8 +189,8 @@ export const content = {
             'Dependes de una red social de terceros',
           ],
         },
-        novaweb: {
-          title: 'Con Bunnatic',
+        locavo: {
+          title: 'Con Locavo',
           items: [
             'Toda tu información estructurada y clara',
             'Formularios de contacto directos',
@@ -215,8 +215,8 @@ export const content = {
             'No puedes tener un formulario de contacto propio',
           ],
         },
-        novaweb: {
-          title: 'Con Bunnatic (+ Google)',
+        locavo: {
+          title: 'Con Locavo (+ Google)',
           items: [
             'Muestras tu propuesta de valor completa',
             'Diseño que transmite confianza y profesionalidad',
@@ -241,8 +241,8 @@ export const content = {
             'Necesitas buscar hosting y dominio aparte',
           ],
         },
-        novaweb: {
-          title: 'Con Bunnatic',
+        locavo: {
+          title: 'Con Locavo',
           items: [
             'Lista en 5 minutos con IA',
             'Cero mantenimiento técnico',
@@ -256,7 +256,7 @@ export const content = {
       id: 'wix',
       name: 'Wix',
       description:
-        'Wix te hace empezar desde cero con plantillas genéricas. Bunnatic genera tu web con IA usando los datos reales de tu negocio.',
+        'Wix te hace empezar desde cero con plantillas genéricas. Locavo genera tu web con IA usando los datos reales de tu negocio.',
       comparison: {
         competitor: {
           title: 'Con Wix',
@@ -268,8 +268,8 @@ export const content = {
             'Soporte técnico limitado',
           ],
         },
-        novaweb: {
-          title: 'Con Bunnatic',
+        locavo: {
+          title: 'Con Locavo',
           items: [
             'La IA escribe los textos por ti',
             'Diseño automático optimizado',
@@ -284,7 +284,7 @@ export const content = {
       id: 'squarespace',
       name: 'Squarespace',
       description:
-        'Squarespace es bonito pero caro y pensado para diseñadores. Bunnatic está pensado para dueños de negocios locales.',
+        'Squarespace es bonito pero caro y pensado para diseñadores. Locavo está pensado para dueños de negocios locales.',
       comparison: {
         competitor: {
           title: 'Con Squarespace',
@@ -295,8 +295,8 @@ export const content = {
             'Soporte técnico en inglés',
           ],
         },
-        novaweb: {
-          title: 'Con Bunnatic',
+        locavo: {
+          title: 'Con Locavo',
           items: [
             'Precio accesible para negocios locales',
             'Enfocado en conseguir clientes',
@@ -442,8 +442,8 @@ export const content = {
           'Dependes de una red social que puede cambiar las reglas',
         ],
       },
-      novaweb: {
-        title: 'Con tu web en novaweb',
+      locavo: {
+        title: 'Con tu web en locavo',
         items: [
           'Apareces en Google cuando te buscan',
           'Recibes contactos directos en tu email',
@@ -508,7 +508,7 @@ export const content = {
       },
       {
         q: '¿Funciona para mi tipo de negocio?',
-        a: 'Bunnatic está diseñado para adaptarse a cualquier tipo de negocio local, desde restaurantes hasta clínicas.',
+        a: 'Locavo está diseñado para adaptarse a cualquier tipo de negocio local, desde restaurantes hasta clínicas.',
       },
     ],
   },
@@ -519,8 +519,8 @@ export const content = {
     trustText: 'Sin tarjeta · Sin técnicos · Cancela cuando quieras',
   },
   footer: {
-    logo: 'Bunnatic',
+    logo: 'Locavo',
     links: ['Aviso legal', 'Política de privacidad', 'Política de cookies'],
-    copyright: '© 2025 bunnatic.com · Hecho con ♥ en Barcelona',
+    copyright: '© 2025 locavo.com · Hecho con ♥ en Barcelona',
   },
 }

@@ -7,7 +7,7 @@ type BrandLogoProps = {
   className?: string
 }
 
-/** Bunnatic logo, identical to the landing navbar mark. */
+/** Locavo logo, identical to the landing navbar mark. */
 export function BrandLogo({ href = '/', className }: BrandLogoProps) {
   return (
     <Link
@@ -24,7 +24,7 @@ export function BrandLogo({ href = '/', className }: BrandLogoProps) {
         <Leaf className="size-4 text-white" />
       </span>
       <span className="text-xl font-semibold tracking-[-0.04em] text-black">
-        Bunnatic
+        Locavo
       </span>
     </Link>
   )

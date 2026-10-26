@@ -32,7 +32,7 @@ export function formatBusinessDate(value: string | null | undefined) {
 
 function DomainStatus({ business }: { business: BusinessCardData }) {
   if (!business.custom_domain) {
-    return <Badge variant="secondary">Subdominio Bunnatic</Badge>
+    return <Badge variant="secondary">Subdominio Locavo</Badge>
   }
   if (business.custom_domain_status === 'active') {
     return (

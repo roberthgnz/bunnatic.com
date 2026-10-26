@@ -17,8 +17,8 @@ export async function generateMetadata({
     locale: safeLocale,
     title:
       safeLocale === 'ca'
-        ? 'Alternativa a Facebook Pages per Captar Clients | Bunnatic'
-        : 'Alternativa a Facebook Pages para Captar Clientes | Bunnatic',
+        ? 'Alternativa a Facebook Pages per Captar Clients | Locavo'
+        : 'Alternativa a Facebook Pages para Captar Clientes | Locavo',
     description:
       safeLocale === 'ca'
         ? "Passa de dependre de l'algoritme de Facebook a convertir visites en contactes amb una web pròpia optimitzada per SEO local."
@@ -66,7 +66,7 @@ export default function AlternativeFacebookPage() {
             'El cliente se distrae con contenido de terceros.',
             'Información crítica difícil de estructurar para convertir.',
           ],
-          novaCardTitle: 'Con Bunnatic',
+          novaCardTitle: 'Con Locavo',
           novaItems: [
             'Tu canal es tuyo, sin depender de reglas de una red social.',
             'Página enfocada a llamada, WhatsApp o formulario de contacto.',
@@ -133,7 +133,7 @@ export default function AlternativeFacebookPage() {
             'El client es distreu amb contingut de tercers.',
             "Informació crítica difícil d'estructurar per convertir.",
           ],
-          novaCardTitle: 'Amb Bunnatic',
+          novaCardTitle: 'Amb Locavo',
           novaItems: [
             "El teu canal és teu, sense dependre de regles d'una xarxa social.",
             'Pàgina enfocada a trucada, WhatsApp o formulari de contacte.',

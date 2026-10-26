@@ -10,7 +10,7 @@ import {
   applyBusinessSourceGeneration,
   buildBusinessSourcePreview as buildBusinessSourcePreviewAction,
   getGenerationEntitlement,
-} from '@/lib/supabase/actions'
+} from '@/lib/db/actions'
 import { RotatingLoaderText } from '@/app/dashboard/_components/RotatingLoaderText'
 import type {
   BusinessSourcePreview,

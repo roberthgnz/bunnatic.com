@@ -54,11 +54,6 @@ export function isPlatformHost(hostname: string) {
     return true
   }
 
-  // Preview deployments
-  if (normalized.endsWith('.vercel.app')) {
-    return true
-  }
-
   return false
 }
 

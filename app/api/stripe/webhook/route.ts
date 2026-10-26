@@ -1,7 +1,7 @@
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/db/server'
 import Stripe from 'stripe'
 
 export async function POST(req: Request) {
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = await stripe.webhooks.constructEventAsync(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
@@ -29,10 +29,7 @@ export async function POST(req: Request) {
     return new NextResponse(`Webhook Error: ${message}`, { status: 400 })
   }
 
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const adminDb = createAdminClient()
 
   if (event.type === 'checkout.session.completed') {
     console.log('Processing checkout.session.completed')
@@ -80,7 +77,7 @@ export async function POST(req: Request) {
 
     console.log('Updating profile for user:', session.metadata.userId)
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await adminDb
       .from('profiles')
       .update({
         stripe_subscription_id: subscription.id,
@@ -93,7 +90,8 @@ export async function POST(req: Request) {
       .eq('id', session.metadata.userId)
 
     if (error) {
-      console.error('Supabase update error:', error)
+      console.error('D1 update error:', error)
+      return new NextResponse('Profile update failed', { status: 500 })
     } else {
       console.log('Profile updated successfully:', data)
     }
@@ -121,7 +119,7 @@ export async function POST(req: Request) {
       })
     }
 
-    await supabaseAdmin
+    await adminDb
       .from('profiles')
       .update({
         stripe_price_id: firstSubscriptionItem.price.id,
@@ -142,7 +140,7 @@ export async function POST(req: Request) {
       })
     }
 
-    await supabaseAdmin
+    await adminDb
       .from('profiles')
       .update({
         stripe_price_id: firstSubscriptionItem.price.id,
@@ -156,7 +154,7 @@ export async function POST(req: Request) {
   if (event.type === 'customer.subscription.deleted') {
     const subscription = event.data.object as Stripe.Subscription
 
-    await supabaseAdmin
+    await adminDb
       .from('profiles')
       .update({
         stripe_subscription_id: null,

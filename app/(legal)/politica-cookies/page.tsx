@@ -20,11 +20,11 @@ export async function generateMetadata({
 
   return buildPageMetadata({
     locale: safeLocale,
-    title: `${legalContent[safeLocale]['politica-cookies'].title} | Bunnatic`,
+    title: `${legalContent[safeLocale]['politica-cookies'].title} | Locavo`,
     description:
       safeLocale === 'ca'
-        ? 'Revisa la política de cookies de Bunnatic, tipus de cookies que utilitzem i com pots gestionar el teu consentiment.'
-        : 'Revisa la política de cookies de Bunnatic, tipos de cookies que utilizamos y cómo puedes gestionar tu consentimiento.',
+        ? 'Revisa la política de cookies de Locavo, tipus de cookies que utilitzem i com pots gestionar el teu consentiment.'
+        : 'Revisa la política de cookies de Locavo, tipos de cookies que utilizamos y cómo puedes gestionar tu consentimiento.',
     esPath: `/${getLegalSlug('politica-cookies', 'es')}`,
     caPath: `/${getLegalSlug('politica-cookies', 'ca')}`,
     noindex: true,

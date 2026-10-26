@@ -17,8 +17,8 @@ export async function generateMetadata({
     locale: safeLocale,
     title:
       safeLocale === 'ca'
-        ? 'Crear Web amb IA per al Teu Negoci | Bunnatic'
-        : 'Crear Web con IA para tu Negocio Local | Bunnatic',
+        ? 'Crear Web amb IA per al Teu Negoci | Locavo'
+        : 'Crear Web con IA para tu Negocio Local | Locavo',
     description:
       safeLocale === 'ca'
         ? 'Troba el teu negoci a Google i publica una web professional en minuts amb IA. Sense tècnics, sense complicacions. Optimitzada per SEO local i captació de clients.'

@@ -20,11 +20,11 @@ export async function generateMetadata({
 
   return buildPageMetadata({
     locale: safeLocale,
-    title: `${legalContent[safeLocale]['politica-privacidad'].title} | Bunnatic`,
+    title: `${legalContent[safeLocale]['politica-privacidad'].title} | Locavo`,
     description:
       safeLocale === 'ca'
-        ? 'Coneix com Bunnatic tracta les teves dades personals, els teus drets de privacitat i com exercir-los segons el RGPD.'
-        : 'Conoce cómo Bunnatic trata tus datos personales, tus derechos de privacidad y cómo ejercerlos según el RGPD.',
+        ? 'Coneix com Locavo tracta les teves dades personals, els teus drets de privacitat i com exercir-los segons el RGPD.'
+        : 'Conoce cómo Locavo trata tus datos personales, tus derechos de privacidad y cómo ejercerlos según el RGPD.',
     esPath: `/${getLegalSlug('politica-privacidad', 'es')}`,
     caPath: `/${getLegalSlug('politica-privacidad', 'ca')}`,
     noindex: true,

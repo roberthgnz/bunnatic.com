@@ -146,10 +146,10 @@ export default function LegalPage({ locale, pageKey }: LegalPageProps) {
             <p className="border-t border-(--home-line) pt-8 text-sm text-(--home-muted)">
               ¿Dudas sobre este documento? Escríbenos a{' '}
               <a
-                href="mailto:hello@bunnatic.com"
+                href="mailto:hello@locavo.com"
                 className="font-medium text-black underline underline-offset-4"
               >
-                hello@bunnatic.com
+                hello@locavo.com
               </a>
               .
             </p>

@@ -716,7 +716,7 @@ export default function PublicBusinessSite({
               rel="noopener"
               className={`underline underline-offset-2 ${focusRing}`}
             >
-              Bunnatic
+              Locavo
             </a>
           </p>
         </div>

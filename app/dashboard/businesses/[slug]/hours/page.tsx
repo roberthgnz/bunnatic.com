@@ -23,7 +23,7 @@ export default async function BusinessHoursPage({
     <HoursManager
       readOnly={!hasBusinessPermission(access.role, 'content.write')}
       businessId={business.id}
-      initialHours={hours}
+      initialHours={hours.map(hour => ({ ...hour, open_time: hour.open_time ?? '09:00', close_time: hour.close_time ?? '18:00' }))}
     />
   )
 }

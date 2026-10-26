@@ -1,41 +1,50 @@
-# Bunnatic
+# Locavo
 
-Creación y gestión de webs para negocios locales con Next.js, React, Supabase y generación asistida por IA.
+Creación y gestión de webs para negocios locales con React, las APIs de Next.js sobre vinext y Cloudflare Workers. NextAuth gestiona las sesiones y los proveedores de acceso; D1 almacena los datos y Workers KV conserva los borradores temporales.
 
 ## Desarrollo
 
 1. Instala las dependencias con `pnpm install`.
-2. Copia `.env.example` a `.env.local` y configura las integraciones que vayas a utilizar.
-3. Ejecuta `pnpm dev` y abre `http://localhost:3000`.
+2. Copia `.env.example` a `.env.local` para las variables públicas de compilación y `.dev.vars.example` a `.dev.vars` para los secretos del servidor. Genera un `AUTH_SECRET` aleatorio y configura las integraciones necesarias.
+3. Ejecuta `pnpm db:migrate:local` y `pnpm cf:typegen`.
+4. Ejecuta `pnpm dev` y abre `http://localhost:3000`.
 
-Supabase proporciona autenticación y datos. Google Places permite buscar negocios; Firecrawl analiza webs existentes y Gemini genera contenido. Los límites de la demo usan Upstash Redis. Stripe, Resend y Cloudflare requieren sus propias variables para pagos, correo y dominios personalizados. Consulta `.env.example` para los nombres exactos; no guardes credenciales en el repositorio.
+El desarrollo y `pnpm start` (vista previa de una compilación) ejecutan el servidor en workerd. D1 y KV se simulan localmente en `.wrangler/state`. Las credenciales locales anteriores no se reutilizan automáticamente.
 
-## Experiencia pública
+## Autenticación y servicios
 
-- `/`: portada con búsqueda de negocio, vista previa interactiva por sector, ejemplos, planes y preguntas frecuentes.
-- `/crear-pagina-web-negocio?q=...`: creador con la búsqueda precargada desde la portada. La consulta requiere una confirmación del usuario antes de llamar a Google.
-- `/ejemplos/restaurante`, `/ejemplos/peluqueria`, `/ejemplos/clinica`: diseños de negocios ficticios, navegables y sin indexación. El contenido común se define en `lib/siteExamples.ts`.
-- `/signup?plan=pro&billing=yearly`: registro que conserva el contexto del plan y la modalidad hasta la configuración inicial. No inicia un cobro.
-- `/dashboard`: gestión de negocios y sus herramientas.
+El registro por correo exige confirmar la dirección. Las contraseñas se guardan con PBKDF2 mediante Web Crypto; los hashes bcrypt importados se verifican y actualizan al iniciar sesión. Los enlaces de confirmación y recuperación caducan en una hora, se almacenan como hashes y se consumen una sola vez. El cambio de contraseña revoca las sesiones anteriores.
 
-Los estilos de la portada viven en `app/globals.css`, con componentes en `components/landing`. Los precios se comparten con el panel a través de `lib/content.ts`.
+Google OAuth requiere `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` y la URL autorizada `https://TU_HOST/api/auth/callback/google`. Resend requiere un remitente verificado para enviar confirmaciones y recuperaciones. Google Places, Firecrawl y Gemini conservan sus integraciones. Stripe conserva pagos y webhooks; su firma se verifica de forma asíncrona compatible con Workers.
+
+Las consultas D1 aplican los permisos en el servidor, incluyendo propietario, equipo activo y aislamiento de los datos privados. Los límites de peticiones usan incrementos atómicos en D1. KV se reserva para estado temporal y tiene consistencia eventual.
 
 ## Comprobaciones
 
 ```sh
-pnpm exec tsc --noEmit
+pnpm typecheck
 pnpm exec tsx scripts/check-auth-redirects.ts
+pnpm exec tsx scripts/check-backoffice.ts
+pnpm exec tsx scripts/check-cloudflare.ts
 pnpm lint
 pnpm build
-pnpm start
+pnpm exec wrangler deploy --dry-run
 ```
 
-Al revisar el recorrido público, comprueba el cambio de sector y dispositivo, los enlaces a ejemplos, el traspaso del nombre al creador y la modalidad mensual/anual hasta el registro. Verifica también el menú móvil, la ausencia de desbordamiento desde 320 px y los estados de error de búsqueda.
+`scripts/check-cloudflare.ts` usa exclusivamente D1 local y usuarios sintéticos. Para comprobar también el inicio de sesión, las APIs protegidas y KV contra el Worker local, establece `TEST_BASE_URL` con la URL de `pnpm dev` o `pnpm start`. La prueba elimina los usuarios y datos que crea y no envía correos ni cobra pagos.
 
-El registro por correo transmite el destino a Supabase y la confirmación conserva sus parámetros. Las pruebas de redirección comprueban el contexto del plan y del borrador, y rechazan destinos externos o malformados. No envían correos. Para probar la entrega real, configura también la lista de destinos autorizados en Supabase para tu dominio.
+Con el servidor de desarrollo abierto, `python scripts/check-worker-http.py http://127.0.0.1:3000` comprueba el mismo recorrido HTTP mediante la API local de Cloudflare, sin iniciar otro workerd. Solo admite un servidor local y limpia los usuarios y negocios sintéticos al terminar.
 
-La demo necesita una conexión de Redis operativa para aplicar sus límites. El comportamiento existente permite continuar las consultas si Redis falla; revisa esa conexión antes de habilitar una demo pública.
+## Despliegue y datos existentes
 
-## Fotografías de los ejemplos
+Consulta [la guía de migración](docs/cloudflare-migration.md) antes del primer despliegue. `wrangler.jsonc` usa el nombre **locavo**. Deben configurarse sus propios recursos, secretos y dominio. Las migraciones locales no trasladan los usuarios ni los datos de producción.
 
-Las fotografías se sirven localmente desde `public/images` y se optimizan con `next/image`. Proceden de Unsplash: [restaurante](https://images.unsplash.com/photo-1555396273-367ea4eb4db5), [peluquería](https://images.unsplash.com/photo-1600948836101-f9ffda59d250) y [clínica](https://images.unsplash.com/photo-1629909613654-28e377c37b09). Los negocios y los textos de las muestras son ficticios.
+## Experiencia pública
+
+- `/`: portada, ejemplos por sector, planes y preguntas frecuentes.
+- `/crear-pagina-web-negocio?q=...`: creador con búsqueda precargada y confirmación antes de llamar a Google.
+- `/ejemplos/restaurante`, `/ejemplos/peluqueria`, `/ejemplos/clinica`: muestras ficticias sin indexación.
+- `/signup?plan=pro&billing=yearly`: registro que conserva el plan, la modalidad y el destino.
+- `/dashboard`: negocios y herramientas de gestión.
+
+Los estilos viven en `app/globals.css`, los componentes de portada en `components/landing` y los precios compartidos en `lib/content.ts`. Las fotografías de los ejemplos se sirven desde `public/images`.

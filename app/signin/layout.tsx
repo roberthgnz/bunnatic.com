@@ -8,9 +8,9 @@ type SignInLayoutProps = {
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Iniciar Sesión en Bunnatic - Gestiona tu Web',
+    title: 'Iniciar Sesión en Locavo - Gestiona tu Web',
     description:
-      'Accede a tu cuenta de Bunnatic para gestionar tu web, actualizar contenido, revisar leads y optimizar la captación de clientes locales.',
+      'Accede a tu cuenta de Locavo para gestionar tu web, actualizar contenido, revisar leads y optimizar la captación de clientes locales.',
     esPath: '/signin',
     caPath: '/signin',
     noindex: true,

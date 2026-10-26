@@ -92,7 +92,7 @@ function ComparisonTable({
     <div className="overflow-hidden rounded-3xl border border-(--home-line) bg-white">
       <table className="w-full table-fixed border-collapse text-left">
         <caption className="sr-only">
-          Comparativa entre {competitorName} y Bunnatic
+          Comparativa entre {competitorName} y Locavo
         </caption>
         <thead>
           <tr>
@@ -198,7 +198,7 @@ export default function AlternativeLanding({
           <SectionHeader
             id="comparativa-title"
             eyebrow="Cara a cara"
-            title={`Bunnatic y ${competitorName}, punto por punto`}
+            title={`Locavo y ${competitorName}, punto por punto`}
             description="Una comparación directa de lo que cambia en el día a día para que elijas con criterio."
           />
           <ComparisonTable

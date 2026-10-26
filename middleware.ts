@@ -1,143 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { updateSession } from '@/lib/supabase/middleware'
+import { getCurrentUser } from '@/lib/auth/session'
+import { env } from 'cloudflare:workers'
 import { isPlatformHost } from '@/lib/domains/config'
 import { normalizeHostname } from '@/lib/domains/hostname'
 
-function copyResponseCookies(source: NextResponse, target: NextResponse) {
-  source.cookies.getAll().forEach((cookie) => {
-    target.cookies.set(cookie.name, cookie.value, {
-      domain: cookie.domain,
-      path: cookie.path,
-      expires: cookie.expires,
-      maxAge: cookie.maxAge,
-      httpOnly: cookie.httpOnly,
-      sameSite: cookie.sameSite,
-      secure: cookie.secure,
-    })
-  })
-}
-
-function getRequestHost(request: NextRequest) {
-  const xForwardedHost = request.headers.get('x-forwarded-host')
-  const hostHeader = (xForwardedHost || request.headers.get('host') || '')
-    .trim()
-    .toLowerCase()
-  if (!hostHeader) {
-    return null
-  }
-
-  const normalized = hostHeader.split(',')[0]?.trim().replace(/:\d+$/, '') || ''
-  const safeHost = normalizeHostname(normalized)
-  return safeHost
-}
-
-function getCustomDomainRewritePath(request: NextRequest, pathname: string) {
-  const host = getRequestHost(request)
-  if (!host || isPlatformHost(host)) {
-    return null
-  }
-
-  if (/^\/w\/domain\/[^/]+\/?$/.test(pathname)) {
-    return null
-  }
-
-  return `/w/domain/${host}`
+function secure(response: NextResponse) {
+  response.headers.set('X-DNS-Prefetch-Control', 'on')
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  return response
 }
 
 export default async function middleware(request: NextRequest) {
-  const { pathname } = new URL(request.url)
-  const customDomainRewritePath = getCustomDomainRewritePath(request, pathname)
-  if (customDomainRewritePath) {
-    const rewriteUrl = new URL(request.url)
-    rewriteUrl.pathname = customDomainRewritePath
-    const response = NextResponse.rewrite(rewriteUrl)
-
-    // Add performance headers
-    response.headers.set('X-DNS-Prefetch-Control', 'on')
-    response.headers.set('X-Frame-Options', 'SAMEORIGIN')
-    response.headers.set('X-Content-Type-Options', 'nosniff')
-    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-
-    return response
-  }
-
-  // First, update the Supabase session
-  const {
-    response: supabaseResponse,
-    user,
-    onboardingCompleted,
-  } = await updateSession(request)
-
-  // Add performance headers to all responses
-  supabaseResponse.headers.set('X-DNS-Prefetch-Control', 'on')
-  supabaseResponse.headers.set('X-Frame-Options', 'SAMEORIGIN')
-  supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff')
-  supabaseResponse.headers.set(
-    'Referrer-Policy',
-    'strict-origin-when-cross-origin'
+  const { pathname } = request.nextUrl
+  const host = normalizeHostname(
+    (request.headers.get('host') || '').replace(/:\d+$/, '')
   )
-
-  // Preserve the requested backoffice location before layouts or pages render.
+  if (host && !isPlatformHost(host)) {
+    // Customer domains never host platform authentication or billing endpoints.
+    if (
+      /^\/(api|auth|signin|signup|dashboard|onboarding|checkout)(?:\/|$)/.test(
+        pathname
+      )
+    )
+      return secure(new NextResponse('Not found', { status: 404 }))
+    if (!/^\/w\/domain\/[^/]+\/?$/.test(pathname)) {
+      const url = new URL(request.url)
+      url.pathname = `/w/domain/${host}`
+      return secure(NextResponse.rewrite(url))
+    }
+  }
+  if (
+    !/^\/(dashboard|signin|signup|onboarding|checkout)(?:\/|$)/.test(pathname)
+  )
+    return secure(NextResponse.next())
+  const user = await getCurrentUser()
   if (!user && /^\/dashboard(?:\/|$)/.test(pathname)) {
     const url = new URL('/signin', request.url)
     url.searchParams.set('next', `${pathname}${request.nextUrl.search}`)
-    const response = NextResponse.redirect(url)
-    copyResponseCookies(supabaseResponse, response)
-    for (const name of [
-      'X-DNS-Prefetch-Control',
-      'X-Frame-Options',
-      'X-Content-Type-Options',
-      'Referrer-Policy',
-    ]) {
-      const value = supabaseResponse.headers.get(name)
-      if (value) response.headers.set(name, value)
-    }
-    return response
+    return secure(NextResponse.redirect(url))
   }
-
-  const guestOnlyAuthPagesMatch = pathname.match(/^\/(signin|signup)(?:\/|$)/)
-  if (guestOnlyAuthPagesMatch && user) {
-    const url = new URL(request.url)
-    if (onboardingCompleted) {
-      url.pathname = `/dashboard`
-      url.search = ''
-    } else {
-      url.pathname = `/onboarding`
-      url.search = '?step=checkout'
-    }
-    const response = NextResponse.redirect(url)
-    copyResponseCookies(supabaseResponse, response)
-
-    // Add performance headers
-    response.headers.set('X-DNS-Prefetch-Control', 'on')
-    response.headers.set('X-Frame-Options', 'SAMEORIGIN')
-    response.headers.set('X-Content-Type-Options', 'nosniff')
-    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-
-    return response
+  if (user && /^\/(signin|signup|onboarding|checkout)(?:\/|$)/.test(pathname)) {
+    const profile = await env.DB.prepare(
+      'SELECT onboarding_completed FROM profiles WHERE id = ?'
+    )
+      .bind(user.id)
+      .first<{ onboarding_completed: number }>()
+    if (
+      profile?.onboarding_completed ||
+      /^\/(signin|signup)(?:\/|$)/.test(pathname)
+    )
+      return secure(
+        NextResponse.redirect(
+          new URL(
+            profile?.onboarding_completed
+              ? '/dashboard'
+              : '/onboarding?step=checkout',
+            request.url
+          )
+        )
+      )
   }
-
-  const onboardingOrCheckoutMatch = pathname.match(
-    /^\/(onboarding|checkout)(?:\/|$)/
-  )
-  if (onboardingOrCheckoutMatch && user && onboardingCompleted) {
-    const url = new URL(request.url)
-    url.pathname = `/dashboard`
-    const response = NextResponse.redirect(url)
-    copyResponseCookies(supabaseResponse, response)
-
-    // Add performance headers
-    response.headers.set('X-DNS-Prefetch-Control', 'on')
-    response.headers.set('X-Frame-Options', 'SAMEORIGIN')
-    response.headers.set('X-Content-Type-Options', 'nosniff')
-    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-
-    return response
-  }
-
-  return supabaseResponse
+  return secure(NextResponse.next())
 }
-
-export const config = {
-  matcher: ['/((?!api|auth|_next|_vercel|.*\\..*).*)'],
-}
+export const config = { matcher: ['/((?!_next|.*\\..*).*)'] }

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { createBusiness } from '@/lib/supabase/actions'
+import { createBusiness } from '@/lib/db/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -54,7 +54,7 @@ export default function NewSitePage() {
           createSuccess: 'Negocio creado correctamente',
           previewLabel: 'Vista previa en directo',
           previewTitle: 'Tu negocio',
-          previewUrl: 'tunegocio.bunnatic.com',
+          previewUrl: 'tunegocio.locavo.com',
           previewCta: 'Reservar',
           importTitle: '¿Ya tienes ficha en Google?',
           importDesc:
@@ -85,7 +85,7 @@ export default function NewSitePage() {
           createSuccess: 'Negoci creat correctament',
           previewLabel: 'Vista prèvia en directe',
           previewTitle: 'El teu negoci',
-          previewUrl: 'elnegoci.bunnatic.com',
+          previewUrl: 'elnegoci.locavo.com',
           previewCta: 'Reservar',
           importTitle: 'Ja tens fitxa a Google?',
           importDesc:
@@ -128,7 +128,7 @@ export default function NewSitePage() {
     ? formData.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '') + '.bunnatic.com'
+        .replace(/(^-|-$)/g, '') + '.locavo.com'
     : t.previewUrl
   const isPreviewEmpty =
     !formData.name && !formData.category && !formData.description

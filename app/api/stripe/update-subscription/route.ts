@@ -1,14 +1,14 @@
+
+import { getCurrentUser } from '@/lib/auth/session'
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db/server'
 import { getStripe } from '@/lib/stripe'
 
 export async function POST(req: Request) {
     try {
         const stripe = getStripe()
-        const supabase = await createClient()
-        const {
-            data: { user },
-        } = await supabase.auth.getUser()
+        const db = await createClient()
+        const user = await getCurrentUser()
 
         if (!user) {
             return new NextResponse('Unauthorized', { status: 401 })
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         }
 
         // Get user profile with subscription info
-        const { data: profile } = await supabase
+        const { data: profile } = await db
             .from('profiles')
             .select('stripe_customer_id, stripe_subscription_id')
             .eq('id', user.id)

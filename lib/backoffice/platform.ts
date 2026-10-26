@@ -6,6 +6,6 @@ export function getPlatformHost() {
   try {
     return new URL(process.env.APP_URL || '').host
   } catch {
-    return 'bunnatic.com'
+    return 'locavo.com'
   }
 }

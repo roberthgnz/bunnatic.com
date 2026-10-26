@@ -99,7 +99,7 @@ export default function Footer() {
 
         <div className="flex flex-col items-start justify-between gap-4 border-t border-white/15 pt-8 sm:flex-row sm:items-center">
           <p className="text-sm text-white/50">
-            © {new Date().getFullYear()} Bunnatic · Hecho con cariño en
+            © {new Date().getFullYear()} Locavo · Hecho con cariño en
             Barcelona
           </p>
           <CookiePreferencesButton />

@@ -15,7 +15,7 @@ type ComparisonConfig = {
       title: string
       items: string[]
     }
-    novaweb: {
+    locavo: {
       title: string
       items: string[]
     }
@@ -69,7 +69,7 @@ export default function Comparison({ alternativeId }: ComparisonProps) {
   }, [competitors, selectedCompetitorId])
 
   const comparatorLabel = 'Con solo'
-  const versusLabel = 'Bunnatic'
+  const versusLabel = 'Locavo'
   const contextualCaption = (platformName: string) =>
     `${platformName} ayuda, pero tu web es la que convierte visitas en clientes.`
 
@@ -81,9 +81,9 @@ export default function Comparison({ alternativeId }: ComparisonProps) {
             title: `${comparatorLabel} ${normalizedName(competitor.name)}`,
             items: competitor.comparison.competitor.items,
           },
-          novaweb: {
-            title: competitor.comparison.novaweb.title,
-            items: competitor.comparison.novaweb.items,
+          locavo: {
+            title: competitor.comparison.locavo.title,
+            items: competitor.comparison.locavo.items,
           },
         },
         caption: contextualCaption(normalizedName(competitor.name)),
@@ -180,12 +180,12 @@ export default function Comparison({ alternativeId }: ComparisonProps) {
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 sm:h-8 sm:w-8">
                       <Check className="h-4 w-4 text-emerald-700 sm:h-5 sm:w-5" />
                     </span>
-                    {comparison.cards.novaweb.title}
+                    {comparison.cards.locavo.title}
                   </h3>
                 </CardHeader>
                 <CardContent className="px-5 pb-6 sm:px-8 sm:pb-8 lg:px-10 lg:pb-10">
                   <ul className="space-y-4 sm:space-y-5 lg:space-y-6">
-                    {comparison.cards.novaweb.items.map((item, i) => (
+                    {comparison.cards.locavo.items.map((item, i) => (
                       <li
                         key={i}
                         className="flex gap-3 text-sm text-slate-900 sm:gap-4 sm:text-base"

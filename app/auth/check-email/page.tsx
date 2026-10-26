@@ -6,7 +6,7 @@ import { FlowShell } from '@/components/auth/FlowShell'
 
 const nextSteps = [
   {
-    title: 'Abre el correo de Bunnatic',
+    title: 'Abre el correo de Locavo',
     text: 'Lo acabamos de enviar a la dirección con la que te has registrado.',
   },
   {
@@ -91,7 +91,7 @@ function CheckEmailContent() {
         <p className="text-muted-foreground mt-6 text-center text-xs">
           ¿Necesitas ayuda?{' '}
           <a
-            href="mailto:hello@bunnatic.com"
+            href="mailto:hello@locavo.com"
             className="text-foreground font-medium underline-offset-4 hover:underline"
           >
             Escribe a soporte

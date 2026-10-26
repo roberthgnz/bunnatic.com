@@ -4,7 +4,7 @@ import {
   getPublicBusinessBySlug,
   getPublicServices,
   getPublicWorkingHours,
-} from '@/lib/supabase/public'
+} from '@/lib/db/public'
 import PublicBusinessSite from '../_components/PublicBusinessSite'
 
 export async function generateMetadata({
@@ -17,7 +17,7 @@ export async function generateMetadata({
 
   if (!business) {
     return {
-      title: 'Negocio no encontrado | Bunnatic',
+      title: 'Negocio no encontrado | Locavo',
       description: 'El negocio que buscas no está disponible.',
       robots: {
         index: false,
@@ -37,14 +37,13 @@ export async function generateMetadata({
     keywords: [
       business.name,
       business.category,
-      business.city || '',
       'negocio local',
-    ].filter(Boolean),
+    ].filter((keyword): keyword is string => Boolean(keyword)),
     openGraph: {
       title,
       description,
       type: 'website',
-      siteName: 'Bunnatic',
+      siteName: 'Locavo',
       locale: 'es_ES',
     },
     twitter: {

@@ -1,4 +1,4 @@
-export const COOKIE_CONSENT_NAME = 'bunnatic_cookie_consent'
+export const COOKIE_CONSENT_NAME = 'locavo_cookie_consent'
 export const COOKIE_CONSENT_EVENT = 'cookie-consent:updated'
 export const COOKIE_PREFERENCES_EVENT = 'cookie-consent:preferences'
 export const COOKIE_CONSENT_VERSION = 1

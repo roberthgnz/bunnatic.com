@@ -1,0 +1,28 @@
+# Runtime values. Copy to .dev.vars; this file is never deployed automatically.
+APP_URL="http://localhost:3000"
+AUTH_URL="http://localhost:3000"
+# Generate a unique cryptographic random value of at least 32 bytes per environment.
+AUTH_SECRET=""
+# Optional Google OAuth provider; callback: /api/auth/callback/google
+AUTH_GOOGLE_ID=""
+AUTH_GOOGLE_SECRET=""
+
+# Verified sender required for registration confirmation and password recovery.
+RESEND_API_KEY=""
+SENDER_EMAIL="Locavo <hello@your-verified-domain.example>"
+
+GEMINI_API_KEY=""
+GOOGLE_PLACES_API_KEY=""
+FIRECRAWL_API_KEY=""
+STRIPE_SECRET_KEY=""
+STRIPE_WEBHOOK_SECRET=""
+
+# Set to the actual platform domain before enabling customer hostnames.
+PLATFORM_ROOT_DOMAIN=""
+PLATFORM_HOSTS="localhost,127.0.0.1"
+PLATFORM_DEFAULT_LOCALE="es"
+CLOUDFLARE_API_TOKEN=""
+CLOUDFLARE_ZONE_ID=""
+CLOUDFLARE_SAAS_CNAME_TARGET=""
+CLOUDFLARE_CUSTOM_HOSTNAME_SSL_METHOD="txt"
+CLOUDFLARE_CUSTOM_ORIGIN_SERVER=""

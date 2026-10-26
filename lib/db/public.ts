@@ -1,10 +1,10 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db/server'
 import { normalizeHostname } from '@/lib/domains/hostname'
 
 export async function getPublicBusinessBySlug(slug: string) {
-  const supabase = await createClient()
+  const db = await createClient()
 
-  const { data: business } = await supabase
+  const { data: business } = await db
     .from('businesses')
     .select('*')
     .eq('slug', slug)
@@ -19,9 +19,9 @@ export async function getPublicBusinessByHostname(hostnameInput: string) {
     return null
   }
 
-  const supabase = await createClient()
+  const db = await createClient()
 
-  const { data: domain } = await supabase
+  const { data: domain } = await db
     .from('business_domains')
     .select('business_id, status')
     .eq('hostname', hostname)
@@ -32,7 +32,7 @@ export async function getPublicBusinessByHostname(hostnameInput: string) {
     return null
   }
 
-  const { data: business } = await supabase
+  const { data: business } = await db
     .from('businesses')
     .select('*')
     .eq('id', domain.business_id)
@@ -41,10 +41,10 @@ export async function getPublicBusinessByHostname(hostnameInput: string) {
   return business ?? null
 }
 
-/** Public site data: RLS allows anonymous reads of services and hours. */
+/** Public site data: D1 query scopes allow anonymous reads of services and hours. */
 export async function getPublicServices(businessId: string) {
-  const supabase = await createClient()
-  const { data } = await supabase
+  const db = await createClient()
+  const { data } = await db
     .from('services')
     .select('*')
     .eq('business_id', businessId)
@@ -54,8 +54,8 @@ export async function getPublicServices(businessId: string) {
 }
 
 export async function getPublicWorkingHours(businessId: string) {
-  const supabase = await createClient()
-  const { data } = await supabase
+  const db = await createClient()
+  const { data } = await db
     .from('working_hours')
     .select('*')
     .eq('business_id', businessId)

@@ -17,8 +17,8 @@ export async function generateMetadata({
     locale: safeLocale,
     title:
       safeLocale === 'ca'
-        ? 'Alternativa a Instagram per Convertir Seguidors en Clients | Bunnatic'
-        : 'Alternativa a Instagram para Convertir Seguidores en Clientes | Bunnatic',
+        ? 'Alternativa a Instagram per Convertir Seguidors en Clients | Locavo'
+        : 'Alternativa a Instagram para Convertir Seguidores en Clientes | Locavo',
     description:
       safeLocale === 'ca'
         ? "Converteix trànsit social en clients amb una web dissenyada per captar contactes. Més enllà del link de la bio."
@@ -66,7 +66,7 @@ export default function AlternativeInstagramPage() {
             'Limitación de enlaces y recorrido de usuario corto.',
             'Difícil transmitir propuesta completa de valor.',
           ],
-          novaCardTitle: 'Con Bunnatic',
+          novaCardTitle: 'Con Locavo',
           novaItems: [
             'Página estructurada por servicios, beneficios y precios.',
             'CTAs visibles para reserva, llamada o solicitud de presupuesto.',
@@ -133,7 +133,7 @@ export default function AlternativeInstagramPage() {
             "Limitació d'enllaços i recorregut d'usuari curt.",
             'Difícil transmetre proposta completa de valor.',
           ],
-          novaCardTitle: 'Amb Bunnatic',
+          novaCardTitle: 'Amb Locavo',
           novaItems: [
             'Pàgina estructurada per serveis, beneficis i preus.',
             'CTAs visibles per reserva, trucada o sol·licitud de pressupost.',

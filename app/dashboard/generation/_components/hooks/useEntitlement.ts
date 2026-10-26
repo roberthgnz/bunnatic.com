@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getGenerationEntitlement } from '@/lib/supabase/actions'
+import { getGenerationEntitlement } from '@/lib/db/actions'
 import type { GenerationEntitlement } from '@/lib/businessSourceGeneration'
 
 export function useEntitlement() {

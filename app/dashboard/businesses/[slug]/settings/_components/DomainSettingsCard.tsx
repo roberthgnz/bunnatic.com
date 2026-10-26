@@ -19,7 +19,7 @@ import {
   connectBusinessDomain,
   disconnectBusinessDomain,
   refreshBusinessDomainStatus,
-} from '@/lib/supabase/actions'
+} from '@/lib/db/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -93,7 +93,7 @@ function getStatusMeta(status: DomainStatus): {
       label: 'Emitiendo SSL',
       variant: 'warning',
       description:
-        'El dominio ya apunta a Bunnatic. Falta validar y emitir el certificado HTTPS.',
+        'El dominio ya apunta a Locavo. Falta validar y emitir el certificado HTTPS.',
     },
     active: {
       label: 'Activo',
@@ -104,7 +104,7 @@ function getStatusMeta(status: DomainStatus): {
       label: 'Movido',
       variant: 'outline',
       description:
-        'El dominio ha dejado de apuntar a Bunnatic. Revisa el registro CNAME.',
+        'El dominio ha dejado de apuntar a Locavo. Revisa el registro CNAME.',
     },
     error: {
       label: 'Error',
@@ -260,7 +260,7 @@ export default function DomainSettingsCard({
     refresh: 'Comprobar estado',
     disconnect: 'Desconectar',
     noDomain:
-      'Todavía no has conectado ningún dominio. Tu web sigue disponible en su dirección de Bunnatic.',
+      'Todavía no has conectado ningún dominio. Tu web sigue disponible en su dirección de Locavo.',
     progressLabel: 'Progreso de la conexión',
     progressSteps: [
       'Dominio añadido',
@@ -271,7 +271,7 @@ export default function DomainSettingsCard({
     dnsTitle: 'Configura estos registros DNS',
     dnsSubtitle:
       'Entra en el panel DNS de tu proveedor y crea los siguientes registros copiando los valores exactamente.',
-    cnameTitle: 'Apunta tu dominio a Bunnatic',
+    cnameTitle: 'Apunta tu dominio a Locavo',
     cnameDesc:
       'Crea o edita un registro CNAME. Solo tendrás que hacerlo una vez.',
     ownershipTitle: 'Demuestra que el dominio es tuyo',

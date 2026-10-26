@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getUpstashRedis } from '@/lib/upstash'
+import { getGenerationStore } from '@/lib/cloudflare/kv'
 
 export const runtime = 'edge'
 
@@ -37,10 +37,10 @@ function normalizeCategoryFromTypes(types: unknown): string {
 }
 
 export async function POST(request: Request) {
-  const redis = getUpstashRedis()
-  if (!redis) {
+  const store = getGenerationStore()
+  if (!store) {
     return NextResponse.json(
-      { error: 'Upstash Redis is not configured' },
+      { error: 'Cloudflare KV is not configured' },
       { status: 503 }
     )
   }
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
 
   const now = Date.now()
   const key = crypto.randomUUID()
-  const redisKey = `tempgen:${key}`
+  const storageKey = `tempgen:${key}`
   const record: TempGeneration = {
     sessionId: body.sessionId,
     draftId: body.draftId,
@@ -77,16 +77,16 @@ export async function POST(request: Request) {
     updatedAt: now,
   }
 
-  await redis.set(redisKey, record, { ex: TEMP_GENERATION_TTL_SECONDS })
+  await store.set(storageKey, record, { ex: TEMP_GENERATION_TTL_SECONDS })
 
   return NextResponse.json({ key })
 }
 
 export async function GET(request: Request) {
-  const redis = getUpstashRedis()
-  if (!redis) {
+  const store = getGenerationStore()
+  if (!store) {
     return NextResponse.json(
-      { error: 'Upstash Redis is not configured' },
+      { error: 'Cloudflare KV is not configured' },
       { status: 503 }
     )
   }
@@ -98,7 +98,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'key is required' }, { status: 400 })
   }
 
-  const record = await redis.get<TempGeneration>(`tempgen:${key}`)
+  const record = await store.get<TempGeneration>(`tempgen:${key}`)
   if (!record) {
     return NextResponse.json(
       { error: 'Temporary generation not found' },

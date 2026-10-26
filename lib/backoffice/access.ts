@@ -12,7 +12,7 @@ import {
 const findBusinessAccess = cache(
   async (field: 'id' | 'slug', value: string) => {
     const session = await requireBackofficeSession()
-    const { data: business, error } = await session.supabase
+    const { data: business, error } = await session.db
       .from('businesses')
       .select('*')
       .eq(field, value)
@@ -21,7 +21,7 @@ const findBusinessAccess = cache(
     if (!business) return null
     let membership = null
     if (business.user_id !== session.user.id) {
-      const result = await session.supabase
+      const result = await session.db
         .from('team_members')
         .select('business_id, user_id, role, status')
         .eq('business_id', business.id)

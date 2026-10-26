@@ -110,7 +110,7 @@ export default function TemplateShowcase() {
                 </div>
                 <span className="flex min-w-0 flex-1 items-center justify-center gap-1.5 truncate text-[11px] text-black/50">
                   <Globe2 className="size-3 shrink-0" aria-hidden="true" />
-                  {example.name.toLowerCase().replaceAll(' ', '')}.bunnatic.com
+                  {example.name.toLowerCase().replaceAll(' ', '')}.locavo.com
                 </span>
                 <div
                   className="flex gap-0.5"

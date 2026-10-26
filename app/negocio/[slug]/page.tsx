@@ -22,7 +22,7 @@ export async function generateMetadata({
   if (!entry) {
     return buildPageMetadata({
       locale: 'es',
-      title: 'Web para Negocios Locales con IA | Bunnatic',
+      title: 'Web para Negocios Locales con IA | Locavo',
       description:
         'Crea una web optimizada para tu tipo de negocio y empieza a captar clientes locales con IA.',
       esPath: '/negocio',
@@ -35,7 +35,7 @@ export async function generateMetadata({
 
   return buildPageMetadata({
     locale: 'es',
-    title: `${localizedCopy.title} | Bunnatic`,
+    title: `${localizedCopy.title} | Locavo`,
     description: localizedCopy.subtitle,
     esPath: `/negocio/${getBusinessSlugByLocale(entry, 'es')}`,
     caPath: `/negocio/${getBusinessSlugByLocale(entry, 'es')}`,

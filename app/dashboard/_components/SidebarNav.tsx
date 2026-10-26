@@ -116,7 +116,7 @@ export function SidebarTopItems({ t }: { t: DashboardContent }) {
     },
     {
       id: 'help',
-      href: `mailto:hello@bunnatic.com?subject=${encodeURIComponent('Ayuda con Bunnatic')}`,
+      href: `mailto:hello@locavo.com?subject=${encodeURIComponent('Ayuda con Locavo')}`,
       icon: LifeBuoy,
       label: t.menu.getHelp,
       active: false,

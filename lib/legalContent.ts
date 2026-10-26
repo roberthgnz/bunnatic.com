@@ -28,14 +28,14 @@ export const legalContent: Record<
       lastUpdatedLabel: 'Última actualización',
       lastUpdatedDate: '10 de marzo de 2026',
       intro:
-        'Este sitio web pertenece a Bunnatic y regula el acceso y uso de nuestra plataforma para crear páginas web con ayuda de inteligencia artificial.',
+        'Este sitio web pertenece a Locavo y regula el acceso y uso de nuestra plataforma para crear páginas web con ayuda de inteligencia artificial.',
       sections: [
         {
           title: '1. Titular del sitio',
           paragraphs: [
-            'Titular: Bunnatic.',
-            'Sitio web: bunnatic.com.',
-            'Contacto general: hello@bunnatic.com.',
+            'Titular: Locavo.',
+            'Sitio web: locavo.com.',
+            'Contacto general: hello@locavo.com.',
           ],
         },
         {
@@ -48,27 +48,27 @@ export const legalContent: Record<
           title: '3. Condiciones de uso',
           paragraphs: [
             'El usuario se compromete a utilizar el sitio de forma lícita, diligente y respetuosa con la normativa vigente.',
-            'Queda prohibido usar los servicios para actividades fraudulentas, suplantación de identidad o cualquier uso que pueda dañar a terceros o a Bunnatic.',
+            'Queda prohibido usar los servicios para actividades fraudulentas, suplantación de identidad o cualquier uso que pueda dañar a terceros o a Locavo.',
           ],
         },
         {
           title: '4. Propiedad intelectual e industrial',
           paragraphs: [
-            'Los textos, diseños, logotipos, código, interfaces, imágenes y demás elementos del sitio son titularidad de Bunnatic o de terceros autorizados.',
+            'Los textos, diseños, logotipos, código, interfaces, imágenes y demás elementos del sitio son titularidad de Locavo o de terceros autorizados.',
             'No se permite su reproducción, distribución o transformación sin autorización previa y expresa.',
           ],
         },
         {
           title: '5. Responsabilidad',
           paragraphs: [
-            'Bunnatic trabaja para mantener el servicio actualizado y disponible, pero no garantiza la ausencia total de interrupciones o errores técnicos.',
+            'Locavo trabaja para mantener el servicio actualizado y disponible, pero no garantiza la ausencia total de interrupciones o errores técnicos.',
             'El usuario es responsable del uso que haga de la información publicada y de los contenidos que cree o publique mediante la plataforma.',
           ],
         },
         {
           title: '6. Enlaces externos',
           paragraphs: [
-            'Este sitio puede incluir enlaces a servicios de terceros. Bunnatic no controla ni asume responsabilidad sobre sus contenidos, políticas o disponibilidad.',
+            'Este sitio puede incluir enlaces a servicios de terceros. Locavo no controla ni asume responsabilidad sobre sus contenidos, políticas o disponibilidad.',
           ],
         },
         {
@@ -85,12 +85,12 @@ export const legalContent: Record<
       lastUpdatedLabel: 'Última actualización',
       lastUpdatedDate: '10 de marzo de 2026',
       intro:
-        'En Bunnatic tratamos los datos personales de forma transparente y conforme al Reglamento (UE) 2016/679 (RGPD) y la normativa aplicable.',
+        'En Locavo tratamos los datos personales de forma transparente y conforme al Reglamento (UE) 2016/679 (RGPD) y la normativa aplicable.',
       sections: [
         {
           title: '1. Datos que tratamos',
           paragraphs: [
-            'Podemos tratar los siguientes datos cuando usas Bunnatic:',
+            'Podemos tratar los siguientes datos cuando usas Locavo:',
           ],
           bullets: [
             'Datos de registro: nombre, correo electrónico y credenciales de acceso.',
@@ -130,7 +130,7 @@ export const legalContent: Record<
         {
           title: '6. Derechos del usuario',
           paragraphs: [
-            'Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando una solicitud a privacy@bunnatic.com.',
+            'Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando una solicitud a privacy@locavo.com.',
             'Si consideras que tus derechos no se han atendido correctamente, puedes presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD).',
           ],
         },
@@ -147,7 +147,7 @@ export const legalContent: Record<
       lastUpdatedLabel: 'Última actualización',
       lastUpdatedDate: '11 de marzo de 2026',
       intro:
-        'Esta política explica qué cookies utiliza Bunnatic, con qué finalidad y cómo puedes aceptar, rechazar o revocar su uso.',
+        'Esta política explica qué cookies utiliza Locavo, con qué finalidad y cómo puedes aceptar, rechazar o revocar su uso.',
       sections: [
         {
           title: '1. Qué son las cookies',
@@ -158,7 +158,7 @@ export const legalContent: Record<
         {
           title: '2. Tipos de cookies que utilizamos',
           paragraphs: [
-            'Actualmente en Bunnatic utilizamos o podemos utilizar las siguientes categorías de cookies:',
+            'Actualmente en Locavo utilizamos o podemos utilizar las siguientes categorías de cookies:',
           ],
           bullets: [
             'Cookies técnicas o estrictamente necesarias: permiten funciones esenciales como la navegación, la seguridad, el acceso a áreas autenticadas y el funcionamiento básico del sitio.',
@@ -177,7 +177,7 @@ export const legalContent: Record<
         {
           title: '4. Cookies analíticas de terceros',
           paragraphs: [
-            'Si aceptas las cookies analíticas, Bunnatic puede utilizar Google Analytics, un servicio prestado por Google, para obtener estadísticas agregadas sobre navegación, uso de páginas y rendimiento del sitio.',
+            'Si aceptas las cookies analíticas, Locavo puede utilizar Google Analytics, un servicio prestado por Google, para obtener estadísticas agregadas sobre navegación, uso de páginas y rendimiento del sitio.',
             'Estas cookies pueden recoger información como páginas visitadas, tiempo de permanencia, navegador, dispositivo y direcciones IP tratadas conforme a la configuración aplicada por el servicio.',
           ],
         },
@@ -198,7 +198,7 @@ export const legalContent: Record<
         {
           title: '7. Más información y contacto',
           paragraphs: [
-            'Si tienes dudas sobre esta política, puedes escribir a privacy@bunnatic.com.',
+            'Si tienes dudas sobre esta política, puedes escribir a privacy@locavo.com.',
             'Para obtener más información sobre el tratamiento de datos personales relacionado con el uso de cookies, puedes consultar también nuestra Política de Privacidad.',
           ],
         },
@@ -211,14 +211,14 @@ export const legalContent: Record<
       lastUpdatedLabel: 'Ultima actualitzacio',
       lastUpdatedDate: '10 de marc de 2026',
       intro:
-        "Aquest lloc web pertany a Bunnatic i regula l'acces i us de la nostra plataforma per crear pagines web amb ajuda d'intelligencia artificial.",
+        "Aquest lloc web pertany a Locavo i regula l'acces i us de la nostra plataforma per crear pagines web amb ajuda d'intelligencia artificial.",
       sections: [
         {
           title: '1. Titular del lloc',
           paragraphs: [
-            'Titular: Bunnatic.',
-            'Lloc web: bunnatic.com.',
-            'Contacte general: hello@bunnatic.com.',
+            'Titular: Locavo.',
+            'Lloc web: locavo.com.',
+            'Contacte general: hello@locavo.com.',
           ],
         },
         {
@@ -231,27 +231,27 @@ export const legalContent: Record<
           title: "3. Condicions d'us",
           paragraphs: [
             "L'usuari es compromet a utilitzar el lloc de forma licita, diligent i respectuosa amb la normativa vigent.",
-            "Queda prohibit utilitzar els serveis per a activitats fraudulentes, suplantacio d'identitat o qualsevol us que pugui perjudicar tercers o Bunnatic.",
+            "Queda prohibit utilitzar els serveis per a activitats fraudulentes, suplantacio d'identitat o qualsevol us que pugui perjudicar tercers o Locavo.",
           ],
         },
         {
           title: '4. Propietat intellectual i industrial',
           paragraphs: [
-            "Els textos, dissenys, logotips, codi, interficies, imatges i la resta d'elements del lloc son titularitat de Bunnatic o de tercers autoritzats.",
+            "Els textos, dissenys, logotips, codi, interficies, imatges i la resta d'elements del lloc son titularitat de Locavo o de tercers autoritzats.",
             'No es permet la reproduccio, distribucio o transformacio sense autoritzacio previa i expressa.',
           ],
         },
         {
           title: '5. Responsabilitat',
           paragraphs: [
-            "Bunnatic treballa per mantenir el servei actualitzat i disponible, pero no garanteix l'absencia total d'interrupcions o errors tecnics.",
+            "Locavo treballa per mantenir el servei actualitzat i disponible, pero no garanteix l'absencia total d'interrupcions o errors tecnics.",
             "L'usuari es responsable de l'us que faci de la informacio publicada i dels continguts que crei o publiqui mitjancant la plataforma.",
           ],
         },
         {
           title: '6. Enllacos externs',
           paragraphs: [
-            'Aquest lloc pot incloure enllacos a serveis de tercers. Bunnatic no controla ni assumeix responsabilitat sobre els seus continguts, politiques o disponibilitat.',
+            'Aquest lloc pot incloure enllacos a serveis de tercers. Locavo no controla ni assumeix responsabilitat sobre els seus continguts, politiques o disponibilitat.',
           ],
         },
         {
@@ -268,12 +268,12 @@ export const legalContent: Record<
       lastUpdatedLabel: 'Ultima actualitzacio',
       lastUpdatedDate: '10 de marc de 2026',
       intro:
-        "A Bunnatic tractem les dades personals de manera transparent i d'acord amb el Reglament (UE) 2016/679 (RGPD) i la normativa aplicable.",
+        "A Locavo tractem les dades personals de manera transparent i d'acord amb el Reglament (UE) 2016/679 (RGPD) i la normativa aplicable.",
       sections: [
         {
           title: '1. Dades que tractem',
           paragraphs: [
-            'Podem tractar les dades seguents quan utilitzes Bunnatic:',
+            'Podem tractar les dades seguents quan utilitzes Locavo:',
           ],
           bullets: [
             "Dades de registre: nom, correu electronic i credencials d'acces.",
@@ -313,7 +313,7 @@ export const legalContent: Record<
         {
           title: "6. Drets de l'usuari",
           paragraphs: [
-            "Pots exercir els teus drets d'acces, rectificacio, supressio, oposicio, limitacio i portabilitat enviant una sollicitud a privacy@bunnatic.com.",
+            "Pots exercir els teus drets d'acces, rectificacio, supressio, oposicio, limitacio i portabilitat enviant una sollicitud a privacy@locavo.com.",
             "Si consideres que els teus drets no s'han ates correctament, pots presentar una reclamacio davant l'Agencia Espanyola de Proteccio de Dades (AEPD).",
           ],
         },
@@ -330,7 +330,7 @@ export const legalContent: Record<
       lastUpdatedLabel: 'Ultima actualitzacio',
       lastUpdatedDate: '11 de marc de 2026',
       intro:
-        "Aquesta politica explica quines cookies utilitza Bunnatic, amb quina finalitat i com pots acceptar-ne, rebutjar-ne o revocar-ne l'us.",
+        "Aquesta politica explica quines cookies utilitza Locavo, amb quina finalitat i com pots acceptar-ne, rebutjar-ne o revocar-ne l'us.",
       sections: [
         {
           title: '1. Que son les cookies',
@@ -341,7 +341,7 @@ export const legalContent: Record<
         {
           title: '2. Tipus de cookies que utilitzem',
           paragraphs: [
-            'Actualment a Bunnatic utilitzem o podem utilitzar les categories de cookies seguents:',
+            'Actualment a Locavo utilitzem o podem utilitzar les categories de cookies seguents:',
           ],
           bullets: [
             "Cookies tecniques o estrictament necessaries: permeten funcions essencials com la navegacio, la seguretat, l'acces a arees autenticades i el funcionament basic del lloc.",
@@ -360,7 +360,7 @@ export const legalContent: Record<
         {
           title: '4. Cookies analitiques de tercers',
           paragraphs: [
-            'Si acceptes les cookies analitiques, Bunnatic pot utilitzar Google Analytics, un servei prestat per Google, per obtenir estadistiques agregades sobre navegacio, us de pagines i rendiment del lloc.',
+            'Si acceptes les cookies analitiques, Locavo pot utilitzar Google Analytics, un servei prestat per Google, per obtenir estadistiques agregades sobre navegacio, us de pagines i rendiment del lloc.',
             "Aquestes cookies poden recollir informacio com les pagines visitades, el temps de permanencia, el navegador, el dispositiu i adreces IP tractades d'acord amb la configuracio aplicada pel servei.",
           ],
         },
@@ -381,7 +381,7 @@ export const legalContent: Record<
         {
           title: '7. Mes informacio i contacte',
           paragraphs: [
-            'Si tens dubtes sobre aquesta politica, pots escriure a privacy@bunnatic.com.',
+            'Si tens dubtes sobre aquesta politica, pots escriure a privacy@locavo.com.',
             "Per obtenir mes informacio sobre el tractament de dades personals relacionat amb l'us de cookies, pots consultar tambe la nostra Politica de Privacitat.",
           ],
         },

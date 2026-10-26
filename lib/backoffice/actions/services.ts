@@ -17,7 +17,7 @@ export async function createService(
   form: FormData
 ): Promise<ActionResult> {
   try {
-    const { supabase, business } = await requireBusinessAccess(
+    const { db, business } = await requireBusinessAccess(
       businessId,
       'content.write'
     )
@@ -26,7 +26,7 @@ export async function createService(
       return {
         error: 'Revisa el nombre, el precio y la duración del servicio.',
       }
-    const { error } = await supabase
+    const { error } = await db
       .from('services')
       .insert({ business_id: businessId, ...parsed.data })
     if (error) throwDataError(error)
@@ -42,7 +42,7 @@ export async function createServicesBatch(
   services: ServiceInput[]
 ): Promise<ActionResult> {
   try {
-    const { supabase, business } = await requireBusinessAccess(
+    const { db, business } = await requireBusinessAccess(
       businessId,
       'content.write'
     )
@@ -52,7 +52,7 @@ export async function createServicesBatch(
         error:
           'Los servicios contienen datos inválidos o superan el límite de 100 por operación.',
       }
-    const { error } = await supabase
+    const { error } = await db
       .from('services')
       .insert(
         parsed.data.map((service) => ({ business_id: businessId, ...service }))
@@ -75,8 +75,8 @@ export async function updateService(
       return {
         error: 'Revisa el nombre, el precio y la duración del servicio.',
       }
-    const { supabase } = await requireBackofficeSession()
-    const result = await supabase
+    const { db } = await requireBackofficeSession()
+    const result = await db
       .from('services')
       .select('id, business_id')
       .eq('id', serviceId)
@@ -91,7 +91,7 @@ export async function updateService(
       result.data.business_id,
       'content.write'
     )
-    const updated = await supabase
+    const updated = await db
       .from('services')
       .update({
         name: parsed.data.name,
@@ -118,8 +118,8 @@ export async function updateService(
 
 export async function deleteService(serviceId: string): Promise<ActionResult> {
   try {
-    const { supabase } = await requireBackofficeSession()
-    const result = await supabase
+    const { db } = await requireBackofficeSession()
+    const result = await db
       .from('services')
       .select('id, business_id')
       .eq('id', serviceId)
@@ -134,7 +134,7 @@ export async function deleteService(serviceId: string): Promise<ActionResult> {
       result.data.business_id,
       'content.write'
     )
-    const removed = await supabase
+    const removed = await db
       .from('services')
       .delete()
       .eq('id', serviceId)

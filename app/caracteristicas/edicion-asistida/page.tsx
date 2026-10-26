@@ -6,7 +6,7 @@ import { buildPageMetadata } from '@/lib/seo'
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Editor Web Visual con IA - Actualiza sin Programar | Bunnatic',
+    title: 'Editor Web Visual con IA - Actualiza sin Programar | Locavo',
     description:
       'Edita tu web sin código con nuestro editor visual asistido por IA. Cambia textos, ofertas y horarios en segundos. Sin depender de programadores ni diseñadores.',
     esPath: `/caracteristicas/${getFeatureSlug('edicion-asistida')}`,

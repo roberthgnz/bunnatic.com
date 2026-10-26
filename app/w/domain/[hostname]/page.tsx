@@ -4,7 +4,7 @@ import {
   getPublicBusinessByHostname,
   getPublicServices,
   getPublicWorkingHours,
-} from '@/lib/supabase/public'
+} from '@/lib/db/public'
 import PublicBusinessSite from '../../_components/PublicBusinessSite'
 
 export async function generateMetadata({

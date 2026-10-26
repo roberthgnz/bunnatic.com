@@ -11,13 +11,13 @@ const BUSINESS_LIST_COLUMNS =
   'id, user_id, slug, name, category, description, address, phone, website, created_at, updated_at'
 
 export const getBusinesses = cache(async (): Promise<BusinessSummary[]> => {
-  const { supabase, user } = await requireBackofficeSession()
+  const { db, user } = await requireBackofficeSession()
   const [owned, memberships] = await Promise.all([
-    supabase
+    db
       .from('businesses')
       .select(BUSINESS_LIST_COLUMNS)
       .eq('user_id', user.id),
-    supabase
+    db
       .from('team_members')
       .select(
         `business_id, user_id, role, status, businesses!inner (${BUSINESS_LIST_COLUMNS})`
@@ -50,7 +50,7 @@ export const getBusinesses = cache(async (): Promise<BusinessSummary[]> => {
       custom_domain_status: null,
     })
   if (byId.size === 0) return []
-  const domains = await supabase
+  const domains = await db
     .from('business_domains')
     .select('business_id, hostname, status')
     .in('business_id', [...byId.keys()])
@@ -79,8 +79,8 @@ export const getBusinessBySlug = cache(
 )
 
 export const getServices = cache(async (businessId: string) => {
-  const { supabase } = await requireBusinessAccess(businessId)
-  const { data, error } = await supabase
+  const { db } = await requireBusinessAccess(businessId)
+  const { data, error } = await db
     .from('services')
     .select('*')
     .eq('business_id', businessId)
@@ -90,8 +90,8 @@ export const getServices = cache(async (businessId: string) => {
 })
 
 export const getWorkingHours = cache(async (businessId: string) => {
-  const { supabase } = await requireBusinessAccess(businessId)
-  const { data, error } = await supabase
+  const { db } = await requireBusinessAccess(businessId)
+  const { data, error } = await db
     .from('working_hours')
     .select('*')
     .eq('business_id', businessId)
@@ -101,8 +101,8 @@ export const getWorkingHours = cache(async (businessId: string) => {
 })
 
 export const getSections = cache(async (businessId: string) => {
-  const { supabase } = await requireBusinessAccess(businessId)
-  const { data, error } = await supabase
+  const { db } = await requireBusinessAccess(businessId)
+  const { data, error } = await db
     .from('business_sections')
     .select('*')
     .eq('business_id', businessId)
@@ -113,8 +113,8 @@ export const getSections = cache(async (businessId: string) => {
 
 export const getBusinessDomainByBusinessId = cache(
   async (businessId: string) => {
-    const { supabase } = await requireBusinessAccess(businessId)
-    const { data, error } = await supabase
+    const { db } = await requireBusinessAccess(businessId)
+    const { data, error } = await db
       .from('business_domains')
       .select('*')
       .eq('business_id', businessId)
@@ -130,8 +130,8 @@ export const getBusinessDomain = cache(async (slug: string) => {
 })
 
 export const getCalendarEvents = cache(async (businessId: string) => {
-  const { supabase } = await requireBusinessAccess(businessId)
-  const { data, error } = await supabase
+  const { db } = await requireBusinessAccess(businessId)
+  const { data, error } = await db
     .from('calendar_events')
     .select('*')
     .eq('business_id', businessId)
@@ -141,8 +141,8 @@ export const getCalendarEvents = cache(async (businessId: string) => {
 })
 
 export const getLeads = cache(async (businessId: string) => {
-  const { supabase } = await requireBusinessAccess(businessId, 'leads.read')
-  const { data, error } = await supabase
+  const { db } = await requireBusinessAccess(businessId, 'leads.read')
+  const { data, error } = await db
     .from('leads')
     .select('*')
     .eq('business_id', businessId)
@@ -175,7 +175,7 @@ export const getBusinessWorkspace = cache(async (slug: string) => {
 
 export const getAnalyticsSummary = cache(
   async (businessId: string): Promise<AnalyticsSummary> => {
-    const { supabase, role } = await requireBusinessAccess(businessId)
+    const { db, role } = await requireBusinessAccess(businessId)
     const canReadLeads = hasBusinessPermission(role, 'leads.read')
     const today = new Date()
     today.setUTCHours(0, 0, 0, 0)
@@ -191,7 +191,7 @@ export const getAnalyticsSummary = cache(
     const [daily, contacts, clicks] = await Promise.all([
       Promise.all(
         days.map(async (day) => {
-          const result = await supabase
+          const result = await db
             .from('analytics_events')
             .select('id', { count: 'exact', head: true })
             .eq('business_id', businessId)
@@ -210,14 +210,14 @@ export const getAnalyticsSummary = cache(
         })
       ),
       canReadLeads
-        ? supabase
+        ? db
             .from('leads')
             .select('id', { count: 'exact', head: true })
             .eq('business_id', businessId)
             .gte('created_at', start)
             .lt('created_at', end)
         : Promise.resolve({ count: null, error: null }),
-      supabase
+      db
         .from('analytics_events')
         .select('id', { count: 'exact', head: true })
         .eq('business_id', businessId)

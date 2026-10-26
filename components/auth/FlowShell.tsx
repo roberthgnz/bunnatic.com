@@ -21,7 +21,7 @@ export function FlowShell({ steps, children }: FlowShellProps) {
           <p className="text-muted-foreground justify-self-end text-xs sm:text-sm">
             <span className="hidden md:inline">¿Tienes dudas? </span>
             <a
-              href="mailto:hello@bunnatic.com"
+              href="mailto:hello@locavo.com"
               className="text-foreground focus-visible:ring-ring/50 rounded-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-3"
             >
               Escríbenos
@@ -34,7 +34,7 @@ export function FlowShell({ steps, children }: FlowShellProps) {
 
       <footer className="text-muted-foreground relative py-6 text-xs">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 sm:flex-row sm:px-6">
-          <p>© {new Date().getFullYear()} Bunnatic</p>
+          <p>© {new Date().getFullYear()} Locavo</p>
           <nav aria-label="Enlaces legales" className="flex gap-5">
             <Link
               href="/aviso-legal"

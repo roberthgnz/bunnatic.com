@@ -13,7 +13,7 @@ _components/
 ├── utils.ts                          # Pure utility functions
 ├── hooks/                            # Custom React hooks (business logic)
 │   ├── index.ts
-│   ├── useGenerationState.ts        # Redis state persistence
+│   ├── useGenerationState.ts        # Cloudflare KV state persistence
 │   ├── useEntitlement.ts            # Quota/limits management
 │   ├── useGoogleSearch.ts           # Google Places search
 │   ├── useUrlCrawl.ts               # URL crawling logic
@@ -72,7 +72,7 @@ Each component receives only the props it needs, with clear interfaces.
 - ❌ Hard to test individual pieces
 - ❌ Difficult to understand data flow
 - ❌ Translations embedded in component
-- ❌ State cleanup only in Redis, not local state
+- ❌ State cleanup only in Cloudflare KV, not local state
 
 ### After (Modular)
 
@@ -83,7 +83,7 @@ Each component receives only the props it needs, with clear interfaces.
 - ✅ Centralized translations
 - ✅ Reusable hooks
 - ✅ Type-safe throughout
-- ✅ Complete state cleanup (Redis + local state) on success
+- ✅ Complete state cleanup (Cloudflare KV + local state) on success
 
 ### State Management
 
@@ -91,7 +91,7 @@ The component now properly cleans up ALL state when:
 
 - ✅ User creates a new business from preview
 - ✅ User applies changes to an existing business
-- ✅ Clears both Redis persistence AND local component state
+- ✅ Clears both Cloudflare KV persistence AND local component state
 - ✅ Resets to initial state for next generation
 
 ### Quota Management

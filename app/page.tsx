@@ -22,7 +22,7 @@ const FinalCTA = dynamic(() => import('@/components/FinalCTA'), {
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Bunnatic | Crea tu Web con IA en 5 Minutos - SEO Local Incluido',
+    title: 'Locavo | Crea tu Web con IA en 5 Minutos - SEO Local Incluido',
     description:
       'Crea una web profesional para tu negocio local con IA en minutos. Optimizada para SEO local, con formularios de contacto y WhatsApp. Convierte visitas en clientes. Prueba gratis sin tarjeta.',
     esPath: '/',

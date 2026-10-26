@@ -9,7 +9,7 @@ export default function NotFound() {
           <Leaf className="size-4 text-white" aria-hidden="true" />
         </span>
         <span className="text-xl font-semibold tracking-[-0.04em]">
-          Bunnatic
+          Locavo
         </span>
       </Link>
 

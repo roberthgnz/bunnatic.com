@@ -11,14 +11,14 @@ export async function saveWorkingHours(
   hours: WorkingHoursInput[]
 ): Promise<ActionResult> {
   try {
-    const { supabase, business } = await requireBusinessAccess(
+    const { db, business } = await requireBusinessAccess(
       businessId,
       'content.write'
     )
     const parsed = workingHoursSchema.safeParse(hours)
     if (!parsed.success)
       return { error: 'Revisa los días y las horas de apertura y cierre.' }
-    const { error } = await supabase.from('working_hours').upsert(
+    const { error } = await db.from('working_hours').upsert(
       parsed.data.map((hour) => ({
         business_id: businessId,
         day_of_week: hour.day_of_week,

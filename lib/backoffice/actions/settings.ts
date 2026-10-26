@@ -27,7 +27,7 @@ export async function updateBusiness(
         'NOT_FOUND',
         'El negocio no existe o no tienes acceso.'
       )
-    const { supabase, business, user } = await requireBusinessAccess(
+    const { db, business, user } = await requireBusinessAccess(
       found.business.id,
       'settings.write'
     )
@@ -41,7 +41,7 @@ export async function updateBusiness(
         error:
           'Revisa el nombre, la categoría y la descripción (máximo 500 caracteres).',
       }
-    const result = await supabase
+    const result = await db
       .from('businesses')
       .update({ ...parsed.data, updated_at: new Date().toISOString() })
       .eq('id', business.id)

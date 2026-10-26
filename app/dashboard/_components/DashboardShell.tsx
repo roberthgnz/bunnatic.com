@@ -28,7 +28,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 import Link from 'next/link'
-import { logout } from '@/lib/supabase/actions'
+import { logout } from '@/lib/auth/actions'
 import { TeamSwitcher } from '@/components/team-switcher'
 import { NavUser } from '@/components/nav-user'
 import { SidebarMainItems, SidebarTopItems } from './SidebarNav'
@@ -97,7 +97,7 @@ export default async function DashboardShell({
               <Leaf className="size-3.5 text-white" aria-hidden="true" />
             </span>
             <span className="text-sidebar-foreground text-[17px] font-semibold tracking-[-0.04em] group-data-[collapsible=icon]:hidden">
-              Bunnatic
+              Locavo
             </span>
           </Link>
           <TeamSwitcher
@@ -210,7 +210,7 @@ export default async function DashboardShell({
               <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem asChild>
                   <Link
-                    href={`mailto:hello@bunnatic.com?subject=${encodeURIComponent(t.menu.feedbackIssue)}`}
+                    href={`mailto:hello@locavo.com?subject=${encodeURIComponent(t.menu.feedbackIssue)}`}
                   >
                     <Bug className="size-4" />
                     {t.menu.feedbackIssue}
@@ -218,7 +218,7 @@ export default async function DashboardShell({
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
-                    href={`mailto:hello@bunnatic.com?subject=${encodeURIComponent(t.menu.feedbackIdea)}`}
+                    href={`mailto:hello@locavo.com?subject=${encodeURIComponent(t.menu.feedbackIdea)}`}
                   >
                     <Lightbulb className="size-4" />
                     {t.menu.feedbackIdea}

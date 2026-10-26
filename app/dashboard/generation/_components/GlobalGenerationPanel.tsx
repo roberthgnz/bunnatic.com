@@ -17,7 +17,7 @@ import {
 import {
   applyBusinessSourceGeneration,
   createBusinessFromPreview,
-} from '@/lib/supabase/actions'
+} from '@/lib/db/actions'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
 import { RotatingLoaderText } from '@/app/dashboard/_components/RotatingLoaderText'
 import { Button } from '@/components/ui/button'
@@ -188,9 +188,9 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
   const {
     isLoadingState,
     setIsLoadingState,
-    saveStateToRedis,
-    loadStateFromRedis,
-    clearStateFromRedis,
+    saveStateToStore,
+    loadStateFromStore,
+    clearStateFromStore,
   } = useGenerationState()
 
   const {
@@ -208,7 +208,7 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
   // Load initial state
   useEffect(() => {
     const loadState = async () => {
-      const savedState = await loadStateFromRedis()
+      const savedState = await loadStateFromStore()
       if (savedState) {
         setSourceType(savedState.sourceType || 'google')
         googleSearch.setGoogleResults(savedState.googleResults || [])
@@ -259,12 +259,12 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
     }
   }, [businesses, selectedBusinessId])
 
-  // Persist state to Redis
+  // Persist state to Cloudflare KV
   useEffect(() => {
     if (isLoadingState) return
 
     const timeoutId = setTimeout(() => {
-      void saveStateToRedis({
+      void saveStateToStore({
         sourceType,
         googleResults: googleSearch.googleResults,
         preview: previewGen.preview,
@@ -294,7 +294,7 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
     setSelectedBlocks(new Set())
     urlCrawl.setCrawlJobId(null)
     urlCrawl.setCrawlUrl(null)
-    void clearStateFromRedis()
+    void clearStateFromStore()
   }
 
   const handleSourceChange = (nextSource: SourceType) => {
@@ -370,8 +370,8 @@ export default function GlobalGenerationPanel({ businesses, locale }: Props) {
   }
 
   const clearAllState = async () => {
-    // Clear Redis state
-    await clearStateFromRedis()
+    // Clear Cloudflare KV state
+    await clearStateFromStore()
 
     // Clear local component state
     previewGen.resetPreview()

@@ -37,7 +37,7 @@ export default async function ExamplePage({ params }: Props) {
           className="inline-flex items-center gap-2 rounded text-sm"
         >
           <ArrowLeft className="size-3.5" aria-hidden="true" />
-          Volver a Bunnatic
+          Volver a Locavo
         </Link>
         <p className="hidden text-xs text-black/55 sm:block">
           Ejemplo de diseño · Negocio ficticio
@@ -155,7 +155,7 @@ export default async function ExamplePage({ params }: Props) {
             Tu negocio también tiene una historia.
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-sm leading-7 opacity-75">
-            Esto es un ejemplo ficticio creado para inspirarte. Bunnatic crea tu
+            Esto es un ejemplo ficticio creado para inspirarte. Locavo crea tu
             propuesta con los datos reales de tu negocio.
           </p>
           <Link
@@ -171,7 +171,7 @@ export default async function ExamplePage({ params }: Props) {
       <footer className="flex flex-wrap items-center justify-between gap-3 px-6 py-7 text-xs opacity-65 sm:px-10">
         <span>{example.name} · Ejemplo de diseño</span>
         <Link href="/" className="rounded hover:underline">
-          Creado con Bunnatic ↗
+          Creado con Locavo ↗
         </Link>
       </footer>
     </div>

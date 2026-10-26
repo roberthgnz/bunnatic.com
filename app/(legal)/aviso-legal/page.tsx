@@ -20,11 +20,11 @@ export async function generateMetadata({
 
   return buildPageMetadata({
     locale: safeLocale,
-    title: `${legalContent[safeLocale]['aviso-legal'].title} | Bunnatic`,
+    title: `${legalContent[safeLocale]['aviso-legal'].title} | Locavo`,
     description:
       safeLocale === 'ca'
-        ? "Consulta l'avís legal de Bunnatic amb informació sobre la titularitat, condicions d'ús i responsabilitats del lloc web."
-        : 'Consulta el aviso legal de Bunnatic con información sobre la titularidad, condiciones de uso y responsabilidades del sitio web.',
+        ? "Consulta l'avís legal de Locavo amb informació sobre la titularitat, condicions d'ús i responsabilitats del lloc web."
+        : 'Consulta el aviso legal de Locavo con información sobre la titularidad, condiciones de uso y responsabilidades del sitio web.',
     esPath: `/${getLegalSlug('aviso-legal', 'es')}`,
     caPath: `/${getLegalSlug('aviso-legal', 'ca')}`,
     noindex: true,

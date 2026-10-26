@@ -5,7 +5,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
     title: 'Nueva contraseña',
-    description: 'Crea una contraseña nueva para tu cuenta de Bunnatic.',
+    description: 'Crea una contraseña nueva para tu cuenta de Locavo.',
     esPath: '/auth/update-password',
     caPath: '/auth/update-password',
     noindex: true,

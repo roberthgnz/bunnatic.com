@@ -6,7 +6,7 @@ import { buildPageMetadata } from '@/lib/seo'
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'SEO Local para Negocios - Atrae Clientes de tu Zona | Bunnatic',
+    title: 'SEO Local para Negocios - Atrae Clientes de tu Zona | Locavo',
     description:
       'Mejora tu visibilidad en Google para búsquedas locales. Optimización SEO técnica y contenido orientado a conversión para que tu negocio aparezca cuando te buscan en tu ciudad.',
     esPath: `/caracteristicas/${getFeatureSlug('seo-local')}`,

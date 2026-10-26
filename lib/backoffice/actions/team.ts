@@ -14,8 +14,8 @@ export async function removeTeamMember(
   memberId: string
 ): Promise<ActionResult> {
   try {
-    const { supabase } = await requireBackofficeSession()
-    const member = await supabase
+    const { db } = await requireBackofficeSession()
+    const member = await db
       .from('team_members')
       .select('id, role, business_id')
       .eq('id', memberId)
@@ -32,7 +32,7 @@ export async function removeTeamMember(
     )
     if (member.data.role === 'owner')
       return { error: 'No se puede eliminar al propietario del negocio.' }
-    const result = await supabase
+    const result = await db
       .from('team_members')
       .delete()
       .eq('id', memberId)

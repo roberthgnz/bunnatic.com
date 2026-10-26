@@ -1,4 +1,6 @@
-import { createClient } from '@/lib/supabase/server'
+
+import { getCurrentUser } from '@/lib/auth/session'
+import { createClient } from '@/lib/db/server'
 import { NextResponse } from 'next/server'
 import { mapStripePriceIdToGenerationPlan } from '@/lib/businessSourceGeneration'
 
@@ -6,16 +8,14 @@ export const runtime = 'edge'
 
 export async function GET() {
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const db = await createClient()
+    const user = await getCurrentUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('full_name, avatar_url, stripe_price_id')
       .eq('id', user.id)
@@ -26,7 +26,7 @@ export async function GET() {
     )
 
     return NextResponse.json({
-      full_name: profile?.full_name || user.user_metadata?.full_name || null,
+      full_name: profile?.full_name || user.name || null,
       email: user.email,
       avatar_url: profile?.avatar_url || null,
       plan,

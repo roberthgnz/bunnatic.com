@@ -24,12 +24,12 @@ import {
   type SignupFormValues,
 } from '@/lib/validations/signup'
 import { cn } from '@/lib/utils'
-import { signup } from '@/lib/supabase/actions'
+import { signup } from '@/lib/auth/actions'
 import { toast } from 'sonner'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
 import { normalizeInternalRedirect } from '@/lib/authRedirect'
 
-import { createClient } from '@/lib/supabase/client'
+import { signIn } from 'next-auth/react'
 
 const CONTEXT_KEYS = [
   'utm_source',
@@ -233,17 +233,7 @@ function SignUpContent() {
   }
 
   const handleSocialLogin = async () => {
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(flow.destination)}`,
-      },
-    })
-
-    if (error) {
-      toast.error(error.message)
-    }
+    await signIn('google', { redirectTo: flow.destination })
   }
 
   const switchLink = (

@@ -80,16 +80,16 @@ export function buildPageMetadata({
 
   // Default OG image if not provided
   const ogImage = image || `${baseUrl}/og-image.png`
-  const ogImageAlt = imageAlt || 'Bunnatic - Crea tu web con IA para captar clientes locales'
+  const ogImageAlt = imageAlt || 'Locavo - Crea tu web con IA para captar clientes locales'
 
   return {
     metadataBase: new URL(baseUrl),
     title,
     description,
     keywords,
-    authors: [{ name: 'Bunnatic' }],
-    creator: 'Bunnatic',
-    publisher: 'Bunnatic',
+    authors: [{ name: 'Locavo' }],
+    creator: 'Locavo',
+    publisher: 'Locavo',
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -101,7 +101,7 @@ export function buildPageMetadata({
       title,
       description,
       url: canonicalUrl,
-      siteName: 'Bunnatic',
+      siteName: 'Locavo',
       locale: locale === 'ca' ? 'ca_ES' : 'es_ES',
       type: 'website',
       images: [
@@ -118,8 +118,8 @@ export function buildPageMetadata({
       title,
       description,
       images: [ogImage],
-      creator: '@bunnatic',
-      site: '@bunnatic',
+      creator: '@locavo',
+      site: '@locavo',
     },
     robots: {
       index: !noindex,

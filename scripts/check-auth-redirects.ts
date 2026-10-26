@@ -9,7 +9,7 @@ const destination =
 
 assert.equal(normalizeInternalRedirect(destination), destination)
 assert.equal(
-  getEmailRedirectPath(`https://www.bunnatic.com${destination}`),
+  getEmailRedirectPath(`https://www.locavo.com${destination}`),
   destination
 )
 assert.equal(getEmailRedirectPath(destination), destination)
@@ -34,10 +34,10 @@ for (const unsafe of [
   assert.equal(normalizeInternalRedirect(unsafe, '/onboarding'), '/onboarding')
 }
 
-const confirmation = new URL('https://www.bunnatic.com/auth/confirm')
+const confirmation = new URL('https://www.locavo.com/auth/confirm')
 confirmation.searchParams.set(
   'next',
-  getEmailRedirectPath(`https://www.bunnatic.com${destination}`)!
+  getEmailRedirectPath(`https://www.locavo.com${destination}`)!
 )
 assert.equal(
   normalizeInternalRedirect(confirmation.searchParams.get('next')),

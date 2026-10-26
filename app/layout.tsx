@@ -20,8 +20,8 @@ const gaTrackingId = process.env.NEXT_PUBLIC_GA_TRACKING_ID
 
 export const metadata: Metadata = {
   title: {
-    default: 'Bunnatic - Crea tu Web con IA en 5 Minutos',
-    template: '%s | Bunnatic',
+    default: 'Locavo - Crea tu Web con IA en 5 Minutos',
+    template: '%s | Locavo',
   },
   description:
     'Crea una web profesional para tu negocio local con IA en minutos. Optimizada para SEO local, con formularios de contacto y WhatsApp. Convierte visitas en clientes.',
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     'generador de páginas web',
     'diseño web automático',
   ],
-  authors: [{ name: 'Bunnatic' }],
-  creator: 'Bunnatic',
-  publisher: 'Bunnatic',
+  authors: [{ name: 'Locavo' }],
+  creator: 'Locavo',
+  publisher: 'Locavo',
   robots: {
     index: true,
     follow: true,
@@ -49,18 +49,18 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'es_ES',
-    siteName: 'Bunnatic',
-    title: 'Bunnatic - Crea tu Web con IA en 5 Minutos',
+    siteName: 'Locavo',
+    title: 'Locavo - Crea tu Web con IA en 5 Minutos',
     description:
       'Crea una web profesional para tu negocio local con IA en minutos. Optimizada para SEO local y captación de clientes.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Bunnatic - Crea tu Web con IA',
+    title: 'Locavo - Crea tu Web con IA',
     description:
       'Crea una web profesional con IA en minutos. Optimizada para SEO local y captación de clientes.',
-    creator: '@bunnatic',
-    site: '@bunnatic',
+    creator: '@locavo',
+    site: '@locavo',
   },
 }
 

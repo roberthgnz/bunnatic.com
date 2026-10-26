@@ -93,7 +93,7 @@ export default function BusinessSettingsForm({
   const t = {
     heading: 'Información general',
     subheading:
-      'Los datos básicos que identifican tu negocio en la web y en Bunnatic.',
+      'Los datos básicos que identifican tu negocio en la web y en Locavo.',
     nameLabel: 'Nombre del negocio',
     nameHint: 'Tal y como quieres que aparezca en tu web.',
     categoryLabel: 'Categoría',

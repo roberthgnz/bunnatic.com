@@ -16,10 +16,10 @@ export async function updateSectionStatus(
   status: string
 ): Promise<ActionResult> {
   try {
-    const { supabase, user } = await requireBackofficeSession()
+    const { db, user } = await requireBackofficeSession()
     const parsed = sectionStatusSchema.safeParse(status)
     if (!parsed.success) return { error: 'Estado de publicación no válido.' }
-    const section = await supabase
+    const section = await db
       .from('business_sections')
       .select('id, business_id')
       .eq('id', sectionId)
@@ -34,7 +34,7 @@ export async function updateSectionStatus(
       section.data.business_id,
       'content.write'
     )
-    const result = await supabase
+    const result = await db
       .from('business_sections')
       .update({ status: parsed.data, last_edited_by: user.id })
       .eq('id', sectionId)

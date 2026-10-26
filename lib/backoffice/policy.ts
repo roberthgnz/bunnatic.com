@@ -40,8 +40,8 @@ export function hasBusinessPermission(
   if (!role) return false
   if (permission === 'read') return true
   if (role === 'owner') return true
-  // Keep writes aligned with the deployed owner-only RLS policies for content.
-  // Calendar is the one existing collaborative write policy; viewers cannot write.
+  // D1 query scopes enforce the same owner-only content permissions.
+  // Calendar also permits active administrators and editors to write.
   return (
     permission === 'calendar.write' && (role === 'admin' || role === 'editor')
   )

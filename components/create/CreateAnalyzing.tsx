@@ -132,8 +132,8 @@ const CreateAnalyzing = forwardRef<HTMLHeadingElement, CreateAnalyzingProps>(
               <span className="flex flex-1 items-center justify-center gap-1.5 truncate text-[10px] text-black/45">
                 <Globe2 className="size-2.5 shrink-0" />
                 {businessName
-                  ? `${slugifyHost(businessName)}.bunnatic.com`
-                  : 'tunegocio.bunnatic.com'}
+                  ? `${slugifyHost(businessName)}.locavo.com`
+                  : 'tunegocio.locavo.com'}
               </span>
             </div>
             <div className="bg-[#f7f7f4] motion-safe:animate-pulse">

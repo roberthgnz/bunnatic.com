@@ -1044,7 +1044,7 @@ function CreateWebContent() {
               <div className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-8">
                 <GeneratedSitePreview
                   name={placeDetails.name}
-                  host={`${slugifyHost(placeDetails.name)}.bunnatic.com`}
+                  host={`${slugifyHost(placeDetails.name)}.locavo.com`}
                   types={placeDetails.types}
                   address={placeDetails.formatted_address}
                   phone={placeDetails.formatted_phone_number}
@@ -1218,7 +1218,7 @@ function CreateWebContent() {
               <p className="mt-6 inline-flex max-w-full items-center gap-2 rounded-full bg-(--home-soft) px-4 py-2 text-sm text-black/75">
                 <Globe2 className="size-4 shrink-0" aria-hidden="true" />
                 <span className="truncate">
-                  {slugifyHost(placeDetails.name)}.bunnatic.com
+                  {slugifyHost(placeDetails.name)}.locavo.com
                 </span>
               </p>
               <div className="mt-8 flex flex-col justify-center gap-2.5 sm:flex-row">

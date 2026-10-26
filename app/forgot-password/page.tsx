@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { AuthShell } from '@/components/auth/AuthShell'
 import { FieldError } from '@/components/auth/FieldError'
-import { createClient } from '@/lib/supabase/client'
+import { requestPasswordReset } from '@/lib/auth/actions'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -28,18 +28,12 @@ export default function ForgotPasswordPage() {
     setError(undefined)
     setSubmitting(true)
 
-    const supabase = createClient()
-    const { error: requestError } = await supabase.auth.resetPasswordForEmail(
-      value,
-      {
-        redirectTo: `${window.location.origin}/auth/update-password?next=/dashboard`,
-      }
-    )
+    const requestResult = await requestPasswordReset(value)
     setSubmitting(false)
 
     // Rate limits are the only error worth surfacing; for anything else we show
     // the same confirmation so the form can't be used to probe which emails exist.
-    if (requestError?.status === 429) {
+    if (requestResult.status === 429) {
       setError('Has hecho demasiados intentos. Espera unos minutos.')
       return
     }

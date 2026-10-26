@@ -1,104 +1,124 @@
-import { User, Briefcase, Clock, CheckSquare, Square } from 'lucide-react'
-import type { SourceBlock, BusinessSourcePreview } from '@/lib/businessSourceGeneration'
+import { Briefcase, Check, Clock, User } from 'lucide-react'
+import type {
+  SourceBlock,
+  BusinessSourcePreview,
+} from '@/lib/businessSourceGeneration'
+import { cn } from '@/lib/utils'
 import { isBlockDisabled } from '../utils'
 
 type Props = {
-    preview: BusinessSourcePreview
-    selectedBlocks: Set<SourceBlock>
-    onToggleBlock: (block: SourceBlock) => void
-    labels: {
-        blocksTitle: string
-        blockProfile: string
-        blockProfileDesc: string
-        blockServices: string
-        blockServicesDesc: string
-        blockHours: string
-        blockHoursDesc: string
-    }
+  preview: BusinessSourcePreview
+  selectedBlocks: Set<SourceBlock>
+  onToggleBlock: (block: SourceBlock) => void
+  labels: {
+    blocksTitle: string
+    blockProfile: string
+    blockProfileDesc: string
+    blockServices: string
+    blockServicesDesc: string
+    blockHours: string
+    blockHoursDesc: string
+    blockUnavailable?: string
+  }
 }
 
 const blockDefs = [
-    {
-        key: 'profile' as const,
-        icon: User,
-        labelKey: 'blockProfile' as const,
-        descKey: 'blockProfileDesc' as const,
-    },
-    {
-        key: 'services' as const,
-        icon: Briefcase,
-        labelKey: 'blockServices' as const,
-        descKey: 'blockServicesDesc' as const,
-    },
-    {
-        key: 'hours' as const,
-        icon: Clock,
-        labelKey: 'blockHours' as const,
-        descKey: 'blockHoursDesc' as const,
-    },
+  {
+    key: 'profile' as const,
+    icon: User,
+    labelKey: 'blockProfile' as const,
+    descKey: 'blockProfileDesc' as const,
+  },
+  {
+    key: 'services' as const,
+    icon: Briefcase,
+    labelKey: 'blockServices' as const,
+    descKey: 'blockServicesDesc' as const,
+  },
+  {
+    key: 'hours' as const,
+    icon: Clock,
+    labelKey: 'blockHours' as const,
+    descKey: 'blockHoursDesc' as const,
+  },
 ]
 
 export function BlockSelector({
-    preview,
-    selectedBlocks,
-    onToggleBlock,
-    labels,
+  preview,
+  selectedBlocks,
+  onToggleBlock,
+  labels,
 }: Props) {
-    return (
-        <div className="space-y-2">
-            <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
-                {labels.blocksTitle}
-            </p>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                {blockDefs.map(({ key, icon: Icon, labelKey, descKey }) => {
-                    const isSelected = selectedBlocks.has(key)
-                    const disabled = isBlockDisabled(key, preview)
-                    return (
-                        <button
-                            key={key}
-                            type="button"
-                            disabled={disabled}
-                            onClick={() => onToggleBlock(key)}
-                            className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${disabled
-                                    ? 'cursor-not-allowed border-slate-200 bg-slate-50 opacity-40'
-                                    : isSelected
-                                        ? 'border-blue-300 bg-blue-50 ring-1 ring-blue-200'
-                                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                                }`}
-                        >
-                            <div
-                                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${isSelected && !disabled
-                                        ? 'bg-blue-100 text-blue-600'
-                                        : 'bg-slate-100 text-slate-500'
-                                    }`}
-                            >
-                                <Icon className="h-4 w-4" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <p
-                                    className={`text-sm font-semibold ${isSelected && !disabled ? 'text-blue-800' : 'text-slate-800'
-                                        }`}
-                                >
-                                    {labels[labelKey]}
-                                </p>
-                                <p className="text-xs leading-relaxed text-slate-500">
-                                    {labels[descKey]}
-                                </p>
-                            </div>
-                            <div
-                                className={`mt-0.5 shrink-0 ${isSelected && !disabled ? 'text-blue-500' : 'text-slate-300'
-                                    }`}
-                            >
-                                {isSelected && !disabled ? (
-                                    <CheckSquare className="h-4 w-4" />
-                                ) : (
-                                    <Square className="h-4 w-4" />
-                                )}
-                            </div>
-                        </button>
-                    )
-                })}
-            </div>
-        </div>
-    )
+  return (
+    <fieldset>
+      <legend className="text-foreground mb-3 text-sm font-medium">
+        {labels.blocksTitle}
+      </legend>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {blockDefs.map(({ key, icon: Icon, labelKey, descKey }) => {
+          const disabled = isBlockDisabled(key, preview)
+          const isSelected = selectedBlocks.has(key) && !disabled
+          return (
+            <label
+              key={key}
+              className={cn(
+                'relative flex items-start gap-3 rounded-xl p-4 transition-[background-color,box-shadow]',
+                'has-focus-visible:outline-ring has-focus-visible:outline-2 has-focus-visible:outline-offset-2',
+                disabled
+                  ? 'bg-muted/50 ring-border cursor-not-allowed ring-1'
+                  : isSelected
+                    ? 'bg-accent/40 ring-primary cursor-pointer ring-2'
+                    : 'bg-card ring-border hover:bg-muted/50 cursor-pointer shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1'
+              )}
+            >
+              <input
+                type="checkbox"
+                checked={isSelected}
+                disabled={disabled}
+                onChange={() => onToggleBlock(key)}
+                className="sr-only"
+              />
+              <span
+                className={cn(
+                  'flex size-8 shrink-0 items-center justify-center rounded-lg',
+                  disabled
+                    ? 'bg-muted text-muted-foreground'
+                    : 'bg-secondary text-secondary-foreground'
+                )}
+              >
+                <Icon className="size-4" aria-hidden="true" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span
+                  className={cn(
+                    'block text-sm font-semibold',
+                    disabled ? 'text-muted-foreground' : 'text-foreground'
+                  )}
+                >
+                  {labels[labelKey]}
+                </span>
+                <span className="text-muted-foreground mt-0.5 block text-xs leading-5">
+                  {disabled && labels.blockUnavailable
+                    ? labels.blockUnavailable
+                    : labels[descKey]}
+                </span>
+              </span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md ring-1 transition-colors',
+                  isSelected
+                    ? 'bg-primary text-primary-foreground ring-primary'
+                    : 'bg-card ring-input text-transparent',
+                  disabled && 'opacity-50'
+                )}
+              >
+                <Check className="size-3.5" />
+              </span>
+            </label>
+          )
+        })}
+      </div>
+    </fieldset>
+  )
 }

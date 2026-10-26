@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -7,10 +8,11 @@ import { z } from 'zod'
 import { updateBusiness } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { FormField } from '@/components/ui/form-field'
 import { toast } from 'sonner'
-import { Loader2, Save } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface Business {
   id: string
@@ -28,6 +30,59 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>
 
+const DESCRIPTION_MAX = 500
+
+function Field({
+  id,
+  label,
+  hint,
+  error,
+  required,
+  aside,
+  className,
+  children,
+}: {
+  id: string
+  label: string
+  hint?: string
+  error?: string
+  required?: boolean
+  aside?: React.ReactNode
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className={cn('space-y-1.5', className)}>
+      <div className="flex items-baseline justify-between gap-2">
+        <Label htmlFor={id} className="text-foreground">
+          {label}
+          {required ? (
+            <span className="text-muted-foreground font-normal">
+              <span aria-hidden="true">*</span>
+              <span className="sr-only">(obligatorio)</span>
+            </span>
+          ) : null}
+        </Label>
+        {aside}
+      </div>
+      {children}
+      {error ? (
+        <p
+          id={`${id}-error`}
+          className="text-destructive flex items-center gap-1 text-xs font-medium"
+        >
+          <AlertCircle className="size-3.5 shrink-0" aria-hidden="true" />
+          {error}
+        </p>
+      ) : hint ? (
+        <p id={`${id}-hint`} className="text-muted-foreground text-xs">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  )
+}
+
 export default function BusinessSettingsForm({
   business,
 }: {
@@ -37,15 +92,19 @@ export default function BusinessSettingsForm({
 
   const t = {
     heading: 'Información general',
-    subheading: 'Datos básicos que identifican tu negocio en Bunnatic.',
+    subheading:
+      'Los datos básicos que identifican tu negocio en la web y en Bunnatic.',
     nameLabel: 'Nombre del negocio',
-    nameHint: 'Tal como aparecerá en tu perfil público.',
+    nameHint: 'Tal y como quieres que aparezca en tu web.',
     categoryLabel: 'Categoría',
-    categoryHint: 'Ej: Restaurante, Peluquería, Fisioterapia…',
+    categoryHint: 'Por ejemplo: restaurante, peluquería, fisioterapia…',
     descLabel: 'Descripción',
-    descHint: 'Máximo 500 caracteres.',
+    descHint:
+      'Cuenta en pocas frases qué haces y qué te diferencia. Se usa como texto de presentación.',
     submit: 'Guardar cambios',
     submitting: 'Guardando…',
+    unsaved: 'Tienes cambios sin guardar',
+    saved: 'Todo guardado',
     success: 'Negocio actualizado correctamente',
     errors: {
       name_min: 'El nombre debe tener al menos 2 caracteres',
@@ -57,6 +116,7 @@ export default function BusinessSettingsForm({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -68,6 +128,7 @@ export default function BusinessSettingsForm({
   })
 
   const err = (key: string) => t.errors[key as keyof typeof t.errors] ?? key
+  const descriptionLength = (watch('description') ?? '').length
 
   async function onSubmit(values: FormValues) {
     const formData = new FormData()
@@ -85,31 +146,51 @@ export default function BusinessSettingsForm({
     }
   }
 
+  const describedBy = (id: string, hasError: boolean) =>
+    hasError ? `${id}-error` : `${id}-hint`
+
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      {/* Header */}
-      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
-        <h3 className="text-sm font-semibold text-slate-900">{t.heading}</h3>
-        <p className="mt-0.5 text-xs text-slate-500">{t.subheading}</p>
+    <section
+      aria-labelledby="settings-general-title"
+      className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-10"
+    >
+      <div className="space-y-1">
+        <h2
+          id="settings-general-title"
+          className="text-foreground text-base font-semibold tracking-[-0.01em]"
+        >
+          {t.heading}
+        </h2>
+        <p className="text-muted-foreground max-w-xs text-sm leading-6">
+          {t.subheading}
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="space-y-5 px-6 py-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+      >
+        <div className="space-y-5 p-5 sm:p-6">
           <div className="grid gap-5 sm:grid-cols-2">
-            <FormField
+            <Field
+              id="business-name"
               label={t.nameLabel}
               hint={t.nameHint}
               error={errors.name ? err(errors.name.message!) : undefined}
               required
             >
               <Input
+                id="business-name"
                 {...register('name')}
+                autoComplete="organization"
                 aria-invalid={!!errors.name}
-                className="h-9"
+                aria-describedby={describedBy('business-name', !!errors.name)}
               />
-            </FormField>
+            </Field>
 
-            <FormField
+            <Field
+              id="business-category"
               label={t.categoryLabel}
               hint={t.categoryHint}
               error={
@@ -118,44 +199,78 @@ export default function BusinessSettingsForm({
               required
             >
               <Input
+                id="business-category"
                 {...register('category')}
                 aria-invalid={!!errors.category}
-                className="h-9"
+                aria-describedby={describedBy(
+                  'business-category',
+                  !!errors.category
+                )}
               />
-            </FormField>
+            </Field>
           </div>
 
-          <FormField
+          <Field
+            id="business-description"
             label={t.descLabel}
             hint={t.descHint}
             error={
               errors.description ? err(errors.description.message!) : undefined
             }
+            aside={
+              <span
+                className={cn(
+                  'text-xs tabular-nums',
+                  descriptionLength > DESCRIPTION_MAX
+                    ? 'text-destructive font-medium'
+                    : 'text-muted-foreground'
+                )}
+                aria-live="polite"
+              >
+                {descriptionLength}/{DESCRIPTION_MAX}
+              </span>
+            }
           >
             <Textarea
+              id="business-description"
               {...register('description')}
               rows={5}
               aria-invalid={!!errors.description}
+              aria-describedby={describedBy(
+                'business-description',
+                !!errors.description
+              )}
               className="resize-none"
             />
-          </FormField>
+          </Field>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/40 px-6 py-3">
-          <p className="text-xs text-slate-400">
-            {isDirty ? '● Cambios sin guardar' : ''}
+        <div className="bg-muted/40 border-border flex flex-col-reverse gap-3 border-t px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <p
+            className="text-muted-foreground flex items-center gap-2 text-xs"
+            aria-live="polite"
+          >
+            <span
+              aria-hidden="true"
+              className={cn(
+                'size-1.5 rounded-full',
+                isDirty ? 'bg-warning' : 'bg-success'
+              )}
+            />
+            {isDirty ? t.unsaved : t.saved}
           </p>
-          <Button type="submit" disabled={isSubmitting || !isDirty} size="sm">
+          <Button
+            type="submit"
+            disabled={isSubmitting || !isDirty}
+            className="sm:w-auto"
+          >
             {isSubmitting ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Save className="h-3.5 w-3.5" />
-            )}
+              <Loader2 className="animate-spin" aria-hidden="true" />
+            ) : null}
             {isSubmitting ? t.submitting : t.submit}
           </Button>
         </div>
       </form>
-    </div>
+    </section>
   )
 }

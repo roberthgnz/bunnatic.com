@@ -1,23 +1,22 @@
 import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
+
+const planStyles: Record<string, string> = {
+  Esencial: 'border-border bg-muted text-muted-foreground',
+  Impulso: 'border-primary/15 bg-secondary text-secondary-foreground',
+  Equipo: 'border-primary/25 bg-accent text-primary',
+  Expansión: 'border-primary bg-primary text-primary-foreground',
+}
 
 export default function PlanBadge({ plan }: { plan?: string }) {
   const planName = plan || 'Esencial'
 
-  const colors = {
-    Esencial: 'border-slate-200 bg-slate-50 text-slate-700',
-    Impulso: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-    Equipo: 'border-blue-200 bg-blue-50 text-blue-700',
-    Expansión: 'border-amber-200 bg-amber-50 text-amber-700',
-  }
-
   return (
     <Badge
       variant="outline"
-      className={
-        colors[planName as keyof typeof colors] ||
-        'border-slate-200 bg-slate-50 text-slate-700'
-      }
+      className={cn(planStyles[planName] ?? planStyles.Esencial)}
     >
+      <span className="sr-only">Plan </span>
       {planName}
     </Badge>
   )

@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch'
 import { Loader2, Save, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
 type HoursRow = {
   day_of_week: number
@@ -37,6 +38,9 @@ const hoursRowSchema = z
 
 const hoursSchema = z.array(hoursRowSchema)
 
+/** Week starts on Monday in Spain; values are day_of_week indexes. */
+const displayOrder = [1, 2, 3, 4, 5, 6, 0]
+
 export default function HoursManager({
   businessId,
   initialHours,
@@ -63,7 +67,8 @@ export default function HoursManager({
 
   const t = {
     title: 'Horario de apertura',
-    description: 'Define cuándo está abierto tu negocio.',
+    description:
+      'Marca los días que abres y a qué hora. Se muestra en tu web pública.',
     save: 'Guardar horario',
     days: [
       'Domingo',
@@ -74,13 +79,17 @@ export default function HoursManager({
       'Viernes',
       'Sábado',
     ],
+    open: 'Abierto',
     closed: 'Cerrado',
-    from: 'Abre',
-    to: 'Cierra',
+    closedAllDay: 'Cerrado todo el día',
+    from: 'Apertura',
+    to: 'Cierre',
     saved: 'Horario guardado',
+    pendingErrors: 'Hay errores pendientes de corregir',
+    footerHint: 'Los cambios no se aplican hasta que guardes el horario.',
     errors: {
-      time_format: 'Formato de hora inválido',
-      time_order: 'El cierre debe ser posterior a la apertura',
+      time_format: 'Formato de hora no válido',
+      time_order: 'La hora de cierre debe ser posterior a la de apertura',
     },
   }
 
@@ -127,77 +136,128 @@ export default function HoursManager({
   }
 
   const hasErrors = Object.keys(validationErrors).length > 0
+  const openDays = hoursState.filter((day) => !day.is_closed).length
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      {/* Header */}
-      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
-        <h3 className="text-sm font-semibold text-slate-900">{t.title}</h3>
-        <p className="mt-0.5 text-xs text-slate-500">{t.description}</p>
+    <div className="max-w-3xl space-y-5 pb-10">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-foreground text-base font-semibold tracking-[-0.01em]">
+            {t.title}
+          </h2>
+          <p className="text-muted-foreground mt-1 text-sm">{t.description}</p>
+        </div>
+        <Button onClick={handleSave} disabled={loading} className="shrink-0">
+          {loading ? (
+            <Loader2 className="animate-spin" aria-hidden="true" />
+          ) : (
+            <Save aria-hidden="true" />
+          )}
+          {t.save}
+        </Button>
       </div>
 
-      <div className="space-y-2 px-6 py-5">
-        {hoursState.map((day, index) => {
-          const hasError = !!validationErrors[index]
-          return (
-            <div
-              key={day.day_of_week}
-              className={`grid items-center gap-3 rounded-lg border px-4 py-3 transition-colors md:grid-cols-[160px_auto_1fr] ${
-                hasError
-                  ? 'border-red-200 bg-red-50/40'
-                  : day.is_closed
-                    ? 'border-slate-100 bg-slate-50/40'
-                    : 'border-slate-200 bg-white'
-              }`}
-            >
-              {/* Day name */}
-              <p
-                className={`text-sm font-medium ${day.is_closed ? 'text-slate-400' : 'text-slate-800'}`}
+      <section
+        aria-labelledby="hours-week-title"
+        className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+      >
+        <div className="border-border flex items-center justify-between gap-3 border-b px-5 py-3.5">
+          <h3
+            id="hours-week-title"
+            className="text-foreground text-sm font-medium"
+          >
+            Semana tipo
+          </h3>
+          <p className="text-muted-foreground text-xs">
+            <span className="text-foreground font-semibold tabular-nums">
+              {openDays}
+            </span>{' '}
+            de 7 días abiertos
+          </p>
+        </div>
+
+        <ul className="divide-border divide-y">
+          {displayOrder.map((index) => {
+            const day = hoursState[index]
+            const dayName = t.days[day.day_of_week]
+            const dayLower = dayName.toLowerCase()
+            const hasError = !!validationErrors[index]
+            const errorId = `hours-error-${day.day_of_week}`
+            const switchId = `hours-open-${day.day_of_week}`
+
+            return (
+              <li
+                key={day.day_of_week}
+                className={cn(
+                  'grid items-center gap-x-4 gap-y-3 px-5 py-3.5 transition-colors sm:grid-cols-[132px_120px_minmax(0,1fr)]',
+                  hasError && 'bg-destructive/5'
+                )}
               >
-                {t.days[day.day_of_week]}
-              </p>
+                {/* Day */}
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className={cn(
+                      'size-2 shrink-0 rounded-full transition-colors',
+                      day.is_closed ? 'bg-muted-foreground/30' : 'bg-success'
+                    )}
+                    aria-hidden="true"
+                  />
+                  <span
+                    className={cn(
+                      'text-sm font-medium',
+                      day.is_closed ? 'text-muted-foreground' : 'text-foreground'
+                    )}
+                  >
+                    {dayName}
+                  </span>
+                </div>
 
-              {/* Closed toggle */}
-              <div className="flex items-center gap-2">
-                <Switch
-                  id={`closed-${day.day_of_week}`}
-                  checked={day.is_closed}
-                  onCheckedChange={(checked) =>
-                    updateDay(index, 'is_closed', checked)
-                  }
-                />
-                <Label
-                  htmlFor={`closed-${day.day_of_week}`}
-                  className={`text-xs ${day.is_closed ? 'text-slate-400' : 'text-slate-500'}`}
-                >
-                  {t.closed}
-                </Label>
-              </div>
+                {/* Open / closed toggle */}
+                <div className="flex items-center gap-2.5">
+                  <Switch
+                    id={switchId}
+                    checked={!day.is_closed}
+                    onCheckedChange={(checked) =>
+                      updateDay(index, 'is_closed', !checked)
+                    }
+                    aria-label={`Abierto el ${dayLower}`}
+                  />
+                  <Label
+                    htmlFor={switchId}
+                    aria-hidden="true"
+                    className={cn(
+                      'cursor-pointer text-sm font-normal',
+                      day.is_closed ? 'text-muted-foreground' : 'text-foreground'
+                    )}
+                  >
+                    {day.is_closed ? t.closed : t.open}
+                  </Label>
+                </div>
 
-              {/* Time inputs or error */}
-              {day.is_closed ? (
-                <span className="text-xs text-slate-300">—</span>
-              ) : (
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-9 shrink-0 text-xs text-slate-400">
-                        {t.from}
-                      </span>
+                {/* Times */}
+                {day.is_closed ? (
+                  <p className="text-muted-foreground/80 text-sm">
+                    {t.closedAllDay}
+                  </p>
+                ) : (
+                  <div className="space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Input
                         type="time"
                         value={day.open_time}
                         onChange={(e) =>
                           updateDay(index, 'open_time', e.target.value)
                         }
+                        aria-label={`${t.from} del ${dayLower}`}
                         aria-invalid={hasError}
-                        className="h-8 w-28 text-sm"
+                        aria-describedby={hasError ? errorId : undefined}
+                        className="h-8 w-[7.5rem] tabular-nums"
                       />
-                    </div>
-                    <span className="text-slate-300">→</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-9 shrink-0 text-xs text-slate-400">
-                        {t.to}
+                      <span
+                        className="text-muted-foreground text-sm"
+                        aria-hidden="true"
+                      >
+                        a
                       </span>
                       <Input
                         type="time"
@@ -205,38 +265,45 @@ export default function HoursManager({
                         onChange={(e) =>
                           updateDay(index, 'close_time', e.target.value)
                         }
+                        aria-label={`${t.to} del ${dayLower}`}
                         aria-invalid={hasError}
-                        className="h-8 w-28 text-sm"
+                        aria-describedby={hasError ? errorId : undefined}
+                        className="h-8 w-[7.5rem] tabular-nums"
                       />
                     </div>
+                    {hasError && (
+                      <p
+                        id={errorId}
+                        className="text-destructive flex items-center gap-1 text-xs font-medium"
+                      >
+                        <AlertCircle
+                          className="size-3 shrink-0"
+                          aria-hidden="true"
+                        />
+                        {validationErrors[index]}
+                      </p>
+                    )}
                   </div>
-                  {hasError && (
-                    <p className="flex items-center gap-1 text-xs text-red-500">
-                      <AlertCircle className="h-3 w-3 shrink-0" />
-                      {validationErrors[index]}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
+                )}
+              </li>
+            )
+          })}
+        </ul>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/40 px-6 py-3">
-        <p className="text-xs text-slate-400">
-          {hasErrors ? '● Hay errores pendientes de corregir' : ''}
-        </p>
-        <Button onClick={handleSave} disabled={loading} size="sm">
-          {loading ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Save className="h-3.5 w-3.5" />
-          )}
-          {t.save}
-        </Button>
-      </div>
+        <div className="border-border bg-muted/40 border-t px-5 py-3">
+          <p
+            className={cn(
+              'flex items-center gap-1.5 text-xs',
+              hasErrors ? 'text-destructive font-medium' : 'text-muted-foreground'
+            )}
+          >
+            {hasErrors ? (
+              <AlertCircle className="size-3.5 shrink-0" aria-hidden="true" />
+            ) : null}
+            {hasErrors ? t.pendingErrors : t.footerHint}
+          </p>
+        </div>
+      </section>
     </div>
   )
 }

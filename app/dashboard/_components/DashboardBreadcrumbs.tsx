@@ -9,6 +9,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { usePathname } from 'next/navigation'
+import { Fragment } from 'react'
 import { DashboardContent } from './dashboard-constants'
 
 export function DashboardBreadcrumbs({ t }: { t: DashboardContent }) {
@@ -19,24 +20,22 @@ export function DashboardBreadcrumbs({ t }: { t: DashboardContent }) {
   const currentPath = pathname.startsWith(dashboardRoot)
     ? pathname.slice(dashboardRoot.length)
     : ''
-  const pathSegments = currentPath
-    .split('/')
-    .filter(Boolean)
-    .filter((segment) => segment !== 'businesses')
+  const segments = currentPath.split('/').filter(Boolean)
 
   const segmentLabelMap: Record<string, string> = {
     overview: 'Resumen',
-    analytics: 'Analytics',
+    analytics: 'Analítica',
     calendar: 'Calendario',
     settings: t.menu.settings,
     team: 'Equipo',
-    leads: 'Leads',
-    hours: 'Horarios',
+    leads: 'Mensajes',
+    hours: 'Horario',
     services: 'Servicios',
-    generation: 'Generación',
+    generation: 'Generación IA',
     profile: t.menu.account,
     subscription: t.menu.billing,
     new: t.menu.newBusiness,
+    businesses: t.menu.businesses,
   }
 
   const formatSegmentLabel = (segment: string) => {
@@ -49,29 +48,40 @@ export function DashboardBreadcrumbs({ t }: { t: DashboardContent }) {
       .replace(/\b\w/g, (letter) => letter.toUpperCase())
   }
 
-  const breadcrumbParentLabel =
-    pathSegments.length === 0 ? undefined : t.menu.businesses
-  const breadcrumbPageLabel =
-    pathSegments.length === 0
-      ? t.menu.dashboard
-      : formatSegmentLabel(pathSegments[pathSegments.length - 1])
+  const crumbs =
+    segments.length === 0
+      ? [{ href: dashboardRoot, label: t.menu.dashboard }]
+      : segments.map((segment, index) => ({
+          href: `${dashboardRoot}/${segments.slice(0, index + 1).join('/')}`,
+          label: formatSegmentLabel(segment),
+        }))
 
   return (
-    <Breadcrumb>
-      <BreadcrumbList>
-        {breadcrumbParentLabel ? (
-          <>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href={`${localePrefix}/dashboard/businesses`}>
-                {breadcrumbParentLabel}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-          </>
-        ) : null}
-        <BreadcrumbItem>
-          <BreadcrumbPage>{breadcrumbPageLabel}</BreadcrumbPage>
-        </BreadcrumbItem>
+    <Breadcrumb className="min-w-0">
+      <BreadcrumbList className="flex-nowrap text-[13px]">
+        {crumbs.map((crumb, index) => {
+          const isLast = index === crumbs.length - 1
+          return (
+            <Fragment key={crumb.href}>
+              {index > 0 ? (
+                <BreadcrumbSeparator className="hidden md:block" />
+              ) : null}
+              <BreadcrumbItem
+                className={isLast ? 'min-w-0' : 'hidden md:inline-flex'}
+              >
+                {isLast ? (
+                  <BreadcrumbPage className="truncate font-medium">
+                    {crumb.label}
+                  </BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink href={crumb.href}>
+                    {crumb.label}
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+            </Fragment>
+          )
+        })}
       </BreadcrumbList>
     </Breadcrumb>
   )

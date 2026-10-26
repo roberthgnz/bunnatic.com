@@ -1,138 +1,159 @@
 'use client'
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { BarChart3, Clock, Eye, LogOut, Users } from 'lucide-react'
 import {
   BarChart,
   Bar,
+  CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import { EmptyState, StatCard } from '@/components/dashboard/page-header'
 
-const data = [
-  { name: 'Lun', visits: 40 },
-  { name: 'Mar', visits: 30 },
-  { name: 'Mie', visits: 20 },
-  { name: 'Jue', visits: 27 },
-  { name: 'Vie', visits: 18 },
-  { name: 'Sab', visits: 23 },
-  { name: 'Dom', visits: 34 },
-]
+type DailyVisits = { name: string; visits: number }
+
+/**
+ * Real traffic tracking is not connected yet. Once it is, feed the last
+ * seven days here and the themed chart below renders automatically.
+ */
+const visitsByDay: DailyVisits[] = []
+
+const numberFormatter = new Intl.NumberFormat('es-ES')
 
 export default function AnalyticsViewer({
   businessId,
-  locale,
 }: {
   businessId: string
   locale: string
 }) {
   const t = {
-    es: {
-      title: 'Analítica',
-      description: 'Resumen de rendimiento de tu sitio web.',
-      visits: 'Visitas',
-      unique: 'Usuarios Únicos',
-      duration: 'Duración Media',
-      bounce: 'Rebote',
-      hint: 'Datos de muestra mientras se conecta la analítica real.',
-    },
-    ca: {
-      title: 'Analítica',
-      description: 'Resum de rendiment del teu lloc web.',
-      visits: 'Visites',
-      unique: 'Usuaris Únics',
-      duration: 'Durada Mitjana',
-      bounce: 'Rebot',
-      hint: "Dades de mostra mentre es connecta l'analítica real.",
-    },
-  }[locale === 'ca' ? 'ca' : 'es']
+    title: 'Analítica',
+    description: 'Cómo encuentran y usan tu web tus clientes.',
+    visits: 'Visitas',
+    unique: 'Visitantes únicos',
+    duration: 'Duración media',
+    bounce: 'Tasa de rebote',
+    noData: 'Sin datos todavía',
+    chartTitle: 'Visitas de los últimos 7 días',
+    chartDescription: 'Número de visitas diarias a tu web pública.',
+    emptyTitle: 'Aún no hay datos de tráfico',
+    emptyDescription:
+      'Las métricas aparecerán aquí en cuanto tu web empiece a registrar visitas.',
+  }
+
+  const hasData = visitsByDay.length > 0
+  const placeholder = <span className="text-muted-foreground/60">—</span>
 
   return (
-    <div className="space-y-4" data-business-id={businessId}>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.visits}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+12,234</div>
-            <p className="text-muted-foreground text-xs">
-              +19% desde el mes pasado
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.unique}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+573</div>
-            <p className="text-muted-foreground text-xs">
-              +201 desde el mes pasado
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.duration}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2m 15s</div>
-            <p className="text-muted-foreground text-xs">
-              -4% desde el mes pasado
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.bounce}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">45%</div>
-            <p className="text-muted-foreground text-xs">
-              +2% desde el mes pasado
-            </p>
-          </CardContent>
-        </Card>
+    <div className="space-y-5 pb-10" data-business-id={businessId}>
+      <div>
+        <h2 className="text-foreground text-base font-semibold tracking-[-0.01em]">
+          {t.title}
+        </h2>
+        <p className="text-muted-foreground mt-1 text-sm">{t.description}</p>
       </div>
 
-      <Card className="col-span-4">
-        <CardHeader>
-          <CardTitle>{t.title}</CardTitle>
-          <CardDescription>
-            {t.description} {t.hint}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pl-2">
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={data}>
-              <XAxis
-                dataKey="name"
-                stroke="#888888"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                stroke="#888888"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => `${value}`}
-              />
-              <Tooltip />
-              <Bar dataKey="visits" fill="#10b981" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <section
+        aria-label="Métricas principales"
+        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+      >
+        <StatCard label={t.visits} value={placeholder} hint={t.noData} icon={Eye} />
+        <StatCard
+          label={t.unique}
+          value={placeholder}
+          hint={t.noData}
+          icon={Users}
+        />
+        <StatCard
+          label={t.duration}
+          value={placeholder}
+          hint={t.noData}
+          icon={Clock}
+        />
+        <StatCard
+          label={t.bounce}
+          value={placeholder}
+          hint={t.noData}
+          icon={LogOut}
+        />
+      </section>
+
+      {hasData ? (
+        <section
+          aria-labelledby="analytics-chart-title"
+          className="bg-card ring-border rounded-xl p-5 shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1 sm:p-6"
+        >
+          <h3
+            id="analytics-chart-title"
+            className="text-foreground text-base font-semibold tracking-[-0.01em]"
+          >
+            {t.chartTitle}
+          </h3>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {t.chartDescription}
+          </p>
+          <div className="mt-6 -ml-2 h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={visitsByDay} barCategoryGap="28%">
+                <CartesianGrid
+                  vertical={false}
+                  stroke="var(--border)"
+                  strokeDasharray="3 3"
+                />
+                <XAxis
+                  dataKey="name"
+                  stroke="var(--muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                />
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  allowDecimals={false}
+                  width={40}
+                  tickFormatter={(value: number) =>
+                    numberFormatter.format(value)
+                  }
+                />
+                <Tooltip
+                  cursor={{ fill: 'var(--muted)' }}
+                  formatter={(value) => [
+                    numberFormatter.format(Number(value)),
+                    t.visits,
+                  ]}
+                  contentStyle={{
+                    background: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 10,
+                    boxShadow: '0 6px 20px -10px rgba(41,73,46,0.25)',
+                    fontSize: 12,
+                  }}
+                  labelStyle={{ color: 'var(--foreground)', fontWeight: 600 }}
+                  itemStyle={{ color: 'var(--muted-foreground)' }}
+                />
+                <Bar
+                  dataKey="visits"
+                  name={t.visits}
+                  fill="var(--chart-1)"
+                  radius={[6, 6, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+      ) : (
+        <EmptyState
+          icon={BarChart3}
+          title={t.emptyTitle}
+          description={t.emptyDescription}
+        />
+      )}
     </div>
   )
 }

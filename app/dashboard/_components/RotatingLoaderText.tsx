@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+
+import { cn } from '@/lib/utils'
 
 interface RotatingLoaderTextProps {
   messages: string[]
@@ -15,6 +17,7 @@ export function RotatingLoaderText({
   className = '',
 }: RotatingLoaderTextProps) {
   const [index, setIndex] = useState(0)
+  const reduceMotion = useReducedMotion()
 
   useEffect(() => {
     if (messages.length <= 1) return
@@ -26,19 +29,25 @@ export function RotatingLoaderText({
     return () => clearInterval(timer)
   }, [messages.length, interval])
 
+  const offset = reduceMotion ? 0 : 6
+
   return (
-    <div className={`relative h-10 min-w-[300px] overflow-hidden ${className}`}>
-      <AnimatePresence mode="wait">
-        <motion.div
+    <div
+      role="status"
+      aria-live="polite"
+      className={cn('relative h-6 w-full max-w-sm overflow-hidden', className)}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.p
           key={index}
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: offset }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.3 }}
-          className="absolute inset-0 flex items-center justify-center px-4 text-center text-sm font-medium text-blue-700"
+          exit={{ opacity: 0, y: -offset }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          className="text-muted-foreground absolute inset-0 flex items-center justify-center text-center text-sm"
         >
           {messages[index]}
-        </motion.div>
+        </motion.p>
       </AnimatePresence>
     </div>
   )

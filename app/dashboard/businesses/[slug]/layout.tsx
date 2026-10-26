@@ -8,7 +8,7 @@ import {
 } from '@/lib/supabase/actions'
 import BusinessSectionNav from './_components/BusinessSectionNav'
 import { BusinessProvider } from './_components/BusinessContext'
-import GenerationFab from './_components/GenerationFab'
+import BusinessHeader from './_components/BusinessHeader'
 
 export default async function BusinessDetailLayout({
   children,
@@ -40,18 +40,10 @@ export default async function BusinessDetailLayout({
       businessDomain={businessDomain}
     >
       <div className="space-y-6">
-        {/* Main Content Area Layout */}
-        <div className="flex flex-col gap-8 md:flex-row">
-          {/* Left Sidebar */}
-          <aside className="w-full shrink-0 md:sticky md:top-6 md:z-20 md:h-[calc(100vh-3rem)] md:w-56 md:overflow-y-auto lg:w-64">
-            <BusinessSectionNav slug={slug} />
-          </aside>
-
-          {/* Right Content */}
-          <main className="min-w-0 flex-1">{children}</main>
-        </div>
+        <BusinessHeader />
+        <BusinessSectionNav slug={slug} />
+        <div className="min-w-0 pt-2">{children}</div>
       </div>
-      <GenerationFab slug={slug} />
     </BusinessProvider>
   )
 }

@@ -2,7 +2,8 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { ChevronsUpDown, Plus, Building2 } from 'lucide-react'
+import { ChevronsUpDown, Plus } from 'lucide-react'
+import { BusinessMonogram } from '@/components/dashboard/page-header'
 
 import {
   DropdownMenu,
@@ -10,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -19,6 +19,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+
+const switcherClass =
+  'bg-card ring-sidebar-border h-12 shadow-[0_1px_2px_rgba(31,42,28,0.05)] ring-1 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:shadow-none group-data-[collapsible=icon]:ring-0'
 
 type TeamItem = {
   name: string
@@ -69,26 +72,26 @@ export function TeamSwitcher({
   }
 
   if (!mounted) {
-    const Logo = activeTeam.logo || Building2
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg">
-            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-              <Logo className="size-4" />
-            </div>
+          <SidebarMenuButton size="lg" className={switcherClass}>
+            <BusinessMonogram
+              name={activeTeam.name}
+              className="size-8 text-xs"
+            />
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{activeTeam.name}</span>
-              <span className="truncate text-xs">{activeTeam.plan}</span>
+              <span className="text-muted-foreground truncate text-xs">
+                {activeTeam.plan}
+              </span>
             </div>
-            <ChevronsUpDown className="ml-auto" />
+            <ChevronsUpDown className="text-muted-foreground ml-auto" />
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
     )
   }
-
-  const ActiveLogo = activeTeam.logo || Building2
 
   return (
     <SidebarMenu>
@@ -97,16 +100,19 @@ export function TeamSwitcher({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className={`${switcherClass} data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground`}
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <ActiveLogo className="size-4" />
-              </div>
+              <BusinessMonogram
+                name={activeTeam.name}
+                className="size-8 text-xs"
+              />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{activeTeam.name}</span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="text-muted-foreground truncate text-xs">
+                  {activeTeam.plan}
+                </span>
               </div>
-              <ChevronsUpDown className="ml-auto" />
+              <ChevronsUpDown className="text-muted-foreground ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -118,8 +124,7 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               {teamLabel}
             </DropdownMenuLabel>
-            {teams.map((team, index) => {
-              const TeamLogo = team.logo || Building2
+            {teams.map((team) => {
               return (
                 <DropdownMenuItem
                   key={team.name}
@@ -129,19 +134,19 @@ export function TeamSwitcher({
                 >
                   {team.href ? (
                     <Link href={team.href}>
-                      <div className="flex size-6 items-center justify-center rounded-md border">
-                        <TeamLogo className="size-3.5 shrink-0" />
-                      </div>
+                      <BusinessMonogram
+                        name={team.name}
+                        className="size-6 rounded-md text-[11px]"
+                      />
                       {team.name}
-                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
                     </Link>
                   ) : (
                     <>
-                      <div className="flex size-6 items-center justify-center rounded-md border">
-                        <TeamLogo className="size-3.5 shrink-0" />
-                      </div>
+                      <BusinessMonogram
+                        name={team.name}
+                        className="size-6 rounded-md text-[11px]"
+                      />
                       {team.name}
-                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
                     </>
                   )}
                 </DropdownMenuItem>

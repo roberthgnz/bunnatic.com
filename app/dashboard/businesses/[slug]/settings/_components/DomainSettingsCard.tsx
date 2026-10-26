@@ -1,7 +1,19 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
-import { Check, Copy, Globe, Loader2, RefreshCcw, Trash2 } from 'lucide-react'
+import { useMemo, useState, useTransition, type ReactNode } from 'react'
+import {
+  AlertTriangle,
+  ArrowUpRight,
+  Check,
+  CheckCircle2,
+  Clock,
+  Copy,
+  Globe,
+  Info,
+  Loader2,
+  RefreshCcw,
+  Trash2,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import {
   connectBusinessDomain,
@@ -10,7 +22,9 @@ import {
 } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
 type DomainStatus = 'pending_dns' | 'pending_ssl' | 'active' | 'moved' | 'error'
 
@@ -58,27 +72,165 @@ function formatDateTime(value: string | null) {
   return formatter.format(date)
 }
 
-function getStatusMeta(status: DomainStatus) {
-  const labels = {
-    pending_dns: 'Pendiente DNS',
-    pending_ssl: 'Pendiente SSL',
-    active: 'Activo',
-    moved: 'Movido',
-    error: 'Error',
+type BadgeVariant = 'success' | 'warning' | 'destructive' | 'outline'
+
+function getStatusMeta(status: DomainStatus): {
+  label: string
+  variant: BadgeVariant
+  description: string
+} {
+  const meta: Record<
+    DomainStatus,
+    { label: string; variant: BadgeVariant; description: string }
+  > = {
+    pending_dns: {
+      label: 'Pendiente de DNS',
+      variant: 'warning',
+      description:
+        'Estamos esperando a que los registros DNS estén configurados y se propaguen.',
+    },
+    pending_ssl: {
+      label: 'Emitiendo SSL',
+      variant: 'warning',
+      description:
+        'El dominio ya apunta a Bunnatic. Falta validar y emitir el certificado HTTPS.',
+    },
+    active: {
+      label: 'Activo',
+      variant: 'success',
+      description: 'Tu web ya se sirve desde este dominio con HTTPS.',
+    },
+    moved: {
+      label: 'Movido',
+      variant: 'outline',
+      description:
+        'El dominio ha dejado de apuntar a Bunnatic. Revisa el registro CNAME.',
+    },
+    error: {
+      label: 'Error',
+      variant: 'destructive',
+      description:
+        'La verificación ha fallado. Revisa los registros y vuelve a comprobar el estado.',
+    },
   }
 
-  const classes: Record<DomainStatus, string> = {
-    pending_dns: 'border-amber-200 bg-amber-50 text-amber-700',
-    pending_ssl: 'border-blue-200 bg-blue-50 text-blue-700',
-    active: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-    moved: 'border-slate-200 bg-slate-100 text-slate-700',
-    error: 'border-rose-200 bg-rose-50 text-rose-700',
-  }
+  return meta[status]
+}
 
-  return {
-    label: labels[status],
-    className: classes[status],
+/** Index of the current step in the connection timeline (0-based). */
+function getProgressStep(status: DomainStatus) {
+  switch (status) {
+    case 'active':
+      return 3
+    case 'pending_ssl':
+      return 2
+    default:
+      return 1
   }
+}
+
+function CopyButton({
+  copied,
+  label,
+  onCopy,
+}: {
+  copied: boolean
+  label: string
+  onCopy: () => void
+}) {
+  return (
+    <Button
+      type="button"
+      size="sm"
+      variant="outline"
+      onClick={onCopy}
+      aria-label={copied ? 'Copiado' : `Copiar ${label}`}
+      className={cn('w-full sm:w-24', copied && 'text-success')}
+    >
+      {copied ? (
+        <Check aria-hidden="true" />
+      ) : (
+        <Copy aria-hidden="true" />
+      )}
+      {copied ? 'Copiado' : 'Copiar'}
+    </Button>
+  )
+}
+
+function DnsField({
+  label,
+  value,
+  copied,
+  onCopy,
+}: {
+  label: string
+  value: string
+  copied: boolean
+  onCopy: () => void
+}) {
+  return (
+    <div className="grid gap-1.5 sm:grid-cols-[72px_minmax(0,1fr)_auto] sm:items-center sm:gap-3">
+      <dt className="text-muted-foreground text-xs font-medium">{label}</dt>
+      <dd className="min-w-0">
+        <code className="bg-muted text-foreground block rounded-md px-2 py-1.5 font-mono text-xs break-all">
+          {value}
+        </code>
+      </dd>
+      <dd>
+        <CopyButton
+          copied={copied}
+          label={label.toLowerCase()}
+          onCopy={onCopy}
+        />
+      </dd>
+    </div>
+  )
+}
+
+function DnsStep({
+  number,
+  title,
+  description,
+  recordType,
+  children,
+}: {
+  number: number
+  title: string
+  description?: string
+  recordType?: string
+  children: ReactNode
+}) {
+  return (
+    <li className="flex gap-4 px-5 py-5 sm:px-6">
+      <span
+        aria-hidden="true"
+        className="bg-secondary text-secondary-foreground flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums"
+      >
+        {number}
+      </span>
+      <div className="min-w-0 flex-1 space-y-3">
+        <div className="space-y-0.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className="text-foreground text-sm font-semibold">
+              <span className="sr-only">Paso {number}: </span>
+              {title}
+            </h4>
+            {recordType ? (
+              <Badge variant="outline" className="font-mono">
+                {recordType}
+              </Badge>
+            ) : null}
+          </div>
+          {description ? (
+            <p className="text-muted-foreground text-xs leading-5">
+              {description}
+            </p>
+          ) : null}
+        </div>
+        {children}
+      </div>
+    </li>
+  )
 }
 
 export default function DomainSettingsCard({
@@ -100,54 +252,58 @@ export default function DomainSettingsCard({
   const t = {
     heading: 'Dominio personalizado',
     subheading:
-      'Conecta tu dominio y gestiona la validación DNS/SSL desde aquí.',
+      'Usa tu propio dominio (por ejemplo, www.tunegocio.com) para tu web. Te guiamos paso a paso con la configuración DNS.',
+    requirement:
+      'Necesitarás acceso al panel DNS de tu proveedor de dominio (GoDaddy, IONOS, Cloudflare…).',
     hostnameLabel: 'Dominio',
-    hostnameHint: 'Ejemplo: www.tunegocio.com',
+    hostnamePlaceholder: 'www.tunegocio.com',
+    hostnameHint: 'Escribe el dominio sin https:// ni barras al final.',
     connect: 'Conectar dominio',
     replace: 'Reemplazar dominio',
-    refreshing: 'Actualizando…',
-    refresh: 'Actualizar estado',
+    refreshing: 'Comprobando…',
+    refresh: 'Comprobar estado',
     disconnect: 'Desconectar',
-    noDomain: 'Aún no hay dominio conectado.',
+    noDomain:
+      'Todavía no has conectado ningún dominio. Tu web sigue disponible en su dirección de Bunnatic.',
+    progressLabel: 'Progreso de la conexión',
+    progressSteps: ['Dominio añadido', 'DNS verificado', 'SSL emitido', 'Activo'],
     dnsTitle: 'Configura estos registros DNS',
     dnsSubtitle:
-      'Copia exactamente estos valores en el panel DNS de tu proveedor.',
-    step1: 'Paso 1 (solo una vez): crea/actualiza el CNAME principal',
-    step2: 'Paso 2: valida propiedad del dominio (Ownership)',
-    step3: 'Paso 3: valida certificado SSL (DCV)',
-    multipleTxtHint:
-      'Si ves varias filas TXT con el mismo host, crea todas (una por valor).',
-    activeDnsInfo:
-      'Dominio activo. No necesitas crear más registros DNS salvo cambios futuros.',
-    cname: 'CNAME',
-    txt: 'TXT de validación',
-    ownershipTxt: 'TXT Ownership',
-    sslTxt: 'TXT SSL (DCV)',
-    sslHttp: 'HTTP SSL (DCV)',
-    url: 'URL',
-    body: 'Body',
+      'Entra en el panel DNS de tu proveedor y crea los siguientes registros copiando los valores exactamente.',
+    cnameTitle: 'Apunta tu dominio a Bunnatic',
+    cnameDesc:
+      'Crea o edita un registro CNAME. Solo tendrás que hacerlo una vez.',
+    ownershipTitle: 'Demuestra que el dominio es tuyo',
+    ownershipDesc:
+      'Añade este registro TXT para verificar la propiedad del dominio.',
+    sslTitle: 'Valida el certificado SSL',
+    sslDesc:
+      'Necesario para servir tu web con HTTPS. Si hay varios registros TXT con el mismo host, créalos todos (uno por valor).',
+    sslTxt: 'Registro TXT',
+    sslHttp: 'Validación HTTP',
     noSslValidationRecords:
-      'Cloudflare aún no devolvió registros SSL/DCV para este dominio.',
+      'Cloudflare todavía no ha generado los registros SSL. Comprueba el estado de nuevo en unos minutos.',
+    activeDnsInfo:
+      'Todo listo. No necesitas crear más registros DNS salvo que cambies de proveedor.',
     host: 'Host',
-    target: 'Target',
+    target: 'Destino',
     value: 'Valor',
-    copy: 'Copiar',
-    copied: 'Copiado',
+    url: 'URL',
+    body: 'Contenido',
     copyError: 'No se pudo copiar al portapapeles.',
-    status: 'Estado',
     validationErrors: 'Errores de validación',
     noValidationErrorDetails:
-      'Cloudflare marcó error, pero no devolvió detalle adicional.',
+      'Cloudflare ha marcado un error, pero no ha devuelto más detalles.',
     sslStatus: 'Estado SSL',
     lastCheck: 'Última comprobación',
     activatedAt: 'Activado el',
-    liveUrl: 'URL activa',
+    visit: 'Visitar web',
     successConnect:
-      'Dominio conectado. Completa DNS y vuelve a actualizar estado.',
+      'Dominio conectado. Configura los registros DNS y comprueba el estado.',
     successRefresh: 'Estado del dominio actualizado.',
     successDisconnect: 'Dominio desconectado correctamente.',
-    copyHint:
-      'Puedes tardar algunos minutos hasta que Cloudflare lo marque como activo.',
+    propagationHint:
+      'Los cambios de DNS pueden tardar desde unos minutos hasta unas horas en propagarse.',
   }
 
   const statusMeta = useMemo(() => {
@@ -258,445 +414,473 @@ export default function DomainSettingsCard({
     }
   }
 
-  const dnsSectionCardClass =
-    'rounded-md border border-slate-200 bg-white p-3 space-y-2'
-  const dnsSectionTitleClass = 'text-xs font-semibold text-slate-900'
-  const dnsFieldLabelClass = 'text-slate-700'
+  const hasOwnershipRecord = Boolean(
+    domain?.verification_record_name && domain?.verification_record_value
+  )
+  let stepCounter = 0
+  const nextStep = () => ++stepCounter
+  const progressStep = domain ? getProgressStep(domain.status) : 0
+  const hasProblem = domain?.status === 'error' || domain?.status === 'moved'
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-          <Globe className="h-4 w-4 text-slate-600" />
-          {t.heading}
-        </h3>
-        <p className="mt-0.5 text-xs text-slate-500">{t.subheading}</p>
+    <section
+      aria-labelledby="settings-domain-title"
+      className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-10"
+    >
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <h2
+            id="settings-domain-title"
+            className="text-foreground text-base font-semibold tracking-[-0.01em]"
+          >
+            {t.heading}
+          </h2>
+          <p className="text-muted-foreground max-w-xs text-sm leading-6">
+            {t.subheading}
+          </p>
+        </div>
+        <p className="text-muted-foreground flex max-w-xs gap-2 text-xs leading-5">
+          <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+          {t.requirement}
+        </p>
       </div>
 
-      <div className="space-y-5 px-6 py-6">
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-slate-900">
+      <div className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1">
+        {/* Hostname form */}
+        <form
+          className="space-y-1.5 p-5 sm:p-6"
+          onSubmit={(event) => {
+            event.preventDefault()
+            handleConnect()
+          }}
+        >
+          <Label htmlFor="custom-domain" className="text-foreground">
             {t.hostnameLabel}
-          </label>
-          <Input
-            value={hostname}
-            onChange={(event) => setHostname(event.target.value)}
-            placeholder={t.hostnameHint}
-            className="h-9"
-            autoCapitalize="off"
-            autoCorrect="off"
-            spellCheck={false}
-          />
-          <p className="text-xs text-slate-500">{t.copyHint}</p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            onClick={handleConnect}
-            disabled={isPending || !canConnect}
-            size="sm"
-          >
-            {isPending ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : null}
-            {domain ? (isReplacing ? t.replace : t.connect) : t.connect}
-          </Button>
-
-          <Button
-            type="button"
-            onClick={handleRefresh}
-            disabled={isPending || !domain}
-            variant="outline"
-            size="sm"
-          >
-            {isPending ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RefreshCcw className="h-3.5 w-3.5" />
-            )}
-            {isPending ? t.refreshing : t.refresh}
-          </Button>
-
-          <Button
-            type="button"
-            onClick={handleDisconnect}
-            disabled={isPending || !domain}
-            variant="ghost"
-            size="sm"
-            className="text-rose-600 hover:bg-rose-50 hover:text-rose-700"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            {t.disconnect}
-          </Button>
-        </div>
+          </Label>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="relative flex-1">
+              <Globe
+                className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+                aria-hidden="true"
+              />
+              <Input
+                id="custom-domain"
+                value={hostname}
+                onChange={(event) => setHostname(event.target.value)}
+                placeholder={t.hostnamePlaceholder}
+                className="pl-9 font-mono text-sm md:text-sm"
+                autoCapitalize="off"
+                autoCorrect="off"
+                autoComplete="off"
+                inputMode="url"
+                spellCheck={false}
+                aria-describedby="custom-domain-hint"
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={isPending || !canConnect}
+              variant={domain && !isReplacing ? 'outline' : 'default'}
+            >
+              {isPending ? (
+                <Loader2 className="animate-spin" aria-hidden="true" />
+              ) : null}
+              {domain ? (isReplacing ? t.replace : t.connect) : t.connect}
+            </Button>
+          </div>
+          <p id="custom-domain-hint" className="text-muted-foreground text-xs">
+            {t.hostnameHint}
+          </p>
+        </form>
 
         {!domain ? (
-          <p className="text-sm text-slate-500">{t.noDomain}</p>
+          <div className="bg-muted/40 border-border text-muted-foreground border-t px-5 py-3.5 text-xs sm:px-6">
+            {t.noDomain}
+          </div>
         ) : (
-          <div className="space-y-4 rounded-lg border border-slate-100 bg-slate-50/40 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm font-medium text-slate-900">
-                {domain.hostname}
-              </p>
-              {statusMeta ? (
-                <Badge variant="outline" className={statusMeta.className}>
-                  {statusMeta.label}
-                </Badge>
-              ) : null}
-            </div>
+          <>
+            {/* Status */}
+            <div className="border-border space-y-5 border-t p-5 sm:p-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex min-w-0 items-start gap-3">
+                  <span className="bg-secondary text-secondary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
+                    <Globe className="size-4" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-foreground truncate font-mono text-sm font-medium">
+                        {domain.hostname}
+                      </p>
+                      {statusMeta ? (
+                        <Badge variant={statusMeta.variant}>
+                          {domain.status === 'active' ? (
+                            <CheckCircle2 aria-hidden="true" />
+                          ) : null}
+                          {statusMeta.label}
+                        </Badge>
+                      ) : null}
+                    </div>
+                    {statusMeta ? (
+                      <p className="text-muted-foreground mt-1 text-xs leading-5">
+                        {statusMeta.description}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+                {domain.status === 'active' ? (
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href={`https://${domain.hostname}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t.visit}
+                      <ArrowUpRight aria-hidden="true" />
+                      <span className="sr-only">
+                        (https://{domain.hostname}, se abre en una pestaña
+                        nueva)
+                      </span>
+                    </a>
+                  </Button>
+                ) : null}
+              </div>
 
-            {domain.status === 'active' ? (
-              <a
-                href={`https://${domain.hostname}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-emerald-700 hover:text-emerald-800 hover:underline"
+              {/* Progress */}
+              <ol
+                aria-label={t.progressLabel}
+                className="grid grid-cols-2 gap-x-3 gap-y-3 sm:grid-cols-4"
               >
-                {t.liveUrl}: https://{domain.hostname}
-              </a>
-            ) : null}
+                {t.progressSteps.map((label, index) => {
+                  const done = index < progressStep || progressStep === 3
+                  const current = index === progressStep && progressStep < 3
+                  const failed = current && hasProblem
+                  return (
+                    <li key={label} className="space-y-1.5">
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'block h-1 rounded-full',
+                          done
+                            ? 'bg-primary'
+                            : failed
+                              ? 'bg-destructive'
+                              : current
+                                ? 'bg-warning'
+                                : 'bg-muted'
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          'flex items-center gap-1 text-xs',
+                          done || current
+                            ? 'text-foreground font-medium'
+                            : 'text-muted-foreground'
+                        )}
+                      >
+                        {done ? (
+                          <Check
+                            className="text-primary size-3"
+                            aria-hidden="true"
+                          />
+                        ) : null}
+                        {label}
+                        <span className="sr-only">
+                          {done
+                            ? ' (completado)'
+                            : failed
+                              ? ' (con errores)'
+                              : current
+                                ? ' (en curso)'
+                                : ' (pendiente)'}
+                        </span>
+                      </span>
+                    </li>
+                  )
+                })}
+              </ol>
 
-            <div className="grid gap-3 text-xs text-slate-600 md:grid-cols-2">
-              <div>
-                <p className="font-medium text-slate-700">{t.status}</p>
-                <p>{domain.status}</p>
-              </div>
-              <div>
-                <p className="font-medium text-slate-700">{t.sslStatus}</p>
-                <p>{domain.cloudflare_ssl_status || '—'}</p>
-              </div>
-              <div>
-                <p className="font-medium text-slate-700">{t.lastCheck}</p>
-                <p>{formatDateTime(domain.last_checked_at)}</p>
-              </div>
-              <div>
-                <p className="font-medium text-slate-700">{t.activatedAt}</p>
-                <p>{formatDateTime(domain.activated_at)}</p>
-              </div>
+              <dl className="bg-muted/40 ring-border grid gap-3 rounded-lg p-3.5 text-xs ring-1 sm:grid-cols-3">
+                <div>
+                  <dt className="text-muted-foreground">{t.sslStatus}</dt>
+                  <dd className="text-foreground mt-0.5 font-medium">
+                    {domain.cloudflare_ssl_status || '—'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">{t.lastCheck}</dt>
+                  <dd className="text-foreground mt-0.5 font-medium tabular-nums">
+                    {formatDateTime(domain.last_checked_at)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">{t.activatedAt}</dt>
+                  <dd className="text-foreground mt-0.5 font-medium tabular-nums">
+                    {formatDateTime(domain.activated_at)}
+                  </dd>
+                </div>
+              </dl>
+
+              {domain.status === 'error' ? (
+                <div
+                  role="alert"
+                  className="border-destructive/20 bg-destructive/5 flex gap-3 rounded-lg border p-3.5"
+                >
+                  <AlertTriangle
+                    className="text-destructive mt-0.5 size-4 shrink-0"
+                    aria-hidden="true"
+                  />
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-destructive text-sm font-medium">
+                      {t.validationErrors}
+                    </p>
+                    {validationErrors.length > 0 ? (
+                      <ul className="text-foreground/80 list-disc space-y-1 pl-4 text-xs leading-5">
+                        {validationErrors.map((errorMessage, index) => (
+                          <li key={`${errorMessage}-${index}`}>
+                            {errorMessage}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-foreground/80 text-xs">
+                        {t.noValidationErrorDetails}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : null}
             </div>
 
-            {domain.status === 'error' ? (
-              <div className="rounded-md border border-rose-200 bg-rose-50 p-3">
-                <p className="mb-2 text-xs font-semibold text-rose-900">
-                  {t.validationErrors}
-                </p>
-                {validationErrors.length > 0 ? (
-                  <ul className="list-disc space-y-1 pl-4 text-xs text-rose-800">
-                    {validationErrors.map((errorMessage, index) => (
-                      <li key={`${errorMessage}-${index}`}>{errorMessage}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-xs text-rose-800">
-                    {t.noValidationErrorDetails}
+            {/* DNS records */}
+            {needsDnsSetup ? (
+              <div className="border-border border-t">
+                <div className="px-5 pt-5 sm:px-6">
+                  <h3 className="text-foreground text-sm font-semibold">
+                    {t.dnsTitle}
+                  </h3>
+                  <p className="text-muted-foreground mt-0.5 text-xs leading-5">
+                    {t.dnsSubtitle}
                   </p>
-                )}
-              </div>
-            ) : null}
+                </div>
 
-            <div className="space-y-3 border-t border-slate-200 pt-3">
-              <div>
-                <p className="text-sm font-semibold text-slate-900">
-                  {t.dnsTitle}
-                </p>
-                <p className="mt-0.5 text-xs text-slate-600">{t.dnsSubtitle}</p>
-              </div>
-
-              {!needsDnsSetup ? (
-                <p className="text-xs text-emerald-700">{t.activeDnsInfo}</p>
-              ) : null}
-
-              {needsDnsSetup && dnsTarget ? (
-                <div className={dnsSectionCardClass}>
-                  <p className={dnsSectionTitleClass}>{t.step1}</p>
-                  <p className="text-xs text-slate-500">{t.cname}</p>
-                  <div className="grid gap-2 text-xs">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={dnsFieldLabelClass}>{t.host}</span>
-                      <div className="flex items-center gap-2">
-                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
-                          {formatDnsHost(domain.hostname)}
-                        </code>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="h-7 px-2 text-[11px]"
-                          onClick={() =>
+                <ol className="divide-border divide-y">
+                  {dnsTarget ? (
+                    <DnsStep
+                      number={nextStep()}
+                      title={t.cnameTitle}
+                      description={t.cnameDesc}
+                      recordType="CNAME"
+                    >
+                      <dl className="space-y-2">
+                        <DnsField
+                          label={t.host}
+                          value={formatDnsHost(domain.hostname)}
+                          copied={copiedKey === 'cname-host'}
+                          onCopy={() =>
                             copyValue(
                               formatDnsHost(domain.hostname),
                               'cname-host'
                             )
                           }
-                        >
-                          {copiedKey === 'cname-host' ? (
-                            <Check className="h-3.5 w-3.5" />
-                          ) : (
-                            <Copy className="h-3.5 w-3.5" />
-                          )}
-                          {copiedKey === 'cname-host' ? t.copied : t.copy}
-                        </Button>
-                      </div>
-                    </div>
+                        />
+                        <DnsField
+                          label={t.target}
+                          value={dnsTarget}
+                          copied={copiedKey === 'cname-target'}
+                          onCopy={() => copyValue(dnsTarget, 'cname-target')}
+                        />
+                      </dl>
+                    </DnsStep>
+                  ) : null}
 
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={dnsFieldLabelClass}>{t.target}</span>
-                      <div className="flex items-center gap-2">
-                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
-                          {dnsTarget}
-                        </code>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="h-7 px-2 text-[11px]"
-                          onClick={() => copyValue(dnsTarget, 'cname-target')}
-                        >
-                          {copiedKey === 'cname-target' ? (
-                            <Check className="h-3.5 w-3.5" />
-                          ) : (
-                            <Copy className="h-3.5 w-3.5" />
-                          )}
-                          {copiedKey === 'cname-target' ? t.copied : t.copy}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-
-              {needsDnsSetup &&
-              domain.verification_record_name &&
-              domain.verification_record_value ? (
-                <div className={dnsSectionCardClass}>
-                  <p className={dnsSectionTitleClass}>{t.step2}</p>
-                  <p className="text-xs text-slate-500">{t.ownershipTxt}</p>
-                  <div className="grid gap-2 text-xs">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={dnsFieldLabelClass}>{t.host}</span>
-                      <div className="flex items-center gap-2">
-                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
-                          {formatDnsHost(domain.verification_record_name)}
-                        </code>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="h-7 px-2 text-[11px]"
-                          onClick={() =>
+                  {hasOwnershipRecord ? (
+                    <DnsStep
+                      number={nextStep()}
+                      title={t.ownershipTitle}
+                      description={t.ownershipDesc}
+                      recordType="TXT"
+                    >
+                      <dl className="space-y-2">
+                        <DnsField
+                          label={t.host}
+                          value={formatDnsHost(domain.verification_record_name)}
+                          copied={copiedKey === 'txt-host'}
+                          onCopy={() =>
                             copyValue(
                               formatDnsHost(domain.verification_record_name),
                               'txt-host'
                             )
                           }
-                        >
-                          {copiedKey === 'txt-host' ? (
-                            <Check className="h-3.5 w-3.5" />
-                          ) : (
-                            <Copy className="h-3.5 w-3.5" />
-                          )}
-                          {copiedKey === 'txt-host' ? t.copied : t.copy}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={dnsFieldLabelClass}>{t.value}</span>
-                      <div className="flex items-center gap-2">
-                        <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
-                          {domain.verification_record_value}
-                        </code>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="h-7 px-2 text-[11px]"
-                          onClick={() =>
+                        />
+                        <DnsField
+                          label={t.value}
+                          value={domain.verification_record_value || ''}
+                          copied={copiedKey === 'txt-value'}
+                          onCopy={() =>
                             copyValue(
                               domain.verification_record_value || '',
                               'txt-value'
                             )
                           }
-                        >
-                          {copiedKey === 'txt-value' ? (
-                            <Check className="h-3.5 w-3.5" />
-                          ) : (
-                            <Copy className="h-3.5 w-3.5" />
-                          )}
-                          {copiedKey === 'txt-value' ? t.copied : t.copy}
-                        </Button>
+                        />
+                      </dl>
+                    </DnsStep>
+                  ) : null}
+
+                  <DnsStep
+                    number={nextStep()}
+                    title={t.sslTitle}
+                    description={
+                      sslValidationRecords.length > 0 ? t.sslDesc : undefined
+                    }
+                  >
+                    {sslValidationRecords.length > 0 ? (
+                      <div className="space-y-3">
+                        {sslValidationRecords.map((record, index) => {
+                          const hasTxt = Boolean(
+                            record.txt_name && record.txt_value
+                          )
+                          const hasHttp = Boolean(
+                            record.http_url && record.http_body
+                          )
+
+                          return (
+                            <div
+                              key={`ssl-validation-${index}`}
+                              className="ring-border space-y-2.5 rounded-lg p-3 ring-1"
+                            >
+                              <p className="text-muted-foreground text-[11px] font-semibold tracking-[0.14em] uppercase">
+                                {hasTxt ? t.sslTxt : hasHttp ? t.sslHttp : 'TXT'}
+                                {sslValidationRecords.length > 1 ? (
+                                  <span className="tabular-nums">
+                                    {' '}
+                                    · {index + 1}/{sslValidationRecords.length}
+                                  </span>
+                                ) : null}
+                              </p>
+
+                              {hasTxt ? (
+                                <dl className="space-y-2">
+                                  <DnsField
+                                    label={t.host}
+                                    value={formatDnsHost(record.txt_name)}
+                                    copied={
+                                      copiedKey === `ssl-txt-host-${index}`
+                                    }
+                                    onCopy={() =>
+                                      copyValue(
+                                        formatDnsHost(record.txt_name),
+                                        `ssl-txt-host-${index}`
+                                      )
+                                    }
+                                  />
+                                  <DnsField
+                                    label={t.value}
+                                    value={record.txt_value || ''}
+                                    copied={
+                                      copiedKey === `ssl-txt-value-${index}`
+                                    }
+                                    onCopy={() =>
+                                      copyValue(
+                                        record.txt_value || '',
+                                        `ssl-txt-value-${index}`
+                                      )
+                                    }
+                                  />
+                                </dl>
+                              ) : null}
+
+                              {hasHttp ? (
+                                <dl className="space-y-2">
+                                  <DnsField
+                                    label={t.url}
+                                    value={record.http_url || ''}
+                                    copied={
+                                      copiedKey === `ssl-http-url-${index}`
+                                    }
+                                    onCopy={() =>
+                                      copyValue(
+                                        record.http_url || '',
+                                        `ssl-http-url-${index}`
+                                      )
+                                    }
+                                  />
+                                  <DnsField
+                                    label={t.body}
+                                    value={record.http_body || ''}
+                                    copied={
+                                      copiedKey === `ssl-http-body-${index}`
+                                    }
+                                    onCopy={() =>
+                                      copyValue(
+                                        record.http_body || '',
+                                        `ssl-http-body-${index}`
+                                      )
+                                    }
+                                  />
+                                </dl>
+                              ) : null}
+                            </div>
+                          )
+                        })}
                       </div>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-
-              {needsDnsSetup && sslValidationRecords.length > 0 ? (
-                <div className="space-y-2">
-                  <p className="text-xs text-slate-600">{t.step3}</p>
-                  <p className="text-xs text-slate-500">{t.multipleTxtHint}</p>
-                  {sslValidationRecords.map((record, index) => {
-                    const hasTxt = Boolean(record.txt_name && record.txt_value)
-                    const hasHttp = Boolean(record.http_url && record.http_body)
-
-                    return (
-                      <div
-                        key={`ssl-validation-${index}`}
-                        className={dnsSectionCardClass}
-                      >
-                        <p className={dnsSectionTitleClass}>
-                          {hasTxt ? t.sslTxt : hasHttp ? t.sslHttp : t.txt}
-                        </p>
-
-                        {hasTxt ? (
-                          <div className="grid gap-2 text-xs">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className={dnsFieldLabelClass}>
-                                {t.host}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
-                                  {formatDnsHost(record.txt_name)}
-                                </code>
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="outline"
-                                  className="h-7 px-2 text-[11px]"
-                                  onClick={() =>
-                                    copyValue(
-                                      formatDnsHost(record.txt_name),
-                                      `ssl-txt-host-${index}`
-                                    )
-                                  }
-                                >
-                                  {copiedKey === `ssl-txt-host-${index}` ? (
-                                    <Check className="h-3.5 w-3.5" />
-                                  ) : (
-                                    <Copy className="h-3.5 w-3.5" />
-                                  )}
-                                  {copiedKey === `ssl-txt-host-${index}`
-                                    ? t.copied
-                                    : t.copy}
-                                </Button>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between gap-2">
-                              <span className={dnsFieldLabelClass}>
-                                {t.value}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <code className="rounded bg-white/80 px-2 py-1 font-mono text-slate-900">
-                                  {record.txt_value}
-                                </code>
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="outline"
-                                  className="h-7 px-2 text-[11px]"
-                                  onClick={() =>
-                                    copyValue(
-                                      record.txt_value || '',
-                                      `ssl-txt-value-${index}`
-                                    )
-                                  }
-                                >
-                                  {copiedKey === `ssl-txt-value-${index}` ? (
-                                    <Check className="h-3.5 w-3.5" />
-                                  ) : (
-                                    <Copy className="h-3.5 w-3.5" />
-                                  )}
-                                  {copiedKey === `ssl-txt-value-${index}`
-                                    ? t.copied
-                                    : t.copy}
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        ) : null}
-
-                        {hasHttp ? (
-                          <div className="grid gap-2 text-xs">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className={dnsFieldLabelClass}>
-                                {t.url}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <code className="rounded bg-white/80 px-2 py-1 font-mono break-all text-slate-900">
-                                  {record.http_url}
-                                </code>
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="outline"
-                                  className="h-7 px-2 text-[11px]"
-                                  onClick={() =>
-                                    copyValue(
-                                      record.http_url || '',
-                                      `ssl-http-url-${index}`
-                                    )
-                                  }
-                                >
-                                  {copiedKey === `ssl-http-url-${index}` ? (
-                                    <Check className="h-3.5 w-3.5" />
-                                  ) : (
-                                    <Copy className="h-3.5 w-3.5" />
-                                  )}
-                                  {copiedKey === `ssl-http-url-${index}`
-                                    ? t.copied
-                                    : t.copy}
-                                </Button>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between gap-2">
-                              <span className={dnsFieldLabelClass}>
-                                {t.body}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <code className="rounded bg-white/80 px-2 py-1 font-mono break-all text-slate-900">
-                                  {record.http_body}
-                                </code>
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="outline"
-                                  className="h-7 px-2 text-[11px]"
-                                  onClick={() =>
-                                    copyValue(
-                                      record.http_body || '',
-                                      `ssl-http-body-${index}`
-                                    )
-                                  }
-                                >
-                                  {copiedKey === `ssl-http-body-${index}` ? (
-                                    <Check className="h-3.5 w-3.5" />
-                                  ) : (
-                                    <Copy className="h-3.5 w-3.5" />
-                                  )}
-                                  {copiedKey === `ssl-http-body-${index}`
-                                    ? t.copied
-                                    : t.copy}
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        ) : null}
-                      </div>
-                    )
-                  })}
-                </div>
-              ) : needsDnsSetup ? (
-                <p className="text-xs text-slate-600">
-                  {t.noSslValidationRecords}
+                    ) : (
+                      <p className="bg-muted/40 text-muted-foreground flex gap-2 rounded-lg p-3 text-xs leading-5">
+                        <Clock
+                          className="mt-0.5 size-3.5 shrink-0"
+                          aria-hidden="true"
+                        />
+                        {t.noSslValidationRecords}
+                      </p>
+                    )}
+                  </DnsStep>
+                </ol>
+              </div>
+            ) : (
+              <div className="border-border border-t px-5 py-4 sm:px-6">
+                <p className="text-success flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="size-4 shrink-0" aria-hidden="true" />
+                  {t.activeDnsInfo}
                 </p>
-              ) : null}
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="bg-muted/40 border-border flex flex-col gap-3 border-t px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <p className="text-muted-foreground text-xs leading-5">
+                {t.propagationHint}
+              </p>
+              <div className="flex shrink-0 items-center gap-2">
+                <Button
+                  type="button"
+                  onClick={handleDisconnect}
+                  disabled={isPending || !domain}
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Trash2 aria-hidden="true" />
+                  {t.disconnect}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleRefresh}
+                  disabled={isPending || !domain}
+                  variant="outline"
+                  size="sm"
+                >
+                  {isPending ? (
+                    <Loader2 className="animate-spin" aria-hidden="true" />
+                  ) : (
+                    <RefreshCcw aria-hidden="true" />
+                  )}
+                  {isPending ? t.refreshing : t.refresh}
+                </Button>
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
-    </div>
+    </section>
   )
 }

@@ -13,6 +13,7 @@ import {
   Settings,
   Users,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 type NavItem = {
   key: string
@@ -21,117 +22,89 @@ type NavItem = {
   icon: ComponentType<{ className?: string }>
 }
 
-type NavGroup = {
-  key: string
-  title: string
-  items: NavItem[]
-}
-
 export default function BusinessSectionNav({ slug }: { slug: string }) {
   const pathname = usePathname() ?? ''
   const base = `/dashboard/businesses/${slug}`
 
-  const groups: NavGroup[] = [
+  const items: NavItem[] = [
     {
-      key: 'operation',
-      title: 'Operación',
-      items: [
-        {
-          key: 'overview',
-          href: `${base}/overview`,
-          label: 'Resumen',
-          icon: LayoutGrid,
-        },
-        {
-          key: 'services',
-          href: `${base}/services`,
-          label: 'Servicios',
-          icon: Briefcase,
-        },
-        {
-          key: 'hours',
-          href: `${base}/hours`,
-          label: 'Horario',
-          icon: Clock,
-        },
-      ],
+      key: 'overview',
+      href: `${base}/overview`,
+      label: 'Resumen',
+      icon: LayoutGrid,
     },
     {
-      key: 'growth',
-      title: 'Crecimiento',
-      items: [
-        {
-          key: 'leads',
-          href: `${base}/leads`,
-          label: 'Mensajes',
-          icon: MessageSquare,
-        },
-        {
-          key: 'analytics',
-          href: `${base}/analytics`,
-          label: 'Analítica',
-          icon: BarChart3,
-        },
-        {
-          key: 'calendar',
-          href: `${base}/calendar`,
-          label: 'Calendario',
-          icon: CalendarIcon,
-        },
-      ],
+      key: 'services',
+      href: `${base}/services`,
+      label: 'Servicios',
+      icon: Briefcase,
+    },
+    { key: 'hours', href: `${base}/hours`, label: 'Horario', icon: Clock },
+    {
+      key: 'leads',
+      href: `${base}/leads`,
+      label: 'Mensajes',
+      icon: MessageSquare,
     },
     {
-      key: 'control',
-      title: 'Control',
-      items: [
-        {
-          key: 'team',
-          href: `${base}/team`,
-          label: 'Equipo',
-          icon: Users,
-        },
-        {
-          key: 'settings',
-          href: `${base}/settings`,
-          label: 'Configuración',
-          icon: Settings,
-        },
-      ],
+      key: 'analytics',
+      href: `${base}/analytics`,
+      label: 'Analítica',
+      icon: BarChart3,
+    },
+    {
+      key: 'calendar',
+      href: `${base}/calendar`,
+      label: 'Calendario',
+      icon: CalendarIcon,
+    },
+    { key: 'team', href: `${base}/team`, label: 'Equipo', icon: Users },
+    {
+      key: 'settings',
+      href: `${base}/settings`,
+      label: 'Configuración',
+      icon: Settings,
     },
   ]
 
   return (
-    <div className="flex flex-col gap-6">
-      {groups.map((group) => (
-        <section key={group.key}>
-          <p className="px-3 pb-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">
-            {group.title}
-          </p>
-          <div className="space-y-1">
-            {group.items.map((item) => {
-              const isActive =
-                pathname === item.href || pathname.startsWith(`${item.href}/`)
-              const Icon = item.icon
-              const classes = `flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-all border-l-[3px] ${
-                isActive
-                  ? 'bg-slate-100 text-slate-900 border-slate-900 shadow-sm'
-                  : 'border-transparent text-slate-600 hover:bg-slate-100/50 hover:text-slate-900'
-              }`
+    <nav
+      aria-label="Secciones del negocio"
+      className="bg-background/85 supports-[backdrop-filter]:bg-background/70 sticky top-14 z-20 -mx-4 border-b px-4 backdrop-blur-md md:-mx-8 md:px-8"
+    >
+      <ul className="-mb-px flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {items.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            pathname.startsWith(`${item.href}/`) ||
+            (item.key === 'overview' && pathname === base)
+          const Icon = item.icon
 
-              return (
-                <Link key={item.key} href={item.href} className={classes}>
-                  <span className="flex items-center gap-3">
-                    <Icon
-                      className={`h-4 w-4 ${isActive ? 'text-slate-900' : 'text-slate-500'}`}
-                    />
-                    {item.label}
-                  </span>
-                </Link>
-              )
-            })}
-          </div>
-        </section>
-      ))}
-    </div>
+          return (
+            <li key={item.key} className="shrink-0">
+              <Link
+                href={item.href}
+                aria-current={isActive ? 'page' : undefined}
+                className={cn(
+                  'focus-visible:ring-ring relative flex h-11 items-center gap-2 rounded-t-md px-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none',
+                  'after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors',
+                  isActive
+                    ? 'text-foreground after:bg-primary'
+                    : 'text-muted-foreground hover:text-foreground after:bg-transparent'
+                )}
+              >
+                <Icon
+                  className={cn(
+                    'size-4',
+                    isActive ? 'text-primary' : 'text-muted-foreground/80'
+                  )}
+                />
+                {item.label}
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+    </nav>
   )
 }

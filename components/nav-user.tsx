@@ -2,12 +2,11 @@
 
 import * as React from 'react'
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
   CreditCard,
   LogOut,
   Sparkles,
+  UserRound,
 } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -35,6 +34,36 @@ function getInitials(name: string) {
   return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase()
 }
 
+function UserAvatar({
+  user,
+  initials,
+}: {
+  user: { name: string; avatar?: string }
+  initials: string
+}) {
+  return (
+    <Avatar className="ring-sidebar-border size-8 rounded-lg ring-1">
+      {user.avatar ? <AvatarImage src={user.avatar} alt="" /> : null}
+      <AvatarFallback className="bg-primary text-primary-foreground rounded-lg text-xs font-semibold">
+        {initials}
+      </AvatarFallback>
+    </Avatar>
+  )
+}
+
+function UserSummary({ user }: { user: { name: string; email: string } }) {
+  return (
+    <div className="grid min-w-0 flex-1 text-left text-sm leading-tight">
+      <span className="truncate font-medium">{user.name}</span>
+      {user.email ? (
+        <span className="text-muted-foreground truncate text-xs">
+          {user.email}
+        </span>
+      ) : null}
+    </div>
+  )
+}
+
 export function NavUser({
   user,
   labels,
@@ -50,6 +79,7 @@ export function NavUser({
     upgrade: string
     account: string
     billing: string
+    /** Kept for API compatibility; notifications are not available yet. */
     notifications: string
     logout: string
   }
@@ -68,20 +98,23 @@ export function NavUser({
     setMounted(true)
   }, [])
 
+  const triggerContent = (
+    <>
+      <UserAvatar user={user} initials={initials} />
+      <UserSummary user={user} />
+      <ChevronsUpDown
+        className="text-muted-foreground ml-auto size-4"
+        aria-hidden="true"
+      />
+    </>
+  )
+
   if (!mounted) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton size="lg">
-            <Avatar className="h-8 w-8 rounded-lg">
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
-            </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs">{user.email}</span>
-            </div>
-            <ChevronsUpDown className="ml-auto size-4" />
+            {triggerContent}
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -95,79 +128,58 @@ export function NavUser({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
+             
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
-              </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              {triggerContent}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-60 rounded-xl"
             side={isMobile ? 'bottom' : 'right'}
             align="end"
-            sideOffset={4}
+            sideOffset={6}
           >
             <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
-                </div>
+              <div className="flex items-center gap-2.5 px-2 py-2 text-left text-sm">
+                <UserAvatar user={user} initials={initials} />
+                <UserSummary user={user} />
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              {hrefs.upgrade ? (
-                <DropdownMenuItem asChild>
-                  <Link href={hrefs.upgrade}>
-                    <Sparkles />
-                    {labels.upgrade}
-                  </Link>
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem>
-                  <Sparkles />
-                  {labels.upgrade}
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuGroup>
+            {hrefs.upgrade ? (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    asChild
+                    className="text-primary focus:text-primary font-medium"
+                  >
+                    <Link href={hrefs.upgrade}>
+                      <Sparkles className="text-primary" aria-hidden="true" />
+                      {labels.upgrade}
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </>
+            ) : null}
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link href={hrefs.account}>
-                  <BadgeCheck />
+                  <UserRound aria-hidden="true" />
                   {labels.account}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href={hrefs.billing}>
-                  <CreditCard />
+                  <CreditCard aria-hidden="true" />
                   {labels.billing}
                 </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                {labels.notifications}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onLogout} variant="destructive">
-              <LogOut />
+              <LogOut aria-hidden="true" />
               {labels.logout}
             </DropdownMenuItem>
           </DropdownMenuContent>

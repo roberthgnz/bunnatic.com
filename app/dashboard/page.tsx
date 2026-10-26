@@ -1,227 +1,189 @@
 import { getBusinesses, getProfile } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
+  ArrowRight,
   Building2,
-  CheckCircle2,
-  CircleDashed,
-  ExternalLink,
+  Globe2,
   Plus,
+  Sparkles,
+  Wand2,
 } from 'lucide-react'
 import Link from 'next/link'
+import {
+  EmptyState,
+  PageHeader,
+  StatCard,
+} from '@/components/dashboard/page-header'
+import {
+  BusinessCard,
+  getPlatformHost,
+} from '@/components/dashboard/business-card'
+
+function getGreeting() {
+  const hour = Number(
+    new Intl.DateTimeFormat('es-ES', {
+      hour: 'numeric',
+      hour12: false,
+      timeZone: 'Europe/Madrid',
+    }).format(new Date())
+  )
+  if (hour < 13) return 'Buenos días,'
+  if (hour < 21) return 'Buenas tardes,'
+  return 'Buenas noches,'
+}
 
 export default async function DashboardPage() {
-  const businesses = await getBusinesses()
-  const profile = await getProfile()
+  const [businesses, profile] = await Promise.all([
+    getBusinesses(),
+    getProfile(),
+  ])
 
-  const t = {
-    welcome: `Hola, ${profile?.full_name || 'Usuario'}`,
-    subtitle: 'Aquí tienes un resumen de tus negocios.',
-    createBusiness: 'Crear nuevo negocio',
-    manageBusinesses: 'Gestionar negocios',
-    noBusinesses: 'Aún no tienes ningún negocio registrado.',
-    startNow: 'Empieza ahora creando tu primer negocio.',
-    totalBusinesses: 'Negocios activos',
-    customActive: 'Dominios custom activos',
-    view: 'Ver detalles',
-    viewLive: 'Ver web',
-    goBusinesses: 'Ir a mis negocios',
-    platformDomain: 'Plataforma',
-    customDomain: 'Custom',
-    pendingDomain: 'Pendiente',
-    errorDomain: 'Revisar',
-    noDescription: 'Sin descripción',
-    updated: 'Actualizado',
-  }
-
-  const platformHost =
-    process.env.PLATFORM_ROOT_DOMAIN?.trim().toLowerCase() ||
-    (() => {
-      try {
-        return new URL(process.env.APP_URL || '').host
-      } catch {
-        return 'bunnatic.com'
-      }
-    })()
+  const firstName =
+    (profile?.full_name as string | undefined)?.trim().split(/\s+/)[0] ||
+    'de nuevo'
+  const platformHost = getPlatformHost()
+  const today = new Intl.DateTimeFormat('es-ES', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'Europe/Madrid',
+  }).format(new Date())
 
   const activeCustomDomains = businesses.filter(
     (business) =>
       business.custom_domain && business.custom_domain_status === 'active'
   ).length
-
-  const formatBusinessDate = (value: string | null | undefined) => {
-    if (!value) return '—'
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return '—'
-    return new Intl.DateTimeFormat('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      timeZone: 'Europe/Madrid',
-    }).format(date)
-  }
+  const withoutDescription = businesses.filter(
+    (business) => !business.description?.trim()
+  ).length
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-            {t.welcome}
-          </h1>
-          <p className="text-sm text-slate-600">{t.subtitle}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" asChild>
-            <Link href={`/dashboard/businesses`}>
-              <Building2 className="mr-2 h-4 w-4" />
-              {t.manageBusinesses}
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href={`/dashboard/new`}>
-              <Plus className="mr-2 h-4 w-4" />
-              {t.createBusiness}
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardDescription>{t.totalBusinesses}</CardDescription>
-            <CardTitle className="text-3xl">{businesses.length}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" className="w-full">
-              <Link href={`/dashboard/businesses`}>
-                {t.goBusinesses}
+    <div className="space-y-10">
+      <PageHeader
+        eyebrow={today}
+        title={getGreeting()}
+        accent={`${firstName}.`}
+        description="Este es el pulso de tus negocios. Mantén tus webs al día y convierte más visitas en clientes."
+        actions={
+          <>
+            <Button variant="outline" asChild>
+              <Link href="/dashboard/generation">
+                <Sparkles aria-hidden="true" />
+                Generar con IA
               </Link>
             </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardDescription>{t.customActive}</CardDescription>
-            <CardTitle className="text-3xl">{activeCustomDomains}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" className="w-full">
-              <Link href={`/dashboard/businesses`}>
-                {t.manageBusinesses}
+            <Button asChild>
+              <Link href="/dashboard/new">
+                <Plus aria-hidden="true" />
+                Crear negocio
               </Link>
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </>
+        }
+      />
 
-      {businesses.length === 0 ? (
-        <div className="flex min-h-72 items-center justify-center rounded-lg border border-dashed bg-white">
-          <div className="flex flex-col items-center gap-1 text-center">
-            <h3 className="text-lg font-semibold tracking-tight text-slate-900">
-              {t.noBusinesses}
-            </h3>
-            <p className="text-sm text-slate-600">{t.startNow}</p>
-            <Button asChild className="mt-4">
-              <Link href={`/dashboard/new`}>{t.createBusiness}</Link>
-            </Button>
+      <section
+        aria-label="Resumen"
+        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      >
+        <StatCard
+          label="Negocios activos"
+          value={businesses.length}
+          hint="Ver todos tus negocios"
+          icon={Building2}
+          href="/dashboard/businesses"
+        />
+        <StatCard
+          label="Dominios propios activos"
+          value={activeCustomDomains}
+          hint={
+            activeCustomDomains === businesses.length && businesses.length > 0
+              ? 'Todo conectado'
+              : 'Conecta tu propio dominio'
+          }
+          icon={Globe2}
+          href="/dashboard/businesses"
+        />
+        <Link
+          href="/dashboard/generation"
+          className="group bg-primary text-primary-foreground focus-visible:ring-ring relative overflow-hidden rounded-xl p-5 shadow-[0_10px_30px_-18px_rgba(41,73,46,0.7)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:col-span-2 lg:col-span-1"
+        >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-16 -right-10 size-48 rounded-full bg-[#d8e7b7]/15 blur-2xl"
+          />
+          <div className="relative flex h-full flex-col">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-white/10">
+              <Wand2 className="size-4 text-[#d8e7b7]" aria-hidden="true" />
+            </span>
+            <p className="mt-4 text-[15px] font-semibold tracking-[-0.01em]">
+              Mejora tu web con IA
+            </p>
+            <p className="mt-1 text-sm leading-5 text-white/70">
+              {withoutDescription > 0
+                ? `${withoutDescription} ${withoutDescription === 1 ? 'negocio necesita' : 'negocios necesitan'} contenido.`
+                : 'Regenera textos y bloques desde Google o tu web actual.'}
+            </p>
+            <span className="mt-auto flex items-center gap-1.5 pt-4 text-sm font-medium text-[#d8e7b7]">
+              Empezar
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </span>
           </div>
+        </Link>
+      </section>
+
+      <section aria-labelledby="recent-businesses" className="space-y-4">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2
+              id="recent-businesses"
+              className="text-foreground text-lg font-semibold tracking-[-0.02em]"
+            >
+              Tus negocios
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Los más recientes primero.
+            </p>
+          </div>
+          {businesses.length > 4 ? (
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/dashboard/businesses">
+                Ver todos
+                <ArrowRight aria-hidden="true" />
+              </Link>
+            </Button>
+          ) : null}
         </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {businesses.slice(0, 4).map((business) => (
-            <Card key={business.id} className="border-slate-200 shadow-sm">
-              <CardContent className="space-y-4 p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
-                      {business.name?.[0]?.toUpperCase() || 'B'}
-                    </div>
-                    <div className="min-w-0">
-                      <CardTitle className="line-clamp-1 text-lg">
-                        {business.name}
-                      </CardTitle>
-                      <CardDescription className="mt-0.5 line-clamp-1 font-mono text-xs">
-                        {business.custom_domain
-                          ? business.custom_domain
-                          : `${platformHost}/w/${business.slug}`}
-                      </CardDescription>
-                    </div>
-                  </div>
 
-                  {business.custom_domain_status === 'active' ? (
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  ) : (
-                    <CircleDashed className="h-4 w-4 text-slate-400" />
-                  )}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className="border-slate-200 bg-slate-100 text-slate-700"
-                  >
-                    {business.custom_domain
-                      ? business.custom_domain_status === 'active'
-                        ? t.customDomain
-                        : business.custom_domain_status === 'error'
-                          ? t.errorDomain
-                          : t.pendingDomain
-                      : t.platformDomain}
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="border-slate-200 bg-slate-100 text-slate-700"
-                  >
-                    {business.category || '—'}
-                  </Badge>
-                </div>
-
-                <p className="line-clamp-2 text-sm text-slate-700">
-                  {business.description || t.noDescription}
-                </p>
-
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-xs text-slate-500">
-                    {t.updated}: {formatBusinessDate(business.updated_at)}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Button asChild size="sm" variant="outline">
-                      <Link
-                        href={`/dashboard/businesses/${business.slug}`}
-                      >
-                        {t.view}
-                      </Link>
-                    </Button>
-                    <Button asChild size="sm" variant="ghost">
-                      <Link
-                        href={
-                          business.custom_domain &&
-                          business.custom_domain_status === 'active'
-                            ? `https://${business.custom_domain}`
-                            : `/w/${business.slug}`
-                        }
-                        target="_blank"
-                      >
-                        {t.viewLive}
-                        <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+        {businesses.length === 0 ? (
+          <EmptyState
+            icon={Building2}
+            title="Aún no tienes ningún negocio"
+            description="Busca tu negocio en Google o pega tu web actual y la IA creará una página lista para publicar en minutos."
+            action={
+              <Button asChild size="lg">
+                <Link href="/dashboard/new">
+                  <Plus aria-hidden="true" />
+                  Crear mi primer negocio
+                </Link>
+              </Button>
+            }
+          />
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {businesses.slice(0, 4).map((business) => (
+              <BusinessCard
+                key={business.id}
+                business={business}
+                platformHost={platformHost}
+              />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   )
 }

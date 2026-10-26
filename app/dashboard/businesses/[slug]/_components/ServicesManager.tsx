@@ -1,16 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createService, deleteService } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { FormField } from '@/components/ui/form-field'
+import { EmptyState } from '@/components/dashboard/page-header'
 import { toast } from 'sonner'
-import { Loader2, Trash2, Plus, Package } from 'lucide-react'
+import { AlertCircle, Briefcase, Loader2, Plus, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 const schema = z.object({
@@ -33,8 +34,81 @@ type FormValues = z.infer<typeof schema>
 type Service = {
   id: string
   name: string
+  description?: string | null
   price?: number | null
   duration?: number | null
+}
+
+const surface =
+  'bg-card ring-border rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1'
+
+const priceFormatter = new Intl.NumberFormat('es-ES', {
+  style: 'currency',
+  currency: 'EUR',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+})
+
+function formatPrice(price: Service['price']) {
+  if (price === null || price === undefined || Number.isNaN(Number(price))) {
+    return null
+  }
+  return Number(price) === 0 ? 'Gratis' : priceFormatter.format(Number(price))
+}
+
+function formatDuration(duration: Service['duration']) {
+  if (!duration) return null
+  const minutes = Number(duration)
+  if (minutes < 60) return `${minutes} min`
+  const hours = Math.floor(minutes / 60)
+  const rest = minutes % 60
+  return rest ? `${hours} h ${rest} min` : `${hours} h`
+}
+
+function Field({
+  id,
+  label,
+  srLabel,
+  required,
+  hint,
+  error,
+  children,
+}: {
+  id: string
+  label: string
+  srLabel?: string
+  required?: boolean
+  hint?: string
+  error?: string
+  children: ReactNode
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor={id} className="text-foreground gap-0.5 text-[13px]">
+        {label}
+        {srLabel ? <span className="sr-only">{srLabel}</span> : null}
+        {required ? (
+          <span className="text-destructive" aria-hidden="true">
+            *
+          </span>
+        ) : null}
+      </Label>
+      {children}
+      {error ? (
+        <p
+          id={`${id}-error`}
+          className="text-destructive flex items-center gap-1 text-xs font-medium"
+        >
+          <AlertCircle className="size-3 shrink-0" aria-hidden="true" />
+          {error}
+        </p>
+      ) : hint ? (
+        <p id={`${id}-hint`} className="text-muted-foreground text-xs">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  )
 }
 
 export default function ServicesManager({
@@ -49,23 +123,30 @@ export default function ServicesManager({
 
   const t = {
     title: 'Servicios',
-    description: 'Gestiona los servicios que ofrece tu negocio.',
+    description:
+      'Lo que ofreces, con su precio y duración. Se muestran en tu web pública.',
+    listTitle: 'Tu carta de servicios',
     addTitle: 'Añadir servicio',
+    addDescription: 'Solo el nombre es obligatorio.',
     name: 'Nombre',
-    price: 'Precio (€)',
-    duration: 'Duración (min)',
+    namePlaceholder: 'Ej. Corte y peinado',
+    price: 'Precio',
+    duration: 'Duración',
     descriptionField: 'Descripción breve',
+    descriptionPlaceholder: 'Qué incluye, para quién es…',
     descHint: 'Opcional · máx. 300 caracteres',
-    add: 'Añadir',
+    add: 'Añadir servicio',
     delete: 'Eliminar',
     confirmDelete: '¿Eliminar este servicio?',
-    noServices: 'No hay servicios registrados aún.',
+    noServices: 'Aún no tienes servicios',
+    noServicesHint:
+      'Añade lo que ofreces con el formulario. Los precios y la duración ayudan a tus clientes a decidir.',
     added: 'Servicio añadido',
     removed: 'Servicio eliminado',
     errors: {
       name_min: 'Mínimo 2 caracteres',
       price_min: 'El precio no puede ser negativo',
-      duration_min: 'Entero ≥ 1',
+      duration_min: 'Debe ser un número entero de minutos (1 o más)',
       description_max: 'Máximo 300 caracteres',
     },
   }
@@ -112,69 +193,240 @@ export default function ServicesManager({
     setDeletingId(null)
   }
 
+  const count = initialServices.length
+
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      {/* Header */}
-      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
-        <h3 className="text-sm font-semibold text-slate-900">{t.title}</h3>
-        <p className="mt-0.5 text-xs text-slate-500">{t.description}</p>
+    <div className="space-y-5 pb-10">
+      <div>
+        <h2 className="text-foreground text-base font-semibold tracking-[-0.01em]">
+          {t.title}
+        </h2>
+        <p className="text-muted-foreground mt-1 text-sm">{t.description}</p>
       </div>
 
-      {/* Add form */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="border-b border-slate-100 px-6 py-5"
-      >
-        <p className="mb-3 text-xs font-semibold tracking-wider text-slate-400 uppercase">
-          {t.addTitle}
-        </p>
-        <div className="grid gap-3 sm:grid-cols-12">
-          <div className="sm:col-span-5">
-            <FormField
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+        {/* Services list */}
+        <section aria-labelledby="services-list-title" className="min-w-0">
+          <h3 id="services-list-title" className="sr-only">
+            {t.listTitle}
+          </h3>
+          {count === 0 ? (
+            <EmptyState
+              icon={Briefcase}
+              title={t.noServices}
+              description={t.noServicesHint}
+            />
+          ) : (
+            <div className={`${surface} overflow-hidden`}>
+              <div className="border-border flex items-center justify-between gap-3 border-b px-5 py-3.5">
+                <p className="text-foreground text-sm font-medium">
+                  {t.listTitle}
+                </p>
+                <p className="text-muted-foreground text-xs tabular-nums">
+                  {count} {count === 1 ? 'servicio' : 'servicios'}
+                </p>
+              </div>
+              <table className="w-full text-sm">
+                <thead className="sr-only sm:not-sr-only">
+                  <tr className="text-muted-foreground border-border border-b text-left text-[11px] font-semibold tracking-[0.14em] uppercase">
+                    <th scope="col" className="px-5 py-2.5 font-semibold">
+                      Servicio
+                    </th>
+                    <th
+                      scope="col"
+                      className="hidden w-28 px-3 py-2.5 text-right font-semibold sm:table-cell"
+                    >
+                      Duración
+                    </th>
+                    <th
+                      scope="col"
+                      className="hidden w-28 px-3 py-2.5 text-right font-semibold sm:table-cell"
+                    >
+                      Precio
+                    </th>
+                    <th scope="col" className="w-14 py-2.5 pr-4">
+                      <span className="sr-only">Acciones</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-border divide-y">
+                  {initialServices.map((service) => {
+                    const price = formatPrice(service.price)
+                    const duration = formatDuration(service.duration)
+                    const isDeleting = deletingId === service.id
+                    return (
+                      <tr
+                        key={service.id}
+                        className="hover:bg-muted/50 align-middle transition-colors"
+                      >
+                        <td className="min-w-0 px-5 py-3.5">
+                          <p className="text-foreground font-medium break-words">
+                            {service.name}
+                          </p>
+                          {service.description ? (
+                            <p className="text-muted-foreground mt-0.5 line-clamp-2 text-xs leading-5">
+                              {service.description}
+                            </p>
+                          ) : null}
+                          {/* Compact meta on small screens */}
+                          {price || duration ? (
+                            <p className="text-muted-foreground mt-1 flex gap-2 text-xs tabular-nums sm:hidden">
+                              {duration ? <span>{duration}</span> : null}
+                              {duration && price ? (
+                                <span aria-hidden="true">·</span>
+                              ) : null}
+                              {price ? (
+                                <span className="text-foreground font-medium">
+                                  {price}
+                                </span>
+                              ) : null}
+                            </p>
+                          ) : null}
+                        </td>
+                        <td className="text-muted-foreground hidden px-3 py-3.5 text-right whitespace-nowrap tabular-nums sm:table-cell">
+                          {duration ?? (
+                            <span className="text-muted-foreground/60">—</span>
+                          )}
+                        </td>
+                        <td className="text-foreground hidden px-3 py-3.5 text-right font-medium whitespace-nowrap tabular-nums sm:table-cell">
+                          {price ?? (
+                            <span className="text-muted-foreground/60 font-normal">
+                              —
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3.5 pr-4 text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleDelete(service.id)}
+                            disabled={isDeleting}
+                            aria-label={`${t.delete} ${service.name}`}
+                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            {isDeleting ? (
+                              <Loader2
+                                className="animate-spin"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <Trash2 aria-hidden="true" />
+                            )}
+                          </Button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        {/* Add form */}
+        <section
+          aria-labelledby="add-service-title"
+          className={`${surface} p-5 lg:sticky lg:top-6`}
+        >
+          <div className="flex items-start gap-3">
+            <span className="bg-secondary text-secondary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
+              <Plus className="size-4" aria-hidden="true" />
+            </span>
+            <div>
+              <h3
+                id="add-service-title"
+                className="text-foreground text-sm font-semibold"
+              >
+                {t.addTitle}
+              </h3>
+              <p className="text-muted-foreground mt-0.5 text-xs">
+                {t.addDescription}
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-5 space-y-4">
+            <Field
+              id="service-name"
               label={t.name}
-              error={errors.name ? err(errors.name.message!) : undefined}
               required
+              error={errors.name ? err(errors.name.message!) : undefined}
             >
               <Input
+                id="service-name"
                 {...register('name')}
+                placeholder={t.namePlaceholder}
+                autoComplete="off"
+                aria-required="true"
                 aria-invalid={!!errors.name}
-                className="h-9"
+                aria-describedby={errors.name ? 'service-name-error' : undefined}
               />
-            </FormField>
-          </div>
-          <div className="sm:col-span-2">
-            <FormField
-              label={t.price}
-              error={errors.price ? err(errors.price.message!) : undefined}
-            >
-              <Input
-                {...register('price')}
-                type="number"
-                step="0.01"
-                min="0"
-                aria-invalid={!!errors.price}
-                className="h-9"
-              />
-            </FormField>
-          </div>
-          <div className="sm:col-span-2">
-            <FormField
-              label={t.duration}
-              error={
-                errors.duration ? err(errors.duration.message!) : undefined
-              }
-            >
-              <Input
-                {...register('duration')}
-                type="number"
-                min="1"
-                aria-invalid={!!errors.duration}
-                className="h-9"
-              />
-            </FormField>
-          </div>
-          <div className="sm:col-span-3">
-            <FormField
+            </Field>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Field
+                id="service-price"
+                label={t.price}
+                srLabel=" en euros"
+                error={errors.price ? err(errors.price.message!) : undefined}
+              >
+                <div className="relative">
+                  <Input
+                    id="service-price"
+                    {...register('price')}
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
+                    min="0"
+                    placeholder="0"
+                    aria-invalid={!!errors.price}
+                    aria-describedby={
+                      errors.price ? 'service-price-error' : undefined
+                    }
+                    className="pr-8 tabular-nums"
+                  />
+                  <span
+                    className="text-muted-foreground pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm"
+                    aria-hidden="true"
+                  >
+                    €
+                  </span>
+                </div>
+              </Field>
+              <Field
+                id="service-duration"
+                label={t.duration}
+                srLabel=" en minutos"
+                error={
+                  errors.duration ? err(errors.duration.message!) : undefined
+                }
+              >
+                <div className="relative">
+                  <Input
+                    id="service-duration"
+                    {...register('duration')}
+                    type="number"
+                    inputMode="numeric"
+                    min="1"
+                    placeholder="30"
+                    aria-invalid={!!errors.duration}
+                    aria-describedby={
+                      errors.duration ? 'service-duration-error' : undefined
+                    }
+                    className="pr-11 tabular-nums"
+                  />
+                  <span
+                    className="text-muted-foreground pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm"
+                    aria-hidden="true"
+                  >
+                    min
+                  </span>
+                </div>
+              </Field>
+            </div>
+
+            <Field
+              id="service-description"
               label={t.descriptionField}
               hint={t.descHint}
               error={
@@ -184,71 +436,31 @@ export default function ServicesManager({
               }
             >
               <Textarea
+                id="service-description"
                 {...register('description')}
-                rows={1}
+                rows={3}
+                placeholder={t.descriptionPlaceholder}
                 aria-invalid={!!errors.description}
-                className="min-h-9 resize-none"
+                aria-describedby={
+                  errors.description
+                    ? 'service-description-error'
+                    : 'service-description-hint'
+                }
+                className="resize-none"
               />
-            </FormField>
-          </div>
-        </div>
-        <div className="mt-3 flex justify-end">
-          <Button type="submit" disabled={isSubmitting} size="sm">
-            {isSubmitting ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Plus className="h-3.5 w-3.5" />
-            )}
-            {t.add}
-          </Button>
-        </div>
-      </form>
+            </Field>
 
-      {/* Services list */}
-      {initialServices.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-12 text-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
-            <Package className="h-5 w-5 text-slate-400" />
-          </div>
-          <p className="text-sm text-slate-500">{t.noServices}</p>
-        </div>
-      ) : (
-        <ul className="divide-y divide-slate-100">
-          {initialServices.map((service) => (
-            <li
-              key={service.id}
-              className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-slate-50/60"
-            >
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-slate-900">
-                  {service.name}
-                </p>
-                {(service.duration || service.price) && (
-                  <p className="mt-0.5 text-xs text-slate-400">
-                    {service.duration ? `${service.duration} min` : ''}
-                    {service.duration && service.price ? ' · ' : ''}
-                    {service.price ? `${service.price}€` : ''}
-                  </p>
-                )}
-              </div>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => handleDelete(service.id)}
-                disabled={deletingId === service.id}
-                aria-label={`${t.delete} ${service.name}`}
-                className="shrink-0 text-slate-400 hover:bg-red-50 hover:text-red-500"
-              >
-                {deletingId === service.id ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
+            <Button type="submit" disabled={isSubmitting} className="w-full">
+              {isSubmitting ? (
+                <Loader2 className="animate-spin" aria-hidden="true" />
+              ) : (
+                <Plus aria-hidden="true" />
+              )}
+              {t.add}
+            </Button>
+          </form>
+        </section>
+      </div>
     </div>
   )
 }

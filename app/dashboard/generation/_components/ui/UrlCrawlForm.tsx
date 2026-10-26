@@ -1,75 +1,82 @@
-import { Globe, Loader2 } from 'lucide-react'
+import { CircleAlert, Globe, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import type { UseFormReturn } from 'react-hook-form'
 import type { UrlCrawlValues } from '../hooks/useUrlCrawl'
 
 type Props = {
-    form: UseFormReturn<UrlCrawlValues>
-    isCrawling: boolean
-    isBuildingPreview: boolean
-    onSubmit: (values: UrlCrawlValues) => void
-    labels: {
-        urlPlaceholder: string
-        crawlButton: string
-        crawling: string
-        errorCrawl: string
-    }
+  form: UseFormReturn<UrlCrawlValues>
+  isCrawling: boolean
+  isBuildingPreview: boolean
+  onSubmit: (values: UrlCrawlValues) => void
+  labels: {
+    urlLabel: string
+    urlPlaceholder: string
+    urlHint: string
+    urlInvalid: string
+    crawlButton: string
+    crawling: string
+  }
 }
 
 export function UrlCrawlForm({
-    form,
-    isCrawling,
-    isBuildingPreview,
-    onSubmit,
-    labels,
+  form,
+  isCrawling,
+  isBuildingPreview,
+  onSubmit,
+  labels,
 }: Props) {
-    return (
-        <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-2 sm:flex-row"
+  const hasError = !!form.formState.errors.url
+  const describedBy = hasError ? 'url-crawl-error' : 'url-crawl-hint'
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+      <label
+        htmlFor="url-crawl-input"
+        className="text-foreground mb-2 block text-sm font-medium"
+      >
+        {labels.urlLabel}
+      </label>
+      <div className="border-input bg-card focus-within:border-ring focus-within:ring-ring/30 has-aria-invalid:border-destructive has-aria-invalid:ring-destructive/20 flex items-center rounded-xl border p-1.5 shadow-[0_4px_16px_-8px_rgba(31,42,28,0.12)] transition-[border-color,box-shadow] focus-within:ring-3">
+        <Globe
+          className="text-muted-foreground ml-2.5 size-4 shrink-0"
+          aria-hidden="true"
+        />
+        <input
+          id="url-crawl-input"
+          type="url"
+          inputMode="url"
+          autoComplete="url"
+          {...form.register('url')}
+          placeholder={labels.urlPlaceholder}
+          aria-invalid={hasError}
+          aria-describedby={describedBy}
+          className="placeholder:text-muted-foreground text-foreground h-10 min-w-0 flex-1 bg-transparent px-3 text-base outline-none sm:text-sm"
+        />
+        <Button
+          type="submit"
+          disabled={isCrawling || isBuildingPreview}
+          className="shrink-0"
         >
-            <div className="relative flex-1 space-y-1.5">
-                <div className="relative">
-                    <Globe className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <Input
-                        {...form.register('url')}
-                        placeholder={labels.urlPlaceholder}
-                        aria-invalid={!!form.formState.errors.url}
-                        className="h-10 border-slate-200 bg-white pl-9 text-sm focus-visible:ring-blue-500/30"
-                    />
-                </div>
-                {form.formState.errors.url && (
-                    <p className="text-destructive flex items-center gap-1 text-xs font-medium">
-                        <svg
-                            className="h-3 w-3 shrink-0"
-                            viewBox="0 0 16 16"
-                            fill="currentColor"
-                            aria-hidden
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.75a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 1.5 0v-3.5zM8 11a.875.875 0 1 0 0-1.75A.875.875 0 0 0 8 11z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
-                        {labels.errorCrawl}
-                    </p>
-                )}
-            </div>
-            <Button type="submit" disabled={isCrawling || isBuildingPreview}>
-                {isCrawling ? (
-                    <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {labels.crawling}
-                    </>
-                ) : (
-                    <>
-                        <Globe className="mr-2 h-4 w-4" />
-                        {labels.crawlButton}
-                    </>
-                )}
-            </Button>
-        </form>
-    )
+          {isCrawling ? (
+            <Loader2 className="animate-spin" aria-hidden="true" />
+          ) : null}
+          {isCrawling ? labels.crawling : labels.crawlButton}
+        </Button>
+      </div>
+      {hasError ? (
+        <p
+          id="url-crawl-error"
+          role="alert"
+          className="text-destructive mt-2 flex items-center gap-1.5 text-xs font-medium"
+        >
+          <CircleAlert className="size-3.5 shrink-0" aria-hidden="true" />
+          {labels.urlInvalid}
+        </p>
+      ) : (
+        <p id="url-crawl-hint" className="text-muted-foreground mt-2 text-xs">
+          {labels.urlHint}
+        </p>
+      )}
+    </form>
+  )
 }

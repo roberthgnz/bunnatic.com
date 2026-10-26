@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -8,20 +9,60 @@ import {
 import {
   Building2,
   Home,
+  LifeBuoy,
   PlusCircle,
   Settings,
-  HelpCircle,
-  Search,
   Sparkles,
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { DashboardContent } from './dashboard-constants'
 
-export function SidebarMainItems({ t }: { t: DashboardContent }) {
-  const pathname = usePathname()
+type NavItem = {
+  id: string
+  href: string
+  icon: typeof Home
+  label: string
+  active: boolean
+  external?: boolean
+}
 
-  const mainNavItems = [
+function NavList({ items }: { items: NavItem[] }) {
+  return (
+    <SidebarMenu className="gap-0.5">
+      {items.map((item) => (
+        <SidebarMenuItem key={item.id}>
+          <SidebarMenuButton
+            asChild
+            isActive={item.active}
+            tooltip={item.label}
+            className="text-sidebar-foreground/75 data-[active=true]:bg-card data-[active=true]:text-sidebar-accent-foreground data-[active=true]:ring-sidebar-border h-9 font-medium data-[active=true]:shadow-[0_1px_2px_rgba(31,42,28,0.06)] data-[active=true]:ring-1"
+          >
+            <Link
+              href={item.href}
+              aria-current={item.active ? 'page' : undefined}
+              {...(item.external
+                ? { target: '_blank', rel: 'noopener noreferrer' }
+                : {})}
+            >
+              <item.icon
+                className={
+                  item.active ? 'text-primary' : 'text-sidebar-foreground/55'
+                }
+              />
+              <span>{item.label}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  )
+}
+
+export function SidebarMainItems({ t }: { t: DashboardContent }) {
+  const pathname = usePathname() ?? ''
+
+  const items: NavItem[] = [
     {
       id: 'dashboard',
       href: `/dashboard`,
@@ -34,16 +75,7 @@ export function SidebarMainItems({ t }: { t: DashboardContent }) {
       href: `/dashboard/businesses`,
       icon: Building2,
       label: t.menu.businesses,
-      active:
-        pathname === `/dashboard/businesses` ||
-        pathname.startsWith(`/dashboard/businesses/`),
-    },
-    {
-      id: 'new',
-      href: `/dashboard/new`,
-      icon: PlusCircle,
-      label: t.menu.newBusiness,
-      active: pathname === `/dashboard/new`,
+      active: pathname.startsWith(`/dashboard/businesses`),
     },
     {
       id: 'generation',
@@ -52,28 +84,29 @@ export function SidebarMainItems({ t }: { t: DashboardContent }) {
       label: t.menu.generation,
       active: pathname === `/dashboard/generation`,
     },
+    {
+      id: 'new',
+      href: `/dashboard/new`,
+      icon: PlusCircle,
+      label: t.menu.newBusiness,
+      active: pathname === `/dashboard/new`,
+    },
   ]
 
   return (
-    <SidebarMenu>
-      {mainNavItems.map((item) => (
-        <SidebarMenuItem key={item.id}>
-          <SidebarMenuButton asChild isActive={item.active}>
-            <Link href={item.href}>
-              <item.icon />
-              <span>{item.label}</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
+    <>
+      <SidebarGroupLabel className="text-sidebar-foreground/50 text-[11px] font-semibold tracking-[0.12em] uppercase">
+        {t.platform}
+      </SidebarGroupLabel>
+      <NavList items={items} />
+    </>
   )
 }
 
 export function SidebarTopItems({ t }: { t: DashboardContent }) {
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ''
 
-  const topNavItems = [
+  const items: NavItem[] = [
     {
       id: 'settings',
       href: `/dashboard/settings`,
@@ -83,32 +116,13 @@ export function SidebarTopItems({ t }: { t: DashboardContent }) {
     },
     {
       id: 'help',
-      href: '#',
-      icon: HelpCircle,
+      href: `mailto:hello@bunnatic.com?subject=${encodeURIComponent('Ayuda con Bunnatic')}`,
+      icon: LifeBuoy,
       label: t.menu.getHelp,
       active: false,
-    },
-    {
-      id: 'search',
-      href: '#',
-      icon: Search,
-      label: t.menu.search,
-      active: false,
+      external: true,
     },
   ]
 
-  return (
-    <SidebarMenu>
-      {topNavItems.map((item) => (
-        <SidebarMenuItem key={item.id}>
-          <SidebarMenuButton asChild isActive={item.active}>
-            <Link href={item.href}>
-              <item.icon />
-              <span>{item.label}</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
-  )
+  return <NavList items={items} />
 }

@@ -2,7 +2,6 @@ import { getBusinessBySlug, getBusinessDomain } from '@/lib/supabase/actions'
 import { notFound } from 'next/navigation'
 import BusinessSettingsForm from './_components/BusinessSettingsForm'
 import DomainSettingsCard from './_components/DomainSettingsCard'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getCloudflareCnameTarget } from '@/lib/domains/config'
 
 export default async function BusinessSettingsPage({
@@ -18,29 +17,22 @@ export default async function BusinessSettingsPage({
     notFound()
   }
 
-  const t = {
-    title: 'Configuración',
-  }
-
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <BusinessSettingsForm business={business} />
-        </CardContent>
-      </Card>
+    <div className="divide-border divide-y pb-10">
+      <div className="pb-8">
+        <BusinessSettingsForm business={business} />
+      </div>
 
-      <DomainSettingsCard
-        businessSlug={slug}
-        initialDomain={domain}
-        dnsTarget={getCloudflareCnameTarget()}
-        rootDomain={
-          process.env.PLATFORM_ROOT_DOMAIN?.trim().toLowerCase() || null
-        }
-      />
+      <div className="pt-8">
+        <DomainSettingsCard
+          businessSlug={slug}
+          initialDomain={domain}
+          dnsTarget={getCloudflareCnameTarget()}
+          rootDomain={
+            process.env.PLATFORM_ROOT_DOMAIN?.trim().toLowerCase() || null
+          }
+        />
+      </div>
     </div>
   )
 }

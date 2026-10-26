@@ -1,7 +1,16 @@
 import { getProfile, updateProfile } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { UserCircle } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { EmptyState, PageHeader } from '@/components/dashboard/page-header'
+import { Mail, UserCircle } from 'lucide-react'
+
+function getInitials(name: string | null | undefined) {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return null
+  if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? null
+  return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase()
+}
 
 export default async function ProfilePage({
   params,
@@ -11,109 +20,194 @@ export default async function ProfilePage({
   const { locale } = await params
   const profile = await getProfile()
 
-  if (!profile) {
-    return <div>Error loading profile</div>
-  }
-
   const t = {
     es: {
-      title: 'Tu Perfil',
-      subtitle: 'Gestiona tu información personal.',
+      eyebrow: 'Cuenta',
+      title: 'Tu',
+      accent: 'perfil',
+      subtitle:
+        'Gestiona tu información personal y cómo te ven los miembros de tu equipo.',
+      cardTitle: 'Información personal',
+      cardDescription:
+        'Estos datos se usan en tu cuenta y en las comunicaciones de Bunnatic.',
       fullName: 'Nombre completo',
+      fullNamePlaceholder: 'Ej. Laura Martínez',
       username: 'Nombre de usuario',
+      usernamePlaceholder: 'Ej. laura',
       website: 'Sitio web',
+      websitePlaceholder: 'https://tunegocio.es',
+      websiteHint: 'Opcional. Tu web personal o la de tu empresa.',
       save: 'Guardar cambios',
       email: 'Email de acceso',
+      emailHint: 'Es el email con el que inicias sesión.',
+      errorTitle: 'No hemos podido cargar tu perfil',
+      errorDescription:
+        'Vuelve a cargar la página. Si el problema continúa, cierra sesión y vuelve a entrar.',
     },
     ca: {
-      title: 'El teu Perfil',
-      subtitle: 'Gestiona la teva informació personal.',
+      eyebrow: 'Compte',
+      title: 'El teu',
+      accent: 'perfil',
+      subtitle:
+        'Gestiona la teva informació personal i com et veuen els membres del teu equip.',
+      cardTitle: 'Informació personal',
+      cardDescription:
+        "Aquestes dades s'utilitzen al teu compte i a les comunicacions de Bunnatic.",
       fullName: 'Nom complet',
+      fullNamePlaceholder: 'Ex. Laura Martínez',
       username: "Nom d'usuari",
+      usernamePlaceholder: 'Ex. laura',
       website: 'Lloc web',
+      websitePlaceholder: 'https://elteunegoci.cat',
+      websiteHint: 'Opcional. La teva web personal o la de la teva empresa.',
       save: 'Desar canvis',
       email: "Email d'accés",
+      emailHint: "És l'email amb què inicies sessió.",
+      errorTitle: "No hem pogut carregar el teu perfil",
+      errorDescription:
+        'Torna a carregar la pàgina. Si el problema continua, tanca la sessió i torna a entrar.',
     },
   }[locale === 'ca' ? 'ca' : 'es']
+
+  if (!profile) {
+    return (
+      <EmptyState
+        icon={UserCircle}
+        title={t.errorTitle}
+        description={t.errorDescription}
+      />
+    )
+  }
 
   async function handleProfileUpdate(formData: FormData) {
     'use server'
     await updateProfile(formData)
   }
 
-  return (
-    <div className="max-w-3xl space-y-5">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-          {t.title}
-        </h1>
-        <p className="text-sm text-slate-600">{t.subtitle}</p>
-      </div>
+  const initials = getInitials(profile.full_name)
 
-      <div className="bg-card text-card-foreground rounded-xl border">
-        <div className="p-6 pt-6">
-          <div className="mb-6 flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-              {profile.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={profile.avatar_url}
-                  alt={profile.full_name || ''}
-                  className="h-full w-full rounded-full object-cover"
-                />
-              ) : (
-                <UserCircle className="h-8 w-8 text-slate-400" />
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-slate-900">{t.email}</p>
-              <p className="text-sm text-slate-600">{profile.email}</p>
-            </div>
+  return (
+    <div className="max-w-3xl space-y-8">
+      <PageHeader
+        eyebrow={t.eyebrow}
+        title={t.title}
+        accent={t.accent}
+        description={t.subtitle}
+      />
+
+      <section
+        aria-labelledby="profile-account-title"
+        className="bg-card ring-border flex items-center gap-4 rounded-xl p-5 shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+      >
+        <div className="bg-secondary text-secondary-foreground ring-border flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1">
+          {profile.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={profile.avatar_url}
+              alt=""
+              className="size-full rounded-full object-cover"
+            />
+          ) : initials ? (
+            <span aria-hidden="true" className="text-base font-semibold">
+              {initials}
+            </span>
+          ) : (
+            <UserCircle className="size-7" aria-hidden="true" />
+          )}
+        </div>
+        <div className="min-w-0">
+          <h2
+            id="profile-account-title"
+            className="text-foreground truncate text-base font-semibold tracking-[-0.01em]"
+          >
+            {profile.full_name || profile.email}
+          </h2>
+          <p className="text-muted-foreground mt-0.5 flex items-center gap-1.5 text-sm">
+            <Mail className="size-3.5 shrink-0" aria-hidden="true" />
+            <span className="sr-only">{t.email}: </span>
+            <span className="truncate">{profile.email}</span>
+          </p>
+        </div>
+      </section>
+
+      <form
+        action={handleProfileUpdate}
+        aria-labelledby="profile-form-title"
+        className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+      >
+        <div className="border-border border-b px-5 py-4">
+          <h2
+            id="profile-form-title"
+            className="text-foreground text-base font-semibold tracking-[-0.01em]"
+          >
+            {t.cardTitle}
+          </h2>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {t.cardDescription}
+          </p>
+        </div>
+
+        <div className="grid gap-5 px-5 py-5 sm:grid-cols-2">
+          <div className="grid gap-2">
+            <Label htmlFor="fullName">{t.fullName}</Label>
+            <Input
+              id="fullName"
+              name="fullName"
+              autoComplete="name"
+              placeholder={t.fullNamePlaceholder}
+              defaultValue={profile.full_name || ''}
+            />
           </div>
 
-          <form action={handleProfileUpdate} className="space-y-4">
-            <div className="grid gap-2">
-              <label htmlFor="fullName" className="text-sm font-medium">
-                {t.fullName}
-              </label>
-              <Input
-                id="fullName"
-                name="fullName"
-                defaultValue={profile.full_name || ''}
-                className="max-w-md"
-              />
-            </div>
+          <div className="grid gap-2">
+            <Label htmlFor="username">{t.username}</Label>
+            <Input
+              id="username"
+              name="username"
+              autoComplete="username"
+              spellCheck={false}
+              placeholder={t.usernamePlaceholder}
+              defaultValue={profile.username || ''}
+            />
+          </div>
 
-            <div className="grid gap-2">
-              <label htmlFor="username" className="text-sm font-medium">
-                {t.username}
-              </label>
-              <Input
-                id="username"
-                name="username"
-                defaultValue={profile.username || ''}
-                className="max-w-md"
-              />
-            </div>
+          <div className="grid gap-2 sm:col-span-2">
+            <Label htmlFor="website">{t.website}</Label>
+            <Input
+              id="website"
+              name="website"
+              inputMode="url"
+              autoComplete="url"
+              spellCheck={false}
+              placeholder={t.websitePlaceholder}
+              aria-describedby="website-hint"
+              defaultValue={profile.website || ''}
+            />
+            <p id="website-hint" className="text-muted-foreground text-xs">
+              {t.websiteHint}
+            </p>
+          </div>
 
-            <div className="grid gap-2">
-              <label htmlFor="website" className="text-sm font-medium">
-                {t.website}
-              </label>
-              <Input
-                id="website"
-                name="website"
-                defaultValue={profile.website || ''}
-                className="max-w-md"
-              />
-            </div>
-
-            <div className="pt-4">
-              <Button type="submit">{t.save}</Button>
-            </div>
-          </form>
+          <div className="grid gap-2 sm:col-span-2">
+            <Label htmlFor="email">{t.email}</Label>
+            <Input
+              id="email"
+              type="email"
+              value={profile.email ?? ''}
+              readOnly
+              disabled
+              aria-describedby="email-hint"
+            />
+            <p id="email-hint" className="text-muted-foreground text-xs">
+              {t.emailHint}
+            </p>
+          </div>
         </div>
-      </div>
+
+        <div className="bg-muted/40 border-border flex justify-end border-t px-5 py-3.5">
+          <Button type="submit">{t.save}</Button>
+        </div>
+      </form>
     </div>
   )
 }

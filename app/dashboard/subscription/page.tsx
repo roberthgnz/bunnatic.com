@@ -1,11 +1,12 @@
 import DashboardPricing from '@/components/DashboardPricing'
+import { PageHeader } from '@/components/dashboard/page-header'
 import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { mapStripePriceIdToGenerationPlan } from '@/lib/businessSourceGeneration'
 
 export const metadata: Metadata = {
-  title: 'Subscription - Bunnatic',
-  description: 'Manage your subscription plan.',
+  title: 'Suscripción - Bunnatic',
+  description: 'Gestiona tu plan de suscripción.',
 }
 
 export default async function SubscriptionPage() {
@@ -64,12 +65,20 @@ export default async function SubscriptionPage() {
   }
 
   return (
-    <DashboardPricing
-      currentPlan={currentPlan}
-      currentPriceId={currentPriceId}
-      hasActiveSubscription={hasActiveSubscription}
-      isTrialActive={isTrialActive}
-      trialEndsAt={trialEndsAt}
-    />
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Facturación"
+        title="Tu"
+        accent="suscripción"
+        description="Consulta tu plan, cambia el periodo de facturación o mejora tu plan cuando lo necesites."
+      />
+      <DashboardPricing
+        currentPlan={currentPlan}
+        currentPriceId={currentPriceId}
+        hasActiveSubscription={hasActiveSubscription}
+        isTrialActive={isTrialActive}
+        trialEndsAt={trialEndsAt}
+      />
+    </div>
   )
 }

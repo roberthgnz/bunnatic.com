@@ -2,73 +2,54 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
-import { ArrowRight, Eye, EyeOff, Zap } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, Loader2, LockKeyhole } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { AuthShell } from '@/components/auth/AuthShell'
+import { FieldError } from '@/components/auth/FieldError'
+import { GoogleIcon } from '@/components/auth/GoogleIcon'
 import {
   createSigninSchema,
   type SigninFormValues,
 } from '@/lib/validations/signin'
-import { cn } from '@/lib/utils'
 import { login } from '@/lib/supabase/actions'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 
-const GoogleLogo = () => (
-  <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-    <path
-      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-      fill="#4285F4"
-    />
-    <path
-      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-      fill="#34A853"
-    />
-    <path
-      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-      fill="#FBBC05"
-    />
-    <path
-      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-      fill="#EA4335"
-    />
-  </svg>
-)
-
 const signInContent = {
-  navbar: {
-    logo: 'Bunnatic',
-  },
   signin: {
-    title: 'Inicia sesión',
-    subtitle: 'Bienvenido de nuevo a Bunnatic',
-    newAccountText: 'Crear una cuenta nueva',
-    or: '¿No tienes cuenta?',
+    title: 'Hola de',
+    titleAccent: 'nuevo',
+    subtitle: 'Inicia sesión para gestionar tu web y tus clientes.',
+    newAccountText: 'Crea una gratis',
+    or: '¿Aún no tienes cuenta?',
     emailLabel: 'Correo electrónico',
+    emailPlaceholder: 'nombre@tunegocio.com',
     passwordLabel: 'Contraseña',
+    passwordPlaceholder: 'Tu contraseña',
     showPassword: 'Mostrar contraseña',
     hidePassword: 'Ocultar contraseña',
-    rememberMe: 'Recordarme',
-    forgotPassword: '¿Olvidaste tu contraseña?',
-    loginButton: 'Entrar',
-    loginButtonLoading: 'Entrando...',
+    forgotPassword: '¿Has olvidado la contraseña?',
+    loginButton: 'Iniciar sesión',
+    loginButtonLoading: 'Entrando…',
     socialGoogle: 'Continuar con Google',
-    orDivider: 'O entra con correo',
-    securityNote: 'Datos seguros y cifrados.',
+    orDivider: 'o con tu correo',
+    securityNote: 'Conexión segura y datos cifrados.',
     validation: {
-      emailRequired: 'El correo es requerido',
-      emailInvalid: 'Correo electrónico inválido',
-      passwordRequired: 'La contraseña es requerida',
+      emailRequired: 'Escribe tu correo electrónico',
+      emailInvalid: 'Revisa el formato del correo (p. ej. nombre@negocio.com)',
+      passwordRequired: 'Escribe tu contraseña',
     },
   },
 } as const
 
 export default function SignInPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+    <Suspense fallback={<div className="bg-background min-h-svh" />}>
       <SignInContent />
     </Suspense>
   )
@@ -79,8 +60,6 @@ function SignInContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [showPassword, setShowPassword] = useState(false)
-
-  const homeHref = '/'
 
   const flow = useMemo(() => {
     const redirectRaw =
@@ -146,190 +125,153 @@ function SignInContent() {
     }
   }
 
-  return (
-    <main className="flex min-h-screen flex-col justify-center bg-slate-50 py-12 font-sans text-gray-900 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link
-          href={homeHref}
-          className="mb-6 flex items-center justify-center gap-2"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 shadow-sm">
-            <Zap className="h-6 w-6 fill-emerald-600 text-emerald-600" />
-          </div>
-          <span className="text-2xl font-bold tracking-tight text-gray-900">
-            {t.navbar.logo}
-          </span>
-        </Link>
+  const switchLink = (
+    <>
+      {t.signin.or}{' '}
+      <Link
+        href={signupHref}
+        className="text-primary focus-visible:ring-ring/50 rounded-sm font-semibold underline-offset-4 outline-none hover:underline focus-visible:ring-3"
+      >
+        {t.signin.newAccountText}
+      </Link>
+    </>
+  )
 
-        <h2 className="mt-2 text-center text-2xl leading-9 font-bold tracking-tight text-gray-900">
-          {t.signin.title}
-        </h2>
-        <p className="mx-auto mt-2 max-w-sm text-center text-sm text-gray-600">
+  return (
+    <AuthShell variant="signin" headerAction={switchLink}>
+      <div>
+        <h1 className="text-[2rem] leading-[1.1] font-semibold tracking-[-0.045em] sm:text-[2.5rem]">
+          {t.signin.title}{' '}
+          <span className="font-serif font-normal text-[#52734a] italic">
+            {t.signin.titleAccent}
+          </span>
+        </h1>
+        <p className="text-muted-foreground mt-3 text-[0.95rem] leading-6">
           {t.signin.subtitle}
         </p>
       </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[420px]">
-        <div className="border border-slate-200 bg-white px-6 py-8 shadow-sm sm:rounded-3xl sm:px-10">
-          <div className="mb-8">
-            <Button
-              variant="outline"
-              type="button"
-              className="h-12 w-full gap-3 rounded-xl border-slate-200 text-base font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
-              onClick={handleSocialLogin}
+      <Button
+        variant="outline"
+        size="lg"
+        type="button"
+        className="mt-8 h-11 w-full gap-3 text-[0.9rem]"
+        onClick={handleSocialLogin}
+      >
+        <GoogleIcon />
+        {t.signin.socialGoogle}
+      </Button>
+
+      <div className="my-6 flex items-center gap-3" aria-hidden="true">
+        <span className="bg-border h-px flex-1" />
+        <span className="text-muted-foreground text-xs">
+          {t.signin.orDivider}
+        </span>
+        <span className="bg-border h-px flex-1" />
+      </div>
+
+      <form
+        className="space-y-5"
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        aria-label={t.signin.loginButton}
+      >
+        <div className="space-y-2">
+          <Label htmlFor="email">{t.signin.emailLabel}</Label>
+          <Input
+            id="email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            {...register('email')}
+            className="h-11 px-3.5"
+            placeholder={t.signin.emailPlaceholder}
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? 'email-error' : undefined}
+          />
+          <FieldError id="email-error" message={errors.email?.message} />
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3">
+            <Label htmlFor="password">{t.signin.passwordLabel}</Label>
+            <a
+              href="#"
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 rounded-sm text-xs font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-3"
             >
-              <GoogleLogo />
-              {t.signin.socialGoogle}
+              {t.signin.forgotPassword}
+            </a>
+          </div>
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              {...register('password')}
+              className="h-11 pr-11 pl-3.5"
+              placeholder={t.signin.passwordPlaceholder}
+              aria-invalid={Boolean(errors.password)}
+              aria-describedby={errors.password ? 'password-error' : undefined}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1.5 -translate-y-1/2 hover:bg-transparent active:-translate-y-1/2"
+              aria-label={
+                showPassword ? t.signin.hidePassword : t.signin.showPassword
+              }
+              aria-pressed={showPassword}
+              aria-controls="password"
+            >
+              {showPassword ? (
+                <EyeOff aria-hidden="true" />
+              ) : (
+                <Eye aria-hidden="true" />
+              )}
             </Button>
           </div>
-
-          <div className="relative mb-8">
-            <div
-              className="absolute inset-0 flex items-center"
-              aria-hidden="true"
-            >
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 font-medium tracking-wide text-slate-400">
-                {t.signin.orDivider}
-              </span>
-            </div>
-          </div>
-
-          <form
-            className="space-y-5"
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-          >
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="email"
-                  className="ml-1 text-sm font-medium text-gray-900"
-                >
-                  {t.signin.emailLabel}
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  {...register('email')}
-                  className={cn(
-                    'h-11 rounded-xl border-slate-200 bg-slate-50 px-4 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20',
-                    errors.email
-                      ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-500/20'
-                      : 'focus:border-emerald-500'
-                  )}
-                  placeholder={t.signin.emailLabel}
-                  aria-invalid={Boolean(errors.email)}
-                />
-                {errors.email ? (
-                  <p className="ml-1 text-xs font-medium text-rose-600">
-                    {errors.email.message}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="ml-1 text-sm font-medium text-gray-900"
-                  >
-                    {t.signin.passwordLabel}
-                  </label>
-                  <a
-                    href="#"
-                    className="text-xs font-medium text-emerald-600 hover:text-emerald-500"
-                  >
-                    {t.signin.forgotPassword}
-                  </a>
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="current-password"
-                    {...register('password')}
-                    className={cn(
-                      'h-11 rounded-xl border-slate-200 bg-slate-50 px-4 pr-11 transition-colors focus:bg-white focus:ring-2 focus:ring-emerald-500/20',
-                      errors.password
-                        ? 'border-rose-300 focus:border-rose-300 focus:ring-rose-500/20'
-                        : 'focus:border-emerald-500'
-                    )}
-                    placeholder={t.signin.passwordLabel}
-                    aria-invalid={Boolean(errors.password)}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2 text-gray-400 hover:bg-transparent hover:text-gray-600"
-                    aria-label={
-                      showPassword
-                        ? t.signin.hidePassword
-                        : t.signin.showPassword
-                    }
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                {errors.password ? (
-                  <p className="ml-1 text-xs font-medium text-rose-600">
-                    {errors.password.message}
-                  </p>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <Button
-                variant="default"
-                type="submit"
-                disabled={!isValid || isSubmitting}
-                className={cn(
-                  'group relative flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-colors',
-                  !isValid || isSubmitting
-                    ? 'cursor-not-allowed bg-emerald-300'
-                    : 'bg-emerald-700 hover:bg-emerald-800'
-                )}
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    {t.signin.loginButtonLoading}
-                  </div>
-                ) : (
-                  <>
-                    {t.signin.loginButton}
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </>
-                )}
-              </Button>
-            </div>
-
-            <p className="mt-4 text-center text-xs text-slate-500">
-              {t.signin.securityNote}
-            </p>
-          </form>
-
-          <p className="mt-8 text-center text-sm text-gray-500">
-            {t.signin.or}{' '}
-            <Link
-              href={signupHref}
-              className="font-semibold text-emerald-600 underline-offset-4 hover:text-emerald-500 hover:underline"
-            >
-              {t.signin.newAccountText}
-            </Link>
-          </p>
+          <FieldError id="password-error" message={errors.password?.message} />
         </div>
-      </div>
-    </main>
+
+        <Button
+          type="submit"
+          size="lg"
+          disabled={!isValid || isSubmitting}
+          aria-busy={isSubmitting}
+          className="mt-2 h-11 w-full text-[0.9rem]"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2
+                className="animate-spin motion-reduce:animate-none"
+                aria-hidden="true"
+              />
+              {t.signin.loginButtonLoading}
+            </>
+          ) : (
+            <>
+              {t.signin.loginButton}
+              <ArrowRight
+                className="transition-transform group-hover/button:translate-x-0.5 motion-reduce:transition-none"
+                aria-hidden="true"
+              />
+            </>
+          )}
+        </Button>
+
+        <p className="text-muted-foreground flex items-center justify-center gap-1.5 text-xs">
+          <LockKeyhole className="size-3.5" aria-hidden="true" />
+          {t.signin.securityNote}
+        </p>
+      </form>
+
+      <p className="text-muted-foreground mt-8 text-center text-sm sm:hidden">
+        {switchLink}
+      </p>
+    </AuthShell>
   )
 }

@@ -1,16 +1,6 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Check,
-  Globe2,
-  Leaf,
-  Quote,
-  Search,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Check, Quote } from 'lucide-react'
 import DemoLinkButton from '@/components/DemoLinkButton'
 import Footer from '@/components/Footer'
 import Navbar from '@/components/Navbar'
@@ -25,7 +15,7 @@ import { content } from '@/lib/content'
 /*
  * Shared building blocks for the public SEO landing templates
  * (/alternativa/*, /caracteristicas/*, /negocio/*). They mirror the home
- * landing design language (warm paper, forest green, serif-italic accents).
+ * landing design language (monochrome, large sans headlines, pill buttons).
  */
 
 type Step = { title: string; description: string }
@@ -43,7 +33,7 @@ const ACCENT_CONNECTORS = [
 ]
 
 /**
- * Splits a headline into a plain lead and a serif-italic accent, using the
+ * Splits a headline into a plain lead and a muted accent, using the
  * first natural connector ("para", "que", "con", a comma…) that leaves at
  * least two words on each side. Returns `accent: null` when no split fits.
  */
@@ -95,7 +85,7 @@ function AccentTitle({
   if (!accent) return <>{title}</>
   return (
     <>
-      {lead} <span className={`block ${accentClassName}`}>{accent}</span>
+      {lead} <span className={accentClassName}>{accent}</span>
     </>
   )
 }
@@ -103,7 +93,7 @@ function AccentTitle({
 /** Page chrome identical to the home landing: skip link, navbar, main, footer. */
 export function LandingShell({ children }: { children: ReactNode }) {
   return (
-    <div className="landing-page min-h-screen overflow-x-clip bg-[#fafaf5] font-sans text-[#2b3b26] selection:bg-[#dce8c9] selection:text-[#263d21]">
+    <div className="landing-page home-page theme-mono min-h-screen overflow-x-clip font-sans">
       <a href="#contenido" className="skip-link">
         Saltar al contenido
       </a>
@@ -127,14 +117,16 @@ export function HeroStatus({
   return (
     <>
       <span
-        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#e7efdf] text-[#4d713c]"
+        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-black text-white"
         aria-hidden="true"
       >
         {icon}
       </span>
       <div className="min-w-0">
-        <p className="text-xs font-semibold text-[#33432b]">{title}</p>
-        <p className="mt-0.5 text-[10px] leading-snug text-[#7d8575]">{text}</p>
+        <p className="text-xs font-medium text-black">{title}</p>
+        <p className="mt-0.5 text-[11px] leading-snug text-(--home-muted)">
+          {text}
+        </p>
       </div>
     </>
   )
@@ -158,48 +150,45 @@ export function SeoHero({
   visual,
 }: SeoHeroProps) {
   return (
-    <section className="landing-hero" aria-labelledby="hero-title">
-      <div className="landing-container grid items-center gap-12 py-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-14 lg:py-20">
+    <section
+      className="border-b border-(--home-line)"
+      aria-labelledby="hero-title"
+    >
+      <div className="landing-container grid items-center gap-14 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16 lg:py-24">
         <div className="min-w-0">
-          <p className="mb-7 inline-flex max-w-full items-center gap-2 rounded-full border border-[#dce3d5] bg-[#eef2e7] px-3 py-1.5 text-[11px] font-semibold text-[#496143]">
-            <Sparkles className="size-3.5 shrink-0" aria-hidden="true" />
-            <span>{badge}</span>
-          </p>
+          <p className="home-eyebrow">{badge}</p>
           <h1
             id="hero-title"
-            className="text-[38px] leading-[1.06] font-semibold tracking-[-0.05em] text-balance text-[#2b3b26] sm:text-5xl lg:text-[54px]"
+            className="text-[clamp(40px,5.2vw,76px)] leading-[0.98] font-medium tracking-[-0.05em] text-balance"
           >
-            <AccentTitle
-              title={title}
-              accentClassName="font-serif font-normal text-[#52734a] italic"
-            />
+            <AccentTitle title={title} />
           </h1>
-          <p className="mt-6 max-w-xl text-base leading-7 text-[#687064] sm:text-lg">
+          <p className="mt-7 max-w-xl text-lg leading-relaxed text-(--home-muted) sm:text-xl">
             {subtitle}
           </p>
           {urgencyText ? (
-            <p className="mt-5 max-w-xl border-l-2 border-[#c9d4b8] pl-3 text-sm leading-6 text-[#727b68]">
+            <p className="mt-5 max-w-xl border-l-2 border-black pl-4 text-base leading-7 text-black/75">
               {urgencyText}
             </p>
           ) : null}
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
             <DemoLinkButton
               label="Probar demo gratis"
-              className="landing-button w-full sm:w-auto"
+              className="home-button w-full sm:w-auto"
               icon={<ArrowRight className="size-4" aria-hidden="true" />}
             />
             <Link
               href="/#pricing"
-              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[7px] border border-[#d6dccb] bg-white px-5 text-[13px] font-medium text-[#344a2e] transition-colors hover:bg-[#f1f4ea] sm:w-auto"
+              className="home-button home-button-outline w-full sm:w-auto"
             >
               Ver precios
               <ArrowUpRight className="size-4" aria-hidden="true" />
             </Link>
           </div>
           {trustLine ? (
-            <p className="mt-5 flex max-w-xl items-start gap-2 text-xs leading-5 text-[#77806e]">
+            <p className="mt-6 flex max-w-xl items-start gap-2 text-sm leading-6 text-(--home-muted)">
               <Check
-                className="mt-0.5 size-3.5 shrink-0 text-[#52734a]"
+                className="mt-1 size-4 shrink-0 text-black"
                 aria-hidden="true"
               />
               {trustLine}
@@ -228,14 +217,14 @@ export function SectionHeader({
   align = 'left',
 }: SectionHeaderProps) {
   return (
-    <div className={align === 'center' ? 'mx-auto max-w-2xl text-center' : ''}>
+    <div className={align === 'center' ? 'mx-auto max-w-3xl text-center' : ''}>
       <p className="landing-eyebrow">{eyebrow}</p>
-      <h2 id={id} className="landing-title text-balance">
+      <h2 id={id} className="landing-title">
         <AccentTitle title={title} />
       </h2>
       {description ? (
         <p
-          className={`mt-4 text-sm leading-7 text-[#7a8071] ${align === 'center' ? '' : 'max-w-md'}`}
+          className={`mt-5 text-lg leading-relaxed text-(--home-muted) ${align === 'center' ? '' : 'max-w-md'}`}
         >
           {description}
         </p>
@@ -243,13 +232,6 @@ export function SectionHeader({
     </div>
   )
 }
-
-const CARD_TINTS = [
-  'bg-[#eff2e8]',
-  'bg-[#f6f1e8]',
-  'bg-[#edf2ee]',
-  'bg-[#f7f4ed]',
-]
 
 export function BenefitGrid({
   eyebrow,
@@ -263,36 +245,33 @@ export function BenefitGrid({
   icon: ReactNode
 }) {
   return (
-    <section
-      className="landing-section bg-white"
-      aria-labelledby="beneficios-title"
-    >
+    <section className="landing-section" aria-labelledby="beneficios-title">
       <div className="landing-container">
-        <div className="mb-10">
+        <div className="mb-14 max-w-4xl">
           <SectionHeader
             id="beneficios-title"
             eyebrow={eyebrow}
             title={title}
           />
         </div>
-        <ul className="grid gap-4 md:grid-cols-3">
+        <ul className="grid gap-5 md:grid-cols-3">
           {items.map((item, index) => (
             <li
               key={item}
-              className={`feature-card flex flex-col ${CARD_TINTS[index % CARD_TINTS.length]}`}
+              className="flex min-h-56 flex-col rounded-3xl bg-(--home-soft) p-8"
             >
               <div className="flex items-center justify-between">
                 <span className="feature-icon" aria-hidden="true">
                   {icon}
                 </span>
                 <span
-                  className="font-serif text-2xl text-[#a3b093]"
+                  className="text-sm font-medium text-black/35 tabular-nums"
                   aria-hidden="true"
                 >
                   {String(index + 1).padStart(2, '0')}
                 </span>
               </div>
-              <p className="mt-6 text-lg leading-snug font-semibold tracking-tight text-[#34472d]">
+              <p className="mt-auto pt-10 text-xl leading-snug font-medium tracking-[-0.02em]">
                 {item}
               </p>
             </li>
@@ -302,8 +281,6 @@ export function BenefitGrid({
     </section>
   )
 }
-
-const STEP_ICONS = [Search, Sparkles, Globe2]
 
 export function StepsSection({
   eyebrow,
@@ -317,43 +294,32 @@ export function StepsSection({
   return (
     <section
       id="como-funciona"
-      className="landing-section bg-[#fcfcf7]"
+      className="landing-section bg-(--home-soft)"
       aria-labelledby="pasos-title"
     >
-      <div className="landing-container">
-        <SectionHeader
-          id="pasos-title"
-          eyebrow={eyebrow}
-          title={title}
-          align="center"
-        />
-        <ol className="mt-12 grid gap-8 md:grid-cols-3 md:gap-10">
-          {steps.map((step, index) => {
-            const Icon = STEP_ICONS[index % STEP_ICONS.length]
-            return (
-              <li key={step.title}>
-                <div className="mb-6 flex items-center justify-between border-b border-[#dfe3d5] pb-5">
-                  <span
-                    className="font-serif text-4xl text-[#9aa989]"
-                    aria-hidden="true"
-                  >
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <Icon
-                    className="size-5 text-[#7c8d6c]"
-                    strokeWidth={1.5}
-                    aria-hidden="true"
-                  />
-                </div>
-                <h3 className="text-lg font-semibold tracking-tight text-[#34472d]">
+      <div className="landing-container grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <SectionHeader id="pasos-title" eyebrow={eyebrow} title={title} />
+        </div>
+        <ol>
+          {steps.map((step, index) => (
+            <li
+              key={step.title}
+              className="grid grid-cols-[3.5rem_1fr] gap-4 border-t border-black/15 py-10 first:border-t-0 first:pt-0 sm:grid-cols-[5rem_1fr] lg:first:border-t lg:first:pt-10"
+            >
+              <span className="text-lg font-medium text-black/35 tabular-nums">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <h3 className="text-2xl font-medium tracking-[-0.03em] sm:text-3xl">
                   {step.title}
                 </h3>
-                <p className="mt-3 text-sm leading-6 text-[#7b8271]">
+                <p className="mt-3 max-w-lg text-base leading-relaxed text-(--home-muted)">
                   {step.description}
                 </p>
-              </li>
-            )
-          })}
+              </div>
+            </li>
+          ))}
         </ol>
       </div>
     </section>
@@ -365,27 +331,31 @@ export function FaqSection({ title, items }: { title: string; items: Faq[] }) {
   return (
     <section
       id="preguntas"
-      className="landing-section border-t border-[#e5e8dc] bg-white"
+      className="landing-section"
       aria-labelledby="faq-title"
     >
-      <div className="landing-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
+      <div className="landing-container grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
         <SectionHeader
           id="faq-title"
           eyebrow="Preguntas frecuentes"
           title={title}
           description="Dar el salto es más fácil cuando sabes qué esperar."
         />
-        <Accordion type="single" collapsible>
+        <Accordion
+          type="single"
+          collapsible
+          className="border-t border-black/15"
+        >
           {items.map(({ q, a }, index) => (
             <AccordionItem
               key={q}
               value={`question-${index}`}
-              className="border-[#e3e7d8]"
+              className="border-black/15 last:border-b"
             >
-              <AccordionTrigger className="py-5 text-left text-sm font-medium text-[#3f5034] hover:no-underline">
+              <AccordionTrigger className="rounded-none py-7 text-left text-lg font-medium tracking-[-0.01em] hover:no-underline **:data-[slot=accordion-trigger-icon]:size-5 **:data-[slot=accordion-trigger-icon]:text-black sm:text-xl">
                 {q}
               </AccordionTrigger>
-              <AccordionContent className="pb-5 text-sm leading-7 text-[#7c8370]">
+              <AccordionContent className="max-w-2xl pb-7 text-base leading-relaxed text-(--home-muted)">
                 {a}
               </AccordionContent>
             </AccordionItem>
@@ -417,31 +387,31 @@ export function ProofAndPlanSection({
 }) {
   return (
     <section
-      className="landing-section bg-[#f4f4eb]"
+      className="landing-section border-t border-(--home-line)"
       aria-labelledby="experiencias-title"
     >
-      <div className="landing-container grid gap-10 lg:grid-cols-[1.35fr_0.65fr] lg:items-start lg:gap-12">
+      <div className="landing-container grid gap-12 lg:grid-cols-[1.35fr_0.65fr] lg:items-start lg:gap-16">
         <div className="min-w-0">
           <SectionHeader
             id="experiencias-title"
             eyebrow="Experiencias"
             title={proofTitle}
           />
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+          <div className="mt-12 grid gap-5 sm:grid-cols-2">
             {testimonials.map((item) => (
               <figure
                 key={item.author}
-                className="feature-card flex flex-col bg-white"
+                className="flex flex-col rounded-3xl bg-(--home-soft) p-8"
               >
-                <Quote className="size-5 text-[#a3b093]" aria-hidden="true" />
-                <blockquote className="mt-4 flex-1 font-serif text-lg leading-snug text-[#34472d] italic">
+                <Quote className="size-6 text-black" aria-hidden="true" />
+                <blockquote className="mt-5 flex-1 text-xl leading-snug font-medium tracking-[-0.02em]">
                   «{item.quote}»
                 </blockquote>
-                <figcaption className="mt-6 border-t border-[#ebeee4] pt-4">
-                  <span className="block text-xs font-semibold text-[#3f5034]">
+                <figcaption className="mt-8 border-t border-black/10 pt-4">
+                  <span className="block text-sm font-medium">
                     {item.author}
                   </span>
-                  <span className="mt-0.5 block text-[11px] text-[#7d8471]">
+                  <span className="mt-0.5 block text-sm text-(--home-muted)">
                     {item.role}
                   </span>
                 </figcaption>
@@ -452,60 +422,53 @@ export function ProofAndPlanSection({
 
         <aside
           aria-labelledby="plan-title"
-          className="relative flex flex-col rounded-2xl border border-[#819768] bg-[#f0f4e7] p-7 shadow-[0_8px_30px_#43572c08]"
+          className="home-dark flex flex-col rounded-3xl bg-[#0b0b0b] p-8 text-white sm:p-10"
         >
-          {recommendedTier ? (
-            <span className="absolute -top-3 left-6 rounded-full bg-[#4e6d3d] px-3 py-1 text-[9px] font-semibold tracking-wide text-white uppercase">
-              Plan {recommendedTier.name}
-            </span>
-          ) : null}
-          <h2
-            id="plan-title"
-            className="text-lg font-semibold tracking-tight text-[#34452c]"
-          >
-            {planTitle}
-          </h2>
-          <p className="mt-5 flex items-baseline gap-1">
+          <div className="flex items-center justify-between gap-3">
+            <h2
+              id="plan-title"
+              className="text-2xl font-medium tracking-[-0.03em]"
+            >
+              {planTitle}
+            </h2>
             {recommendedTier ? (
-              <>
-                <span className="text-[42px] font-semibold tracking-[-.06em] text-[#2f4228]">
-                  {recommendedTier.priceMonthly}
-                </span>
-                <span className="text-xs text-[#7e8672]">/mes</span>
-              </>
-            ) : (
-              <span className="text-[42px] font-semibold tracking-[-.06em] text-[#2f4228]">
-                {planPrice}
+              <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-black">
+                Plan {recommendedTier.name}
               </span>
-            )}
+            ) : null}
+          </div>
+          <p className="mt-8 flex items-baseline gap-1.5">
+            <span className="text-6xl font-medium tracking-[-0.06em]">
+              {recommendedTier ? recommendedTier.priceMonthly : planPrice}
+            </span>
+            {recommendedTier ? (
+              <span className="text-sm text-white/60">/mes</span>
+            ) : null}
           </p>
-          <p className="mt-1 text-[11px] text-[#7d8471]">
+          <p className="mt-2 text-sm text-white/55">
             14 días de prueba · Sin permanencia
           </p>
-          <ul className="mt-6 space-y-3 border-t border-[#dde4d2] pt-6">
+          <ul className="mt-8 space-y-4 border-t border-white/15 pt-8">
             {planItems.map((item) => (
-              <li
-                key={item}
-                className="flex items-start gap-2.5 text-sm text-[#495a3e]"
-              >
-                <Check
-                  className="mt-0.5 size-4 shrink-0 text-[#6b8d4c]"
-                  aria-hidden="true"
-                />
+              <li key={item} className="flex items-start gap-3 text-sm">
+                <Check className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 {item}
               </li>
             ))}
           </ul>
-          <Link href={planHref} className="landing-button mt-7 w-full">
+          <Link
+            href={planHref}
+            className="home-button home-button-light mt-10 w-full"
+          >
             Crear cuenta y empezar
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
           <Link
             href="/#pricing"
-            className="mt-4 inline-flex items-center justify-center gap-1.5 self-center rounded text-[11px] font-semibold text-[#5b714c] hover:underline hover:underline-offset-4"
+            className="mt-5 inline-flex items-center justify-center gap-1.5 self-center rounded text-sm font-medium text-white/75 underline decoration-white/30 underline-offset-4 hover:text-white"
           >
             Comparar todos los planes
-            <ArrowUpRight className="size-3.5" aria-hidden="true" />
+            <ArrowUpRight className="size-4" aria-hidden="true" />
           </Link>
         </aside>
       </div>
@@ -528,55 +491,32 @@ export function FinalCtaSection({
 }) {
   return (
     <section
-      className="bg-white px-5 pt-4 pb-12 sm:px-10"
+      className="home-dark bg-[#0b0b0b] text-white"
       aria-labelledby="cta-title"
     >
-      <div className="relative mx-auto max-w-[1240px] overflow-hidden rounded-2xl bg-[#29452e] px-6 py-16 text-center text-white sm:py-20">
-        <Leaf
-          className="pointer-events-none absolute -top-10 -left-10 size-64 -rotate-12 text-[#90ae6d]/10"
-          strokeWidth={0.6}
-          aria-hidden="true"
-        />
-        <Leaf
-          className="pointer-events-none absolute -right-10 -bottom-16 size-80 rotate-150 text-[#90ae6d]/10"
-          strokeWidth={0.6}
-          aria-hidden="true"
-        />
-        <div className="relative">
-          <p className="mb-5 inline-flex items-center gap-2 text-[10px] font-medium tracking-[.16em] text-[#bbce9e] uppercase">
-            <Sparkles className="size-3.5" aria-hidden="true" />
-            Tu próximo paso
-          </p>
-          <h2
-            id="cta-title"
-            className="mx-auto max-w-3xl text-4xl leading-tight font-medium tracking-[-.04em] text-balance sm:text-5xl"
-          >
-            <AccentTitle
-              title={title}
-              accentClassName="font-serif font-normal text-[#c8dda6] italic"
-            />
-          </h2>
-          <p className="mx-auto mt-5 max-w-md text-sm leading-7 text-[#bfccb3]">
-            {subtitle}
-          </p>
-          <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-            <Link
-              href={primaryHref}
-              className="inline-flex min-h-12 items-center justify-center gap-4 rounded-lg bg-[#d6e7b8] px-6 py-3 text-sm font-semibold text-[#344d2a] transition-colors hover:bg-[#e4efcf] focus-visible:outline-[#d6e7b8]!"
-            >
-              {primaryLabel}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-            <DemoLinkButton
-              label={secondaryLabel}
-              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-[#d6e7b8]!"
-            />
-          </div>
-          <p className="mt-5 flex items-center justify-center gap-2 text-[10px] text-[#aabc98]">
-            <ShieldCheck className="size-3.5" aria-hidden="true" />
-            Sin tarjeta para empezar · Sin permanencia
-          </p>
+      <div className="landing-container flex min-h-[70svh] flex-col items-center justify-center py-28 text-center">
+        <h2
+          id="cta-title"
+          className="max-w-5xl text-[clamp(40px,6vw,92px)] leading-[0.97] font-medium tracking-[-0.055em] text-balance"
+        >
+          <AccentTitle title={title} accentClassName="text-white/45" />
+        </h2>
+        <p className="mx-auto mt-7 max-w-lg text-lg leading-relaxed text-white/65">
+          {subtitle}
+        </p>
+        <div className="mt-12 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
+          <Link href={primaryHref} className="home-button home-button-light">
+            {primaryLabel}
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+          <DemoLinkButton
+            label={secondaryLabel}
+            className="home-button home-button-outline"
+          />
         </div>
+        <p className="mt-6 text-sm text-white/55">
+          Sin tarjeta para empezar · Sin permanencia
+        </p>
       </div>
     </section>
   )

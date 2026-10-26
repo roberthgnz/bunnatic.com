@@ -30,7 +30,7 @@ const CreateAnalyzing = forwardRef<HTMLHeadingElement, CreateAnalyzingProps>(
     return (
       <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
         <div className="mx-auto w-full max-w-md lg:mx-0">
-          <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#dce3d5] bg-[#eef2e7] px-3 py-1.5 text-[11px] font-semibold text-[#496143]">
+          <p className="mb-6 inline-flex items-center gap-2 text-[13px] font-medium text-[#6b6b66]">
             <Loader2
               className="size-3.5 motion-safe:animate-spin"
               aria-hidden="true"
@@ -42,18 +42,16 @@ const CreateAnalyzing = forwardRef<HTMLHeadingElement, CreateAnalyzingProps>(
           <h1
             ref={headingRef}
             tabIndex={-1}
-            className="text-3xl leading-tight font-semibold tracking-[-0.04em] text-[#2b3b26] outline-none sm:text-4xl"
+            className="text-4xl leading-[1] font-medium tracking-[-0.05em] text-balance text-[#0b0b0b] outline-none sm:text-5xl"
           >
             {title}
           </h1>
-          <p className="mt-3 text-sm leading-6 text-[#687064] sm:text-base sm:leading-7">
-            {subtitle}
-          </p>
+          <p className="mt-5 text-base leading-7 text-[#6b6b66]">{subtitle}</p>
 
-          <div className="mt-8">
-            <div className="mb-2 flex items-center justify-between text-xs text-[#7b8271]">
+          <div className="mt-10">
+            <div className="mb-2.5 flex items-center justify-between text-xs text-[#6b6b66]">
               <span id="crear-progress-label">Progreso del análisis</span>
-              <span className="font-medium text-[#2b3b26] tabular-nums">
+              <span className="font-medium text-[#0b0b0b] tabular-nums">
                 {progress}%
               </span>
             </div>
@@ -63,10 +61,10 @@ const CreateAnalyzing = forwardRef<HTMLHeadingElement, CreateAnalyzingProps>(
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={progress}
-              className="h-1.5 w-full overflow-hidden rounded-full bg-[#e4e7dc]"
+              className="h-1 w-full overflow-hidden rounded-full bg-black/10"
             >
               <div
-                className="h-full rounded-full bg-[#29492e] motion-safe:transition-[width] motion-safe:duration-300"
+                className="h-full rounded-full bg-[#0b0b0b] motion-safe:transition-[width] motion-safe:duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -81,18 +79,18 @@ const CreateAnalyzing = forwardRef<HTMLHeadingElement, CreateAnalyzingProps>(
                 <li
                   key={step.label}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
-                    active && 'bg-white ring-1 ring-[#e3e6da]',
-                    done || active ? 'text-[#2b3b26]' : 'text-[#9aa08f]'
+                    'flex items-center gap-3 rounded-full px-3.5 py-2.5 text-sm transition-colors',
+                    active && 'bg-[#f3f3ef]',
+                    done || active ? 'text-[#0b0b0b]' : 'text-black/35'
                   )}
                 >
                   <span
                     aria-hidden="true"
                     className={cn(
                       'flex size-5 shrink-0 items-center justify-center rounded-full',
-                      done && 'bg-[#29492e] text-white',
-                      active && 'border border-[#9fb38a] text-[#5b714c]',
-                      !done && !active && 'border border-[#dde1d3]'
+                      done && 'bg-[#0b0b0b] text-white',
+                      active && 'border border-black/30 text-[#0b0b0b]',
+                      !done && !active && 'border border-black/15'
                     )}
                   >
                     {done ? (
@@ -115,7 +113,7 @@ const CreateAnalyzing = forwardRef<HTMLHeadingElement, CreateAnalyzingProps>(
           <p aria-live="polite" aria-atomic="true" className="sr-only">
             {activeLabel}
           </p>
-          <p className="mt-6 text-xs leading-5 text-[#8a9180]">
+          <p className="mt-6 text-xs leading-5 text-[#6b6b66]">
             {inputMode === 'url'
               ? 'Leer una web puede tardar hasta un minuto. No cierres esta página.'
               : 'Solo tarda unos segundos. Usamos únicamente datos públicos.'}
@@ -124,43 +122,43 @@ const CreateAnalyzing = forwardRef<HTMLHeadingElement, CreateAnalyzingProps>(
 
         {/* Skeleton of the site being generated */}
         <div aria-hidden="true" className="min-w-0">
-          <div className="overflow-hidden rounded-xl border border-[#d9dfcf] bg-white shadow-[0_22px_55px_-28px_#425a3e40]">
-            <div className="flex h-10 items-center gap-3 border-b border-[#e8e9df] px-3">
+          <div className="overflow-hidden rounded-2xl border border-[#e6e6e1] bg-white shadow-[0_30px_70px_-40px_rgba(0,0,0,0.35)]">
+            <div className="flex h-10 items-center gap-3 border-b border-[#e6e6e1] px-3">
               <div className="flex gap-1">
-                <span className="size-1.5 rounded-full bg-[#e0dfd5]" />
-                <span className="size-1.5 rounded-full bg-[#e0dfd5]" />
-                <span className="size-1.5 rounded-full bg-[#e0dfd5]" />
+                <span className="size-1.5 rounded-full bg-black/15" />
+                <span className="size-1.5 rounded-full bg-black/15" />
+                <span className="size-1.5 rounded-full bg-black/15" />
               </div>
-              <span className="flex flex-1 items-center justify-center gap-1.5 truncate text-[10px] text-[#929688]">
+              <span className="flex flex-1 items-center justify-center gap-1.5 truncate text-[10px] text-black/45">
                 <Globe2 className="size-2.5 shrink-0" />
                 {businessName
                   ? `${slugifyHost(businessName)}.bunnatic.com`
                   : 'tunegocio.bunnatic.com'}
               </span>
             </div>
-            <div className="bg-[#f6f5ef] motion-safe:animate-pulse">
+            <div className="bg-[#f7f7f4] motion-safe:animate-pulse">
               <div className="flex items-center justify-between px-5 py-4">
                 {businessName ? (
-                  <span className="truncate font-serif text-base text-[#2b3b26]">
+                  <span className="truncate font-serif text-base text-[#0b0b0b]">
                     {businessName}
                   </span>
                 ) : (
-                  <span className="h-3 w-28 rounded bg-[#e3e5da]" />
+                  <span className="h-3 w-28 rounded bg-[#e6e6e1]" />
                 )}
-                <span className="h-6 w-20 rounded-full bg-[#e3e5da]" />
+                <span className="h-6 w-20 rounded-full bg-[#e6e6e1]" />
               </div>
-              <div className="space-y-3 bg-[#e7eadf] px-5 py-12 sm:px-8 sm:py-16">
-                <span className="block h-2.5 w-32 rounded bg-[#d6dacb]" />
-                <span className="block h-7 w-3/4 rounded bg-[#d6dacb]" />
-                <span className="block h-7 w-1/2 rounded bg-[#d6dacb]" />
-                <span className="mt-6 block h-8 w-32 rounded-full bg-[#d6dacb]" />
+              <div className="space-y-3 bg-[#ebebe6] px-5 py-12 sm:px-8 sm:py-16">
+                <span className="block h-2.5 w-32 rounded bg-[#dcdcd6]" />
+                <span className="block h-7 w-3/4 rounded bg-[#dcdcd6]" />
+                <span className="block h-7 w-1/2 rounded bg-[#dcdcd6]" />
+                <span className="mt-6 block h-8 w-32 rounded-full bg-[#dcdcd6]" />
               </div>
               <div className="grid gap-4 px-5 py-6 sm:grid-cols-3 sm:px-8">
                 {[0, 1, 2].map((item) => (
                   <div key={item} className="space-y-2">
-                    <span className="block h-3 w-2/3 rounded bg-[#e3e5da]" />
-                    <span className="block h-2 w-full rounded bg-[#eceee5]" />
-                    <span className="block h-2 w-5/6 rounded bg-[#eceee5]" />
+                    <span className="block h-3 w-2/3 rounded bg-[#e6e6e1]" />
+                    <span className="block h-2 w-full rounded bg-[#efefea]" />
+                    <span className="block h-2 w-5/6 rounded bg-[#efefea]" />
                   </div>
                 ))}
               </div>

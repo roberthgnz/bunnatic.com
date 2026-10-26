@@ -140,11 +140,9 @@ function SignInContent() {
   return (
     <AuthShell variant="signin" headerAction={switchLink}>
       <div>
-        <h1 className="text-[2rem] leading-[1.1] font-semibold tracking-[-0.045em] sm:text-[2.5rem]">
+        <h1 className="text-[2rem] leading-[1.02] font-medium tracking-[-0.05em] sm:text-[2.5rem]">
           {t.signin.title}{' '}
-          <span className="font-serif font-normal text-[#52734a] italic">
-            {t.signin.titleAccent}
-          </span>
+          <span className="text-muted-foreground">{t.signin.titleAccent}</span>
         </h1>
         <p className="text-muted-foreground mt-3 text-[0.95rem] leading-6">
           {t.signin.subtitle}

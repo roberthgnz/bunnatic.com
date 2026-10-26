@@ -257,11 +257,9 @@ function OnboardingContent() {
           <p className="text-primary text-xs font-semibold tracking-[0.12em] uppercase">
             Paso 1 de 2
           </p>
-          <h1 className="mt-3 text-[2rem] leading-[1.08] font-semibold tracking-[-0.045em] sm:text-[2.75rem]">
+          <h1 className="mt-3 text-[2rem] leading-[1.02] font-medium tracking-[-0.05em] sm:text-[2.75rem]">
             Empieza tu prueba{' '}
-            <span className="font-serif font-normal text-[#52734a] italic">
-              gratis de 14 días
-            </span>
+            <span className="text-muted-foreground">gratis de 14 días</span>
           </h1>
           <p className="text-muted-foreground mx-auto mt-4 max-w-md text-[0.95rem] leading-6">
             {`Incluye prueba del plan ${selectedTier.name}. Sin tarjeta de crédito.`}
@@ -410,11 +408,9 @@ function OnboardingContent() {
           <p className="text-primary text-xs font-semibold tracking-[0.12em] uppercase">
             {t.step}
           </p>
-          <h1 className="mt-3 text-[2rem] leading-[1.08] font-semibold tracking-[-0.045em] sm:text-[2.5rem]">
+          <h1 className="mt-3 text-[2rem] leading-[1.02] font-medium tracking-[-0.05em] sm:text-[2.5rem]">
             {t.title}{' '}
-            <span className="font-serif font-normal text-[#52734a] italic">
-              {t.titleAccent}
-            </span>
+            <span className="text-muted-foreground">{t.titleAccent}</span>
           </h1>
           <p className="text-muted-foreground mt-3 max-w-md text-[0.95rem] leading-6">
             {t.subtitle}
@@ -571,7 +567,6 @@ function OnboardingContent() {
               </div>
 
               <div className="bg-primary text-primary-foreground relative mt-5 overflow-hidden rounded-xl p-5">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_100%_0%,rgba(216,231,183,0.22),transparent)]" />
                 <p className="relative font-serif text-xl leading-tight italic">
                   {formData.name || t.previewTitle}
                 </p>
@@ -585,7 +580,7 @@ function OnboardingContent() {
                     <div className="h-2 w-4/5 rounded-full bg-white/15" />
                   </div>
                 )}
-                <span className="text-primary relative mt-4 inline-flex rounded-md bg-[#fbfcf7] px-2.5 py-1 text-[10px] font-semibold">
+                <span className="text-primary relative mt-4 inline-flex rounded-full bg-white px-3 py-1 text-[10px] font-semibold">
                   {t.previewCta}
                 </span>
               </div>

@@ -115,17 +115,17 @@ export default function GeneratedSitePreview({
   return (
     <div
       className={cn(
-        'mx-auto w-full overflow-hidden rounded-xl border border-[#d9dfcf] bg-white shadow-[0_22px_55px_-28px_#425a3e40] motion-safe:transition-[max-width] motion-safe:duration-300',
+        'mx-auto w-full overflow-hidden rounded-2xl border border-[#e6e6e1] bg-white shadow-[0_30px_70px_-40px_rgba(0,0,0,0.35)] motion-safe:transition-[max-width] motion-safe:duration-300',
         mobile ? 'max-w-[360px]' : 'max-w-none'
       )}
     >
-      <div className="flex h-10 items-center gap-3 border-b border-[#e8e9df] bg-white px-3">
+      <div className="flex h-10 items-center gap-3 border-b border-[#e6e6e1] bg-white px-3">
         <div className="flex gap-1" aria-hidden="true">
-          <span className="size-1.5 rounded-full bg-[#e0dfd5]" />
-          <span className="size-1.5 rounded-full bg-[#e0dfd5]" />
-          <span className="size-1.5 rounded-full bg-[#e0dfd5]" />
+          <span className="size-1.5 rounded-full bg-black/15" />
+          <span className="size-1.5 rounded-full bg-black/15" />
+          <span className="size-1.5 rounded-full bg-black/15" />
         </div>
-        <span className="flex min-w-0 flex-1 items-center justify-center gap-1.5 text-[10px] text-[#929688]">
+        <span className="flex min-w-0 flex-1 items-center justify-center gap-1.5 text-[10px] text-black/45">
           <Globe2 className="size-2.5 shrink-0" aria-hidden="true" />
           <span className="truncate">{host}</span>
         </span>
@@ -140,8 +140,8 @@ export default function GeneratedSitePreview({
             aria-pressed={!mobile}
             onClick={() => setMobile(false)}
             className={cn(
-              'rounded p-1.5',
-              !mobile ? 'bg-[#edf1e7] text-[#3c5633]' : 'text-[#9c9f94]'
+              'rounded-full p-1.5',
+              !mobile ? 'bg-[#f3f3ef] text-[#0b0b0b]' : 'text-black/40'
             )}
           >
             <Monitor className="size-3" aria-hidden="true" />
@@ -152,8 +152,8 @@ export default function GeneratedSitePreview({
             aria-pressed={mobile}
             onClick={() => setMobile(true)}
             className={cn(
-              'rounded p-1.5',
-              mobile ? 'bg-[#edf1e7] text-[#3c5633]' : 'text-[#9c9f94]'
+              'rounded-full p-1.5',
+              mobile ? 'bg-[#f3f3ef] text-[#0b0b0b]' : 'text-black/40'
             )}
           >
             <Smartphone className="size-3" aria-hidden="true" />
@@ -165,7 +165,7 @@ export default function GeneratedSitePreview({
         role="region"
         aria-label={`Vista previa de la web de ${name}`}
         tabIndex={0}
-        className="@container h-[460px] overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#5a7b3c] sm:h-[560px] lg:h-[640px]"
+        className="@container h-[460px] overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#0b0b0b] sm:h-[560px] lg:h-[640px]"
         style={{ backgroundColor: theme.surface, color: theme.color }}
       >
         {/* Site nav */}
@@ -226,7 +226,10 @@ export default function GeneratedSitePreview({
             <p className="mt-3 max-w-md text-xs leading-relaxed text-white/85 @xl:text-sm">
               {heroText}
             </p>
-            <span className="mt-6 inline-flex items-center rounded-full bg-white px-4 py-2.5 text-[11px] font-semibold text-[#263d2d]">
+            <span
+              className="mt-6 inline-flex items-center rounded-full bg-white px-4 py-2.5 text-[11px] font-semibold"
+              style={{ color: theme.color }}
+            >
               {copy.contactNow}
             </span>
           </div>

@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Check, Globe2, Sparkles } from 'lucide-react'
+import { Check, Globe2 } from 'lucide-react'
 import { siteExamples } from '@/lib/siteExamples'
 import { BrandLogo } from '@/components/auth/BrandLogo'
 
@@ -19,7 +19,7 @@ type AuthShellProps = {
  */
 export function AuthShell({ variant, headerAction, children }: AuthShellProps) {
   return (
-    <div className="bg-background text-foreground grid min-h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+    <div className="theme-mono bg-background text-foreground grid min-h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <div className="flex min-h-svh flex-col px-5 py-5 sm:px-10 sm:py-7 lg:px-14 xl:px-20">
         <header className="flex items-center justify-between gap-4">
           <BrandLogo />
@@ -103,22 +103,10 @@ function AuthBrandPanel({ variant }: { variant: AuthVariant }) {
       className="relative hidden p-3 lg:block"
     >
       <div className="bg-primary text-primary-foreground sticky top-3 flex h-[calc(100svh-1.5rem)] flex-col overflow-hidden rounded-[28px] px-10 py-10 xl:px-14 xl:py-12">
-        {/* Decorative glow */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_45%_at_88%_4%,rgba(216,231,183,0.20),transparent_70%),radial-gradient(50%_40%_at_0%_100%,rgba(120,150,96,0.28),transparent_70%)]"
-        />
-
         <div className="relative">
-          <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-[#d8e7b7]">
-            <Sparkles className="size-3.5" aria-hidden="true" />
-            {copy.eyebrow}
-          </p>
-          <h2 className="mt-7 max-w-md text-[2.5rem] leading-[1.05] font-semibold tracking-[-0.045em] xl:text-5xl">
-            {copy.title}{' '}
-            <span className="font-serif font-normal text-[#d8e7b7] italic">
-              {copy.accent}
-            </span>
+          <p className="text-sm font-medium text-white/55">{copy.eyebrow}</p>
+          <h2 className="mt-6 max-w-md text-[2.75rem] leading-[1] font-medium tracking-[-0.05em] xl:text-[3.5rem]">
+            {copy.title} <span className="text-white/45">{copy.accent}</span>
           </h2>
           <p className="text-primary-foreground/75 mt-5 max-w-md text-[0.95rem] leading-7">
             {copy.text}
@@ -130,7 +118,7 @@ function AuthBrandPanel({ variant }: { variant: AuthVariant }) {
           aria-hidden="true"
           className="relative my-auto py-8 [@media(max-height:820px)]:hidden"
         >
-          <div className="mx-auto max-w-[440px] rotate-[-1.5deg] overflow-hidden rounded-2xl bg-white text-[#1f2a1c] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.45)] ring-1 ring-black/5">
+          <div className="mx-auto max-w-[440px] rotate-[-1.5deg] overflow-hidden rounded-2xl bg-white text-[#1f2a1c] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)] ring-1 ring-black/5">
             <div className="flex h-8 items-center gap-3 border-b border-[#e8e9df] px-3">
               <div className="flex gap-1">
                 <span className="size-1.5 rounded-full bg-[#e0dfd5]" />
@@ -175,13 +163,13 @@ function AuthBrandPanel({ variant }: { variant: AuthVariant }) {
               ))}
             </div>
           </div>
-          <div className="absolute bottom-3 left-2 flex items-center gap-2.5 rounded-xl bg-white px-3 py-2.5 text-[#1f2a1c] shadow-lg ring-1 ring-black/5 xl:left-6">
-            <span className="flex size-7 items-center justify-center rounded-full bg-[#e7efdf] text-[#4d713c]">
+          <div className="absolute bottom-3 left-2 flex items-center gap-2.5 rounded-2xl bg-white px-3 py-2.5 text-black shadow-lg ring-1 ring-black/5 xl:left-6">
+            <span className="flex size-7 items-center justify-center rounded-full bg-black text-white">
               <Check className="size-3.5" />
             </span>
             <div>
               <p className="text-[11px] font-semibold">Web publicada</p>
-              <p className="text-[10px] text-[#7d8575]">{domain}</p>
+              <p className="text-[10px] text-black/55">{domain}</p>
             </div>
           </div>
         </div>
@@ -190,7 +178,7 @@ function AuthBrandPanel({ variant }: { variant: AuthVariant }) {
           {copy.benefits.map((benefit) => (
             <li key={benefit} className="flex items-center gap-3">
               <span
-                className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#d8e7b7]/15 text-[#d8e7b7]"
+                className="flex size-5 shrink-0 items-center justify-center rounded-full bg-white text-black"
                 aria-hidden="true"
               >
                 <Check className="size-3" />

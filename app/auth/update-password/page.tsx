@@ -135,11 +135,8 @@ function UpdatePasswordContent() {
           <span className="bg-secondary text-secondary-foreground ring-border flex size-12 items-center justify-center rounded-xl ring-1">
             <KeyRound className="size-5" aria-hidden="true" />
           </span>
-          <h1 className="mt-6 text-[2rem] leading-[1.1] font-semibold tracking-[-0.045em]">
-            Enlace{' '}
-            <span className="font-serif font-normal text-[#52734a] italic">
-              caducado
-            </span>
+          <h1 className="mt-6 text-[2rem] leading-[1.02] font-medium tracking-[-0.05em]">
+            Enlace <span className="text-muted-foreground">caducado</span>
           </h1>
           <p className="text-muted-foreground mt-3 text-[0.95rem] leading-6">
             El enlace ya se ha usado o ha caducado. Pide uno nuevo y úsalo en la
@@ -151,11 +148,9 @@ function UpdatePasswordContent() {
         </div>
       ) : (
         <>
-          <h1 className="text-[2rem] leading-[1.1] font-semibold tracking-[-0.045em] sm:text-[2.5rem]">
+          <h1 className="text-[2rem] leading-[1.02] font-medium tracking-[-0.05em] sm:text-[2.5rem]">
             Crea una contraseña{' '}
-            <span className="font-serif font-normal text-[#52734a] italic">
-              nueva
-            </span>
+            <span className="text-muted-foreground">nueva</span>
           </h1>
           <p className="text-muted-foreground mt-3 text-[0.95rem] leading-6">
             Elige una contraseña segura que no uses en otros sitios.

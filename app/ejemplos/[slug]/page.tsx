@@ -31,20 +31,20 @@ export default async function ExamplePage({ params }: Props) {
       className="example-page min-h-screen"
       style={{ background: example.surface, color: example.color }}
     >
-      <div className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-3 border-b border-black/10 bg-[#fafaf5] px-5 py-3 text-[#30422b] sm:px-8">
+      <div className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-3 border-b border-black/10 bg-white px-5 py-3 text-black sm:px-8">
         <Link
           href="/#ejemplos"
-          className="inline-flex items-center gap-2 rounded text-xs"
+          className="inline-flex items-center gap-2 rounded text-sm"
         >
           <ArrowLeft className="size-3.5" aria-hidden="true" />
           Volver a Bunnatic
         </Link>
-        <p className="hidden text-[11px] text-[#78826d] sm:block">
+        <p className="hidden text-xs text-black/55 sm:block">
           Ejemplo de diseño · Negocio ficticio
         </p>
         <Link
           href={createHref}
-          className="landing-button min-h-9! px-4! py-2! text-xs!"
+          className="landing-button min-h-10! px-5! py-2! text-sm!"
         >
           Crear la web de mi negocio
           <ArrowUpRight className="size-3.5" aria-hidden="true" />

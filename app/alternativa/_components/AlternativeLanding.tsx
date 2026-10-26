@@ -89,7 +89,7 @@ function ComparisonTable({
   )
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[#e1e5d8] bg-white shadow-[0_8px_25px_#3b4b2c08]">
+    <div className="overflow-hidden rounded-3xl border border-(--home-line) bg-white">
       <table className="w-full table-fixed border-collapse text-left">
         <caption className="sr-only">
           Comparativa entre {competitorName} y Bunnatic
@@ -98,20 +98,20 @@ function ComparisonTable({
           <tr>
             <th
               scope="col"
-              className="w-1/2 border-b border-[#e8eadd] bg-[#f6f6ef] px-4 py-4 align-bottom text-xs font-semibold text-[#5f6656] sm:px-7 sm:py-5 sm:text-sm"
+              className="w-1/2 border-b border-(--home-line) bg-white px-4 py-5 align-bottom text-sm font-medium text-(--home-muted) sm:px-8 sm:py-6 sm:text-base"
             >
               {competitorTitle}
             </th>
             <th
               scope="col"
-              className="w-1/2 border-b border-l border-[#dde4d2] bg-[#eef3e6] px-4 py-4 align-bottom text-xs font-semibold text-[#29492e] sm:px-7 sm:py-5 sm:text-sm"
+              className="w-1/2 border-b border-l border-white/10 bg-[#0b0b0b] px-4 py-5 align-bottom text-sm font-medium text-white sm:px-8 sm:py-6 sm:text-base"
             >
               <span className="flex items-center gap-2">
                 <span
-                  className="hidden size-6 shrink-0 items-center justify-center rounded-md bg-[#29492e] sm:flex"
+                  className="hidden size-6 shrink-0 items-center justify-center rounded-md bg-white sm:flex"
                   aria-hidden="true"
                 >
-                  <Leaf className="size-3.5 text-[#d8e7b7]" />
+                  <Leaf className="size-3.5 text-black" />
                 </span>
                 {novaTitle}
               </span>
@@ -122,24 +122,24 @@ function ComparisonTable({
           {rows.map((row, index) => (
             <tr
               key={`${row.competitor ?? ''}-${row.nova ?? ''}-${index}`}
-              className="border-b border-[#eef0e7] last:border-b-0"
+              className="border-b border-(--home-line) last:border-b-0"
             >
-              <td className="px-4 py-4 align-top text-[13px] leading-6 break-words text-[#6f7666] sm:px-7 sm:py-5 sm:text-sm">
+              <td className="px-4 py-5 align-top text-sm leading-6 break-words text-(--home-muted) sm:px-8 sm:py-6 sm:text-base">
                 {row.competitor ? (
                   <span className="flex items-start gap-2.5">
                     <Minus
-                      className="mt-1 size-3.5 shrink-0 text-[#b3ad9f]"
+                      className="mt-1 size-4 shrink-0 text-black/30"
                       aria-hidden="true"
                     />
                     {row.competitor}
                   </span>
                 ) : null}
               </td>
-              <td className="border-l border-[#e3e9d9] bg-[#f7f9f2] px-4 py-4 align-top text-[13px] leading-6 font-medium break-words text-[#34472d] sm:px-7 sm:py-5 sm:text-sm">
+              <td className="border-l border-(--home-line) bg-(--home-soft) px-4 py-5 align-top text-sm leading-6 font-medium break-words text-black sm:px-8 sm:py-6 sm:text-base">
                 {row.nova ? (
                   <span className="flex items-start gap-2.5">
                     <Check
-                      className="mt-1 size-3.5 shrink-0 text-[#5d8443]"
+                      className="mt-1 size-4 shrink-0 text-black"
                       aria-hidden="true"
                     />
                     {row.nova}
@@ -191,7 +191,7 @@ export default function AlternativeLanding({
 
       <section
         id="comparativa"
-        className="landing-section bg-white"
+        className="landing-section"
         aria-labelledby="comparativa-title"
       >
         <div className="landing-container grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:items-start lg:gap-16">

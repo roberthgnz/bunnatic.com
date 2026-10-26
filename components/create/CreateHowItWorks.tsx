@@ -106,16 +106,16 @@ export default function CreateHowItWorks({
     {
       number: '1',
       title: copy.howToStep1,
-      color: 'bg-emerald-500',
+      color: 'bg-[#0b0b0b]',
       mockup: (
         <motion.div className="space-y-3" variants={cardVariants}>
-          <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-xs text-gray-500 shadow-sm">
-            <Search className="h-4 w-4 text-gray-400" />
+          <div className="flex items-center gap-2 rounded-full border border-[#e6e6e1] bg-white px-3.5 py-2.5 text-xs text-[#6b6b66]">
+            <Search className="h-4 w-4 text-black/40" />
             <span>{copy.searchPlaceholder}</span>
           </div>
           <motion.div className="overflow-hidden" variants={revealResult}>
-            <div className="flex items-center gap-2 px-1 text-xs font-medium text-gray-900">
-              <MapPin className="h-4 w-4 text-emerald-500" />
+            <div className="flex items-center gap-2 px-1 text-xs font-medium text-[#0b0b0b]">
+              <MapPin className="h-4 w-4 text-[#0b0b0b]" />
               <span className="truncate">
                 {query.trim() || 'Pizzería Napoli, Madrid'}
               </span>
@@ -127,28 +127,28 @@ export default function CreateHowItWorks({
     {
       number: '2',
       title: copy.howToStep2,
-      color: 'bg-violet-500',
+      color: 'bg-[#0b0b0b]',
       mockup: (
         <motion.div className="space-y-3.5" variants={cardVariants}>
-          <div className="flex items-center gap-2 border-b border-gray-200 pb-2.5 text-xs font-semibold text-gray-900">
-            <Globe className="h-4 w-4 text-violet-500" />
+          <div className="flex items-center gap-2 border-b border-[#e6e6e1] pb-2.5 text-xs font-medium text-[#0b0b0b]">
+            <Globe className="h-4 w-4 text-[#0b0b0b]" />
             {copy.extractedData}
           </div>
-          <ul className="space-y-2.5 text-xs text-gray-600">
+          <ul className="space-y-2.5 text-xs text-[#6b6b66]">
             <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              <CheckCircle2 className="h-4 w-4 text-[#0b0b0b]" />
               {copy.step1}
             </li>
             <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              <CheckCircle2 className="h-4 w-4 text-[#0b0b0b]" />
               {copy.step2}
             </li>
             <motion.li
-              className="flex items-center gap-2 overflow-hidden text-gray-400"
+              className="flex items-center gap-2 overflow-hidden text-black/40"
               variants={loadingReveal}
             >
               <motion.div
-                className="h-4 w-4 rounded-full border-2 border-gray-300 border-t-violet-500"
+                className="h-4 w-4 rounded-full border-2 border-black/15 border-t-[#0b0b0b]"
                 variants={{
                   rest: { rotate: 0 },
                   hover: {
@@ -160,10 +160,10 @@ export default function CreateHowItWorks({
               {copy.step3}
             </motion.li>
           </ul>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+          <div className="h-1 w-full overflow-hidden rounded-full bg-black/10">
             <motion.div
               variants={progressPulse}
-              className="h-full w-full bg-violet-500"
+              className="h-full w-full bg-[#0b0b0b]"
             />
           </div>
         </motion.div>
@@ -172,20 +172,20 @@ export default function CreateHowItWorks({
     {
       number: '3',
       title: copy.howToStep3,
-      color: 'bg-blue-500',
+      color: 'bg-[#0b0b0b]',
       mockup: (
         <motion.div className="space-y-2.5" variants={cardVariants}>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-700">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#0b0b0b] px-3 py-1 text-[11px] font-medium text-white">
             <CheckCircle2 className="h-3.5 w-3.5" />
             {copy.optimized}
           </div>
           <motion.div className="overflow-hidden" variants={chatReveal}>
-            <div className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-gray-100">
+            <div className="rounded-2xl border border-[#e6e6e1] bg-white p-3">
               <div className="flex items-start gap-2.5">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 ring-1 ring-blue-100">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#f3f3ef] text-[#0b0b0b]">
                   <MessageCircle className="h-4 w-4" />
                 </div>
-                <p className="text-xs leading-snug font-medium text-gray-700">
+                <p className="text-xs leading-snug font-medium text-black/75">
                   {copy.generatedProposal}
                 </p>
               </div>
@@ -197,17 +197,17 @@ export default function CreateHowItWorks({
   ]
 
   return (
-    <section className="mt-8 rounded-3xl bg-slate-50 p-4 ring-1 ring-slate-200/80 sm:p-6">
+    <section className="mt-8 rounded-3xl bg-[#f3f3ef] p-4 sm:p-8">
       <div className="mx-auto max-w-xl text-center">
-        <h4 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-2xl">
+        <h4 className="text-2xl font-medium tracking-[-0.04em] text-[#0b0b0b] sm:text-3xl">
           {copy.howToTitle}
         </h4>
-        <p className="mt-2 text-sm text-gray-600 sm:text-base">
+        <p className="mt-3 text-sm text-[#6b6b66] sm:text-base">
           {copy.howToSubtitle}
         </p>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:gap-5 lg:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:gap-5 lg:grid-cols-3">
         {steps.map((step, index) => (
           <motion.div
             key={step.title}
@@ -222,17 +222,17 @@ export default function CreateHowItWorks({
               animate="rest"
               variants={cardVariants}
             >
-              <Card className="rounded-3xl bg-white shadow-sm ring-1 ring-gray-200 transition-all hover:shadow-md">
+              <Card className="rounded-3xl border-0 bg-white shadow-none ring-1 ring-[#e6e6e1] transition-shadow hover:ring-[#0b0b0b]">
                 <CardContent className="p-5 sm:p-6">
-                  <div className="flex items-center gap-3 text-base font-bold text-gray-900">
+                  <div className="flex items-center gap-3 text-base font-medium tracking-[-0.01em] text-[#0b0b0b]">
                     <span
-                      className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm text-white ${step.color}`}
+                      className={`flex h-9 w-9 items-center justify-center rounded-full text-sm text-white tabular-nums ${step.color}`}
                     >
                       {step.number}
                     </span>
                     {step.title}
                   </div>
-                  <div className="mt-5 rounded-2xl border border-gray-100 bg-gray-50/60 p-4">
+                  <div className="mt-5 rounded-2xl bg-[#f3f3ef] p-4">
                     {step.mockup}
                   </div>
                 </CardContent>

@@ -34,7 +34,7 @@ export default function CreateStepper({ current }: CreateStepperProps) {
                 aria-hidden="true"
                 className={cn(
                   'mx-2 h-px w-6 sm:mx-3 sm:w-12',
-                  completed || active ? 'bg-[#6f8a5a]' : 'bg-[#dde1d3]'
+                  completed || active ? 'bg-[#0b0b0b]' : 'bg-black/15'
                 )}
               />
             ) : null}
@@ -42,11 +42,11 @@ export default function CreateStepper({ current }: CreateStepperProps) {
               <span
                 className={cn(
                   'flex size-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold tabular-nums transition-colors',
-                  completed && 'bg-[#29492e] text-white',
-                  active && 'bg-[#29492e] text-white ring-4 ring-[#29492e]/12',
+                  completed && 'bg-[#0b0b0b] text-white',
+                  active && 'bg-[#0b0b0b] text-white ring-4 ring-black/8',
                   !completed &&
                     !active &&
-                    'border border-[#dde1d3] bg-white text-[#8a9180]'
+                    'border border-black/15 bg-white text-black/45'
                 )}
               >
                 {completed ? (
@@ -59,8 +59,8 @@ export default function CreateStepper({ current }: CreateStepperProps) {
                 className={cn(
                   'text-xs sm:text-[13px]',
                   active
-                    ? 'font-medium text-[#2b3b26]'
-                    : 'sr-only text-[#7b8271] sm:not-sr-only'
+                    ? 'font-medium text-[#0b0b0b]'
+                    : 'sr-only text-[#6b6b66] sm:not-sr-only'
                 )}
               >
                 {step.label}

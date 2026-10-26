@@ -62,11 +62,8 @@ export default function ForgotPasswordPage() {
           <span className="bg-secondary text-secondary-foreground ring-border flex size-12 items-center justify-center rounded-xl ring-1">
             <MailCheck className="size-5" aria-hidden="true" />
           </span>
-          <h1 className="mt-6 text-[2rem] leading-[1.1] font-semibold tracking-[-0.045em]">
-            Revisa tu{' '}
-            <span className="font-serif font-normal text-[#52734a] italic">
-              correo
-            </span>
+          <h1 className="mt-6 text-[2rem] leading-[1.02] font-medium tracking-[-0.05em]">
+            Revisa tu <span className="text-muted-foreground">correo</span>
           </h1>
           <p className="text-muted-foreground mt-3 text-[0.95rem] leading-6">
             Si existe una cuenta con{' '}
@@ -99,11 +96,8 @@ export default function ForgotPasswordPage() {
         </div>
       ) : (
         <>
-          <h1 className="text-[2rem] leading-[1.1] font-semibold tracking-[-0.045em] sm:text-[2.5rem]">
-            Recupera tu{' '}
-            <span className="font-serif font-normal text-[#52734a] italic">
-              acceso
-            </span>
+          <h1 className="text-[2rem] leading-[1.02] font-medium tracking-[-0.05em] sm:text-[2.5rem]">
+            Recupera tu <span className="text-muted-foreground">acceso</span>
           </h1>
           <p className="text-muted-foreground mt-3 text-[0.95rem] leading-6">
             Escribe el correo de tu cuenta y te enviaremos un enlace para crear

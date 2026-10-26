@@ -43,23 +43,20 @@ export default function LandingHeroPreview({
             </button>
           ))}
         </div>
-        <span className="flex items-center gap-1.5 text-[10px] text-[#7b8272]">
-          <span
-            className="size-1.5 rounded-full bg-[#789660]"
-            aria-hidden="true"
-          />
+        <span className="flex items-center gap-1.5 text-xs text-(--home-muted)">
+          <span className="size-1.5 rounded-full bg-black" aria-hidden="true" />
           Vista de ejemplo
         </span>
       </div>
       <div className="hero-browser">
-        <div className="flex h-10 items-center gap-3 border-b border-[#e8e9df] bg-white px-3">
+        <div className="flex h-10 items-center gap-3 border-b border-black/10 bg-white px-3">
           <div className="flex gap-1" aria-hidden="true">
-            <span className="size-1.5 rounded-full bg-[#e0dfd5]" />
-            <span className="size-1.5 rounded-full bg-[#e0dfd5]" />
-            <span className="size-1.5 rounded-full bg-[#e0dfd5]" />
+            <span className="size-2 rounded-full bg-black/15" />
+            <span className="size-2 rounded-full bg-black/15" />
+            <span className="size-2 rounded-full bg-black/15" />
           </div>
-          <span className="flex min-w-0 flex-1 items-center justify-center gap-1.5 truncate text-[9px] text-[#929688]">
-            <Globe2 className="size-2.5 shrink-0" aria-hidden="true" />
+          <span className="flex min-w-0 flex-1 items-center justify-center gap-1.5 truncate text-[11px] text-black/50">
+            <Globe2 className="size-3 shrink-0" aria-hidden="true" />
             {example.name.toLowerCase().replaceAll(' ', '')}.bunnatic.com
           </span>
           <span className="w-8" aria-hidden="true" />

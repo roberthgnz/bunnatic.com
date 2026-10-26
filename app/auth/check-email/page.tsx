@@ -39,11 +39,8 @@ function CheckEmailContent() {
             <MailCheck className="size-6" />
           </span>
 
-          <h1 className="mt-6 text-[1.75rem] leading-tight font-semibold tracking-[-0.04em]">
-            Revisa tu{' '}
-            <span className="font-serif font-normal text-[#52734a] italic">
-              correo
-            </span>
+          <h1 className="mt-6 text-[1.75rem] leading-tight font-medium tracking-[-0.045em]">
+            Revisa tu <span className="text-muted-foreground">correo</span>
           </h1>
           <p className="text-muted-foreground mt-2 text-sm leading-6">
             Te hemos enviado un enlace para confirmar tu cuenta. Solo te llevará

@@ -152,7 +152,7 @@ function getCityFromAddress(address?: string): string | null {
 
 export default function CreateWebPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#fafaf5]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
       <CreateWebContent />
     </Suspense>
   )
@@ -687,18 +687,14 @@ function CreateWebContent() {
   }, [step])
 
   return (
-    <div className="landing-page flex min-h-screen flex-col bg-[#fafaf5] font-sans text-[#2b3b26] selection:bg-[#dce8c9] selection:text-[#263d21]">
+    <div className="landing-page home-page theme-mono flex min-h-screen flex-col bg-white font-sans text-[#0b0b0b]">
       <a href="#contenido" className="skip-link">
         Saltar al contenido
       </a>
       <Navbar />
 
       <main id="contenido" className="relative flex-1">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(60%_70%_at_50%_0%,#edf1e3,transparent)]"
-        />
-        <div className="relative mx-auto w-full max-w-6xl px-5 pt-8 pb-16 sm:px-8 sm:pt-10 lg:pb-24">
+        <div className="relative mx-auto w-full max-w-6xl px-5 pt-10 pb-20 sm:px-8 sm:pt-12 lg:pb-32">
           <CreateStepper current={stepIndex} />
           <p aria-live="polite" aria-atomic="true" className="sr-only">
             {searchStatus}
@@ -706,44 +702,44 @@ function CreateWebContent() {
 
           {step === 'search' && (
             <div key="search">
-              <div className="mx-auto mt-10 max-w-2xl sm:mt-14">
+              <div className="mx-auto mt-14 max-w-2xl sm:mt-20">
                 <div className="text-center">
-                  <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#dce3d5] bg-[#eef2e7] px-3 py-1.5 text-[11px] font-semibold text-[#496143]">
+                  <p className="mb-6 inline-flex items-center gap-2 text-[13px] font-medium text-(--home-muted)">
                     <Sparkles className="size-3.5" aria-hidden="true" />
                     Demo gratuita · sin registro
                   </p>
                   <h1
                     ref={headingRef}
                     tabIndex={-1}
-                    className="text-[2.6rem] leading-[1.05] font-semibold tracking-[-0.05em] text-[#2b3b26] outline-none sm:text-6xl"
+                    className="text-[clamp(44px,7vw,84px)] leading-[0.95] font-medium tracking-[-0.055em] text-balance outline-none"
                   >
                     {t.crear.title}{' '}
-                    <span className="block font-serif font-normal text-[#52734a] italic">
+                    <span className="block text-[#8a8a84]">
                       {t.crear.titleAccent}
                     </span>
                   </h1>
-                  <p className="mx-auto mt-5 max-w-lg text-base leading-7 text-[#687064] sm:text-lg sm:leading-8">
+                  <p className="mx-auto mt-7 max-w-lg text-base leading-7 text-(--home-muted) sm:text-lg sm:leading-8">
                     {t.crear.subtitle}
                   </p>
                 </div>
 
-                <form onSubmit={handleSearch} className="mt-9" role="search">
+                <form onSubmit={handleSearch} className="mt-12" role="search">
                   <label
                     htmlFor="crear-business"
-                    className="mb-2 block px-1 text-sm font-medium text-[#3a4b33]"
+                    className="mb-2.5 block px-1 text-sm font-medium sm:px-5"
                   >
                     {t.crear.searchLabel}
                   </label>
-                  <div className="flex flex-col gap-1.5 rounded-xl border border-[#dce0d1] bg-white p-1.5 shadow-[0_5px_20px_#35472d08] transition-[border-color,box-shadow] focus-within:border-[#738d5c] focus-within:shadow-[0_0_0_3px_#738d5c1f] sm:flex-row sm:items-center">
+                  <div className="flex flex-col gap-1.5 rounded-3xl border border-black/15 bg-white p-1.5 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.25)] transition-[border-color,box-shadow] focus-within:border-[#0b0b0b] focus-within:shadow-[0_0_0_3px_rgba(0,0,0,0.08)] sm:flex-row sm:items-center sm:rounded-full">
                     <div className="flex min-w-0 flex-1 items-center">
                       {inputIsUrl ? (
                         <Globe2
-                          className="ml-3 size-4 shrink-0 text-[#5b714c]"
+                          className="ml-4 size-4 shrink-0 text-[#0b0b0b]"
                           aria-hidden="true"
                         />
                       ) : (
                         <Search
-                          className="ml-3 size-4 shrink-0 text-[#7a8273]"
+                          className="ml-4 size-4 shrink-0 text-black/45"
                           aria-hidden="true"
                         />
                       )}
@@ -757,13 +753,13 @@ function CreateWebContent() {
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder={t.crear.searchPlaceholder}
-                        className="min-w-0 flex-1 bg-transparent px-3 py-3.5 text-base text-[#2b3b26] outline-none! placeholder:text-[#899080] sm:text-[15px]"
+                        className="min-w-0 flex-1 bg-transparent px-3 py-3.5 text-base text-[#0b0b0b] outline-none! placeholder:text-black/45 sm:text-[15px]"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={isSearching || !query.trim()}
-                      className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#29492e] px-5 text-sm font-medium text-white transition-colors hover:bg-[#3d6038] disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-11"
+                      className="home-button shrink-0 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       {isSearching ? (
                         <>
@@ -785,7 +781,7 @@ function CreateWebContent() {
                   </div>
                   <p
                     id="crear-business-hint"
-                    className="mt-2.5 px-1 text-xs leading-5 text-[#7b8271]"
+                    className="mt-3 px-1 text-xs leading-5 text-(--home-muted) sm:px-5"
                   >
                     {inputIsUrl
                       ? `Analizaremos el contenido público de ${inputHost ?? 'tu web'}.`
@@ -795,7 +791,7 @@ function CreateWebContent() {
                   </p>
                 </form>
 
-                <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
                   <SourceHint
                     icon={MapPin}
                     title="Desde Google"
@@ -810,12 +806,12 @@ function CreateWebContent() {
                   />
                 </div>
 
-                <ul className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-[11px] text-[#77806e]">
+                <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-(--home-muted)">
                   {['Demo gratis', 'Sin tarjeta', 'Solo datos públicos'].map(
                     (item) => (
                       <li key={item} className="flex items-center gap-1.5">
                         <Check
-                          className="size-3 text-[#52734a]"
+                          className="size-3.5 text-[#0b0b0b]"
                           aria-hidden="true"
                         />
                         {item}
@@ -827,7 +823,7 @@ function CreateWebContent() {
                 {searchError && !rateLimitExceeded && (
                   <div
                     role="alert"
-                    className="border-destructive/25 bg-destructive/5 text-destructive mt-6 flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm leading-6"
+                    className="border-destructive/25 bg-destructive/5 text-destructive mt-6 flex items-start gap-2.5 rounded-2xl border px-4 py-3 text-sm leading-6"
                   >
                     <AlertCircle
                       className="mt-1 size-4 shrink-0"
@@ -840,20 +836,20 @@ function CreateWebContent() {
                 {rateLimitExceeded && (
                   <div
                     role="alert"
-                    className="mt-6 rounded-2xl border border-[#ecdcb8] bg-[#fbf6ea] p-5 sm:p-6"
+                    className="mt-6 rounded-3xl bg-(--home-soft) p-6 sm:p-8"
                   >
                     <div className="flex items-start gap-3">
                       <span
                         aria-hidden="true"
-                        className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f3e6c6] text-[#9a6418]"
+                        className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-[#0b0b0b]"
                       >
                         <Clock className="size-4" />
                       </span>
                       <div className="min-w-0">
-                        <h2 className="text-base font-semibold text-[#2b3b26]">
+                        <h2 className="text-xl font-medium tracking-[-0.03em]">
                           Has llegado al límite de la demo
                         </h2>
-                        <p className="mt-1 text-sm leading-6 text-[#6e6a58]">
+                        <p className="mt-1.5 text-sm leading-6 text-(--home-muted)">
                           Ya has usado las búsquedas gratuitas de la
                           demostración.
                           {rateLimitResetAt
@@ -862,7 +858,7 @@ function CreateWebContent() {
                         </p>
                       </div>
                     </div>
-                    <ul className="mt-4 grid gap-1.5 text-xs text-[#5f6b55] sm:grid-cols-3">
+                    <ul className="mt-6 grid gap-2 border-t border-black/10 pt-5 text-xs text-black/70 sm:grid-cols-3">
                       {[
                         'Crea tu web desde tu panel',
                         '14 días de prueba',
@@ -870,7 +866,7 @@ function CreateWebContent() {
                       ].map((item) => (
                         <li key={item} className="flex items-center gap-1.5">
                           <Check
-                            className="size-3.5 shrink-0 text-[#52734a]"
+                            className="size-3.5 shrink-0 text-[#0b0b0b]"
                             aria-hidden="true"
                           />
                           {item}
@@ -879,7 +875,7 @@ function CreateWebContent() {
                     </ul>
                     <Link
                       href={signupHref}
-                      className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#29492e] px-5 text-sm font-medium text-white transition-colors hover:bg-[#3d6038] sm:w-auto"
+                      className="home-button mt-6 w-full sm:w-auto"
                     >
                       Crear mi cuenta gratis
                       <ArrowRight className="size-4" aria-hidden="true" />
@@ -900,20 +896,20 @@ function CreateWebContent() {
                 )}
 
                 {showNoResults && (
-                  <div className="mt-6 rounded-2xl border border-[#e8e1d4] bg-[#f6f1e8] p-5 sm:p-6">
-                    <h2 className="text-base font-semibold text-[#2b3b26]">
+                  <div className="mt-6 rounded-3xl bg-(--home-soft) p-6 sm:p-8">
+                    <h2 className="text-xl font-medium tracking-[-0.03em]">
                       {t.crear.noResultsTitle}
                     </h2>
-                    <p className="mt-1.5 text-sm leading-6 text-[#7a7466]">
+                    <p className="mt-1.5 text-sm leading-6 text-(--home-muted)">
                       {t.crear.noResultsSubtitle}
                     </p>
-                    <div className="mt-5 flex flex-col gap-3 border-t border-[#e8e1d4] pt-5 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-sm font-medium text-[#3a4b33]">
+                    <div className="mt-6 flex flex-col gap-4 border-t border-black/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="text-sm font-medium">
                         ¿Prefieres que te ayudemos personalmente?
                       </p>
                       <Link
                         href={signupHref}
-                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#d9d2c2] bg-white px-4 text-sm font-medium text-[#2b3b26] transition-colors hover:bg-[#fbf9f4]"
+                        className="home-button home-button-light"
                       >
                         Crear mi web con ayuda
                         <ArrowRight className="size-4" aria-hidden="true" />
@@ -924,9 +920,9 @@ function CreateWebContent() {
               </div>
 
               {!hasSearched && !isSearching && (
-                <div className="mx-auto mt-20 max-w-4xl">
+                <div className="mx-auto mt-28 max-w-5xl sm:mt-36">
                   <h2 className="landing-eyebrow text-center">Así funciona</h2>
-                  <ol className="mt-6 grid gap-6 sm:grid-cols-3 sm:gap-8">
+                  <ol className="mt-8 grid gap-8 sm:grid-cols-3 sm:gap-10">
                     {[
                       {
                         number: '01',
@@ -946,37 +942,37 @@ function CreateWebContent() {
                     ].map((item) => (
                       <li
                         key={item.number}
-                        className="border-t border-[#dfe3d5] pt-4"
+                        className="border-t border-black/15 pt-6"
                       >
                         <span
                           aria-hidden="true"
-                          className="font-serif text-2xl text-[#9aa989]"
+                          className="text-lg font-medium text-black/35 tabular-nums"
                         >
                           {item.number}
                         </span>
-                        <h3 className="mt-2 text-[15px] font-semibold tracking-tight text-[#34472d]">
+                        <h3 className="mt-4 text-2xl font-medium tracking-[-0.03em]">
                           {item.title}
                         </h3>
-                        <p className="mt-1 text-sm leading-6 text-[#7b8271]">
+                        <p className="mt-2 text-sm leading-6 text-(--home-muted)">
                           {item.text}
                         </p>
                       </li>
                     ))}
                   </ol>
 
-                  <div className="mt-12 flex flex-col gap-5 rounded-2xl border border-[#e3e6da] bg-white p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+                  <div className="mt-16 flex flex-col gap-6 rounded-3xl bg-(--home-soft) p-6 sm:flex-row sm:items-center sm:justify-between sm:p-10">
                     <div className="flex items-start gap-4">
                       <span
                         aria-hidden="true"
-                        className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-[#dfe4d4] bg-[#f1f4ea] text-[#748765]"
+                        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-[#0b0b0b]"
                       >
                         <Leaf className="size-5" />
                       </span>
                       <div>
-                        <h2 className="text-base font-semibold tracking-tight text-[#2b3b26]">
+                        <h2 className="text-xl font-medium tracking-[-0.03em] sm:text-2xl">
                           ¿Tu negocio no aparece en Google?
                         </h2>
-                        <p className="mt-1 max-w-md text-sm leading-6 text-[#7b8271]">
+                        <p className="mt-1.5 max-w-md text-sm leading-6 text-(--home-muted)">
                           No pasa nada. Crea tu cuenta y te guiamos para montar
                           tu web desde cero.
                         </p>
@@ -984,7 +980,7 @@ function CreateWebContent() {
                     </div>
                     <Link
                       href={signupHref}
-                      className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-[#dce0d1] bg-white px-4 text-sm font-medium text-[#2b3b26] transition-colors hover:bg-[#f6f7f1]"
+                      className="home-button home-button-light shrink-0"
                     >
                       Empezar desde cero
                       <ArrowRight className="size-4" aria-hidden="true" />
@@ -996,7 +992,7 @@ function CreateWebContent() {
           )}
 
           {step === 'analyzing' && (
-            <div key="analyzing" className="mt-10 sm:mt-14">
+            <div key="analyzing" className="mt-14 sm:mt-20">
               <CreateAnalyzing
                 ref={headingRef}
                 progress={analysisProgress}
@@ -1024,28 +1020,28 @@ function CreateWebContent() {
           )}
 
           {step === 'preview' && placeDetails && (
-            <div key="preview" className="mt-10 sm:mt-12">
-              <div className="max-w-3xl">
-                <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#dce3d5] bg-[#eef2e7] px-3 py-1.5 text-[11px] font-semibold text-[#496143]">
+            <div key="preview" className="mt-14 sm:mt-20">
+              <div className="max-w-4xl">
+                <p className="mb-6 inline-flex items-center gap-2 text-[13px] font-medium text-(--home-muted)">
                   <Check className="size-3.5" aria-hidden="true" />
                   Propuesta generada
                 </p>
                 <h1
                   ref={headingRef}
                   tabIndex={-1}
-                  className="text-3xl leading-tight font-semibold tracking-[-0.045em] break-words text-[#2b3b26] outline-none sm:text-5xl sm:leading-[1.08]"
+                  className="text-[clamp(36px,5.4vw,72px)] leading-[1] font-medium tracking-[-0.05em] break-words outline-none"
                 >
                   {t.crear.previewTitle.replace('{name}', placeDetails.name)}{' '}
-                  <span className="block font-serif font-normal text-[#52734a] italic">
+                  <span className="block text-[#8a8a84]">
                     {t.crear.previewTitleAccent}
                   </span>
                 </h1>
-                <p className="mt-4 max-w-xl text-sm leading-6 text-[#687064] sm:text-base sm:leading-7">
+                <p className="mt-6 max-w-xl text-base leading-7 text-(--home-muted) sm:text-lg sm:leading-8">
                   {t.crear.minimalistNote}
                 </p>
               </div>
 
-              <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-8">
+              <div className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-8">
                 <GeneratedSitePreview
                   name={placeDetails.name}
                   host={`${slugifyHost(placeDetails.name)}.bunnatic.com`}
@@ -1077,25 +1073,25 @@ function CreateWebContent() {
                 <aside className="space-y-4 lg:sticky lg:top-24">
                   <section
                     aria-labelledby="crear-data-title"
-                    className="rounded-2xl border border-[#e3e6da] bg-white p-5"
+                    className="rounded-3xl border border-(--home-line) bg-white p-6"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <h2
                         id="crear-data-title"
-                        className="text-[10px] font-semibold tracking-[0.15em] text-[#778769] uppercase"
+                        className="text-[13px] font-medium text-(--home-muted)"
                       >
                         {t.crear.extractedData}
                       </h2>
-                      <span className="rounded-full bg-[#eef2e7] px-2 py-0.5 text-[10px] font-medium text-[#496143]">
+                      <span className="rounded-full bg-(--home-soft) px-2.5 py-1 text-[11px] font-medium text-black/70">
                         {analysisInputMode === 'url'
                           ? 'Desde tu web'
                           : 'Desde Google'}
                       </span>
                     </div>
-                    <p className="mt-3 text-lg leading-snug font-semibold tracking-tight break-words text-[#2b3b26]">
+                    <p className="mt-4 text-2xl leading-tight font-medium tracking-[-0.03em] break-words">
                       {placeDetails.name}
                     </p>
-                    <dl className="mt-4 space-y-3 text-sm text-[#5f6b55]">
+                    <dl className="mt-5 space-y-3 border-t border-(--home-line) pt-5 text-sm text-(--home-muted)">
                       {placeDetails.formatted_address ? (
                         <DataRow icon={MapPin} label="Dirección">
                           {placeDetails.formatted_address}
@@ -1108,7 +1104,7 @@ function CreateWebContent() {
                       ) : null}
                       {placeDetails.rating ? (
                         <DataRow icon={Star} label="Valoración" star>
-                          <span className="font-medium text-[#2b3b26]">
+                          <span className="font-medium text-[#0b0b0b]">
                             {placeDetails.rating.toLocaleString('es-ES')}
                           </span>{' '}
                           ·{' '}
@@ -1121,7 +1117,7 @@ function CreateWebContent() {
                       {priceLevelValue ? (
                         <DataRow icon={Euro} label={t.crear.priceLevel}>
                           {t.crear.priceLevel}:{' '}
-                          <span className="font-medium text-[#2b3b26]">
+                          <span className="font-medium text-[#0b0b0b]">
                             {priceLevelValue}
                           </span>
                         </DataRow>
@@ -1139,26 +1135,21 @@ function CreateWebContent() {
 
                   <section
                     aria-labelledby="crear-publish-title"
-                    className="relative overflow-hidden rounded-2xl bg-[#29452e] p-5 text-white sm:p-6"
+                    className="home-dark relative overflow-hidden rounded-3xl bg-[#0b0b0b] p-6 text-white sm:p-7"
                   >
-                    <Leaf
-                      className="pointer-events-none absolute -right-10 -bottom-12 size-48 rotate-150 text-[#90ae6d]/10"
-                      strokeWidth={0.6}
-                      aria-hidden="true"
-                    />
                     <div className="relative">
                       <h2
                         id="crear-publish-title"
-                        className="text-lg font-semibold tracking-tight"
+                        className="text-2xl font-medium tracking-[-0.03em]"
                       >
                         {t.crear.allCorrect}
                       </h2>
-                      <p className="mt-2 text-sm leading-6 text-[#bfccb3]">
+                      <p className="mt-3 text-sm leading-6 text-white/65">
                         {analysisInputMode === 'url'
                           ? t.crear.generatedProposalWeb
                           : t.crear.generatedProposalGoogle}
                       </p>
-                      <ul className="mt-4 space-y-1.5 text-xs text-[#d5dfca]">
+                      <ul className="mt-6 space-y-2.5 border-t border-white/15 pt-5 text-sm text-white/80">
                         {[
                           'Edita textos, fotos y servicios',
                           'Conecta tu propio dominio',
@@ -1166,7 +1157,7 @@ function CreateWebContent() {
                         ].map((item) => (
                           <li key={item} className="flex items-center gap-2">
                             <Check
-                              className="size-3.5 shrink-0 text-[#c8dda6]"
+                              className="size-4 shrink-0 text-white"
                               aria-hidden="true"
                             />
                             {item}
@@ -1183,7 +1174,7 @@ function CreateWebContent() {
                             input_mode: analysisInputMode,
                           })
                         }
-                        className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#d6e7b8] px-5 text-sm font-semibold text-[#2b4325] transition-colors hover:bg-[#e4efcf] focus-visible:outline-[#d6e7b8]!"
+                        className="home-button home-button-light mt-7 w-full"
                       >
                         {t.crear.publishNow}
                         <ArrowRight className="size-4" aria-hidden="true" />
@@ -1191,7 +1182,7 @@ function CreateWebContent() {
                       <button
                         type="button"
                         onClick={() => setStep('search')}
-                        className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/20 px-5 text-sm font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline-[#d6e7b8]!"
+                        className="home-button home-button-outline mt-2.5 w-full border-white/25!"
                       >
                         <RotateCcw className="size-4" aria-hidden="true" />
                         {t.crear.searchAnother}
@@ -1206,42 +1197,39 @@ function CreateWebContent() {
           {step === 'dashboard' && placeDetails && (
             <div
               key="dashboard"
-              className="mx-auto mt-12 max-w-xl rounded-2xl border border-[#e3e6da] bg-white p-6 text-center sm:p-10"
+              className="mx-auto mt-14 max-w-xl rounded-3xl border border-(--home-line) bg-white p-8 text-center sm:mt-20 sm:p-12"
             >
               <span
                 aria-hidden="true"
-                className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#e7efdf] text-[#4d713c]"
+                className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#0b0b0b] text-white"
               >
                 <Check className="size-5" />
               </span>
               <h1
                 ref={headingRef}
                 tabIndex={-1}
-                className="mt-5 text-2xl font-semibold tracking-[-0.04em] text-[#2b3b26] outline-none sm:text-3xl"
+                className="mt-6 text-3xl leading-tight font-medium tracking-[-0.045em] outline-none sm:text-4xl"
               >
                 {t.crear.publishedTitle}
               </h1>
-              <p className="mt-3 text-sm leading-6 text-[#687064] sm:text-base">
+              <p className="mt-3 text-sm leading-6 text-(--home-muted) sm:text-base">
                 {t.crear.publishedSubtitle.replace('{name}', placeDetails.name)}
               </p>
-              <p className="mt-5 inline-flex max-w-full items-center gap-2 rounded-lg border border-[#e3e6da] bg-[#f6f7f1] px-3 py-2 text-sm text-[#3a4b33]">
+              <p className="mt-6 inline-flex max-w-full items-center gap-2 rounded-full bg-(--home-soft) px-4 py-2 text-sm text-black/75">
                 <Globe2 className="size-4 shrink-0" aria-hidden="true" />
                 <span className="truncate">
                   {slugifyHost(placeDetails.name)}.bunnatic.com
                 </span>
               </p>
               <div className="mt-8 flex flex-col justify-center gap-2.5 sm:flex-row">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#29492e] px-5 text-sm font-medium text-white transition-colors hover:bg-[#3d6038]"
-                >
+                <Link href="/dashboard" className="home-button">
                   {t.crear.goToDashboard}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
                 <button
                   type="button"
                   onClick={() => setStep('search')}
-                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-[#dce0d1] bg-white px-5 text-sm font-medium text-[#2b3b26] transition-colors hover:bg-[#f6f7f1]"
+                  className="home-button home-button-outline border-(--home-line)!"
                 >
                   {t.crear.createAnother}
                 </button>
@@ -1269,22 +1257,24 @@ function SourceHint({
   return (
     <div
       className={cn(
-        'flex items-start gap-3 rounded-xl border px-3.5 py-3 transition-colors',
-        active ? 'border-[#b9c6aa] bg-white' : 'border-[#e6e8de] bg-white/50'
+        'flex items-start gap-3 rounded-2xl border px-4 py-3.5 transition-colors',
+        active
+          ? 'border-[#0b0b0b] bg-white'
+          : 'border-(--home-line) bg-(--home-soft)/60'
       )}
     >
       <span
         aria-hidden="true"
         className={cn(
-          'mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg',
-          active ? 'bg-[#e5edda] text-[#3c5633]' : 'bg-[#f1f3ec] text-[#8a9180]'
+          'mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full',
+          active ? 'bg-[#0b0b0b] text-white' : 'bg-white text-black/50'
         )}
       >
         <Icon className="size-3.5" />
       </span>
       <div className="min-w-0">
-        <p className="text-xs font-semibold text-[#3a4b33]">{title}</p>
-        <p className="mt-0.5 text-xs leading-5 break-words text-[#7b8271]">
+        <p className="text-[13px] font-medium">{title}</p>
+        <p className="mt-0.5 text-xs leading-5 break-words text-(--home-muted)">
           {text}
         </p>
       </div>
@@ -1309,7 +1299,7 @@ function DataRow({
         <Icon
           className={cn(
             'size-4',
-            star ? 'fill-[#c9a15a] text-[#c9a15a]' : 'text-[#8a9180]'
+            star ? 'fill-[#0b0b0b] text-[#0b0b0b]' : 'text-black/40'
           )}
           aria-hidden="true"
         />

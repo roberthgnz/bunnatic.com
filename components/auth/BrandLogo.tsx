@@ -18,12 +18,12 @@ export function BrandLogo({ href = '/', className }: BrandLogoProps) {
       )}
     >
       <span
-        className="flex size-8 items-center justify-center rounded-lg bg-[#29492e]"
+        className="flex size-8 items-center justify-center rounded-lg bg-black"
         aria-hidden="true"
       >
-        <Leaf className="size-4 text-[#d8e7b7]" />
+        <Leaf className="size-4 text-white" />
       </span>
-      <span className="text-xl font-semibold tracking-[-0.04em] text-[#2c3b27]">
+      <span className="text-xl font-semibold tracking-[-0.04em] text-black">
         Bunnatic
       </span>
     </Link>

@@ -71,7 +71,9 @@ export default function LandingHeroPreview({
           />
         </div>
       </div>
-      {status ? <div className="hero-status max-w-[300px]">{status}</div> : null}
+      {status ? (
+        <div className="hero-status max-w-[300px]">{status}</div>
+      ) : null}
     </div>
   )
 }

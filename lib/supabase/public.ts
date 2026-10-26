@@ -40,3 +40,26 @@ export async function getPublicBusinessByHostname(hostnameInput: string) {
 
   return business ?? null
 }
+
+/** Public site data: RLS allows anonymous reads of services and hours. */
+export async function getPublicServices(businessId: string) {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('services')
+    .select('*')
+    .eq('business_id', businessId)
+    .order('created_at', { ascending: true })
+
+  return data ?? []
+}
+
+export async function getPublicWorkingHours(businessId: string) {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('working_hours')
+    .select('*')
+    .eq('business_id', businessId)
+    .order('day_of_week', { ascending: true })
+
+  return data ?? []
+}

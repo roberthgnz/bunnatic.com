@@ -64,10 +64,7 @@ const PALETTES: Record<'food' | 'beauty' | 'health' | 'neutral', Palette> = {
 }
 
 function normalizeText(value: string) {
-  return value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+  return value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
 }
 
 export function getSitePalette(...hints: Array<string | null | undefined>) {
@@ -169,7 +166,7 @@ export function splitDescription(description: string | null | undefined) {
     return { lead: first, rest: paragraphs.slice(1).join('\n\n').trim() }
   }
 
-  const sentence = text.match(/^.{40,240}?[.!?](\s|$)/s)?.[0]?.trim()
+  const sentence = text.match(/^[\s\S]{40,240}?[.!?](\s|$)/)?.[0]?.trim()
   if (sentence) {
     return { lead: sentence, rest: text.slice(sentence.length).trim() || null }
   }

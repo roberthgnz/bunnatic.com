@@ -70,8 +70,7 @@ export default function CreateResultsList({
                         </span>
                         {typeof place.user_ratings_total === 'number' ? (
                           <span>
-                            (
-                            {place.user_ratings_total.toLocaleString('es-ES')}{' '}
+                            ({place.user_ratings_total.toLocaleString('es-ES')}{' '}
                             reseñas)
                           </span>
                         ) : null}

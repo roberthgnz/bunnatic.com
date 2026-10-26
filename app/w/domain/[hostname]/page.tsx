@@ -1,7 +1,10 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { getServices, getWorkingHours } from '@/lib/supabase/actions'
-import { getPublicBusinessByHostname } from '@/lib/supabase/public'
+import {
+  getPublicBusinessByHostname,
+  getPublicServices,
+  getPublicWorkingHours,
+} from '@/lib/supabase/public'
 import PublicBusinessSite from '../../_components/PublicBusinessSite'
 
 export async function generateMetadata({
@@ -39,8 +42,8 @@ export default async function PublicBusinessDomainPage({
   }
 
   const [services, hours] = await Promise.all([
-    getServices(business.id),
-    getWorkingHours(business.id),
+    getPublicServices(business.id),
+    getPublicWorkingHours(business.id),
   ])
 
   return (

@@ -80,8 +80,10 @@ function themeForTypes(types: string[] = []) {
         }
       : DEFAULT_THEME
   }
-  if (types.some((type) => FOOD_TYPES.includes(type))) return pick('restaurante')
-  if (types.some((type) => SALON_TYPES.includes(type))) return pick('peluqueria')
+  if (types.some((type) => FOOD_TYPES.includes(type)))
+    return pick('restaurante')
+  if (types.some((type) => SALON_TYPES.includes(type)))
+    return pick('peluqueria')
   if (types.some((type) => CLINIC_TYPES.includes(type))) return pick('clinica')
   return DEFAULT_THEME
 }
@@ -172,7 +174,10 @@ export default function GeneratedSitePreview({
             <Leaf className="size-4 shrink-0" aria-hidden="true" />
             <span className="truncate">{name}</span>
           </span>
-          <span className="hidden gap-4 text-[10px] @xl:flex" aria-hidden="true">
+          <span
+            className="hidden gap-4 text-[10px] @xl:flex"
+            aria-hidden="true"
+          >
             <span>Nosotros</span>
             {services.length > 0 ? <span>Servicios</span> : null}
             <span>Contacto</span>
@@ -184,7 +189,7 @@ export default function GeneratedSitePreview({
 
         {/* Cover */}
         <div
-          className="relative min-h-[300px] overflow-hidden @xl:min-h-[360px]"
+          className="relative flex min-h-[320px] flex-col justify-end overflow-hidden @xl:min-h-[380px]"
           style={theme.image ? undefined : { backgroundColor: '#29452e' }}
         >
           {theme.image ? (
@@ -196,7 +201,7 @@ export default function GeneratedSitePreview({
                 sizes="(max-width: 1023px) 92vw, 760px"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
               <span className="absolute top-3 right-3 rounded-full bg-black/35 px-2 py-0.5 text-[9px] text-white/85 backdrop-blur-sm">
                 Foto de ejemplo
               </span>
@@ -208,7 +213,7 @@ export default function GeneratedSitePreview({
               aria-hidden="true"
             />
           )}
-          <div className="relative px-5 pt-14 pb-10 @xl:px-8 @xl:pt-20">
+          <div className="relative px-5 pt-14 pb-8 @xl:px-8 @xl:pt-20 @xl:pb-10">
             {eyebrow ? (
               <span className="mb-3 flex items-center gap-1.5 text-[10px] font-medium tracking-[0.16em] text-white/80 uppercase">
                 <MapPin className="size-3 shrink-0" aria-hidden="true" />
@@ -240,7 +245,10 @@ export default function GeneratedSitePreview({
             <ul className="mt-3 space-y-2.5 text-xs leading-5 opacity-85 @xl:text-[13px]">
               {address ? (
                 <li className="flex items-start gap-2">
-                  <MapPin className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+                  <MapPin
+                    className="mt-0.5 size-3.5 shrink-0"
+                    aria-hidden="true"
+                  />
                   <span className="min-w-0 break-words">{address}</span>
                 </li>
               ) : null}

@@ -1,17 +1,20 @@
-'use client'
-
-import Link from 'next/link'
-import DemoLinkButton from '@/components/DemoLinkButton'
-import Footer from '@/components/Footer'
-import Navbar from '@/components/Navbar'
+import dynamic from 'next/dynamic'
+import { Check, Leaf, Minus } from 'lucide-react'
+import LandingHeroPreview from '@/components/landing/LandingHeroPreview'
 import {
-  ArrowRight,
-  CheckCircle2,
-  Clock3,
-  MessageSquareQuote,
-  ShieldCheck,
-  XCircle,
-} from 'lucide-react'
+  FinalCtaSection,
+  HeroStatus,
+  LandingShell,
+  ProofAndPlanSection,
+  SectionHeader,
+  SeoHero,
+  StepsSection,
+} from '@/components/landing/SeoLandingSections'
+import { content } from '@/lib/content'
+
+const FAQ = dynamic(() => import('@/components/FAQ'), {
+  loading: () => <div className="h-96" />,
+})
 
 type Locale = 'es' | 'ca'
 
@@ -54,6 +57,103 @@ type AlternativeLandingProps = {
   copy: Record<Locale, AlternativeCopy>
 }
 
+/** Which example site (lib/siteExamples) to show first in the hero preview. */
+const previewBySlug: Record<string, string> = {
+  facebook: 'restaurante',
+  instagram: 'peluqueria',
+  'google-my-business': 'clinica',
+  wordpress: 'clinica',
+  wix: 'restaurante',
+  squarespace: 'peluqueria',
+}
+
+function ComparisonTable({
+  competitorName,
+  competitorTitle,
+  competitorItems,
+  novaTitle,
+  novaItems,
+}: {
+  competitorName: string
+  competitorTitle: string
+  competitorItems: string[]
+  novaTitle: string
+  novaItems: string[]
+}) {
+  const rows = Array.from(
+    { length: Math.max(competitorItems.length, novaItems.length) },
+    (_, index) => ({
+      competitor: competitorItems[index],
+      nova: novaItems[index],
+    })
+  )
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-[#e1e5d8] bg-white shadow-[0_8px_25px_#3b4b2c08]">
+      <table className="w-full table-fixed border-collapse text-left">
+        <caption className="sr-only">
+          Comparativa entre {competitorName} y Bunnatic
+        </caption>
+        <thead>
+          <tr>
+            <th
+              scope="col"
+              className="w-1/2 border-b border-[#e8eadd] bg-[#f6f6ef] px-4 py-4 align-bottom text-xs font-semibold text-[#5f6656] sm:px-7 sm:py-5 sm:text-sm"
+            >
+              {competitorTitle}
+            </th>
+            <th
+              scope="col"
+              className="w-1/2 border-b border-l border-[#dde4d2] bg-[#eef3e6] px-4 py-4 align-bottom text-xs font-semibold text-[#29492e] sm:px-7 sm:py-5 sm:text-sm"
+            >
+              <span className="flex items-center gap-2">
+                <span
+                  className="hidden size-6 shrink-0 items-center justify-center rounded-md bg-[#29492e] sm:flex"
+                  aria-hidden="true"
+                >
+                  <Leaf className="size-3.5 text-[#d8e7b7]" />
+                </span>
+                {novaTitle}
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, index) => (
+            <tr
+              key={`${row.competitor ?? ''}-${row.nova ?? ''}-${index}`}
+              className="border-b border-[#eef0e7] last:border-b-0"
+            >
+              <td className="px-4 py-4 align-top text-[13px] leading-6 break-words text-[#6f7666] sm:px-7 sm:py-5 sm:text-sm">
+                {row.competitor ? (
+                  <span className="flex items-start gap-2.5">
+                    <Minus
+                      className="mt-1 size-3.5 shrink-0 text-[#b3ad9f]"
+                      aria-hidden="true"
+                    />
+                    {row.competitor}
+                  </span>
+                ) : null}
+              </td>
+              <td className="border-l border-[#e3e9d9] bg-[#f7f9f2] px-4 py-4 align-top text-[13px] leading-6 font-medium break-words text-[#34472d] sm:px-7 sm:py-5 sm:text-sm">
+                {row.nova ? (
+                  <span className="flex items-start gap-2.5">
+                    <Check
+                      className="mt-1 size-3.5 shrink-0 text-[#5d8443]"
+                      aria-hidden="true"
+                    />
+                    {row.nova}
+                  </span>
+                ) : null}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 export default function AlternativeLanding({
   slug,
   copy,
@@ -61,190 +161,80 @@ export default function AlternativeLanding({
   const t = copy.es
   const signupHref = `/signup?redirect=/checkout&source=alternative-${slug}`
   const planHref = `/signup?redirect=/checkout&plan=pro&source=alternative-${slug}`
+  const competitorName =
+    content.competitors.find((competitor) => competitor.id === slug)?.name ??
+    t.competitorCardTitle.replace(/^(solo\s+)?con\s+/i, '')
 
   return (
-    <main className="min-h-screen bg-white text-gray-900">
-      <Navbar useDemoCta />
+    <LandingShell>
+      <SeoHero
+        badge={t.badge}
+        title={t.title}
+        subtitle={t.subtitle}
+        urgencyText={t.urgencyText}
+        trustLine={t.trustLine}
+        visual={
+          <LandingHeroPreview
+            initialExample={previewBySlug[slug]}
+            status={
+              t.novaItems[0] ? (
+                <HeroStatus
+                  icon={<Leaf className="size-4" />}
+                  title={t.novaCardTitle}
+                  text={t.novaItems[0]}
+                />
+              ) : null
+            }
+          />
+        }
+      />
 
-      <section className="overflow-hidden border-b border-slate-200 px-4 pt-10 pb-14 sm:px-6 sm:pt-16 sm:pb-16 lg:px-8 lg:pt-24 lg:pb-20">
-        <div className="relative mx-auto max-w-5xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100 sm:px-4 sm:py-2 sm:text-sm">
-            <Clock3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            {t.badge}
-          </span>
-          <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:mt-6 sm:text-5xl lg:text-6xl">
-            {t.title}
-          </h1>
-          <p className="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-gray-600 sm:mt-6 sm:text-lg">
-            {t.subtitle}
-          </p>
-          <p className="mt-3 text-xs font-semibold text-gray-500 sm:mt-4 sm:text-sm">
-            {t.urgencyText}
-          </p>
-          <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-            <DemoLinkButton
-              label="Probar demo gratis"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-700 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-800 sm:w-auto sm:text-base"
-            />
-            <Link
-              href="/#pricing"
-              className="inline-flex w-full items-center justify-center rounded-full border border-gray-300 px-6 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-50 sm:w-auto sm:text-base"
-            >
-              Ver precios
-            </Link>
-          </div>
-          <p className="mt-4 text-xs font-medium text-gray-500 sm:mt-5 sm:text-sm">
-            {t.trustLine}
-          </p>
+      <section
+        id="comparativa"
+        className="landing-section bg-white"
+        aria-labelledby="comparativa-title"
+      >
+        <div className="landing-container grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:items-start lg:gap-16">
+          <SectionHeader
+            id="comparativa-title"
+            eyebrow="Cara a cara"
+            title={`Bunnatic y ${competitorName}, punto por punto`}
+            description="Una comparación directa de lo que cambia en el día a día para que elijas con criterio."
+          />
+          <ComparisonTable
+            competitorName={competitorName}
+            competitorTitle={t.competitorCardTitle}
+            competitorItems={t.competitorItems}
+            novaTitle={t.novaCardTitle}
+            novaItems={t.novaItems}
+          />
         </div>
       </section>
 
-      <section className="py-14 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-4 sm:gap-8 md:grid-cols-2">
-            <article className="rounded-3xl bg-gray-50 p-5 ring-1 ring-gray-200 sm:p-8">
-              <h2 className="text-xl font-extrabold text-gray-900 sm:text-2xl">
-                {t.competitorCardTitle}
-              </h2>
-              <ul className="mt-5 space-y-3 sm:mt-6 sm:space-y-4">
-                {t.competitorItems.map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
-                    <span className="text-sm font-medium text-gray-700">
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-            <article className="relative rounded-3xl bg-emerald-50 p-5 ring-1 ring-emerald-200 sm:p-8">
-              <span className="absolute -top-3 right-5 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-bold text-white sm:right-6 sm:text-xs">
-                Recomendado
-              </span>
-              <h2 className="text-xl font-extrabold text-emerald-900 sm:text-2xl">
-                {t.novaCardTitle}
-              </h2>
-              <ul className="mt-5 space-y-3 sm:mt-6 sm:space-y-4">
-                {t.novaItems.map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
-                    <span className="text-sm font-medium text-emerald-900">
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          </div>
-        </div>
-      </section>
+      <StepsSection
+        eyebrow="Cómo dar el salto"
+        title={t.switchTitle}
+        steps={t.switchSteps}
+      />
 
-      <section className="bg-slate-50 py-14 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-extrabold sm:text-3xl">
-            {t.switchTitle}
-          </h2>
-          <div className="mt-6 grid gap-4 sm:mt-10 sm:gap-6 md:grid-cols-3">
-            {t.switchSteps.map((step, index) => (
-              <article
-                key={step.title}
-                className="rounded-3xl bg-white p-5 ring-1 ring-gray-200 sm:p-6"
-              >
-                <p className="text-xs font-bold text-emerald-600 sm:text-sm">
-                  0{index + 1}
-                </p>
-                <h3 className="mt-2 text-lg font-bold sm:mt-3 sm:text-xl">
-                  {step.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600 sm:mt-3">
-                  {step.description}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ProofAndPlanSection
+        proofTitle={t.proofTitle}
+        testimonials={t.testimonials}
+        planTitle={t.planTitle}
+        planPrice={t.planPrice}
+        planItems={t.planItems}
+        planHref={planHref}
+      />
 
-      <section className="py-14 sm:py-20">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:gap-8 sm:px-6 lg:grid-cols-2 lg:px-8">
-          <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
-            <h2 className="text-xl font-extrabold sm:text-2xl">
-              {t.proofTitle}
-            </h2>
-            <div className="mt-6 space-y-4">
-              {t.testimonials.map((item) => (
-                <article
-                  key={item.author}
-                  className="rounded-2xl bg-slate-50 p-4 sm:p-5"
-                >
-                  <MessageSquareQuote className="h-5 w-5 text-emerald-600" />
-                  <p className="mt-3 text-sm leading-relaxed text-gray-700">
-                    {item.quote}
-                  </p>
-                  <p className="mt-3 text-sm font-bold text-gray-900">
-                    {item.author}
-                  </p>
-                  <p className="text-xs font-medium text-gray-500">
-                    {item.role}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
+      <FAQ />
 
-          <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-8">
-            <h3 className="text-lg font-extrabold text-gray-900 sm:text-xl">
-              {t.planTitle}
-            </h3>
-            <p className="mt-1 text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              {t.planPrice}
-            </p>
-            <ul className="mt-5 space-y-3">
-              {t.planItems.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-2 text-sm font-medium text-gray-700"
-                >
-                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href={planHref}
-              className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-gray-900 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-gray-800"
-            >
-              Crear cuenta y empezar
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-t border-gray-100 bg-slate-50 py-14 sm:py-16">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-          <h2 className="text-2xl font-extrabold tracking-tight sm:text-4xl">
-            {t.finalTitle}
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-base text-gray-600 sm:mt-4 sm:text-lg">
-            {t.finalSubtitle}
-          </p>
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
-              href={signupHref}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-700 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-800 sm:w-auto sm:text-base"
-            >
-              {t.ctaPrimary}
-              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Link>
-            <DemoLinkButton
-              label={t.ctaSecondary}
-              className="inline-flex w-full items-center justify-center rounded-full border border-gray-300 px-6 py-3 text-sm font-bold text-gray-900 transition-colors hover:bg-white sm:w-auto sm:text-base"
-            />
-          </div>
-        </div>
-      </section>
-
-      <Footer />
-    </main>
+      <FinalCtaSection
+        title={t.finalTitle}
+        subtitle={t.finalSubtitle}
+        primaryHref={signupHref}
+        primaryLabel={t.ctaPrimary}
+        secondaryLabel={t.ctaSecondary}
+      />
+    </LandingShell>
   )
 }

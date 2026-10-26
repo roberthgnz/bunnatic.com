@@ -127,7 +127,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
       ? signupFromCreateHref
       : targetPath
   const ctaText = useDemoCta
-    ? 'Ver en accion'
+    ? 'Ver en acción'
     : isCreatePage
       ? 'Crear cuenta'
       : 'Crear mi web'

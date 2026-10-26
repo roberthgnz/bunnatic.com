@@ -28,7 +28,11 @@ export default function DemoLinkButton(props: DemoLinkButtonProps) {
   )
 }
 
-function DemoLinkButtonContent({ className, label, icon }: DemoLinkButtonProps) {
+function DemoLinkButtonContent({
+  className,
+  label,
+  icon,
+}: DemoLinkButtonProps) {
   const pathname = usePathname() ?? '/'
   const searchParams = useSearchParams()
   const paramsText = searchParams.toString()

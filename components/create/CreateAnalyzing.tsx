@@ -35,7 +35,9 @@ const CreateAnalyzing = forwardRef<HTMLHeadingElement, CreateAnalyzingProps>(
               className="size-3.5 motion-safe:animate-spin"
               aria-hidden="true"
             />
-            {inputMode === 'url' ? 'Leyendo tu web' : 'Leyendo tu ficha de Google'}
+            {inputMode === 'url'
+              ? 'Leyendo tu web'
+              : 'Leyendo tu ficha de Google'}
           </p>
           <h1
             ref={headingRef}

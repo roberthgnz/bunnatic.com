@@ -197,22 +197,22 @@ export function CookieConsent() {
           aria-label="Preferencias de privacidad"
           className="fixed inset-x-0 bottom-0 z-50 p-3 sm:right-auto sm:p-5"
         >
-          <div className="mx-auto max-w-sm rounded-2xl border border-[#dce3d2] bg-[#fdfef9] p-5 text-[#34472d] shadow-[0_8px_40px_#30452c20]">
+          <div className="mx-auto max-w-sm rounded-2xl border border-black/10 bg-white p-5 text-black shadow-[0_12px_40px_#0000001f]">
             <div className="flex flex-col gap-3">
               <div className="max-w-3xl min-w-0">
-                <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-[#6c8555] uppercase">
+                <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-black/55 uppercase">
                   <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
                   {t.badge}
                 </div>
                 <h2 className="mt-1 text-sm leading-tight font-semibold">
                   {t.title}
                 </h2>
-                <p className="mt-2 text-xs leading-5 text-[#7a8470]">
+                <p className="mt-2 text-xs leading-5 text-black/60">
                   {t.description}
                 </p>
                 <Link
                   href={policyHref}
-                  className="mt-2 inline-block text-[11px] text-[#6b7d5a] underline underline-offset-4 hover:text-[#34472d]"
+                  className="mt-2 inline-block text-[11px] text-black/60 underline underline-offset-4 hover:text-black"
                 >
                   {t.policy}
                 </Link>
@@ -223,7 +223,7 @@ export function CookieConsent() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-10 border-[#d7dfcc] bg-transparent text-xs text-[#526845] hover:bg-[#edf2e5]"
+                  className="h-10 rounded-full border-black/15 bg-transparent text-xs text-black hover:bg-black/5"
                   onClick={handleReject}
                 >
                   {t.rejectAll}
@@ -232,7 +232,7 @@ export function CookieConsent() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-10 border-[#d7dfcc] bg-transparent text-xs text-[#526845] hover:bg-[#edf2e5]"
+                  className="h-10 rounded-full border-black/15 bg-transparent text-xs text-black hover:bg-black/5"
                   onClick={() => openCookiePreferences()}
                 >
                   {t.configure}
@@ -240,7 +240,7 @@ export function CookieConsent() {
                 <Button
                   type="button"
                   size="sm"
-                  className="h-10 bg-[#29492e] text-xs text-white hover:bg-[#3d6038]"
+                  className="h-10 rounded-full bg-black text-xs text-white hover:bg-[#2a2a2a]"
                   onClick={handleAccept}
                 >
                   {t.acceptAll}

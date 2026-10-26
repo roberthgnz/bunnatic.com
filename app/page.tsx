@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
-import BusinessTypes from '@/components/landing/BusinessTypes'
+import Highlights from '@/components/landing/Highlights'
 import Features from '@/components/landing/Features'
+import TemplateShowcase from '@/components/landing/TemplateShowcase'
 import Examples from '@/components/landing/Examples'
 import HowItWorks from '@/components/HowItWorks'
 import Pricing from '@/components/Pricing'
@@ -41,17 +42,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function Home() {
   return (
-    <div className="landing-page min-h-screen bg-[#fafaf5] font-sans text-[#2b3b26] selection:bg-[#dce8c9] selection:text-[#263d21]">
+    <div className="landing-page home-page min-h-screen font-sans">
       <a href="#contenido" className="skip-link">
         Saltar al contenido
       </a>
       <Navbar />
       <main id="contenido">
         <Hero />
-        <BusinessTypes />
+        <Highlights />
         <Features />
-        <HowItWorks />
+        <TemplateShowcase />
         <Examples />
+        <HowItWorks />
         <Pricing />
         <FAQ />
         <FinalCTA />

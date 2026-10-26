@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
-  ArrowUpRight,
+  ArrowRight,
   Leaf,
   LogOut,
   User,
@@ -38,7 +38,7 @@ export default function Navbar(props: NavbarProps) {
   return (
     <Suspense
       fallback={
-        <div className="h-16 w-full border-b border-slate-200 bg-white" />
+        <div className="h-[72px] w-full border-b border-black/10 bg-white" />
       }
     >
       <NavbarContent {...props} />
@@ -149,30 +149,29 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   return (
     <nav
       aria-label="Navegación principal"
-      className="sticky top-0 z-50 w-full border-b border-[#e7e9df] bg-[#fafaf5]/95 backdrop-blur-md"
+      className="sticky top-0 z-50 w-full border-b border-black/10 bg-white/95 backdrop-blur-md"
     >
-      <div className="landing-container flex h-[76px] items-center justify-between gap-3">
+      <div className="mx-auto flex h-[72px] w-[min(1400px,calc(100%-48px))] items-center justify-between gap-3 md:w-[min(1400px,calc(100%-80px))]">
         <Link href={homePath} className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#29492e]">
-            <Leaf className="h-4 w-4 text-[#d8e7b7]" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black">
+            <Leaf className="h-4 w-4 text-white" />
           </div>
-          <span className="text-xl font-semibold tracking-[-0.04em] text-[#2c3b27] sm:text-[23px]">
+          <span className="text-xl font-semibold tracking-[-0.04em] text-black sm:text-[23px]">
             {t.navbar.logo}
           </span>
         </Link>
+        <div className="mr-auto ml-10 hidden items-center gap-7 lg:flex">
+          {navigationLinks.map((feature) => (
+            <Link
+              key={feature.href}
+              href={feature.href}
+              className="rounded text-sm text-black/70 transition-colors hover:text-black"
+            >
+              {feature.label}
+            </Link>
+          ))}
+        </div>
         <div className="flex items-center gap-3 sm:gap-6">
-          <div className="hidden items-center gap-6 lg:flex">
-            {navigationLinks.map((feature) => (
-              <Link
-                key={feature.href}
-                href={feature.href}
-                className="rounded text-xs font-medium text-[#727a66] transition-colors hover:text-[#29492e]"
-              >
-                {feature.label}
-              </Link>
-            ))}
-          </div>
-
           {/* Mobile menu button */}
           <Button
             type="button"
@@ -196,7 +195,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
             <div className="flex items-center gap-2">
               <Link
                 href={dashboardPath}
-                className="hidden rounded-full bg-slate-900 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-slate-800 sm:flex sm:px-5 sm:py-2.5 sm:text-sm"
+                className="hidden rounded-full bg-black px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-[#2a2a2a] sm:flex sm:px-5 sm:py-2.5 sm:text-sm"
               >
                 {dashboardLabel}
               </Link>
@@ -258,7 +257,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
             <div className="flex items-center gap-5">
               <Link
                 href="/signin"
-                className="hidden rounded text-xs font-medium text-[#69745e] hover:text-[#29492e] sm:block"
+                className="hidden rounded text-sm text-black/70 transition-colors hover:text-black sm:block"
               >
                 Iniciar sesión
               </Link>
@@ -270,10 +269,10 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
                     locale: 'es',
                   })
                 }
-                className="landing-button gap-3! px-4! text-xs!"
+                className="inline-flex min-h-10 items-center gap-2 rounded-full bg-black px-5 text-sm font-medium text-white transition-colors hover:bg-[#2a2a2a]"
               >
                 {ctaText}
-                <ArrowUpRight className="size-3.5" aria-hidden="true" />
+                <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
             </div>
           )}
@@ -284,7 +283,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
       {mobileMenuOpen && (
         <div
           id="mobile-navigation"
-          className="border-t border-[#e3e7d9] bg-[#fafaf5] lg:hidden"
+          className="border-t border-black/10 bg-white lg:hidden"
         >
           <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
             <div className="flex flex-col gap-3">

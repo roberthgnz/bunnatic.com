@@ -1,7 +1,7 @@
 'use client'
 
 import { content } from '@/lib/content'
-import { Leaf } from 'lucide-react'
+import { ArrowRight, Leaf } from 'lucide-react'
 import Link from 'next/link'
 import {
   getAlternativeSlug,
@@ -26,86 +26,82 @@ export default function Footer() {
       href: `/${getLegalSlug('politica-cookies', 'es')}`,
     },
   ]
+  const columns = [
+    {
+      title: 'Características',
+      links: (t.features ?? []).map((feature) => ({
+        label: feature.title,
+        href: `/caracteristicas/${getFeatureSlug(feature.id, 'es')}`,
+      })),
+    },
+    {
+      title: 'Alternativas',
+      links: (t.competitors ?? []).map((competitor) => ({
+        label: `Alternativa a ${competitor.name}`,
+        href: `/alternativa/${getAlternativeSlug(competitor.id, 'es')}`,
+      })),
+    },
+    { title: 'Legal', links: legalLinks },
+  ]
 
   return (
-    <footer className="border-t border-[#e4e7db] bg-[#f6f6ef] py-14">
-      <div className="landing-container">
-        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#29492e]">
-                <Leaf className="h-4 w-4 text-[#d8e7b7]" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900">
+    <footer className="bg-[#0b0b0b] pt-20 pb-10 text-white sm:pt-28">
+      <div className="mx-auto w-[min(1400px,calc(100%-48px))] md:w-[min(1400px,calc(100%-80px))]">
+        <div className="flex flex-col justify-between gap-10 border-b border-white/15 pb-16 lg:flex-row lg:items-end">
+          <p className="max-w-2xl text-[clamp(32px,4vw,56px)] leading-[1.02] font-medium tracking-[-0.045em]">
+            Grandes ideas empiezan en pequeños negocios.
+          </p>
+          <Link
+            href="/crear-pagina-web-negocio"
+            className="inline-flex min-h-12 w-fit items-center gap-2.5 rounded-full bg-white px-6 text-[15px] font-medium text-black transition-colors hover:bg-[#e9e9e4] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          >
+            Crear mi web
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 gap-12 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="flex flex-col gap-5">
+            <Link href="/" className="flex w-fit items-center gap-2">
+              <span className="flex size-8 items-center justify-center rounded-lg bg-white">
+                <Leaf className="size-4 text-black" aria-hidden="true" />
+              </span>
+              <span className="text-xl font-semibold tracking-[-0.04em]">
                 {t.footer.logo}
               </span>
-            </div>
-            <p className="max-w-xs text-sm leading-relaxed font-medium text-slate-600">
-              Grandes ideas empiezan en pequeños negocios. Tu próxima etapa
-              empieza con una web.
+            </Link>
+            <p className="max-w-xs text-sm leading-relaxed text-white/55">
+              Tu próxima etapa empieza con una web. Creada con IA, pensada para
+              negocios locales.
             </p>
           </div>
 
-          <div>
-            <h3 className="mb-6 text-sm font-bold tracking-wider text-slate-900 uppercase">
-              Características
-            </h3>
-            <ul className="flex flex-col gap-4 text-sm font-medium text-slate-600">
-              {t.features?.map((feature) => (
-                <li key={feature.id}>
-                  <Link
-                    href={`/caracteristicas/${getFeatureSlug(feature.id, 'es')}`}
-                    className="transition-colors hover:text-slate-900"
-                  >
-                    {feature.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="mb-6 text-sm font-bold tracking-wider text-slate-900 uppercase">
-              Alternativas
-            </h3>
-            <ul className="flex flex-col gap-4 text-sm font-medium text-slate-600">
-              {t.competitors?.map((competitor) => (
-                <li key={competitor.id}>
-                  <Link
-                    href={`/alternativa/${getAlternativeSlug(competitor.id, 'es')}`}
-                    className="transition-colors hover:text-slate-900"
-                  >
-                    Alternativa a {competitor.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="mb-6 text-sm font-bold tracking-wider text-slate-900 uppercase">
-              Legal
-            </h3>
-            <ul className="flex flex-col gap-4 text-sm font-medium text-slate-600">
-              {legalLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="transition-colors hover:text-slate-900"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {columns.map((column) => (
+            <div key={column.title}>
+              <h3 className="mb-5 text-sm font-medium text-white/45">
+                {column.title}
+              </h3>
+              <ul className="flex flex-col gap-3 text-sm">
+                {column.links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-white/85 transition-colors hover:text-white hover:underline hover:underline-offset-4"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 sm:flex-row">
-          <div className="text-sm font-medium text-slate-500">
+        <div className="flex flex-col items-start justify-between gap-4 border-t border-white/15 pt-8 sm:flex-row sm:items-center">
+          <p className="text-sm text-white/50">
             © {new Date().getFullYear()} Bunnatic · Hecho con cariño en
             Barcelona
-          </div>
+          </p>
           <CookiePreferencesButton />
         </div>
       </div>

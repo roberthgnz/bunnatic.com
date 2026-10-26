@@ -40,38 +40,37 @@ export default function FAQ() {
   return (
     <section
       id="preguntas"
-      className="landing-section border-t border-[#e5e8dc] bg-white"
+      className="home-section border-t border-(--home-line)"
     >
-      <div className="landing-container grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
+      <div className="home-container grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
         <div>
-          <p className="landing-eyebrow">Todo claro, desde el principio</p>
-          <h2 className="landing-title">
-            Pequeñas dudas.
-            <br />
-            <span className="landing-serif">Respuestas claras.</span>
-          </h2>
-          <p className="mt-5 max-w-xs text-sm leading-7 text-[#818772]">
+          <h2 className="home-title">Preguntas frecuentes</h2>
+          <p className="mt-6 max-w-xs text-lg text-(--home-muted)">
             Dar el salto es más fácil cuando sabes qué esperar.
           </p>
           <Link
             href="/crear-pagina-web-negocio"
-            className="mt-7 inline-flex items-center gap-2 rounded text-xs font-semibold text-[#536d42]"
+            className="mt-8 inline-flex items-center gap-2 text-sm font-medium underline decoration-black/25 underline-offset-4 hover:decoration-black"
           >
             Pruébalo por ti mismo
-            <ArrowUpRight className="size-3.5" aria-hidden="true" />
+            <ArrowUpRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
-        <Accordion type="single" collapsible>
+        <Accordion
+          type="single"
+          collapsible
+          className="border-t border-black/15"
+        >
           {questions.map(({ q, a }, index) => (
             <AccordionItem
               key={q}
               value={`question-${index}`}
-              className="border-[#e3e7d8]"
+              className="border-black/15 last:border-b"
             >
-              <AccordionTrigger className="py-5 text-left text-sm font-medium text-[#3f5034] hover:no-underline">
+              <AccordionTrigger className="rounded-none py-7 text-left text-lg font-medium tracking-[-0.01em] hover:no-underline **:data-[slot=accordion-trigger-icon]:size-5 **:data-[slot=accordion-trigger-icon]:text-black sm:text-xl">
                 {q}
               </AccordionTrigger>
-              <AccordionContent className="pb-5 text-sm leading-7 text-[#7c8370]">
+              <AccordionContent className="max-w-2xl pb-7 text-base leading-relaxed text-(--home-muted)">
                 {a}
               </AccordionContent>
             </AccordionItem>

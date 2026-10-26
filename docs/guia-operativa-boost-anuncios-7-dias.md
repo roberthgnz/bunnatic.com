@@ -69,6 +69,18 @@ Pon este:
 
 - `/crear`
 
+Pagina de destino del trafico:
+
+- dirige siempre el trafico del anuncio a la pagina `/crear`
+- no mandes trafico a la home
+- no mandes trafico al perfil de Instagram
+- no mandes trafico a una pagina distinta segun la creatividad
+
+Motivo:
+
+- `/crear` es la pagina que queremos validar porque ahi ocurre la prueba de la demo
+- si cambias la pagina de destino, luego no podras comparar anuncios de forma limpia
+
 Si quieres medir mejor, usa UTMs:
 
 - `/crear?utm_source=instagram&utm_medium=paid_social&utm_campaign=semana_1_validacion&utm_content=imagen_dia_1`
@@ -410,9 +422,10 @@ Haz siempre estas 5 cosas:
 
 1. mismo CTA: `Probar demo gratis`
 2. mismo enlace: `/crear`
-3. una sola audiencia
-4. 1 imagen = 1 dia = 1 presupuesto
-5. repetir lo que funcione
+3. misma pagina de destino del trafico: `/crear`
+4. una sola audiencia
+5. 1 imagen = 1 dia = 1 presupuesto
+6. repetir lo que funcione
 
 ## 11) Tu checklist final antes de darle a promocionar
 
@@ -424,8 +437,9 @@ Antes de gastar dinero, revisa esto:
 4. la imagen termina con `Probar demo gratis`
 5. elegiste `Mas visitas al sitio web`
 6. pusiste el enlace correcto
-7. pusiste solo una audiencia
-8. el presupuesto es de 15-25 EUR por 1 dia
+7. confirmaste que el trafico va a la pagina `/crear`
+8. pusiste solo una audiencia
+9. el presupuesto es de 15-25 EUR por 1 dia
 
 ## 12) Resumen en una frase
 

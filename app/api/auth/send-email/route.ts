@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Webhook } from 'standardwebhooks'
 import { Resend } from 'resend'
+import { getEmailRedirectPath } from '@/lib/authRedirect'
 
 export const runtime = 'nodejs'
 
@@ -33,16 +34,6 @@ interface WebhookPayload {
   }
 }
 
-function getNextPath(redirectTo?: string) {
-  if (!redirectTo) return null
-
-  try {
-    return new URL(redirectTo).pathname
-  } catch {
-    return redirectTo
-  }
-}
-
 function getBaseUrl(siteUrl: string, redirectTo?: string) {
   if (!redirectTo || !redirectTo.startsWith('http')) return siteUrl
 
@@ -67,7 +58,7 @@ function buildConfirmationUrl(
     queryParams.set('token_hash', tokenHash)
   }
 
-  const nextPath = getNextPath(redirectTo)
+  const nextPath = getEmailRedirectPath(redirectTo)
   if (nextPath) {
     queryParams.set('next', nextPath)
   }

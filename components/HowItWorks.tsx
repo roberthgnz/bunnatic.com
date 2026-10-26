@@ -1,110 +1,90 @@
-'use client'
-
-import { content } from '@/lib/content'
 import {
-  CheckCircle2,
-  Globe,
+  ArrowRight,
+  Check,
+  Globe2,
   MapPin,
-  MessageCircle,
   Search,
+  Sparkles,
 } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import Link from 'next/link'
+
+const steps = [
+  {
+    number: '01',
+    title: 'Dinos quién eres.',
+    text: 'Busca tu negocio en Google o comparte tu web actual. Recogemos la información para empezar.',
+    icon: Search,
+  },
+  {
+    number: '02',
+    title: 'Déjaselo a la IA.',
+    text: 'Creamos una propuesta con tus textos, servicios y estilo. Revísala y hazla tuya.',
+    icon: Sparkles,
+  },
+  {
+    number: '03',
+    title: 'Abre tu puerta digital.',
+    text: 'Crea tu cuenta, termina de configurar tu negocio y publica cuando lo tengas todo listo.',
+    icon: Globe2,
+  },
+]
 
 export default function HowItWorks() {
-  const t = content
-  const steps = [...t.howItWorks.steps].sort(
-    (a, b) => Number(a.number) - Number(b.number)
-  )
-  const stepAccent = ['bg-emerald-700', 'bg-slate-700', 'bg-slate-700']
-
   return (
-    <section className="border-b border-slate-200 bg-white py-16 sm:py-24 lg:py-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-            {t.howItWorks.title}
+    <section id="como-funciona" className="landing-section bg-[#fcfcf7]">
+      <div className="landing-container">
+        <div className="text-center">
+          <p className="landing-eyebrow">De tu idea a tu web</p>
+          <h2 className="landing-title">
+            Tres pasos.<span className="landing-serif"> Cero líos.</span>
           </h2>
-          <p className="mt-3 text-base leading-7 text-slate-600 sm:mt-4 sm:text-lg sm:leading-8">
-            {t.howItWorks.subtitle}
+          <p className="mt-4 text-sm text-[#7b8271]">
+            No necesitas más tiempo libre. Necesitas una forma más fácil.
           </p>
         </div>
-
-        <div className="mx-auto mt-10 max-w-2xl sm:mt-14 lg:mt-16 lg:max-w-none">
-          <dl className="grid max-w-xl grid-cols-1 gap-4 sm:gap-6 lg:max-w-none lg:grid-cols-3 lg:gap-8">
-            {steps.map((step, index) => (
-              <Card
-                key={step.title}
-                className="rounded-2xl border border-slate-200 bg-white shadow-sm"
-              >
-                <CardContent className="p-5 sm:p-7">
-                  <dt className="flex items-center gap-x-3 text-base leading-7 font-bold text-slate-900 sm:text-lg">
-                    <span
-                      className={`flex h-9 w-9 items-center justify-center rounded-md text-sm text-white sm:h-10 sm:w-10 sm:text-base ${
-                        stepAccent[index] ?? 'bg-emerald-700'
-                      }`}
-                    >
-                      {step.number}
-                    </span>
-                    {step.title}
-                  </dt>
-                  <dd className="mt-3 text-sm leading-relaxed text-slate-600 sm:mt-4 sm:text-base">
-                    <p>{step.description}</p>
-
-                    <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:mt-6 sm:p-5">
-                      {index === 0 && (
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500 sm:text-sm">
-                            <Search className="h-4 w-4 text-slate-400" />
-                            <span>{step.mockup?.input}</span>
-                          </div>
-                          <div className="flex items-center gap-2 px-1 text-xs font-medium text-slate-800 sm:text-sm">
-                            <MapPin className="h-4 w-4 text-emerald-700" />
-                            <span>{step.mockup?.result}</span>
-                          </div>
-                        </div>
-                      )}
-
-                      {index === 1 && (
-                        <div className="space-y-4">
-                          <div className="flex items-center gap-2 border-b border-slate-200 pb-2 text-xs font-semibold text-slate-900 sm:text-sm">
-                            <Globe className="h-4 w-4 text-slate-700" />
-                            {step.mockup?.title}
-                          </div>
-                          <ul className="space-y-3 text-xs font-medium text-slate-600 sm:text-sm">
-                            {step.mockup?.items?.map((item, i) => (
-                              <li key={i} className="flex items-center gap-3">
-                                <CheckCircle2 className="h-4 w-4 text-emerald-700 sm:h-5 sm:w-5" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {index === 2 && (
-                        <div className="space-y-4">
-                          <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-800 sm:text-xs">
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                            {step.mockup?.tag}
-                          </div>
-                          <div className="rounded-lg border border-slate-200 bg-white p-3 sm:p-4">
-                            <div className="flex items-start gap-3">
-                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-700 sm:h-9 sm:w-9">
-                                <MessageCircle className="h-4 w-4" />
-                              </div>
-                              <p className="text-xs leading-snug font-medium text-slate-700 sm:text-sm">
-                                {step.mockup?.chat}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </dd>
-                </CardContent>
-              </Card>
-            ))}
-          </dl>
+        <div className="mt-12 grid gap-8 md:grid-cols-3 md:gap-10">
+          {steps.map(({ number, title, text, icon: Icon }, index) => (
+            <article key={number} className="relative">
+              <div className="mb-6 flex items-center justify-between border-b border-[#dfe3d5] pb-5">
+                <span className="font-serif text-4xl text-[#9aa989]">
+                  {number}
+                </span>
+                <Icon
+                  className="size-5 text-[#7c8d6c]"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
+              </div>
+              <h3 className="text-lg font-semibold tracking-tight text-[#34472d]">
+                {title}
+              </h3>
+              <p className="mt-3 text-sm leading-6 text-[#7b8271]">{text}</p>
+              <div className="mt-6 flex min-h-14 items-center gap-3 rounded-xl border border-[#e3e6da] bg-white p-3 text-[11px] text-[#728263]">
+                {index === 0 ? (
+                  <>
+                    <MapPin className="size-4 shrink-0" aria-hidden="true" />
+                    <span>Tu negocio, tu ciudad, tu historia.</span>
+                  </>
+                ) : index === 1 ? (
+                  <>
+                    <Sparkles className="size-4 shrink-0" aria-hidden="true" />
+                    <span>Una propuesta pensada para ti.</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="size-4 shrink-0" aria-hidden="true" />
+                    <span>Tu web, lista para salir al mundo.</span>
+                  </>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="mt-10 text-center">
+          <Link href="/crear-pagina-web-negocio" className="landing-button">
+            Vamos con el primer paso
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </section>

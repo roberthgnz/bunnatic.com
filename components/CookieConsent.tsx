@@ -26,8 +26,8 @@ const t = {
   badge: 'Cookies',
   title: 'Cookies y privacidad',
   description:
-    'Usamos cookies tecnicas para el funcionamiento del sitio. Las cookies se activan solo con tu consentimiento.',
-  policy: 'Politica de cookies',
+    'Usamos cookies necesarias para que todo funcione. Tú decides si activas las de analítica.',
+  policy: 'Política de cookies',
   acceptAll: 'Aceptar',
   rejectAll: 'Rechazar',
   configure: 'Configurar',
@@ -193,32 +193,37 @@ export function CookieConsent() {
       </Dialog>
 
       {!hasDecision ? (
-        <section className="fixed inset-x-0 bottom-0 z-50 p-2 sm:p-4">
-          <div className="animate-in slide-in-from-bottom-4 fade-in mx-auto max-w-5xl rounded-lg sm:rounded-xl border border-slate-700 bg-slate-950/95 p-3 sm:p-4 text-white shadow-2xl backdrop-blur-md transition-all duration-500">
-            <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <section
+          aria-label="Preferencias de privacidad"
+          className="fixed inset-x-0 bottom-0 z-50 p-3 sm:right-auto sm:p-5"
+        >
+          <div className="mx-auto max-w-sm rounded-2xl border border-[#dce3d2] bg-[#fdfef9] p-5 text-[#34472d] shadow-[0_8px_40px_#30452c20]">
+            <div className="flex flex-col gap-3">
               <div className="max-w-3xl min-w-0">
-                <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold tracking-wide text-emerald-300 uppercase">
+                <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-wide text-[#6c8555] uppercase">
                   <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
                   {t.badge}
                 </div>
-                <h2 className="mt-0.5 sm:mt-1 text-sm sm:text-base font-semibold leading-tight">{t.title}</h2>
-                <p className="mt-1 sm:mt-2 text-xs sm:text-sm leading-5 sm:leading-6 break-words text-slate-300">
+                <h2 className="mt-1 text-sm leading-tight font-semibold">
+                  {t.title}
+                </h2>
+                <p className="mt-2 text-xs leading-5 text-[#7a8470]">
                   {t.description}
                 </p>
                 <Link
                   href={policyHref}
-                  className="mt-1 sm:mt-2 inline-block text-xs sm:text-sm text-slate-400 underline underline-offset-2 sm:underline-offset-4 transition-colors hover:text-emerald-300"
+                  className="mt-2 inline-block text-[11px] text-[#6b7d5a] underline underline-offset-4 hover:text-[#34472d]"
                 >
                   {t.policy}
                 </Link>
               </div>
 
-              <div className="flex gap-2 sm:grid sm:grid-cols-3">
+              <div className="grid grid-cols-3 gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="flex-1 sm:flex-none border-slate-600 bg-transparent text-white hover:bg-slate-800 text-xs sm:text-sm h-8 sm:h-10"
+                  className="h-10 border-[#d7dfcc] bg-transparent text-xs text-[#526845] hover:bg-[#edf2e5]"
                   onClick={handleReject}
                 >
                   {t.rejectAll}
@@ -227,7 +232,7 @@ export function CookieConsent() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="hidden sm:flex border-slate-600 bg-transparent text-white hover:bg-slate-800 text-xs sm:text-sm h-8 sm:h-10"
+                  className="h-10 border-[#d7dfcc] bg-transparent text-xs text-[#526845] hover:bg-[#edf2e5]"
                   onClick={() => openCookiePreferences()}
                 >
                   {t.configure}
@@ -235,7 +240,7 @@ export function CookieConsent() {
                 <Button
                   type="button"
                   size="sm"
-                  className="flex-1 sm:flex-none bg-emerald-400 text-slate-950 hover:bg-emerald-300 text-xs sm:text-sm h-8 sm:h-10"
+                  className="h-10 bg-[#29492e] text-xs text-white hover:bg-[#3d6038]"
                   onClick={handleAccept}
                 >
                   {t.acceptAll}

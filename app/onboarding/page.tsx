@@ -33,6 +33,8 @@ function OnboardingContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const plan = searchParams.get('plan') ?? 'starter'
+  const billing =
+    searchParams.get('billing') === 'yearly' ? 'yearly' : 'monthly'
   const step = searchParams.get('step') === 'business' ? 'business' : 'checkout'
   const source = searchParams.get('source')
   const draftId = searchParams.get('draftId')
@@ -66,6 +68,7 @@ function OnboardingContent() {
     const params = new URLSearchParams()
     params.set('step', 'business')
     params.set('plan', plan)
+    params.set('billing', billing)
     if (draftId) {
       params.set('draftId', draftId)
     }
@@ -79,7 +82,7 @@ function OnboardingContent() {
       params.set('tempGenerationKey', tempGenerationKey)
     }
     return `/onboarding?${params.toString()}`
-  }, [draftId, plan, publishIntent, source, tempGenerationKey])
+  }, [billing, draftId, plan, publishIntent, source, tempGenerationKey])
 
   const draftSnapshot = useSyncExternalStore(
     (callback) => {
@@ -186,9 +189,7 @@ function OnboardingContent() {
       toast.error(result.error)
       setLoading(false)
     } else {
-      toast.success(
-        'Negocio creado correctamente'
-      )
+      toast.success('Negocio creado correctamente')
       router.push(`/dashboard`)
     }
   }
@@ -219,9 +220,7 @@ function OnboardingContent() {
           <h1 className="mb-3 text-2xl font-extrabold text-gray-900 sm:text-4xl">
             Comienza tu prueba
             <br />
-            <span className="text-emerald-700">
-              gratuita de 14 días
-            </span>
+            <span className="text-emerald-700">gratuita de 14 días</span>
           </h1>
 
           <p className="mx-auto max-w-lg text-sm text-gray-600 sm:text-base">
@@ -245,14 +244,17 @@ function OnboardingContent() {
                 <p className="mt-1 text-sm text-gray-600">
                   {selectedTier.description}
                 </p>
+                <p className="mt-2 text-xs font-medium text-emerald-700">
+                  {billing === 'yearly'
+                    ? `${selectedTier.priceYearly}/mes · ${selectedTier.annualTotal} con facturación anual tras la prueba.`
+                    : `${selectedTier.priceMonthly}/mes con facturación mensual tras la prueba.`}
+                </p>
               </div>
             </div>
 
             {draftData.name && (
               <div className="rounded-lg border border-emerald-100 bg-white p-3">
-                <p className="mb-1 text-xs text-gray-600">
-                  Web para:
-                </p>
+                <p className="mb-1 text-xs text-gray-600">Web para:</p>
                 <p className="text-sm font-semibold break-words text-gray-900">
                   {draftData.name}
                 </p>

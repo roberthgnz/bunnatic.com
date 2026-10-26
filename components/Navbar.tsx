@@ -10,7 +10,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Zap, LogOut, User, Settings, LayoutDashboard, Menu, X } from 'lucide-react'
+import {
+  ArrowUpRight,
+  Leaf,
+  LogOut,
+  User,
+  Settings,
+  LayoutDashboard,
+  Menu,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { getFeatureSlug } from '@/lib/pageSlugs'
@@ -45,6 +54,30 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   const paramsText = searchParams.toString()
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const navigationLinks =
+    pathname === '/'
+      ? [
+          { href: '/#caracteristicas', label: 'Qué incluye' },
+          { href: '/#como-funciona', label: 'Cómo funciona' },
+          { href: '/#ejemplos', label: 'Ejemplos' },
+          { href: '/#pricing', label: 'Precios' },
+        ]
+      : t.navbar.coreFeatures.map((feature) => ({
+          href: `/caracteristicas/${getFeatureSlug(feature.id, 'es')}`,
+          label: feature.label,
+        }))
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false)
+        document.getElementById('mobile-menu-toggle')?.focus()
+      }
+    }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [mobileMenuOpen])
 
   useEffect(() => {
     const supabase = createClient()
@@ -97,7 +130,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
     ? 'Ver en accion'
     : isCreatePage
       ? 'Crear cuenta'
-      : t.navbar.cta
+      : 'Crear mi web'
   const dashboardLabel = 'Dashboard'
   const profileLabel = 'Perfil'
   const settingsLabel = 'Configuración'
@@ -114,23 +147,26 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
   }
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <nav
+      aria-label="Navegación principal"
+      className="sticky top-0 z-50 w-full border-b border-[#e7e9df] bg-[#fafaf5]/95 backdrop-blur-md"
+    >
+      <div className="landing-container flex h-[76px] items-center justify-between gap-3">
         <Link href={homePath} className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-100">
-            <Zap className="h-5 w-5 fill-emerald-700 text-emerald-700" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#29492e]">
+            <Leaf className="h-4 w-4 text-[#d8e7b7]" />
           </div>
-          <span className="text-base font-bold tracking-tight text-slate-900 sm:text-xl">
+          <span className="text-xl font-semibold tracking-[-0.04em] text-[#2c3b27] sm:text-[23px]">
             {t.navbar.logo}
           </span>
         </Link>
         <div className="flex items-center gap-3 sm:gap-6">
-          <div className="hidden items-center gap-4 lg:flex">
-            {t.navbar.coreFeatures.map((feature) => (
+          <div className="hidden items-center gap-6 lg:flex">
+            {navigationLinks.map((feature) => (
               <Link
-                key={feature.id}
-                href={`/caracteristicas/${getFeatureSlug(feature.id, 'es')}`}
-                className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+                key={feature.href}
+                href={feature.href}
+                className="rounded text-xs font-medium text-[#727a66] transition-colors hover:text-[#29492e]"
               >
                 {feature.label}
               </Link>
@@ -140,6 +176,10 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
           {/* Mobile menu button */}
           <Button
             type="button"
+            id="mobile-menu-toggle"
+            aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-navigation"
             variant="ghost"
             size="icon"
             className="lg:hidden"
@@ -165,6 +205,7 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
                   <Button
                     variant="ghost"
                     size="icon"
+                    aria-label="Abrir menú de mi cuenta"
                     className="relative h-9 w-9 rounded-full border-2 border-slate-200 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white transition-all hover:border-slate-300 hover:shadow-md"
                   >
                     <span className="text-sm font-semibold">
@@ -175,8 +216,10 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">Mi cuenta</p>
-                      <p className="text-xs leading-none text-muted-foreground">
+                      <p className="text-sm leading-none font-medium">
+                        Mi cuenta
+                      </p>
+                      <p className="text-muted-foreground text-xs leading-none">
                         {user.email}
                       </p>
                     </div>
@@ -212,37 +255,58 @@ function NavbarContent({ useDemoCta = false }: NavbarProps) {
               </DropdownMenu>
             </div>
           ) : (
-            <Link
-              href={ctaHref}
-              onClick={() =>
-                trackFunnelEvent('landing_cta_click', {
-                  placement: 'navbar',
-                  locale: 'es',
-                })
-              }
-              className="rounded-full bg-slate-900 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-slate-800 sm:px-5 sm:py-2.5 sm:text-sm"
-            >
-              {ctaText}
-            </Link>
+            <div className="flex items-center gap-5">
+              <Link
+                href="/signin"
+                className="hidden rounded text-xs font-medium text-[#69745e] hover:text-[#29492e] sm:block"
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                href={ctaHref}
+                onClick={() =>
+                  trackFunnelEvent('landing_cta_click', {
+                    placement: 'navbar',
+                    locale: 'es',
+                  })
+                }
+                className="landing-button gap-3! px-4! text-xs!"
+              >
+                {ctaText}
+                <ArrowUpRight className="size-3.5" aria-hidden="true" />
+              </Link>
+            </div>
           )}
         </div>
       </div>
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-slate-200 bg-white lg:hidden">
+        <div
+          id="mobile-navigation"
+          className="border-t border-[#e3e7d9] bg-[#fafaf5] lg:hidden"
+        >
           <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
             <div className="flex flex-col gap-3">
-              {t.navbar.coreFeatures.map((feature) => (
+              {navigationLinks.map((feature) => (
                 <Link
-                  key={feature.id}
-                  href={`/caracteristicas/${getFeatureSlug(feature.id, 'es')}`}
+                  key={feature.href}
+                  href={feature.href}
                   className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {feature.label}
                 </Link>
               ))}
+              {!user ? (
+                <Link
+                  href="/signin"
+                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-600"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Iniciar sesión
+                </Link>
+              ) : null}
               {user && (
                 <Link
                   href={dashboardPath}

@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 // The client you created in Step 2
 import { createClient } from '@/lib/supabase/server'
+import { normalizeInternalRedirect } from '@/lib/authRedirect'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   // if "next" is in search params, use it as the redirection URL
-  const next = searchParams.get('next') ?? '/'
+  const next = normalizeInternalRedirect(searchParams.get('next'), '/')
 
   if (code) {
     const supabase = await createClient()

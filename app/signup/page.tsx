@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 import { signup } from '@/lib/supabase/actions'
 import { toast } from 'sonner'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
+import { normalizeInternalRedirect } from '@/lib/authRedirect'
 
 import { createClient } from '@/lib/supabase/client'
 
@@ -27,6 +28,7 @@ const CONTEXT_KEYS = [
   'utm_content',
   'source',
   'plan',
+  'billing',
   'planSuggested',
   'sector',
   'draftId',
@@ -97,10 +99,7 @@ const signUpContent = {
 const REDIRECT_KEYS = new Set(['redirect', 'next', 'returnTo', 'to'])
 
 function normalizeInternalPath(path: string) {
-  if (!path || !path.startsWith('/') || path.startsWith('//')) {
-    return '/onboarding'
-  }
-  return path
+  return normalizeInternalRedirect(path, '/onboarding')
 }
 
 export default function SignUpPage() {
@@ -226,6 +225,7 @@ function SignUpContent() {
     formData.append('email', data.email)
     formData.append('password', data.password)
     formData.append('name', data.name)
+    formData.append('redirect', flow.destination)
 
     const result = await signup(formData)
 

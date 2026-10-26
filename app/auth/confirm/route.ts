@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
+import { normalizeInternalRedirect } from '@/lib/authRedirect'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const tokenHash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
+  const next = normalizeInternalRedirect(searchParams.get('next'))
 
   if (tokenHash && type) {
     const supabase = await createClient()
@@ -15,8 +17,7 @@ export async function GET(request: Request) {
     })
 
     if (!error) {
-      // Redirigir al dashboard después de confirmar el correo
-      return NextResponse.redirect(`${origin}/dashboard`)
+      return NextResponse.redirect(new URL(next, origin))
     }
   }
 

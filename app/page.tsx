@@ -2,32 +2,21 @@ import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
-import Ticker from '@/components/Ticker'
+import BusinessTypes from '@/components/landing/BusinessTypes'
+import Features from '@/components/landing/Features'
+import Examples from '@/components/landing/Examples'
 import HowItWorks from '@/components/HowItWorks'
 import Pricing from '@/components/Pricing'
 import Footer from '@/components/Footer'
 import { buildPageMetadata } from '@/lib/seo'
 
 // Lazy load components below the fold
-const Comparison = dynamic(() => import('@/components/Comparison'), {
-  loading: () => <div className="h-96" />,
-})
-const AIDemo = dynamic(() => import('@/components/AIDemo'), {
-  loading: () => <div className="h-96" />,
-})
 const FAQ = dynamic(() => import('@/components/FAQ'), {
   loading: () => <div className="h-96" />,
 })
 const FinalCTA = dynamic(() => import('@/components/FinalCTA'), {
   loading: () => <div className="h-64" />,
 })
-
-type HomePageProps = {
-  searchParams?: Promise<{
-    alternative?: string
-    alternativeId?: string
-  }>
-}
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
@@ -50,23 +39,24 @@ export async function generateMetadata(): Promise<Metadata> {
   })
 }
 
-export default async function Home({ searchParams }: HomePageProps) {
-  const resolvedSearchParams = (await searchParams) ?? {}
-  const comparisonAlternative =
-    resolvedSearchParams.alternative ?? resolvedSearchParams.alternativeId
-
+export default function Home() {
   return (
-    <main className="min-h-screen bg-white font-sans text-gray-900 selection:bg-emerald-200 selection:text-emerald-900">
+    <div className="landing-page min-h-screen bg-[#fafaf5] font-sans text-[#2b3b26] selection:bg-[#dce8c9] selection:text-[#263d21]">
+      <a href="#contenido" className="skip-link">
+        Saltar al contenido
+      </a>
       <Navbar />
-      <Hero />
-      <Ticker />
-      <HowItWorks />
-      <Pricing />
-      <Comparison alternativeId={comparisonAlternative} />
-      <AIDemo />
-      <FAQ />
-      <FinalCTA />
+      <main id="contenido">
+        <Hero />
+        <BusinessTypes />
+        <Features />
+        <HowItWorks />
+        <Examples />
+        <Pricing />
+        <FAQ />
+        <FinalCTA />
+      </main>
       <Footer />
-    </main>
+    </div>
   )
 }

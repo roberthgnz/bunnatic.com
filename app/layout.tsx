@@ -12,7 +12,7 @@ import { getOrganizationSchema, getWebSiteSchema } from '@/lib/structured-data'
 
 const geist = Geist({
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-geist-sans',
   display: 'swap',
   preload: true,
 })

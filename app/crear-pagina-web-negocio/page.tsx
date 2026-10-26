@@ -127,7 +127,9 @@ function CreateWebContent() {
   const [step, setStep] = useState<
     'search' | 'analyzing' | 'preview' | 'dashboard'
   >('search')
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(() =>
+    (pageSearchParams.get('q') ?? '').slice(0, 200)
+  )
   const [places, setPlaces] = useState<PlaceSearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
@@ -289,6 +291,7 @@ function CreateWebContent() {
     lastSearchMode === 'google' &&
     hasSearched &&
     !isSearching &&
+    !searchError &&
     query.trim().length > 0 &&
     places.length === 0
   const genericUrlError =
@@ -488,6 +491,14 @@ function CreateWebContent() {
             'Has alcanzado el límite de búsquedas de demostración.'
         )
         setPlaces([])
+      } else if (
+        !res.ok ||
+        (data.status && !['OK', 'ZERO_RESULTS'].includes(data.status))
+      ) {
+        setPlaces([])
+        setSearchError(
+          'No pudimos buscar negocios en Google en este momento. Vuelve a intentarlo en unos minutos o introduce la dirección de tu web.'
+        )
       } else {
         setPlaces(
           Array.isArray(data.results)
@@ -622,6 +633,7 @@ function CreateWebContent() {
                 <div className="relative flex-1">
                   <Search className="pointer-events-none absolute top-1/2 left-3 z-10 h-4 w-4 -translate-y-1/2 text-gray-400 sm:left-4 sm:h-5 sm:w-5" />
                   <input
+                    aria-label="Nombre del negocio, ciudad o dirección de tu web"
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -631,6 +643,9 @@ function CreateWebContent() {
                 </div>
                 <Button
                   type="submit"
+                  aria-label={
+                    isSearching ? 'Buscando negocios' : 'Buscar negocio'
+                  }
                   variant="default"
                   disabled={isSearching || !query.trim()}
                   className="h-11 w-full rounded-full bg-gray-900 px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-800 disabled:opacity-50 sm:absolute sm:top-1/2 sm:right-2 sm:h-12 sm:w-12 sm:-translate-y-1/2 sm:px-0 sm:shadow-none"
@@ -652,7 +667,10 @@ function CreateWebContent() {
               </div>
             </form>
             {searchError && !rateLimitExceeded && (
-              <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:mb-6">
+              <div
+                role="alert"
+                className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:mb-6"
+              >
                 {searchError}
               </div>
             )}

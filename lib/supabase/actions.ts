@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { normalizeInternalRedirect } from '@/lib/authRedirect'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
 
@@ -427,9 +428,10 @@ export async function buildBusinessSourcePreview(input: {
 
   // Get updated entitlement
   const nextEntitlementResult = await getGenerationEntitlementInternal(user.id)
-  const nextEntitlement = 'error' in nextEntitlementResult
-    ? entitlement
-    : nextEntitlementResult.entitlement
+  const nextEntitlement =
+    'error' in nextEntitlementResult
+      ? entitlement
+      : nextEntitlementResult.entitlement
 
   return {
     preview,
@@ -555,7 +557,8 @@ export async function applyBusinessSourceGeneration(input: {
   // Note: Quota was already consumed when building the preview
   // Just get current entitlement for UI update
   const entitlementResult = await getGenerationEntitlementInternal(user.id)
-  const entitlement = 'error' in entitlementResult ? null : entitlementResult.entitlement
+  const entitlement =
+    'error' in entitlementResult ? null : entitlementResult.entitlement
 
   const updatedBlocks: SourceBlock[] = []
   const preview = input.previewPayload
@@ -796,11 +799,19 @@ export async function signup(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const name = formData.get('name') as string
+  const destination = normalizeInternalRedirect(
+    formData.get('redirect'),
+    '/onboarding?step=checkout'
+  )
+  const appUrl = process.env.APP_URL
 
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: appUrl
+        ? new URL(destination, appUrl).toString()
+        : undefined,
       data: {
         full_name: name,
       },
@@ -842,10 +853,10 @@ export async function getProfile() {
   return profile
     ? { ...profile, email: user.email }
     : {
-      id: user.id,
-      full_name: user.user_metadata?.full_name || null,
-      email: user.email,
-    }
+        id: user.id,
+        full_name: user.user_metadata?.full_name || null,
+        email: user.email,
+      }
 }
 
 export async function updateProfile(formData: FormData) {
@@ -1498,8 +1509,8 @@ export async function refreshBusinessDomainStatus(slug: string) {
   try {
     const cloudflareDomain = currentDomain.cloudflare_custom_hostname_id
       ? await getCloudflareCustomHostname(
-        currentDomain.cloudflare_custom_hostname_id
-      )
+          currentDomain.cloudflare_custom_hostname_id
+        )
       : await findCloudflareCustomHostnameByHostname(currentDomain.hostname)
 
     if (!cloudflareDomain) {

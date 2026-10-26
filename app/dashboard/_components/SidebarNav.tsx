@@ -36,7 +36,7 @@ function NavList({ items }: { items: NavItem[] }) {
             asChild
             isActive={item.active}
             tooltip={item.label}
-            className="text-sidebar-foreground/75 data-[active=true]:bg-card data-[active=true]:text-sidebar-accent-foreground data-[active=true]:ring-sidebar-border h-9 font-medium data-[active=true]:shadow-[0_1px_2px_rgba(31,42,28,0.06)] data-[active=true]:ring-1"
+            className="text-sidebar-foreground/75 data-[active=true]:bg-card data-[active=true]:text-sidebar-accent-foreground data-[active=true]:ring-sidebar-border h-9 font-medium data-[active=true]:shadow-[0_1px_2px_rgba(0,0,0,0.06)] data-[active=true]:ring-1"
           >
             <Link
               href={item.href}
@@ -95,7 +95,7 @@ export function SidebarMainItems({ t }: { t: DashboardContent }) {
 
   return (
     <>
-      <SidebarGroupLabel className="text-sidebar-foreground/50 text-[11px] font-semibold tracking-[0.12em] uppercase">
+      <SidebarGroupLabel className="text-sidebar-foreground/50 text-xs font-medium">
         {t.platform}
       </SidebarGroupLabel>
       <NavList items={items} />

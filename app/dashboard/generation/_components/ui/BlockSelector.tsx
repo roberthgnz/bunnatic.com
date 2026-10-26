@@ -68,7 +68,7 @@ export function BlockSelector({
                   ? 'bg-muted/50 ring-border cursor-not-allowed ring-1'
                   : isSelected
                     ? 'bg-accent/40 ring-primary cursor-pointer ring-2'
-                    : 'bg-card ring-border hover:bg-muted/50 cursor-pointer shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1'
+                    : 'bg-card ring-border hover:bg-muted/50 cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1'
               )}
             >
               <input

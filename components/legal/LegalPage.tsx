@@ -36,7 +36,7 @@ export default function LegalPage({ locale, pageKey }: LegalPageProps) {
   }))
 
   return (
-    <div className="landing-page home-page theme-mono min-h-screen font-sans">
+    <div className="landing-page home-page min-h-screen font-sans">
       <a href="#contenido" className="skip-link">
         Saltar al contenido
       </a>

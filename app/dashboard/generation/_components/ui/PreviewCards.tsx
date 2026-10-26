@@ -39,7 +39,7 @@ type Props = {
 }
 
 const surface =
-  'bg-card ring-border rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1'
+  'bg-card ring-border rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1'
 
 function SectionTitle({
   icon: Icon,

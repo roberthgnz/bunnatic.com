@@ -36,7 +36,7 @@ export function UrlCrawlForm({
       >
         {labels.urlLabel}
       </label>
-      <div className="border-input bg-card focus-within:border-ring focus-within:ring-ring/30 has-aria-invalid:border-destructive has-aria-invalid:ring-destructive/20 flex items-center rounded-xl border p-1.5 shadow-[0_4px_16px_-8px_rgba(31,42,28,0.12)] transition-[border-color,box-shadow] focus-within:ring-3">
+      <div className="border-input bg-card focus-within:border-ring focus-within:ring-ring/30 has-aria-invalid:border-destructive has-aria-invalid:ring-destructive/20 flex items-center rounded-xl border p-1.5 shadow-[0_4px_16px_-8px_rgba(0,0,0,0.12)] transition-[border-color,box-shadow] focus-within:ring-3">
         <Globe
           className="text-muted-foreground ml-2.5 size-4 shrink-0"
           aria-hidden="true"

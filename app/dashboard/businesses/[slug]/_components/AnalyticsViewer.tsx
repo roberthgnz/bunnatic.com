@@ -84,7 +84,7 @@ export default function AnalyticsViewer({
                 <Bar
                   dataKey="visits"
                   name="Visitas"
-                  fill="#52734a"
+                  fill="var(--chart-1)"
                   radius={[5, 5, 0, 0]}
                   maxBarSize={48}
                 />

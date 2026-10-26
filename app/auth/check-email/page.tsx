@@ -31,7 +31,7 @@ function CheckEmailContent() {
   return (
     <FlowShell>
       <div className="mx-auto flex w-full max-w-md flex-col px-4 py-12 sm:py-20">
-        <div className="bg-card ring-border rounded-2xl p-6 shadow-[0_1px_2px_rgba(31,42,28,0.04),0_12px_32px_-16px_rgba(31,42,28,0.12)] ring-1 sm:p-8">
+        <div className="bg-card ring-border rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_-16px_rgba(0,0,0,0.12)] ring-1 sm:p-8">
           <span
             className="bg-accent text-primary ring-primary/10 flex size-12 items-center justify-center rounded-xl ring-1"
             aria-hidden="true"

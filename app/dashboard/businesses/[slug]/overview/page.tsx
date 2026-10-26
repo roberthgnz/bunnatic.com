@@ -150,7 +150,7 @@ export default async function BusinessOverviewPage({
 
         <section
           aria-labelledby="setup-title"
-          className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+          className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
         >
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
             <div>
@@ -238,7 +238,7 @@ export default async function BusinessOverviewPage({
       <aside className="space-y-6">
         <section
           aria-labelledby="profile-title"
-          className="bg-card ring-border rounded-xl p-5 shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+          className="bg-card ring-border rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
         >
           <div className="flex items-center justify-between gap-2">
             <h2
@@ -271,7 +271,7 @@ export default async function BusinessOverviewPage({
 
         <section
           aria-labelledby="contact-title"
-          className="bg-card ring-border rounded-xl p-5 shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+          className="bg-card ring-border rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
         >
           <div className="flex items-center justify-between gap-2">
             <h2

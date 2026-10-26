@@ -13,7 +13,7 @@ type FlowShellProps = {
  */
 export function FlowShell({ steps, children }: FlowShellProps) {
   return (
-    <div className="theme-mono bg-background text-foreground relative flex min-h-svh flex-col">
+    <div className="bg-background text-foreground relative flex min-h-svh flex-col">
       <header className="border-border/70 bg-background/80 sticky top-0 z-20 border-b backdrop-blur-md">
         <div className="mx-auto grid h-[72px] max-w-6xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 sm:grid-cols-[1fr_auto_1fr] sm:px-6">
           <BrandLogo />

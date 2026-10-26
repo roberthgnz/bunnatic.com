@@ -68,7 +68,7 @@ export function BusinessCard({
     : `${platformHost}/w/${business.slug}`
 
   return (
-    <article className="group bg-card ring-border hover:ring-ring/40 relative flex flex-col rounded-xl p-5 shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1 transition-[box-shadow] hover:shadow-[0_10px_30px_-16px_rgba(41,73,46,0.35)]">
+    <article className="group bg-card ring-border hover:ring-ring/40 relative flex flex-col rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1 transition-[box-shadow] hover:shadow-[0_10px_30px_-16px_rgba(0,0,0,0.35)]">
       <div className="flex items-start gap-3.5">
         <BusinessMonogram name={business.name} className="size-11 text-base" />
         <div className="min-w-0 flex-1">

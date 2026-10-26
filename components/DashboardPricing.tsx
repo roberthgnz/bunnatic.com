@@ -359,7 +359,7 @@ export default function DashboardPricing({
       <section
         aria-label="Estado de tu suscripción"
         className={cn(
-          'bg-card ring-border flex flex-col gap-4 rounded-xl p-5 shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1 sm:flex-row sm:items-center',
+          'bg-card ring-border flex flex-col gap-4 rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1 sm:flex-row sm:items-center',
           status.tone === 'warning' && 'bg-warning/5 ring-warning/30'
         )}
       >
@@ -412,7 +412,7 @@ export default function DashboardPricing({
               className={cn(
                 'focus-visible:ring-ring/50 h-8 flex-1 rounded-md px-3.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3 sm:flex-none',
                 !isAnnual
-                  ? 'bg-card text-foreground shadow-[0_1px_2px_rgba(31,42,28,0.08)]'
+                  ? 'bg-card text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
@@ -425,7 +425,7 @@ export default function DashboardPricing({
               className={cn(
                 'focus-visible:ring-ring/50 inline-flex h-8 flex-1 items-center justify-center gap-2 rounded-md px-3.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3 sm:flex-none',
                 isAnnual
-                  ? 'bg-card text-foreground shadow-[0_1px_2px_rgba(31,42,28,0.08)]'
+                  ? 'bg-card text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
@@ -459,8 +459,8 @@ export default function DashboardPricing({
                 className={cn(
                   'relative flex h-full flex-col overflow-hidden rounded-xl ring-1',
                   inverted
-                    ? 'bg-primary text-primary-foreground ring-primary shadow-[0_18px_40px_-24px_rgba(41,73,46,0.8)]'
-                    : 'bg-card text-card-foreground ring-border shadow-[0_1px_2px_rgba(31,42,28,0.04)]',
+                    ? 'bg-primary text-primary-foreground ring-primary shadow-[0_18px_40px_-24px_rgba(0,0,0,0.8)]'
+                    : 'bg-card text-card-foreground ring-border shadow-[0_1px_2px_rgba(0,0,0,0.04)]',
                   isCurrentTier &&
                     'ring-primary ring-offset-background ring-2 ring-offset-2'
                 )}
@@ -475,7 +475,7 @@ export default function DashboardPricing({
                     </h3>
                     <div className="flex items-center gap-1.5">
                       {isRecommended && !isCurrentTier ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium text-[#d8e7b7]">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-xs font-medium text-black">
                           <Sparkles className="size-3" aria-hidden="true" />
                           Recomendado
                         </span>
@@ -586,12 +586,15 @@ export default function DashboardPricing({
 
                   <ul className="mt-6 space-y-3.5">
                     {tier.features.map((feature) => (
-                      <li key={feature.title} className="flex items-start gap-3">
+                      <li
+                        key={feature.title}
+                        className="flex items-start gap-3"
+                      >
                         <span
                           className={cn(
                             'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full',
                             inverted
-                              ? 'bg-white/10 text-[#d8e7b7]'
+                              ? 'bg-white/10 text-white'
                               : 'bg-secondary text-primary'
                           )}
                         >
@@ -626,7 +629,7 @@ export default function DashboardPricing({
                   <div>
                     <h4
                       className={cn(
-                        'text-[11px] font-semibold tracking-[0.12em] uppercase',
+                        'text-xs font-medium',
                         inverted
                           ? 'text-primary-foreground/60'
                           : 'text-muted-foreground'
@@ -639,7 +642,7 @@ export default function DashboardPricing({
                   <div>
                     <h4
                       className={cn(
-                        'text-[11px] font-semibold tracking-[0.12em] uppercase',
+                        'text-xs font-medium',
                         inverted
                           ? 'text-primary-foreground/60'
                           : 'text-muted-foreground'

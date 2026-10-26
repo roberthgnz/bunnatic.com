@@ -124,7 +124,7 @@ export default function ContentReviewManager({
   return (
     <section
       aria-labelledby="content-review-title"
-      className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+      className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
     >
       <div className="border-border flex items-start justify-between gap-3 border-b px-5 py-4 sm:px-6">
         <div>

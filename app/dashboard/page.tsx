@@ -97,15 +97,11 @@ export default async function DashboardPage() {
         />
         <Link
           href="/dashboard/generation"
-          className="group bg-primary text-primary-foreground focus-visible:ring-ring relative overflow-hidden rounded-xl p-5 shadow-[0_10px_30px_-18px_rgba(41,73,46,0.7)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:col-span-2 lg:col-span-1"
+          className="group bg-primary text-primary-foreground focus-visible:ring-ring relative overflow-hidden rounded-xl p-5 shadow-[0_10px_30px_-18px_rgba(0,0,0,0.7)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:col-span-2 lg:col-span-1"
         >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-16 -right-10 size-48 rounded-full bg-[#d8e7b7]/15 blur-2xl"
-          />
           <div className="relative flex h-full flex-col">
             <span className="flex size-8 items-center justify-center rounded-lg bg-white/10">
-              <Wand2 className="size-4 text-[#d8e7b7]" aria-hidden="true" />
+              <Wand2 className="size-4 text-white" aria-hidden="true" />
             </span>
             <p className="mt-4 text-[15px] font-semibold tracking-[-0.01em]">
               Mejora tu web con IA
@@ -115,7 +111,7 @@ export default async function DashboardPage() {
                 ? `${withoutDescription} ${withoutDescription === 1 ? 'negocio necesita' : 'negocios necesitan'} contenido.`
                 : 'Regenera textos y bloques desde Google o tu web actual.'}
             </p>
-            <span className="mt-auto flex items-center gap-1.5 pt-4 text-sm font-medium text-[#d8e7b7]">
+            <span className="mt-auto flex items-center gap-1.5 pt-4 text-sm font-medium text-white">
               Empezar
               <ArrowRight
                 className="size-4 transition-transform group-hover:translate-x-0.5"

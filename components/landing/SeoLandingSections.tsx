@@ -93,7 +93,7 @@ function AccentTitle({
 /** Page chrome identical to the home landing: skip link, navbar, main, footer. */
 export function LandingShell({ children }: { children: ReactNode }) {
   return (
-    <div className="landing-page home-page theme-mono min-h-screen overflow-x-clip font-sans">
+    <div className="landing-page home-page min-h-screen overflow-x-clip font-sans">
       <a href="#contenido" className="skip-link">
         Saltar al contenido
       </a>

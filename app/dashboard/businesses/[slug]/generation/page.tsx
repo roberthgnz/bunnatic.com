@@ -59,7 +59,7 @@ export default async function BusinessGenerationPage({
       <aside className="space-y-6">
         <section
           aria-labelledby="generation-how-title"
-          className="bg-card ring-border rounded-xl p-5 shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+          className="bg-card ring-border rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
         >
           <h2
             id="generation-how-title"
@@ -91,7 +91,7 @@ export default async function BusinessGenerationPage({
 
         <section
           aria-labelledby="generation-edit-title"
-          className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+          className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
         >
           <div className="p-5 pb-3">
             <h2

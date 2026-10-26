@@ -155,7 +155,7 @@ export default function NewSitePage() {
           <form
             onSubmit={handleSubmit}
             aria-labelledby="new-business-form-title"
-            className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+            className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
           >
             <div className="space-y-6 p-5 sm:p-8">
               <div className="space-y-1">
@@ -265,10 +265,10 @@ export default function NewSitePage() {
         {/* Live preview */}
         <aside aria-label={t.previewLabel} className="hidden lg:block">
           <div className="sticky top-6 space-y-3">
-            <p className="text-muted-foreground text-[11px] font-semibold tracking-[0.14em] uppercase">
+            <p className="text-muted-foreground text-xs font-medium">
               {t.previewLabel}
             </p>
-            <div className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_12px_32px_-18px_rgba(41,73,46,0.35)] ring-1">
+            <div className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_12px_32px_-18px_rgba(0,0,0,0.35)] ring-1">
               <div className="border-border bg-muted/60 flex items-center gap-3 border-b px-3 py-2.5">
                 <span className="flex gap-1.5" aria-hidden="true">
                   <span className="bg-border size-2.5 rounded-full" />

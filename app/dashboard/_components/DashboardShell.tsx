@@ -94,7 +94,7 @@ export default async function DashboardShell({
             className="focus-visible:ring-ring flex items-center gap-2 rounded-md px-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 focus-visible:ring-2 focus-visible:outline-none"
           >
             <span className="bg-primary flex size-7 shrink-0 items-center justify-center rounded-lg">
-              <Leaf className="size-3.5 text-[#d8e7b7]" aria-hidden="true" />
+              <Leaf className="size-3.5 text-white" aria-hidden="true" />
             </span>
             <span className="text-sidebar-foreground text-[17px] font-semibold tracking-[-0.04em] group-data-[collapsible=icon]:hidden">
               Bunnatic
@@ -115,9 +115,9 @@ export default async function DashboardShell({
 
           <SidebarGroup className="mt-auto gap-3">
             {showUpgrade ? (
-              <div className="bg-card ring-sidebar-border rounded-xl p-3.5 shadow-[0_1px_2px_rgba(31,42,28,0.05)] ring-1 group-data-[collapsible=icon]:hidden">
+              <div className="bg-card ring-sidebar-border rounded-xl p-3.5 shadow-[0_1px_2px_rgba(0,0,0,0.05)] ring-1 group-data-[collapsible=icon]:hidden">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sidebar-foreground/60 text-[11px] font-semibold tracking-[0.12em] uppercase">
+                  <p className="text-sidebar-foreground/60 text-xs font-medium">
                     Tu plan
                   </p>
                   <span className="bg-secondary text-secondary-foreground rounded-full px-2 py-0.5 text-[11px] font-medium">

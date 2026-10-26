@@ -687,7 +687,7 @@ function CreateWebContent() {
   }, [step])
 
   return (
-    <div className="landing-page home-page theme-mono flex min-h-screen flex-col bg-white font-sans text-[#0b0b0b]">
+    <div className="landing-page home-page flex min-h-screen flex-col bg-white font-sans text-[#0b0b0b]">
       <a href="#contenido" className="skip-link">
         Saltar al contenido
       </a>

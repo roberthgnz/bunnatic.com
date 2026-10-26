@@ -85,8 +85,7 @@ function getDefaultSelectedBlocks(
   return next
 }
 
-const sectionLabelClass =
-  'text-muted-foreground text-[11px] font-semibold tracking-[0.14em] uppercase'
+const sectionLabelClass = 'text-muted-foreground text-xs font-medium'
 
 function StepHeading({
   number,
@@ -632,7 +631,7 @@ export default function SourceGenerationPanel({
   return (
     <section
       aria-labelledby="source-generation-title"
-      className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+      className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
     >
       {/* Header */}
       <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6">
@@ -717,7 +716,7 @@ export default function SourceGenerationPanel({
                 className={cn(
                   'focus-visible:ring-ring/50 flex items-center justify-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3',
                   active
-                    ? 'bg-card text-foreground ring-border shadow-[0_1px_2px_rgba(31,42,28,0.08)] ring-1'
+                    ? 'bg-card text-foreground ring-border shadow-[0_1px_2px_rgba(0,0,0,0.08)] ring-1'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >

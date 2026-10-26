@@ -97,7 +97,7 @@ export default async function ProfilePage({
 
       <section
         aria-labelledby="profile-account-title"
-        className="bg-card ring-border flex items-center gap-4 rounded-xl p-5 shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+        className="bg-card ring-border flex items-center gap-4 rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
       >
         <div className="bg-secondary text-secondary-foreground ring-border flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1">
           {profile.avatar_url ? (
@@ -133,7 +133,7 @@ export default async function ProfilePage({
       <form
         action={handleProfileUpdate}
         aria-labelledby="profile-form-title"
-        className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+        className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
       >
         <div className="border-border border-b px-5 py-4">
           <h2

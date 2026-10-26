@@ -52,7 +52,7 @@ type Service = {
 }
 
 const surface =
-  'bg-card ring-border rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1'
+  'bg-card ring-border rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1'
 
 const priceFormatter = new Intl.NumberFormat('es-ES', {
   style: 'currency',
@@ -291,7 +291,7 @@ export default function ServicesManager({
                 </div>
                 <table className="w-full text-sm">
                   <thead className="sr-only sm:not-sr-only">
-                    <tr className="text-muted-foreground border-border border-b text-left text-[11px] font-semibold tracking-[0.14em] uppercase">
+                    <tr className="text-muted-foreground border-border border-b text-left text-xs font-medium">
                       <th scope="col" className="px-5 py-2.5 font-semibold">
                         Servicio
                       </th>

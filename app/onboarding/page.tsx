@@ -418,7 +418,7 @@ function OnboardingContent() {
 
           <form
             onSubmit={handleSubmit}
-            className="bg-card ring-border mt-8 space-y-5 rounded-2xl p-5 shadow-[0_1px_2px_rgba(31,42,28,0.04),0_12px_32px_-16px_rgba(31,42,28,0.12)] ring-1 sm:p-7"
+            className="bg-card ring-border mt-8 space-y-5 rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_-16px_rgba(0,0,0,0.12)] ring-1 sm:p-7"
           >
             <div className="space-y-2">
               <Label htmlFor="name">{t.nameLabel}</Label>
@@ -534,7 +534,7 @@ function OnboardingContent() {
             <span className="bg-success size-1.5 rounded-full" />
             {t.previewLabel}
           </p>
-          <div className="bg-card ring-border overflow-hidden rounded-2xl shadow-[0_24px_48px_-24px_rgba(31,42,28,0.25)] ring-1">
+          <div className="bg-card ring-border overflow-hidden rounded-2xl shadow-[0_24px_48px_-24px_rgba(0,0,0,0.25)] ring-1">
             <div className="border-border flex h-9 items-center gap-3 border-b px-3">
               <div className="flex gap-1">
                 <span className="bg-border size-2 rounded-full" />

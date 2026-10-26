@@ -11,48 +11,7 @@
 }
 
 :root {
-  /* Brand: warm paper neutrals + forest green, shared with the landing. */
-  --background: #f8f8f3;
-  --foreground: #1f2a1c;
-  --card: #ffffff;
-  --card-foreground: #1f2a1c;
-  --popover: #ffffff;
-  --popover-foreground: #1f2a1c;
-  --primary: #29492e;
-  --primary-foreground: #fbfcf7;
-  --secondary: #eef1e6;
-  --secondary-foreground: #2f4229;
-  --muted: #f2f3ec;
-  --muted-foreground: #6a7263;
-  --accent: #eaeedf;
-  --accent-foreground: #29412a;
-  --destructive: oklch(0.56 0.19 27);
-  --border: #e4e6db;
-  --input: #dadecf;
-  --ring: #6f8a5a;
-  --success: #3f7a3a;
-  --warning: #b7791f;
-  --chart-1: #29492e;
-  --chart-2: #6f8a5a;
-  --chart-3: #a9bd8b;
-  --chart-4: #c9a15a;
-  --chart-5: #8a6f4d;
-  --radius: 0.625rem;
-  --sidebar: #f2f3ec;
-  --sidebar-foreground: #2b3b26;
-  --sidebar-primary: #29492e;
-  --sidebar-primary-foreground: #fbfcf7;
-  --sidebar-accent: #e6eadb;
-  --sidebar-accent-foreground: #1f2f1c;
-  --sidebar-border: #e2e5d8;
-  --sidebar-ring: #6f8a5a;
-}
-
-/*
- * Public + auth surfaces use a monochrome palette. Set on :root (via :has) so
- * portaled popovers/dialogs pick it up too; the dashboard keeps the default.
- */
-:root:has(.theme-mono) {
+  /* Brand: monochrome ink on white, shared by landing, auth and app. */
   --background: #ffffff;
   --foreground: #0b0b0b;
   --card: #ffffff;
@@ -67,17 +26,30 @@
   --muted-foreground: #6b6b66;
   --accent: #efefea;
   --accent-foreground: #0b0b0b;
+  --destructive: oklch(0.56 0.19 27);
   --border: #e6e6e1;
   --input: #dcdcd6;
   --ring: #0b0b0b;
+  --success: #2f7a3a;
+  --warning: #b7791f;
+  --chart-1: #0b0b0b;
+  --chart-2: #5c5c57;
+  --chart-3: #9a9a93;
+  --chart-4: #c8c8c1;
+  --chart-5: #e3e3dd;
+  --radius: 0.625rem;
+  --sidebar: #f7f7f4;
+  --sidebar-foreground: #0b0b0b;
+  --sidebar-primary: #0b0b0b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ecece7;
+  --sidebar-accent-foreground: #0b0b0b;
+  --sidebar-border: #e6e6e1;
+  --sidebar-ring: #0b0b0b;
 }
-:root:has(.theme-mono) ::selection {
-  background: #0b0b0b;
-  color: #fff;
-}
-/* Pill buttons on public/auth surfaces (unlayered so it beats size radii). */
-:root:has(.theme-mono)
-  [data-slot='button']:not([data-size^='icon']):not([data-variant='link']) {
+
+/* Pill buttons everywhere (unlayered so it beats the size radii). */
+[data-slot='button']:not([data-size^='icon']):not([data-variant='link']) {
   border-radius: 999px;
 }
 
@@ -88,8 +60,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.78 0.09 135);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.145 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -109,7 +81,7 @@
   --chart-5: oklch(0.424 0.199 265.638);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: oklch(0.985 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
@@ -171,8 +143,8 @@
     font-feature-settings: 'cv11', 'ss01';
   }
   ::selection {
-    background: #d8e7b7;
-    color: #1f2a1c;
+    background: #0b0b0b;
+    color: #fff;
   }
   html {
     @apply font-sans;

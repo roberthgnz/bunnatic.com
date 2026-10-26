@@ -38,7 +38,7 @@ const choiceClasses = (selected: boolean) =>
     'has-focus-visible:outline-ring has-focus-visible:outline-2 has-focus-visible:outline-offset-2',
     selected
       ? 'bg-accent/40 ring-primary ring-2'
-      : 'bg-card ring-border hover:bg-muted/50 shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1'
+      : 'bg-card ring-border hover:bg-muted/50 shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1'
   )
 
 export function BusinessSelector({

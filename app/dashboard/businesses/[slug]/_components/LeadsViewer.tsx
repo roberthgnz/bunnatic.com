@@ -73,7 +73,7 @@ export default function LeadsViewer({ leads }: { leads: Lead[] }) {
       ) : (
         <ul
           aria-label={t.title}
-          className="bg-card ring-border divide-border divide-y overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+          className="bg-card ring-border divide-border divide-y overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
         >
           {leads.map((lead) => {
             const date = new Date(lead.created_at)

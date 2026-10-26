@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/sidebar'
 
 const switcherClass =
-  'bg-card ring-sidebar-border h-12 shadow-[0_1px_2px_rgba(31,42,28,0.05)] ring-1 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:shadow-none group-data-[collapsible=icon]:ring-0'
+  'bg-card ring-sidebar-border h-12 shadow-[0_1px_2px_rgba(0,0,0,0.05)] ring-1 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:shadow-none group-data-[collapsible=icon]:ring-0'
 
 type TeamItem = {
   name: string

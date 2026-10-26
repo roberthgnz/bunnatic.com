@@ -19,7 +19,7 @@ type AuthShellProps = {
  */
 export function AuthShell({ variant, headerAction, children }: AuthShellProps) {
   return (
-    <div className="theme-mono bg-background text-foreground grid min-h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+    <div className="bg-background text-foreground grid min-h-svh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <div className="flex min-h-svh flex-col px-5 py-5 sm:px-10 sm:py-7 lg:px-14 xl:px-20">
         <header className="flex items-center justify-between gap-4">
           <BrandLogo />

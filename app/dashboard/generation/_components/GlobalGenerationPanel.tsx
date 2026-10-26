@@ -59,7 +59,7 @@ type Props = {
 type StepId = 1 | 2 | 3
 
 const surface =
-  'bg-card ring-border rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1'
+  'bg-card ring-border rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1'
 
 function Stepper({
   steps,
@@ -148,7 +148,7 @@ function StepHeading({
     <div className="mb-6 space-y-1">
       <p
         aria-hidden="true"
-        className="text-muted-foreground text-[11px] font-semibold tracking-[0.14em] uppercase"
+        className="text-muted-foreground text-xs font-medium"
       >
         {stepWord} {step}/{total}
       </p>

@@ -169,7 +169,7 @@ export default function BusinessSettingsForm({
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
-        className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+        className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1"
       >
         <div className="space-y-5 p-5 sm:p-6">
           <div className="grid gap-5 sm:grid-cols-2">

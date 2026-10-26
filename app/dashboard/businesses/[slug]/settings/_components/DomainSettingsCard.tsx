@@ -446,7 +446,7 @@ export default function DomainSettingsCard({
         </p>
       </div>
 
-      <div className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1">
+      <div className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1">
         {/* Hostname form */}
         <form
           className="space-y-1.5 p-5 sm:p-6"
@@ -750,7 +750,7 @@ export default function DomainSettingsCard({
                               key={`ssl-validation-${index}`}
                               className="ring-border space-y-2.5 rounded-lg p-3 ring-1"
                             >
-                              <p className="text-muted-foreground text-[11px] font-semibold tracking-[0.14em] uppercase">
+                              <p className="text-muted-foreground text-xs font-medium">
                                 {hasTxt
                                   ? t.sslTxt
                                   : hasHttp

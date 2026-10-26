@@ -14,7 +14,7 @@ export function PageHeader({
 }: {
   eyebrow?: React.ReactNode
   title: React.ReactNode
-  /** Rendered after the title in the brand serif italic. */
+  /** Rendered after the title as a muted second tone. */
   accent?: React.ReactNode
   description?: React.ReactNode
   actions?: React.ReactNode
@@ -29,18 +29,16 @@ export function PageHeader({
     >
       <div className="min-w-0 space-y-1.5">
         {eyebrow ? (
-          <p className="text-muted-foreground text-[11px] font-semibold tracking-[0.14em] uppercase">
+          <p className="text-muted-foreground text-[13px] font-medium">
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="text-foreground text-2xl font-semibold tracking-[-0.035em] text-balance sm:text-[28px]">
+        <h1 className="text-foreground text-[28px] leading-[1.05] font-medium tracking-[-0.045em] text-balance sm:text-4xl">
           {title}
           {accent ? (
             <>
               {' '}
-              <span className="font-serif font-normal tracking-[-0.02em] text-[#52734a] italic">
-                {accent}
-              </span>
+              <span className="text-muted-foreground">{accent}</span>
             </>
           ) : null}
         </h1>
@@ -84,7 +82,7 @@ export function StatCard({
           </span>
         ) : null}
       </div>
-      <p className="text-foreground mt-3 text-3xl font-semibold tracking-[-0.04em] tabular-nums">
+      <p className="text-foreground mt-3 text-4xl font-medium tracking-[-0.05em] tabular-nums">
         {value}
       </p>
       {hint ? (
@@ -102,9 +100,9 @@ export function StatCard({
   )
 
   const classes = cn(
-    'group bg-card ring-border relative block rounded-xl p-5 shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1 transition-shadow',
+    'group bg-card ring-border relative block rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1 transition-shadow',
     href &&
-      'hover:ring-ring/40 focus-visible:ring-ring hover:shadow-[0_6px_20px_-10px_rgba(41,73,46,0.25)] focus-visible:ring-2 focus-visible:outline-none',
+      'hover:ring-ring/40 focus-visible:ring-ring hover:shadow-[0_6px_20px_-10px_rgba(0,0,0,0.2)] focus-visible:ring-2 focus-visible:outline-none',
     className
   )
 
@@ -158,11 +156,11 @@ export function EmptyState({
 }
 
 const monogramPalette = [
-  'bg-[#29492e] text-[#d8e7b7]',
-  'bg-[#52734a] text-[#f3f6ea]',
-  'bg-[#8a6f4d] text-[#f7efe2]',
-  'bg-[#3d5a6b] text-[#e3eef3]',
-  'bg-[#6b4f6e] text-[#f3e8f4]',
+  'bg-[#0b0b0b] text-white',
+  'bg-[#3a3a37] text-white',
+  'bg-[#6b6b66] text-white',
+  'bg-[#e6e6e1] text-[#0b0b0b]',
+  'bg-[#f3f3ef] text-[#0b0b0b] ring-1 ring-[#e6e6e1]',
 ]
 
 export function BusinessMonogram({

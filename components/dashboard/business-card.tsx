@@ -3,6 +3,7 @@ import { ArrowUpRight, Globe2 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { BusinessMonogram } from '@/components/dashboard/page-header'
+import { businessRoleLabels, type BusinessRole } from '@/lib/backoffice/policy'
 
 export type BusinessCardData = {
   id: string
@@ -14,19 +15,7 @@ export type BusinessCardData = {
   custom_domain_status?: string | null
   updated_at?: string | null
   created_at?: string | null
-}
-
-export function getPlatformHost() {
-  return (
-    process.env.PLATFORM_ROOT_DOMAIN?.trim().toLowerCase() ||
-    (() => {
-      try {
-        return new URL(process.env.APP_URL || '').host
-      } catch {
-        return 'bunnatic.com'
-      }
-    })()
-  )
+  role?: BusinessRole
 }
 
 export function formatBusinessDate(value: string | null | undefined) {
@@ -114,6 +103,11 @@ export function BusinessCard({
 
       <div className="mt-4 flex flex-wrap items-center gap-1.5">
         <DomainStatus business={business} />
+        {business.role && business.role !== 'owner' ? (
+          <Badge variant="outline">
+            Compartido · {businessRoleLabels[business.role]}
+          </Badge>
+        ) : null}
         {business.category ? (
           <Badge variant="outline">{business.category}</Badge>
         ) : null}

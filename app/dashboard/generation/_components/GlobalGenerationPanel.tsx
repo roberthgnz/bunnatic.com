@@ -3,15 +3,33 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Loader2, Sparkles, Wand2, Building2 } from 'lucide-react'
 import {
-    applyBusinessSourceGeneration,
-    createBusinessFromPreview,
+  ArrowLeft,
+  ArrowRight,
+  Building2,
+  Check,
+  Loader2,
+  Plus,
+  Sparkles,
+  TriangleAlert,
+  Wand2,
+} from 'lucide-react'
+import {
+  applyBusinessSourceGeneration,
+  createBusinessFromPreview,
 } from '@/lib/supabase/actions'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
 import { RotatingLoaderText } from '@/app/dashboard/_components/RotatingLoaderText'
 import { Button } from '@/components/ui/button'
-import type { SourceType, SourceBlock } from '@/lib/businessSourceGeneration'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState } from '@/components/dashboard/page-header'
+import { cn } from '@/lib/utils'
+import type {
+  SourceType,
+  SourceBlock,
+  BusinessSourcePreview,
+} from '@/lib/businessSourceGeneration'
 
 // Hooks
 import { useGenerationState } from './hooks/useGenerationState'
@@ -34,504 +52,778 @@ import { getDefaultSelectedBlocks } from './utils'
 import type { BusinessListItem, PlaceSearchResult } from './types'
 
 type Props = {
-    businesses: BusinessListItem[]
-    locale: string
+  businesses: BusinessListItem[]
+  locale: string
+}
+
+type StepId = 1 | 2 | 3
+
+const surface =
+  'bg-card ring-border rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1'
+
+function Stepper({
+  steps,
+  current,
+  label,
+  stepWord,
+}: {
+  steps: string[]
+  current: StepId
+  label: string
+  stepWord: string
+}) {
+  return (
+    <nav aria-label={label}>
+      <ol className="flex items-center gap-2 sm:gap-3">
+        {steps.map((step, index) => {
+          const number = index + 1
+          const isDone = number < current
+          const isActive = number === current
+          return (
+            <li key={step} className="flex items-center gap-2 sm:gap-3">
+              {index > 0 ? (
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'h-px w-5 sm:w-8',
+                    isDone || isActive ? 'bg-primary/40' : 'bg-border'
+                  )}
+                />
+              ) : null}
+              <span
+                aria-current={isActive ? 'step' : undefined}
+                className="flex items-center gap-2"
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums transition-colors',
+                    isActive &&
+                      'bg-primary text-primary-foreground ring-primary/15 ring-4',
+                    isDone &&
+                      'bg-secondary text-primary ring-primary/20 ring-1',
+                    !isActive &&
+                      !isDone &&
+                      'bg-card text-muted-foreground ring-border ring-1'
+                  )}
+                >
+                  {isDone ? <Check className="size-3.5" /> : number}
+                </span>
+                <span
+                  className={cn(
+                    'text-sm',
+                    isActive
+                      ? 'text-foreground font-medium'
+                      : 'text-muted-foreground hidden sm:inline'
+                  )}
+                >
+                  <span className="sr-only">
+                    {stepWord} {number}:{' '}
+                  </span>
+                  {step}
+                </span>
+              </span>
+            </li>
+          )
+        })}
+      </ol>
+    </nav>
+  )
+}
+
+function StepHeading({
+  step,
+  total,
+  stepWord,
+  title,
+  description,
+}: {
+  step: StepId
+  total: number
+  stepWord: string
+  title: string
+  description?: string
+}) {
+  return (
+    <div className="mb-6 space-y-1">
+      <p
+        aria-hidden="true"
+        className="text-muted-foreground text-[11px] font-semibold tracking-[0.14em] uppercase"
+      >
+        {stepWord} {step}/{total}
+      </p>
+      <h2
+        id="generation-step-title"
+        className="text-foreground text-lg font-semibold tracking-[-0.02em]"
+      >
+        {title}
+      </h2>
+      {description ? (
+        <p className="text-muted-foreground max-w-2xl text-sm leading-6">
+          {description}
+        </p>
+      ) : null}
+    </div>
+  )
 }
 
 export default function GlobalGenerationPanel({ businesses, locale }: Props) {
-    const router = useRouter()
-    const t = getTranslations(locale)
+  const router = useRouter()
+  const t = getTranslations(locale)
 
-    // State management
-    const [sourceType, setSourceType] = useState<SourceType>('google')
-    const [selectedBlocks, setSelectedBlocks] = useState<Set<SourceBlock>>(new Set())
-    const [selectedBusinessId, setSelectedBusinessId] = useState<string>('')
-    const [isApplying, setIsApplying] = useState(false)
+  // State management
+  const [sourceType, setSourceType] = useState<SourceType>('google')
+  const [selectedBlocks, setSelectedBlocks] = useState<Set<SourceBlock>>(
+    new Set()
+  )
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string>('')
+  const [isApplying, setIsApplying] = useState(false)
+  // Presentation only: which wizard step is shown for the current preview.
+  const [stepView, setStepView] = useState<{
+    step: StepId
+    preview: BusinessSourcePreview | null
+  }>({ step: 1, preview: null })
 
-    // Custom hooks
-    const {
-        isLoadingState,
-        setIsLoadingState,
-        saveStateToRedis,
-        loadStateFromRedis,
-        clearStateFromRedis,
-    } = useGenerationState()
+  // Custom hooks
+  const {
+    isLoadingState,
+    setIsLoadingState,
+    saveStateToRedis,
+    loadStateFromRedis,
+    clearStateFromRedis,
+  } = useGenerationState()
 
-    const { entitlement, isLimitReached, quotaLabel, loadEntitlement, setEntitlement } =
-        useEntitlement()
+  const {
+    entitlement,
+    isLimitReached,
+    quotaLabel,
+    loadEntitlement,
+    setEntitlement,
+  } = useEntitlement()
 
-    const googleSearch = useGoogleSearch(locale, t.errorSearch)
-    const urlCrawl = useUrlCrawl(locale, t.errorCrawl)
-    const previewGen = usePreviewGeneration(locale, t.errorPreview)
+  const googleSearch = useGoogleSearch(locale, t.errorSearch)
+  const urlCrawl = useUrlCrawl(locale, t.errorCrawl)
+  const previewGen = usePreviewGeneration(locale, t.errorPreview)
 
-    // Load initial state
-    useEffect(() => {
-        const loadState = async () => {
-            const savedState = await loadStateFromRedis()
-            if (savedState) {
-                setSourceType(savedState.sourceType || 'google')
-                googleSearch.setGoogleResults(savedState.googleResults || [])
-                previewGen.setPreview(savedState.preview || null)
-                setSelectedBlocks(new Set(savedState.selectedBlocks || []) as Set<SourceBlock>)
-                setSelectedBusinessId(savedState.selectedBusinessId || '')
-
-                if (savedState.googleQuery) {
-                    googleSearch.form.setValue('query', savedState.googleQuery)
-                }
-                if (savedState.urlValue) {
-                    urlCrawl.form.setValue('url', savedState.urlValue)
-                }
-
-                // Resume crawl if pending
-                if (savedState.crawlJobId && savedState.crawlUrl) {
-                    await urlCrawl.resumeCrawl(
-                        savedState.crawlJobId,
-                        savedState.crawlUrl,
-                        async (result) => {
-                            await previewGen.buildPreview('url', result, (preview, entitlement) => {
-                                if (entitlement) {
-                                    setEntitlement(entitlement)
-                                }
-                                if (preview) {
-                                    setSelectedBlocks(getDefaultSelectedBlocks(preview))
-                                }
-                            })
-                        }
-                    )
-                }
-            }
-            setIsLoadingState(false)
-        }
-        void loadState()
-    }, [])
-
-    // Pre-select first business
-    useEffect(() => {
-        if (businesses.length > 0 && !selectedBusinessId) {
-            setSelectedBusinessId(businesses[0].id)
-        }
-    }, [businesses, selectedBusinessId])
-
-    // Persist state to Redis
-    useEffect(() => {
-        if (isLoadingState) return
-
-        const timeoutId = setTimeout(() => {
-            void saveStateToRedis({
-                sourceType,
-                googleResults: googleSearch.googleResults,
-                preview: previewGen.preview,
-                selectedBlocks: Array.from(selectedBlocks),
-                selectedBusinessId,
-                googleQuery: googleSearch.form.getValues('query'),
-                urlValue: urlCrawl.form.getValues('url'),
-                crawlJobId: urlCrawl.crawlJobId,
-                crawlUrl: urlCrawl.crawlUrl,
-            })
-        }, 500)
-
-        return () => clearTimeout(timeoutId)
-    }, [
-        sourceType,
-        googleSearch.googleResults,
-        previewGen.preview,
-        selectedBlocks,
-        selectedBusinessId,
-        urlCrawl.crawlJobId,
-        urlCrawl.crawlUrl,
-        isLoadingState,
-    ])
-
-    const resetGeneratedState = () => {
-        previewGen.resetPreview()
-        setSelectedBlocks(new Set())
-        urlCrawl.setCrawlJobId(null)
-        urlCrawl.setCrawlUrl(null)
-        void clearStateFromRedis()
-    }
-
-    const handleSourceChange = (nextSource: SourceType) => {
-        if (sourceType === nextSource) return
-        setSourceType(nextSource)
-        googleSearch.setGoogleResults([])
-        resetGeneratedState()
-        trackFunnelEvent('source_selected', {
-            source_type: nextSource,
-            locale,
-        })
-    }
-
-    const handleGoogleSearch = async (values: { query: string }) => {
-        resetGeneratedState()
-        await googleSearch.handleSearch(values)
-    }
-
-    const handleSelectGoogleResult = async (result: PlaceSearchResult) => {
-        try {
-            const response = await fetch(
-                `/api/places/details?place_id=${encodeURIComponent(result.place_id)}&lang=${locale}`
-            )
-            const data = (await response.json()) as { result?: unknown; error?: string }
-            if (!response.ok || !data.result) throw new Error(data.error || t.errorDetails)
-
-            await previewGen.buildPreview('google', data.result, (preview, entitlement) => {
-                if (entitlement) {
-                    setEntitlement(entitlement)
-                }
-                if (preview) {
-                    setSelectedBlocks(getDefaultSelectedBlocks(preview))
-                }
-            })
-        } catch (error) {
-            console.error(error)
-            toast.error(t.errorDetails)
-        }
-    }
-
-    const handleCrawlUrl = async (values: { url: string }) => {
-        resetGeneratedState()
-        await urlCrawl.handleCrawl(values, async (result) => {
-            await previewGen.buildPreview('url', result, (preview, entitlement) => {
-                if (entitlement) {
-                    setEntitlement(entitlement)
-                }
-                if (preview) {
-                    setSelectedBlocks(getDefaultSelectedBlocks(preview))
-                }
-            })
-        })
-    }
-
-    const toggleBlock = (block: SourceBlock) => {
-        setSelectedBlocks((prev) => {
-            const next = new Set(prev)
-            if (next.has(block)) {
-                next.delete(block)
-            } else {
-                next.add(block)
-            }
-            return next
-        })
-    }
-
-    const clearAllState = async () => {
-        // Clear Redis state
-        await clearStateFromRedis()
-
-        // Clear local component state
-        previewGen.resetPreview()
-        setSelectedBlocks(new Set())
-        setSelectedBusinessId(businesses.length > 0 ? businesses[0].id : '')
-        googleSearch.setGoogleResults([])
-        urlCrawl.setCrawlJobId(null)
-        urlCrawl.setCrawlUrl(null)
-    }
-
-    const handleApply = async () => {
-        if (!previewGen.preview || !selectedBusinessId) return
-
-        if (selectedBusinessId === 'new') {
-            setIsApplying(true)
-            try {
-                const result = await createBusinessFromPreview({
-                    sourceType,
-                    preview: previewGen.preview,
-                })
-                if ('error' in result) {
-                    toast.error(result.error)
-                    return
-                }
-
-                toast.success(t.success)
-
-                // Clear all state after successful creation
-                await clearAllState()
-
-                if (result.slug) {
-                    router.push(`/dashboard/businesses/${result.slug}`)
-                } else {
-                    router.push('/dashboard')
-                }
-            } catch (error) {
-                console.error(error)
-                toast.error(t.errorPreview)
-            } finally {
-                setIsApplying(false)
-            }
-            return
-        }
-
-        if (isLimitReached) {
-            trackFunnelEvent('limit_blocked', { source_type: sourceType, locale })
-            toast.error(t.limitReached)
-            return
-        }
-
-        const blocks = Array.from(selectedBlocks)
-        if (blocks.length === 0) return
-
-        setIsApplying(true)
-        trackFunnelEvent('apply_submitted', {
-            source_type: sourceType,
-            locale,
-            blocks_count: blocks.length,
-        })
-
-        try {
-            const result = await applyBusinessSourceGeneration({
-                businessId: selectedBusinessId,
-                sourceType,
-                selectedBlocks: blocks,
-                previewPayload: previewGen.preview,
-            })
-
-            if ('error' in result) {
-                toast.error(result.error)
-                if ('entitlement' in result && result.entitlement) {
-                    setEntitlement(result.entitlement)
-                }
-                return
-            }
-
-            toast.success(t.success)
-            trackFunnelEvent('apply_success', {
-                source_type: sourceType,
-                locale,
-                blocks_count: blocks.length,
-            })
-            if ('entitlement' in result && result.entitlement) setEntitlement(result.entitlement)
-            else await loadEntitlement()
-
-            // Clear all state after successful application
-            await clearAllState()
-
-            const business = businesses.find((b) => b.id === selectedBusinessId)
-            if (business) {
-                router.push(`/dashboard/businesses/${business.slug}/overview`)
-            } else {
-                router.refresh()
-            }
-        } catch (error) {
-            console.error(error)
-            toast.error(t.errorPreview)
-        } finally {
-            setIsApplying(false)
-        }
-    }
-
-    // No businesses state
-    if (businesses.length === 0) {
-        return (
-            <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
-                    <Building2 className="h-6 w-6 text-slate-500" />
-                </div>
-                <div>
-                    <h3 className="text-lg font-semibold text-slate-900">{t.noBusinesses}</h3>
-                    <p className="text-sm text-slate-500">{t.createBusinessFirst}</p>
-                </div>
-                <Button onClick={() => router.push('/dashboard/new')}>
-                    {t.createBusinessFirst.split(' ')[0]}
-                </Button>
-            </div>
+  // Load initial state
+  useEffect(() => {
+    const loadState = async () => {
+      const savedState = await loadStateFromRedis()
+      if (savedState) {
+        setSourceType(savedState.sourceType || 'google')
+        googleSearch.setGoogleResults(savedState.googleResults || [])
+        previewGen.setPreview(savedState.preview || null)
+        setSelectedBlocks(
+          new Set(savedState.selectedBlocks || []) as Set<SourceBlock>
         )
+        setSelectedBusinessId(savedState.selectedBusinessId || '')
+
+        if (savedState.googleQuery) {
+          googleSearch.form.setValue('query', savedState.googleQuery)
+        }
+        if (savedState.urlValue) {
+          urlCrawl.form.setValue('url', savedState.urlValue)
+        }
+
+        // Resume crawl if pending
+        if (savedState.crawlJobId && savedState.crawlUrl) {
+          await urlCrawl.resumeCrawl(
+            savedState.crawlJobId,
+            savedState.crawlUrl,
+            async (result) => {
+              await previewGen.buildPreview(
+                'url',
+                result,
+                (preview, entitlement) => {
+                  if (entitlement) {
+                    setEntitlement(entitlement)
+                  }
+                  if (preview) {
+                    setSelectedBlocks(getDefaultSelectedBlocks(preview))
+                  }
+                }
+              )
+            }
+          )
+        }
+      }
+      setIsLoadingState(false)
+    }
+    void loadState()
+  }, [])
+
+  // Pre-select first business
+  useEffect(() => {
+    if (businesses.length > 0 && !selectedBusinessId) {
+      setSelectedBusinessId(businesses[0].id)
+    }
+  }, [businesses, selectedBusinessId])
+
+  // Persist state to Redis
+  useEffect(() => {
+    if (isLoadingState) return
+
+    const timeoutId = setTimeout(() => {
+      void saveStateToRedis({
+        sourceType,
+        googleResults: googleSearch.googleResults,
+        preview: previewGen.preview,
+        selectedBlocks: Array.from(selectedBlocks),
+        selectedBusinessId,
+        googleQuery: googleSearch.form.getValues('query'),
+        urlValue: urlCrawl.form.getValues('url'),
+        crawlJobId: urlCrawl.crawlJobId,
+        crawlUrl: urlCrawl.crawlUrl,
+      })
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [
+    sourceType,
+    googleSearch.googleResults,
+    previewGen.preview,
+    selectedBlocks,
+    selectedBusinessId,
+    urlCrawl.crawlJobId,
+    urlCrawl.crawlUrl,
+    isLoadingState,
+  ])
+
+  const resetGeneratedState = () => {
+    previewGen.resetPreview()
+    setSelectedBlocks(new Set())
+    urlCrawl.setCrawlJobId(null)
+    urlCrawl.setCrawlUrl(null)
+    void clearStateFromRedis()
+  }
+
+  const handleSourceChange = (nextSource: SourceType) => {
+    if (sourceType === nextSource) return
+    setSourceType(nextSource)
+    googleSearch.setGoogleResults([])
+    resetGeneratedState()
+    trackFunnelEvent('source_selected', {
+      source_type: nextSource,
+      locale,
+    })
+  }
+
+  const handleGoogleSearch = async (values: { query: string }) => {
+    resetGeneratedState()
+    await googleSearch.handleSearch(values)
+  }
+
+  const handleSelectGoogleResult = async (result: PlaceSearchResult) => {
+    try {
+      const response = await fetch(
+        `/api/places/details?place_id=${encodeURIComponent(result.place_id)}&lang=${locale}`
+      )
+      const data = (await response.json()) as {
+        result?: unknown
+        error?: string
+      }
+      if (!response.ok || !data.result)
+        throw new Error(data.error || t.errorDetails)
+
+      await previewGen.buildPreview(
+        'google',
+        data.result,
+        (preview, entitlement) => {
+          if (entitlement) {
+            setEntitlement(entitlement)
+          }
+          if (preview) {
+            setSelectedBlocks(getDefaultSelectedBlocks(preview))
+          }
+        }
+      )
+    } catch (error) {
+      console.error(error)
+      toast.error(t.errorDetails)
+    }
+  }
+
+  const handleCrawlUrl = async (values: { url: string }) => {
+    resetGeneratedState()
+    await urlCrawl.handleCrawl(values, async (result) => {
+      await previewGen.buildPreview('url', result, (preview, entitlement) => {
+        if (entitlement) {
+          setEntitlement(entitlement)
+        }
+        if (preview) {
+          setSelectedBlocks(getDefaultSelectedBlocks(preview))
+        }
+      })
+    })
+  }
+
+  const toggleBlock = (block: SourceBlock) => {
+    setSelectedBlocks((prev) => {
+      const next = new Set(prev)
+      if (next.has(block)) {
+        next.delete(block)
+      } else {
+        next.add(block)
+      }
+      return next
+    })
+  }
+
+  const clearAllState = async () => {
+    // Clear Redis state
+    await clearStateFromRedis()
+
+    // Clear local component state
+    previewGen.resetPreview()
+    setSelectedBlocks(new Set())
+    setSelectedBusinessId(businesses.length > 0 ? businesses[0].id : '')
+    googleSearch.setGoogleResults([])
+    urlCrawl.setCrawlJobId(null)
+    urlCrawl.setCrawlUrl(null)
+  }
+
+  const handleApply = async () => {
+    if (!previewGen.preview || !selectedBusinessId) return
+
+    if (selectedBusinessId === 'new') {
+      setIsApplying(true)
+      try {
+        const result = await createBusinessFromPreview({
+          sourceType,
+          preview: previewGen.preview,
+        })
+        if ('error' in result) {
+          toast.error(result.error)
+          return
+        }
+
+        toast.success(t.success)
+
+        // Clear all state after successful creation
+        await clearAllState()
+
+        if (result.slug) {
+          router.push(`/dashboard/businesses/${result.slug}`)
+        } else {
+          router.push('/dashboard')
+        }
+      } catch (error) {
+        console.error(error)
+        toast.error(t.errorPreview)
+      } finally {
+        setIsApplying(false)
+      }
+      return
     }
 
-    const hasSelectableBlocks = selectedBlocks.size > 0
+    if (isLimitReached) {
+      trackFunnelEvent('limit_blocked', { source_type: sourceType, locale })
+      toast.error(t.limitReached)
+      return
+    }
 
+    const blocks = Array.from(selectedBlocks)
+    if (blocks.length === 0) return
+
+    setIsApplying(true)
+    trackFunnelEvent('apply_submitted', {
+      source_type: sourceType,
+      locale,
+      blocks_count: blocks.length,
+    })
+
+    try {
+      const result = await applyBusinessSourceGeneration({
+        businessId: selectedBusinessId,
+        sourceType,
+        selectedBlocks: blocks,
+        previewPayload: previewGen.preview,
+      })
+
+      if ('error' in result) {
+        toast.error(result.error)
+        if ('entitlement' in result && result.entitlement) {
+          setEntitlement(result.entitlement)
+        }
+        return
+      }
+
+      toast.success(t.success)
+      trackFunnelEvent('apply_success', {
+        source_type: sourceType,
+        locale,
+        blocks_count: blocks.length,
+      })
+      if ('entitlement' in result && result.entitlement)
+        setEntitlement(result.entitlement)
+      else await loadEntitlement()
+
+      // Clear all state after successful application
+      await clearAllState()
+
+      const business = businesses.find((b) => b.id === selectedBusinessId)
+      if (business) {
+        router.push(`/dashboard/businesses/${business.slug}/overview`)
+      } else {
+        router.refresh()
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error(t.errorPreview)
+    } finally {
+      setIsApplying(false)
+    }
+  }
+
+  // No businesses state
+  if (businesses.length === 0) {
     return (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            {/* Header */}
-            <div className="flex flex-col justify-between gap-3 bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-5 sm:flex-row sm:items-center">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/20 ring-1 ring-blue-400/30">
-                        <Wand2 className="h-4.5 w-4.5 text-blue-300" />
-                    </div>
-                    <div>
-                        <h3 className="text-sm font-semibold text-white">{t.title}</h3>
-                        <p className="max-w-sm text-xs leading-relaxed text-slate-400">
-                            {t.subtitle}
-                        </p>
-                    </div>
-                </div>
-                {/* Quota badge */}
-                <div className="shrink-0">
-                    {entitlement?.isLimited ? (
-                        <div
-                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 ${isLimitReached
-                                ? 'bg-red-900/40 text-red-300 ring-red-700/40'
-                                : 'bg-blue-900/30 text-blue-300 ring-blue-700/30'
-                                }`}
-                        >
-                            <Sparkles className="h-3 w-3" />
-                            {t.quotaLimited}: {quotaLabel}
-                        </div>
-                    ) : (
-                        <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-900/30 px-3 py-1 text-xs font-medium text-emerald-300 ring-1 ring-emerald-700/30">
-                            <Sparkles className="h-3 w-3" />
-                            {t.quotaUnlimited}
-                        </div>
-                    )}
-                </div>
+      <EmptyState
+        icon={Building2}
+        title={t.noBusinesses}
+        description={t.createBusinessFirst}
+        action={
+          <Button size="lg" onClick={() => router.push('/dashboard/new')}>
+            <Plus aria-hidden="true" />
+            {t.createButton}
+          </Button>
+        }
+      />
+    )
+  }
+
+  const hasSelectableBlocks = selectedBlocks.size > 0
+  const preview = previewGen.preview
+  const isWorking = previewGen.isBuildingPreview || urlCrawl.isCrawling
+  const currentStep: StepId =
+    !preview || isWorking ? 1 : stepView.preview === preview ? stepView.step : 2
+  const goToStep = (step: StepId) => setStepView({ step, preview })
+  const isNewBusiness = selectedBusinessId === 'new'
+  const isApplyDisabled =
+    isApplying ||
+    !selectedBusinessId ||
+    (selectedBusinessId !== 'new' && (isLimitReached || !hasSelectableBlocks))
+
+  const blockLabels: Record<SourceBlock, string> = {
+    profile: t.blockProfile,
+    services: t.blockServices,
+    hours: t.blockHours,
+  }
+  const stepTitles = [t.stepSource, t.stepReview, t.stepApply]
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Stepper
+          steps={stepTitles}
+          current={currentStep}
+          label={t.stepsLabel}
+          stepWord={t.stepOf}
+        />
+        {entitlement ? (
+          entitlement.isLimited ? (
+            <Badge
+              variant={isLimitReached ? 'destructive' : 'secondary'}
+              className="h-7 px-2.5 tabular-nums"
+            >
+              <Sparkles aria-hidden="true" />
+              {t.quotaLimited}: {quotaLabel}
+            </Badge>
+          ) : (
+            <Badge variant="success" className="h-7 px-2.5">
+              <Sparkles aria-hidden="true" />
+              {t.quotaUnlimited}
+            </Badge>
+          )
+        ) : null}
+      </div>
+
+      {/* Limit warning */}
+      {isLimitReached && (
+        <div
+          role="status"
+          className="bg-warning/10 ring-warning/25 flex items-start gap-3 rounded-xl px-4 py-3 ring-1"
+        >
+          <TriangleAlert
+            className="text-warning mt-0.5 size-4 shrink-0"
+            aria-hidden="true"
+          />
+          <p className="text-foreground text-sm">
+            {t.limitReached}{' '}
+            <span className="font-medium">{t.limitReachedHint}</span>
+          </p>
+        </div>
+      )}
+
+      <section
+        aria-labelledby="generation-step-title"
+        className={cn(surface, 'p-5 sm:p-8')}
+      >
+        {currentStep === 1 && (
+          <div className="animate-in fade-in duration-200">
+            <StepHeading
+              step={1}
+              total={3}
+              stepWord={t.stepOf}
+              title={t.stepSource}
+            />
+
+            <SourceTypeToggle
+              sourceType={sourceType}
+              onSourceChange={handleSourceChange}
+              labels={{
+                sourceLabel: t.sourceLabel,
+                sourceGoogle: t.sourceGoogle,
+                sourceUrl: t.sourceUrl,
+                sourceGoogleDesc: t.sourceGoogleDesc,
+                sourceUrlDesc: t.sourceUrlDesc,
+              }}
+            />
+
+            <div className="mt-7">
+              {sourceType === 'google' ? (
+                <GoogleSearchForm
+                  form={googleSearch.form}
+                  isSearching={googleSearch.isSearching}
+                  isBuildingPreview={previewGen.isBuildingPreview}
+                  googleResults={googleSearch.googleResults}
+                  onSubmit={handleGoogleSearch}
+                  onSelectResult={handleSelectGoogleResult}
+                  labels={{
+                    searchLabel: t.searchLabel,
+                    searchPlaceholder: t.searchPlaceholder,
+                    searchButton: t.searchButton,
+                    searching: t.searching,
+                    searchHint: t.searchHint,
+                    searchRequired: t.searchRequired,
+                    resultsTitle: t.resultsTitle,
+                    resultsCount: t.resultsCount,
+                    selectResult: t.selectResult,
+                  }}
+                />
+              ) : (
+                <UrlCrawlForm
+                  form={urlCrawl.form}
+                  isCrawling={urlCrawl.isCrawling}
+                  isBuildingPreview={previewGen.isBuildingPreview}
+                  onSubmit={handleCrawlUrl}
+                  labels={{
+                    urlLabel: t.urlLabel,
+                    urlPlaceholder: t.urlPlaceholder,
+                    urlHint: t.urlHint,
+                    urlInvalid: t.urlInvalid,
+                    crawlButton: t.crawlButton,
+                    crawling: t.crawling,
+                  }}
+                />
+              )}
             </div>
 
-            {/* Limit warning */}
-            {isLimitReached && (
-                <div className="flex items-start gap-3 border-b border-amber-200 bg-amber-50 px-6 py-3">
-                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-                    <p className="text-sm text-amber-800">
-                        {t.limitReached} <span className="font-medium">{t.limitReachedHint}</span>
-                    </p>
+            {/* Building preview loader */}
+            {isWorking && (
+              <div className="bg-muted/40 ring-border animate-in fade-in mt-6 flex flex-col items-center gap-4 rounded-xl px-6 py-8 text-center ring-1 duration-300">
+                <span className="bg-secondary text-secondary-foreground flex size-10 items-center justify-center rounded-xl">
+                  <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+                </span>
+                <div className="flex w-full flex-col items-center gap-1">
+                  <p className="text-foreground text-sm font-medium">
+                    {t.generatingTitle}
+                  </p>
+                  <RotatingLoaderText messages={t.generatingMessages} />
                 </div>
+                <div
+                  className="w-full max-w-md space-y-2.5 pt-2"
+                  aria-hidden="true"
+                >
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="size-10 rounded-lg" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-3.5 w-1/2" />
+                      <Skeleton className="h-3 w-1/3" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-5/6" />
+                </div>
+              </div>
             )}
 
-            <div className="space-y-6 p-6">
-                {/* Source toggle */}
-                <SourceTypeToggle
-                    sourceType={sourceType}
-                    onSourceChange={handleSourceChange}
-                    labels={{
-                        sourceLabel: t.sourceLabel,
-                        sourceGoogle: t.sourceGoogle,
-                        sourceUrl: t.sourceUrl,
-                    }}
-                />
+            {/* A preview is already available (user stepped back) */}
+            {!isWorking && preview && (
+              <div className="bg-accent/40 ring-border mt-6 flex flex-col gap-3 rounded-xl px-4 py-3.5 ring-1 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-foreground text-sm">
+                  {t.resumePreview}{' '}
+                  <span className="font-semibold">
+                    {preview.profile.name || '—'}
+                  </span>
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToStep(2)}
+                >
+                  {t.resumeButton}
+                  <ArrowRight aria-hidden="true" />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
-                {/* Search / URL input */}
-                {sourceType === 'google' ? (
-                    <GoogleSearchForm
-                        form={googleSearch.form}
-                        isSearching={googleSearch.isSearching}
-                        isBuildingPreview={previewGen.isBuildingPreview}
-                        googleResults={googleSearch.googleResults}
-                        onSubmit={handleGoogleSearch}
-                        onSelectResult={handleSelectGoogleResult}
-                        labels={{
-                            searchPlaceholder: t.searchPlaceholder,
-                            searchButton: t.searchButton,
-                            searching: t.searching,
-                            errorSearch: t.errorSearch,
-                            selectBusiness: t.selectBusiness,
-                            sourceGoogle: t.sourceGoogle,
-                        }}
-                    />
-                ) : (
-                    <UrlCrawlForm
-                        form={urlCrawl.form}
-                        isCrawling={urlCrawl.isCrawling}
-                        isBuildingPreview={previewGen.isBuildingPreview}
-                        onSubmit={handleCrawlUrl}
-                        labels={{
-                            urlPlaceholder: t.urlPlaceholder,
-                            crawlButton: t.crawlButton,
-                            crawling: t.crawling,
-                            errorCrawl: t.errorCrawl,
-                        }}
-                    />
-                )}
+        {currentStep === 2 && preview && (
+          <div className="animate-in fade-in slide-in-from-bottom-1 duration-200">
+            <StepHeading
+              step={2}
+              total={3}
+              stepWord={t.stepOf}
+              title={t.previewTitle}
+              description={t.previewSubtitle}
+            />
 
-                {/* Building preview loader */}
-                {(previewGen.isBuildingPreview || urlCrawl.isCrawling) && (
-                    <div className="animate-in fade-in flex items-center justify-center gap-3 rounded-xl border border-blue-100 bg-blue-50 py-10 duration-300">
-                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-                        <RotatingLoaderText messages={t.generatingMessages} />
-                    </div>
-                )}
+            <div className="space-y-6">
+              <BlockSelector
+                preview={preview}
+                selectedBlocks={selectedBlocks}
+                onToggleBlock={toggleBlock}
+                labels={{
+                  blocksTitle: t.blocksTitle,
+                  blockProfile: t.blockProfile,
+                  blockProfileDesc: t.blockProfileDesc,
+                  blockServices: t.blockServices,
+                  blockServicesDesc: t.blockServicesDesc,
+                  blockHours: t.blockHours,
+                  blockHoursDesc: t.blockHoursDesc,
+                  blockUnavailable: t.blockUnavailable,
+                }}
+              />
 
-                {/* Preview section */}
-                {!previewGen.isBuildingPreview && !urlCrawl.isCrawling && (
-                    <>
-                        {previewGen.preview ? (
-                            <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5 duration-300">
-                                <BusinessSelector
-                                    businesses={businesses}
-                                    selectedBusinessId={selectedBusinessId}
-                                    onSelectBusiness={setSelectedBusinessId}
-                                    labels={{
-                                        targetBusinessLabel: t.targetBusinessLabel,
-                                        selectTargetPlaceholder: t.selectTargetPlaceholder,
-                                        createNewBusiness: t.createNewBusiness,
-                                    }}
-                                />
-
-                                <BlockSelector
-                                    preview={previewGen.preview}
-                                    selectedBlocks={selectedBlocks}
-                                    onToggleBlock={toggleBlock}
-                                    labels={{
-                                        blocksTitle: t.blocksTitle,
-                                        blockProfile: t.blockProfile,
-                                        blockProfileDesc: t.blockProfileDesc,
-                                        blockServices: t.blockServices,
-                                        blockServicesDesc: t.blockServicesDesc,
-                                        blockHours: t.blockHours,
-                                        blockHoursDesc: t.blockHoursDesc,
-                                    }}
-                                />
-
-                                <PreviewCards
-                                    preview={previewGen.preview}
-                                    labels={{
-                                        blockProfile: t.blockProfile,
-                                        blockServices: t.blockServices,
-                                        blockHours: t.blockHours,
-                                        ratingLabel: t.ratingLabel,
-                                        reviewsLabel: t.reviewsLabel,
-                                        priceLabel: t.priceLabel,
-                                        statusLabel: t.statusLabel,
-                                        mapsLabel: t.mapsLabel,
-                                        noServices: t.noServices,
-                                        noHours: t.noHours,
-                                    }}
-                                />
-
-                                {/* Apply button */}
-                                <div className="pt-1">
-                                    <Button
-                                        type="button"
-                                        onClick={handleApply}
-                                        disabled={
-                                            isApplying ||
-                                            !selectedBusinessId ||
-                                            (selectedBusinessId !== 'new' &&
-                                                (isLimitReached || !hasSelectableBlocks))
-                                        }
-                                        className="h-12 w-full"
-                                    >
-                                        {isApplying ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                {selectedBusinessId === 'new' ? t.createButton : t.applying}
-                                            </>
-                                        ) : (
-                                            <>
-                                                {selectedBusinessId === 'new' ? (
-                                                    <>
-                                                        <Wand2 className="mr-2 h-4 w-4" />
-                                                        {t.createButton}
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Sparkles className="mr-2 h-4 w-4" />
-                                                        {t.applyButton}
-                                                    </>
-                                                )}
-                                            </>
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 py-12 text-center">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-50 ring-1 ring-blue-100">
-                                    <Sparkles className="h-6 w-6 text-blue-400" />
-                                </div>
-                                <p className="text-sm font-medium text-slate-500">{t.noPreview}</p>
-                            </div>
-                        )}
-                    </>
-                )}
+              <PreviewCards
+                preview={preview}
+                labels={{
+                  blockProfile: t.blockProfile,
+                  blockServices: t.blockServices,
+                  blockHours: t.blockHours,
+                  ratingLabel: t.ratingLabel,
+                  reviewsLabel: t.reviewsLabel,
+                  priceLabel: t.priceLabel,
+                  statusLabel: t.statusLabel,
+                  mapsLabel: t.mapsLabel,
+                  noServices: t.noServices,
+                  noHours: t.noHours,
+                  addressLabel: t.addressLabel,
+                  phoneLabel: t.phoneLabel,
+                  websiteLabel: t.websiteLabel,
+                  closedLabel: t.closedLabel,
+                  dayNames: t.dayNames,
+                  statusOperational: t.statusOperational,
+                  statusClosedTemporarily: t.statusClosedTemporarily,
+                  statusClosedPermanently: t.statusClosedPermanently,
+                }}
+              />
             </div>
-        </div>
-    )
+
+            <div className="border-border mt-8 flex flex-col-reverse gap-2 border-t pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <Button type="button" variant="ghost" onClick={() => goToStep(1)}>
+                <ArrowLeft aria-hidden="true" />
+                {t.changeSource}
+              </Button>
+              <Button type="button" size="lg" onClick={() => goToStep(3)}>
+                {t.continueButton}
+                <ArrowRight aria-hidden="true" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 3 && preview && (
+          <div className="animate-in fade-in slide-in-from-bottom-1 duration-200">
+            <StepHeading
+              step={3}
+              total={3}
+              stepWord={t.stepOf}
+              title={t.stepApply}
+            />
+
+            <BusinessSelector
+              businesses={businesses}
+              selectedBusinessId={selectedBusinessId}
+              onSelectBusiness={setSelectedBusinessId}
+              labels={{
+                targetBusinessLabel: t.targetBusinessLabel,
+                targetBusinessHint: t.targetBusinessHint,
+                selectTargetPlaceholder: t.selectTargetPlaceholder,
+                createNewBusiness: t.createNewBusiness,
+                createNewBusinessDesc: t.createNewBusinessDesc,
+              }}
+            />
+
+            {/* Summary of what will be applied */}
+            <div className="bg-muted/40 ring-border mt-6 rounded-xl px-4 py-3.5 ring-1">
+              <p className="text-muted-foreground text-xs font-medium">
+                {t.summaryTitle}
+              </p>
+              {isNewBusiness ? (
+                <p className="text-foreground mt-1.5 text-sm">{t.summaryNew}</p>
+              ) : hasSelectableBlocks ? (
+                <ul className="mt-2 flex flex-wrap gap-1.5">
+                  {Array.from(selectedBlocks).map((block) => (
+                    <li key={block}>
+                      <Badge variant="secondary">
+                        <Check aria-hidden="true" />
+                        {blockLabels[block]}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-warning mt-1.5 flex items-center gap-1.5 text-sm font-medium">
+                  <TriangleAlert
+                    className="size-4 shrink-0"
+                    aria-hidden="true"
+                  />
+                  {t.noBlocksSelected}
+                </p>
+              )}
+            </div>
+
+            <div className="border-border mt-8 flex flex-col-reverse gap-2 border-t pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => goToStep(2)}
+                disabled={isApplying}
+              >
+                <ArrowLeft aria-hidden="true" />
+                {t.backButton}
+              </Button>
+              <Button
+                type="button"
+                size="lg"
+                onClick={handleApply}
+                disabled={isApplyDisabled}
+              >
+                {isApplying ? (
+                  <>
+                    <Loader2 className="animate-spin" aria-hidden="true" />
+                    {isNewBusiness ? t.creating : t.applying}
+                  </>
+                ) : isNewBusiness ? (
+                  <>
+                    <Wand2 aria-hidden="true" />
+                    {t.createButton}
+                  </>
+                ) : (
+                  <>
+                    <Sparkles aria-hidden="true" />
+                    {t.applyButton}
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+      </section>
+    </div>
+  )
 }

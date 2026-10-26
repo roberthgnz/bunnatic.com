@@ -1,6 +1,22 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import * as backofficeQueries from '@/lib/backoffice/queries'
+import * as serviceActions from '@/lib/backoffice/actions/services'
+import * as hoursActions from '@/lib/backoffice/actions/hours'
+import { updateBusiness as updateBusinessSettings } from '@/lib/backoffice/actions/settings'
+import { removeTeamMember as removeBusinessTeamMember } from '@/lib/backoffice/actions/team'
+import * as calendarActions from '@/lib/backoffice/actions/calendar'
+import {
+  getBackofficeSession,
+  getBackofficeProfile,
+} from '@/lib/backoffice/session'
+import {
+  requireBusinessAccess,
+  authorizeBusinessMutation,
+} from '@/lib/backoffice/access'
+import { updateSectionStatus as updateContentStatus } from '@/lib/backoffice/actions/content'
+import type { ServiceInput, WorkingHoursInput } from '@/lib/backoffice/types'
 import { normalizeInternalRedirect } from '@/lib/authRedirect'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
@@ -87,41 +103,11 @@ type GooglePlaceData = {
   [key: string]: unknown
 }
 
-type BusinessListItem = {
-  id: string
-  name: string
-  slug: string
-  category?: string | null
-  description?: string | null
-  address?: string | null
-  phone?: string | null
-  website?: string | null
-  custom_domain?: string | null
-  custom_domain_status?: DomainConnectionStatus | null
-  created_at?: string | null
-  updated_at?: string | null
-  [key: string]: unknown
-}
-
-type ServiceInput = {
-  name: string
-  description?: string | null
-  price?: number | null
-  duration?: number | null
-}
-
 type TeamMemberContent = {
   id: string
   name: string
   role: string
   image_url: string | null
-}
-
-type WorkingHoursInput = {
-  day_of_week: number
-  open_time: string
-  close_time: string
-  is_closed: boolean
 }
 
 function parseTeamMembers(content: unknown): TeamMemberContent[] {
@@ -328,6 +314,8 @@ export async function generateAndApplyContent(
   name: string,
   category: string
 ) {
+  const guard = await authorizeBusinessMutation(businessId, 'content.write')
+  if ('error' in guard) return { error: guard.error }
   const supabase = await createClient()
 
   // 1. Generate content
@@ -827,36 +815,11 @@ export async function signup(formData: FormData) {
 }
 
 export async function getUser() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  return user
+  return (await getBackofficeSession()).user
 }
 
 export async function getProfile() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return null
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
-
-  return profile
-    ? { ...profile, email: user.email }
-    : {
-        id: user.id,
-        full_name: user.user_metadata?.full_name || null,
-        email: user.email,
-      }
+  return getBackofficeProfile()
 }
 
 export async function updateProfile(formData: FormData) {
@@ -1127,170 +1090,23 @@ export async function createBusiness(formData: FormData) {
 }
 
 export async function getBusinesses() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return []
-  }
-
-  const { data: ownedBusinesses } = await supabase
-    .from('businesses')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-
-  const { data: teamMemberships } = await supabase
-    .from('team_members')
-    .select(
-      `
-      businesses!inner (*)
-    `
-    )
-    .eq('user_id', user.id)
-    .eq('status', 'active')
-
-  const teamBusinesses = (
-    (teamMemberships || []) as unknown as Array<{
-      businesses: BusinessListItem | null
-    }>
-  )
-    .map((membership) => membership.businesses)
-    .filter((business): business is BusinessListItem => Boolean(business))
-
-  const allBusinesses: BusinessListItem[] = [
-    ...((ownedBusinesses || []) as BusinessListItem[]),
-    ...teamBusinesses,
-  ]
-  const deduped = Array.from(
-    new Map(allBusinesses.map((business) => [business.id, business])).values()
-  )
-  const businessIds = deduped.map((business) => business.id)
-
-  let domainByBusinessId = new Map<
-    string,
-    { hostname: string; status: DomainConnectionStatus }
-  >()
-
-  if (businessIds.length > 0) {
-    const { data: domains } = await supabase
-      .from('business_domains')
-      .select('business_id, hostname, status')
-      .in('business_id', businessIds)
-
-    if (domains && Array.isArray(domains)) {
-      domainByBusinessId = new Map(
-        (
-          domains as Array<{
-            business_id: string
-            hostname: string
-            status: DomainConnectionStatus
-          }>
-        ).map((domain) => [
-          domain.business_id,
-          {
-            hostname: domain.hostname,
-            status: domain.status,
-          },
-        ])
-      )
-    }
-  }
-
-  return deduped
-    .map((business) => {
-      const domain = domainByBusinessId.get(business.id)
-      return {
-        ...business,
-        custom_domain: domain?.hostname ?? null,
-        custom_domain_status: domain?.status ?? null,
-      }
-    })
-    .sort(
-      (a, b) =>
-        new Date(b.created_at || '').getTime() -
-        new Date(a.created_at || '').getTime()
-    )
+  return backofficeQueries.getBusinesses()
 }
 
 export async function getBusinessBySlug(slug: string) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return null
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('*')
-    .eq('slug', slug)
-    .single()
-
-  if (!business) {
-    return null
-  }
-
-  if (business.user_id === user.id) {
-    return business
-  }
-
-  const { data: membership } = await supabase
-    .from('team_members')
-    .select('id')
-    .eq('business_id', business.id)
-    .eq('user_id', user.id)
-    .eq('status', 'active')
-    .maybeSingle()
-
-  return membership ? business : null
+  return backofficeQueries.getBusinessBySlug(slug)
 }
 
 export async function getBusinessDomain(slug: string) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return null
-  }
-
-  const business = await getBusinessBySlug(slug)
-  if (!business) {
-    return null
-  }
-
-  const { data: domain, error } = await supabase
-    .from('business_domains')
-    .select('*')
-    .eq('business_id', business.id)
-    .maybeSingle()
-
-  if (error) {
-    return null
-  }
-
-  return (domain as BusinessDomainRecord | null) ?? null
+  return (await backofficeQueries.getBusinessDomain(
+    slug
+  )) as BusinessDomainRecord | null
 }
 
 export async function getBusinessDomainByBusinessId(businessId: string) {
-  const supabase = await createClient()
-  const { data: domain, error } = await supabase
-    .from('business_domains')
-    .select('*')
-    .eq('business_id', businessId)
-    .maybeSingle()
-
-  if (error) {
-    return null
-  }
-
-  return (domain as BusinessDomainRecord | null) ?? null
+  return (await backofficeQueries.getBusinessDomainByBusinessId(
+    businessId
+  )) as BusinessDomainRecord | null
 }
 
 function computeActivatedAt(
@@ -1659,104 +1475,28 @@ export async function disconnectBusinessDomain(slug: string) {
 }
 
 export async function updateBusiness(slug: string, formData: FormData) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return { error: 'Not authenticated' }
-  }
-
-  const name = formData.get('name') as string
-  const description = formData.get('description') as string
-  const category = formData.get('category') as string
-
-  const { error } = await supabase
-    .from('businesses')
-    .update({
-      name,
-      description,
-      category,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('user_id', user.id)
-    .eq('slug', slug)
-
-  if (error) {
-    return { error: error.message }
-  }
-
-  revalidatePath(`/dashboard/businesses/${slug}`)
-  revalidatePath('/dashboard')
-  return { success: true }
+  return updateBusinessSettings(slug, formData)
 }
 
 // Services
 export async function getServices(businessId: string) {
-  const supabase = await createClient()
-  const { data: services } = await supabase
-    .from('services')
-    .select('*')
-    .eq('business_id', businessId)
-    .order('created_at', { ascending: true })
-
-  return services || []
+  return backofficeQueries.getServices(businessId)
 }
 
 export async function createService(businessId: string, formData: FormData) {
-  const supabase = await createClient()
-  const name = formData.get('name') as string
-  const description = formData.get('description') as string
-  const price = formData.get('price') as string
-  const duration = formData.get('duration') as string
-
-  const { error } = await supabase.from('services').insert({
-    business_id: businessId,
-    name,
-    description,
-    price: price ? parseFloat(price) : null,
-    duration: duration ? parseInt(duration, 10) : null,
-  })
-
-  if (error) {
-    return { error: error.message }
-  }
-
-  revalidatePath('/dashboard')
-  return { success: true }
+  return serviceActions.createService(businessId, formData)
 }
 
 export async function createServicesBatch(
   businessId: string,
   services: ServiceInput[]
 ) {
-  const supabase = await createClient()
-
-  const { error } = await supabase.from('services').insert(
-    services.map((s) => ({
-      business_id: businessId,
-      name: s.name,
-      description: s.description,
-      price: s.price,
-      duration: s.duration,
-    }))
-  )
-
-  if (error) return { error: error.message }
-  return { success: true }
+  return serviceActions.createServicesBatch(businessId, services)
 }
 
 // Calendar
 export async function getCalendarEvents(businessId: string) {
-  const supabase = await createClient()
-  const { data: events } = await supabase
-    .from('calendar_events')
-    .select('*')
-    .eq('business_id', businessId)
-    .order('start_time', { ascending: true })
-
-  return events || []
+  return backofficeQueries.getCalendarEvents(businessId)
 }
 
 export async function createCalendarEvent(
@@ -1766,36 +1506,18 @@ export async function createCalendarEvent(
   end: Date,
   type: string
 ) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return { error: 'Debes iniciar sesión para crear eventos.' }
-  }
-
-  if (!title.trim()) {
-    return { error: 'El título del evento es obligatorio.' }
-  }
-
-  const { error } = await supabase.from('calendar_events').insert({
-    business_id: businessId,
-    title: title.trim(),
-    start_time: start.toISOString(),
-    end_time: end.toISOString(),
-    type: type.trim() || 'general',
-    created_by: user.id,
-  })
-
-  if (error) return { error: error.message }
-
-  revalidatePath('/dashboard')
-  return { success: true }
+  return calendarActions.createCalendarEvent(
+    businessId,
+    title,
+    start,
+    end,
+    type
+  )
 }
 
 // Public Team Management (stored in business_sections)
 export async function getPublicTeamMembers(businessId: string) {
+  await requireBusinessAccess(businessId)
   const supabase = await createClient()
   const { data: section } = await supabase
     .from('business_sections')
@@ -1812,6 +1534,8 @@ export async function getPublicTeamMembers(businessId: string) {
 }
 
 export async function createTeamMember(businessId: string, formData: FormData) {
+  const guard = await authorizeBusinessMutation(businessId, 'content.write')
+  if ('error' in guard) return { error: guard.error }
   const supabase = await createClient()
 
   const {
@@ -1867,6 +1591,8 @@ export async function createTeamMember(businessId: string, formData: FormData) {
 }
 
 export async function deleteTeamMember(businessId: string, memberId: string) {
+  const guard = await authorizeBusinessMutation(businessId, 'content.write')
+  if ('error' in guard) return { error: guard.error }
   const supabase = await createClient()
 
   const {
@@ -1902,6 +1628,7 @@ export async function deleteTeamMember(businessId: string, memberId: string) {
 
 // Audit Logs
 export async function getAuditLogs(businessId: string) {
+  await requireBusinessAccess(businessId)
   const supabase = await createClient()
   const { data: logs } = await supabase
     .from('audit_logs')
@@ -1920,38 +1647,16 @@ export async function getAuditLogs(businessId: string) {
 
 // Internal Reviews (Sections)
 export async function getSections(businessId: string) {
-  const supabase = await createClient()
-  const { data: sections } = await supabase
-    .from('business_sections')
-    .select('*')
-    .eq('business_id', businessId)
-    .order('order_index', { ascending: true })
-
-  return sections || []
+  return backofficeQueries.getSections(businessId)
 }
 
 export async function updateSectionStatus(sectionId: string, status: string) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  const { error } = await supabase
-    .from('business_sections')
-    .update({
-      status,
-      last_edited_by: user?.id,
-    })
-    .eq('id', sectionId)
-
-  if (error) return { error: error.message }
-
-  revalidatePath('/dashboard')
-  return { success: true }
+  return updateContentStatus(sectionId, status)
 }
 
 // Team Members
 export async function getTeamMembers(businessId: string) {
+  await requireBusinessAccess(businessId)
   const supabase = await createClient()
   const { data: members } = await supabase
     .from('team_members')
@@ -2048,44 +1753,16 @@ export async function inviteTeamMember(
 }
 
 export async function removeTeamMember(memberId: string) {
-  const supabase = await createClient()
-  const { data: member } = await supabase
-    .from('team_members')
-    .select('id, role')
-    .eq('id', memberId)
-    .maybeSingle()
-
-  if (member?.role === 'owner') {
-    return { error: 'No se puede eliminar al propietario del negocio.' }
-  }
-
-  const { error } = await supabase
-    .from('team_members')
-    .delete()
-    .eq('id', memberId)
-  if (error) return { error: error.message }
-
-  revalidatePath('/dashboard')
-  return { success: true }
+  return removeBusinessTeamMember(memberId)
 }
 
 // Analytics
 export async function getAnalyticsSummary(businessId: string) {
-  void businessId
-  // Mock data for now as we don't have real events yet
-  return {
-    visits: Math.floor(Math.random() * 1000),
-    unique_visitors: Math.floor(Math.random() * 800),
-    avg_duration: '2m 15s',
-    bounce_rate: '45%',
-  }
+  return backofficeQueries.getAnalyticsSummary(businessId)
 }
 
 export async function deleteService(serviceId: string) {
-  const supabase = await createClient()
-  const { error } = await supabase.from('services').delete().eq('id', serviceId)
-  if (error) return { error: error.message }
-  return { success: true }
+  return serviceActions.deleteService(serviceId)
 }
 
 export async function submitLead(formData: FormData) {
@@ -2113,47 +1790,17 @@ export async function submitLead(formData: FormData) {
 
 // Leads
 export async function getLeads(businessId: string) {
-  const supabase = await createClient()
-  const { data: leads } = await supabase
-    .from('leads')
-    .select('*')
-    .eq('business_id', businessId)
-    .order('created_at', { ascending: false })
-
-  return leads || []
+  return backofficeQueries.getLeads(businessId)
 }
 
 // Working Hours
 export async function getWorkingHours(businessId: string) {
-  const supabase = await createClient()
-  const { data: hours } = await supabase
-    .from('working_hours')
-    .select('*')
-    .eq('business_id', businessId)
-    .order('day_of_week', { ascending: true })
-
-  return hours || []
+  return backofficeQueries.getWorkingHours(businessId)
 }
 
 export async function saveWorkingHours(
   businessId: string,
   hours: WorkingHoursInput[]
 ) {
-  const supabase = await createClient()
-
-  const { error } = await supabase.from('working_hours').upsert(
-    hours.map((h) => ({
-      business_id: businessId,
-      day_of_week: h.day_of_week,
-      open_time: h.is_closed ? null : h.open_time,
-      close_time: h.is_closed ? null : h.close_time,
-      is_closed: h.is_closed,
-    })),
-    { onConflict: 'business_id, day_of_week' }
-  )
-
-  if (error) return { error: error.message }
-
-  revalidatePath('/dashboard')
-  return { success: true }
+  return hoursActions.saveWorkingHours(businessId, hours)
 }

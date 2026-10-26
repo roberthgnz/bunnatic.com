@@ -1,4 +1,6 @@
-import { getBusinesses, getProfile } from '@/lib/supabase/actions'
+import { getBusinesses } from '@/lib/backoffice/queries'
+import { getBackofficeProfile as getProfile } from '@/lib/backoffice/session'
+import { getPlatformHost } from '@/lib/backoffice/platform'
 import { Button } from '@/components/ui/button'
 import {
   ArrowRight,
@@ -14,10 +16,7 @@ import {
   PageHeader,
   StatCard,
 } from '@/components/dashboard/page-header'
-import {
-  BusinessCard,
-  getPlatformHost,
-} from '@/components/dashboard/business-card'
+import { BusinessCard } from '@/components/dashboard/business-card'
 
 function getGreeting() {
   const hour = Number(
@@ -65,20 +64,12 @@ export default async function DashboardPage() {
         accent={`${firstName}.`}
         description="Este es el pulso de tus negocios. Mantén tus webs al día y convierte más visitas en clientes."
         actions={
-          <>
-            <Button variant="outline" asChild>
-              <Link href="/dashboard/generation">
-                <Sparkles aria-hidden="true" />
-                Generar con IA
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link href="/dashboard/new">
-                <Plus aria-hidden="true" />
-                Crear negocio
-              </Link>
-            </Button>
-          </>
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/generation">
+              <Sparkles aria-hidden="true" />
+              Generar con IA
+            </Link>
+          </Button>
         }
       />
 

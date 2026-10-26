@@ -12,7 +12,13 @@ import { usePathname } from 'next/navigation'
 import { Fragment } from 'react'
 import { DashboardContent } from './dashboard-constants'
 
-export function DashboardBreadcrumbs({ t }: { t: DashboardContent }) {
+export function DashboardBreadcrumbs({
+  t,
+  businesses,
+}: {
+  t: DashboardContent
+  businesses: { name: string; slug: string }[]
+}) {
   const pathname = usePathname()
   const localePrefix = ''
 
@@ -43,7 +49,15 @@ export function DashboardBreadcrumbs({ t }: { t: DashboardContent }) {
       return segmentLabelMap[segment]
     }
 
-    return decodeURIComponent(segment)
+    const business = businesses.find((item) => item.slug === segment)
+    if (business) return business.name
+    let decoded = segment
+    try {
+      decoded = decodeURIComponent(segment)
+    } catch {
+      /* Keep malformed segments printable. */
+    }
+    return decoded
       .replace(/-/g, ' ')
       .replace(/\b\w/g, (letter) => letter.toUpperCase())
   }

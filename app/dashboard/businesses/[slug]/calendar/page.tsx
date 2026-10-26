@@ -1,6 +1,8 @@
+import { findBusinessAccessBySlug } from '@/lib/backoffice/access'
+import { hasBusinessPermission } from '@/lib/backoffice/policy'
 import { notFound } from 'next/navigation'
 import CalendarManager from '../_components/CalendarManager'
-import { getBusinessBySlug, getCalendarEvents } from '@/lib/supabase/actions'
+import { getCalendarEvents } from '@/lib/backoffice/queries'
 
 export default async function BusinessCalendarPage({
   params,
@@ -8,15 +10,21 @@ export default async function BusinessCalendarPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const business = await getBusinessBySlug(slug)
+  const access = await findBusinessAccessBySlug(slug)
+  const business = access?.business
 
-  if (!business) {
+  if (!business || !access) {
     notFound()
   }
 
   const events = await getCalendarEvents(business.id)
 
   return (
-    <CalendarManager businessId={business.id} events={events} locale="es" />
+    <CalendarManager
+      readOnly={!hasBusinessPermission(access.role, 'calendar.write')}
+      businessId={business.id}
+      events={events}
+      locale="es"
+    />
   )
 }

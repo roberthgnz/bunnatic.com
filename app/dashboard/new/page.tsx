@@ -5,7 +5,14 @@ import { useParams, useRouter } from 'next/navigation'
 import { createBusiness } from '@/lib/supabase/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Loader2, ArrowLeft } from 'lucide-react'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
+import {
+  BusinessMonogram,
+  PageHeader,
+} from '@/components/dashboard/page-header'
+import { ArrowLeft, ArrowRight, Loader2, Lock, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 
@@ -25,36 +32,65 @@ export default function NewSitePage() {
     () =>
       ({
         es: {
-          title: 'Crear negocio',
-          subtitle: 'Configura tu negocio para comenzar.',
-          back: 'Volver al dashboard',
+          eyebrow: 'Nuevo negocio',
+          title: 'Crea tu',
+          titleAccent: 'negocio',
+          subtitle:
+            'Empieza con lo básico. Podrás añadir servicios, horario y contenido cuando quieras.',
+          back: 'Volver al panel',
+          formTitle: 'Datos básicos',
+          formHint: 'Solo necesitamos tres cosas para empezar.',
           nameLabel: 'Nombre del negocio',
-          namePlaceholder: 'Ej. Restaurante La Plaza',
+          nameHint: 'Así lo verán tus clientes en tu web.',
+          namePlaceholder: 'Ej.: Restaurante La Plaza',
           categoryLabel: 'Categoría',
-          categoryPlaceholder: 'Ej. Restaurante, Clínica, Taller...',
-          descLabel: 'Descripción corta (opcional)',
-          descPlaceholder: 'Describe brevemente tu negocio...',
+          categoryPlaceholder: 'Ej.: Restaurante, clínica, taller…',
+          descLabel: 'Descripción corta',
+          optional: 'Opcional',
+          descPlaceholder: 'Cuenta en una o dos frases qué ofreces y a quién.',
+          cancel: 'Cancelar',
           create: 'Crear negocio',
-          creating: 'Creando...',
+          creating: 'Creando…',
           createSuccess: 'Negocio creado correctamente',
-          previewTitle: 'Vista previa',
+          previewLabel: 'Vista previa en directo',
+          previewTitle: 'Tu negocio',
           previewUrl: 'tunegocio.bunnatic.com',
+          previewCta: 'Reservar',
+          importTitle: '¿Ya tienes ficha en Google?',
+          importDesc:
+            'Impórtala con IA y rellenamos perfil, servicios y horario por ti.',
+          importCta: 'Importar con IA',
         },
         ca: {
-          title: 'Crear negoci',
-          subtitle: 'Configura el teu negoci per començar.',
-          back: 'Tornar al dashboard',
+          eyebrow: 'Nou negoci',
+          title: 'Crea el teu',
+          titleAccent: 'negoci',
+          subtitle:
+            'Comença pel bàsic. Podràs afegir serveis, horari i contingut quan vulguis.',
+          back: 'Tornar al tauler',
+          formTitle: 'Dades bàsiques',
+          formHint: 'Només necessitem tres coses per començar.',
           nameLabel: 'Nom del negoci',
-          namePlaceholder: 'Ex. Restaurant La Plaça',
+          nameHint: 'Així el veuran els teus clients al teu web.',
+          namePlaceholder: 'Ex.: Restaurant La Plaça',
           categoryLabel: 'Categoria',
-          categoryPlaceholder: 'Ex. Restaurant, Clínica, Taller...',
-          descLabel: 'Descripció curta (opcional)',
-          descPlaceholder: 'Descriu breument el teu negoci...',
+          categoryPlaceholder: 'Ex.: Restaurant, clínica, taller…',
+          descLabel: 'Descripció curta',
+          optional: 'Opcional',
+          descPlaceholder:
+            'Explica en una o dues frases què ofereixes i a qui.',
+          cancel: 'Cancel·lar',
           create: 'Crear negoci',
-          creating: 'Creant...',
+          creating: 'Creant…',
           createSuccess: 'Negoci creat correctament',
-          previewTitle: 'Vista prèvia',
+          previewLabel: 'Vista prèvia en directe',
+          previewTitle: 'El teu negoci',
           previewUrl: 'elnegoci.bunnatic.com',
+          previewCta: 'Reservar',
+          importTitle: 'Ja tens fitxa a Google?',
+          importDesc:
+            'Importa-la amb IA i omplim el perfil, els serveis i l’horari per tu.',
+          importCta: 'Importar amb IA',
         },
       })[locale],
     [locale]
@@ -88,55 +124,72 @@ export default function NewSitePage() {
     }
   }
 
-  return (
-    <div className="space-y-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-            {t.title}
-          </h1>
-          <p className="text-sm text-slate-600">{t.subtitle}</p>
-        </div>
-        <Button asChild variant="outline">
-          <Link href={`/dashboard`}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t.back}
-          </Link>
-        </Button>
-      </div>
+  const previewHost = formData.name
+    ? formData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '') + '.bunnatic.com'
+    : t.previewUrl
+  const isPreviewEmpty =
+    !formData.name && !formData.category && !formData.description
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="grid gap-0 lg:grid-cols-2">
-          {/* Left side - Form */}
-          <div className="p-6 sm:p-10 lg:p-12">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-900"
+  return (
+    <div className="space-y-8 pb-10">
+      <PageHeader
+        eyebrow={t.eyebrow}
+        title={t.title}
+        accent={t.titleAccent}
+        description={t.subtitle}
+        actions={
+          <Button asChild variant="ghost">
+            <Link href="/dashboard">
+              <ArrowLeft aria-hidden="true" />
+              {t.back}
+            </Link>
+          </Button>
+        }
+      />
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="min-w-0 space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            aria-labelledby="new-business-form-title"
+            className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+          >
+            <div className="space-y-6 p-5 sm:p-8">
+              <div className="space-y-1">
+                <h2
+                  id="new-business-form-title"
+                  className="text-foreground text-base font-semibold tracking-[-0.01em]"
                 >
-                  {t.nameLabel}
-                </label>
+                  {t.formTitle}
+                </h2>
+                <p className="text-muted-foreground text-sm">{t.formHint}</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="name">{t.nameLabel}</Label>
                 <Input
                   id="name"
                   name="name"
                   required
+                  autoComplete="organization"
+                  aria-describedby="name-hint"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder={t.namePlaceholder}
-                  className="h-11 rounded-lg border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                  className="h-10"
                 />
+                <p id="name-hint" className="text-muted-foreground text-xs">
+                  {t.nameHint}
+                </p>
               </div>
 
               <div className="space-y-2">
-                <label
-                  htmlFor="category"
-                  className="block text-sm font-medium text-gray-900"
-                >
-                  {t.categoryLabel}
-                </label>
+                <Label htmlFor="category">{t.categoryLabel}</Label>
                 <Input
                   id="category"
                   name="category"
@@ -146,18 +199,18 @@ export default function NewSitePage() {
                     setFormData({ ...formData, category: e.target.value })
                   }
                   placeholder={t.categoryPlaceholder}
-                  className="h-11 rounded-lg border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                  className="h-10"
                 />
               </div>
 
               <div className="space-y-2">
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-900"
-                >
+                <Label htmlFor="description" className="justify-between">
                   {t.descLabel}
-                </label>
-                <textarea
+                  <span className="text-muted-foreground text-xs font-normal">
+                    {t.optional}
+                  </span>
+                </Label>
+                <Textarea
                   id="description"
                   name="description"
                   rows={3}
@@ -166,73 +219,117 @@ export default function NewSitePage() {
                     setFormData({ ...formData, description: e.target.value })
                   }
                   placeholder={t.descPlaceholder}
-                  className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm placeholder:text-gray-400 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  className="min-h-24"
                 />
               </div>
+            </div>
 
-              <Button
-                type="submit"
-                disabled={loading}
-                className="h-11 w-full rounded-lg bg-gray-900 text-sm font-medium text-white transition-colors hover:bg-gray-800"
-              >
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <div className="border-border bg-muted/40 flex flex-col-reverse gap-2 border-t px-5 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-8">
+              <Button asChild variant="ghost">
+                <Link href="/dashboard">{t.cancel}</Link>
+              </Button>
+              <Button type="submit" size="lg" disabled={loading}>
+                {loading ? (
+                  <Loader2 className="animate-spin" aria-hidden="true" />
+                ) : null}
                 {loading ? t.creating : t.create}
               </Button>
-            </form>
-          </div>
+            </div>
+          </form>
 
-          {/* Right side - Preview */}
-          <div className="hidden items-center justify-center border-l border-gray-200 bg-gray-100 p-12 lg:flex">
-            <div className="w-full max-w-sm">
-              <div className="rounded-xl border border-gray-200 bg-white p-6">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-700 text-lg font-bold text-white">
-                    {formData.name
-                      ? formData.name.charAt(0).toUpperCase()
-                      : '?'}
-                  </div>
+          <Link
+            href="/dashboard/generation"
+            className="group bg-accent/40 ring-border hover:bg-accent/70 focus-visible:ring-ring flex items-center gap-4 rounded-xl p-4 ring-1 transition-colors focus-visible:ring-2 focus-visible:outline-none sm:p-5"
+          >
+            <span className="bg-secondary text-secondary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
+              <Sparkles className="size-4" aria-hidden="true" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="text-foreground block text-sm font-semibold">
+                {t.importTitle}
+              </span>
+              <span className="text-muted-foreground block text-xs leading-5">
+                {t.importDesc}
+              </span>
+            </span>
+            <span className="text-primary hidden shrink-0 items-center gap-1 text-sm font-medium sm:flex">
+              {t.importCta}
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </span>
+          </Link>
+        </div>
+
+        {/* Live preview */}
+        <aside aria-label={t.previewLabel} className="hidden lg:block">
+          <div className="sticky top-6 space-y-3">
+            <p className="text-muted-foreground text-[11px] font-semibold tracking-[0.14em] uppercase">
+              {t.previewLabel}
+            </p>
+            <div className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_12px_32px_-18px_rgba(41,73,46,0.35)] ring-1">
+              <div className="border-border bg-muted/60 flex items-center gap-3 border-b px-3 py-2.5">
+                <span className="flex gap-1.5" aria-hidden="true">
+                  <span className="bg-border size-2.5 rounded-full" />
+                  <span className="bg-border size-2.5 rounded-full" />
+                  <span className="bg-border size-2.5 rounded-full" />
+                </span>
+                <span className="bg-card text-muted-foreground ring-border flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs ring-1">
+                  <Lock className="size-3 shrink-0" aria-hidden="true" />
+                  <span className="truncate">{previewHost}</span>
+                </span>
+              </div>
+
+              <div className="p-6">
+                <div className="flex items-center gap-3">
+                  <BusinessMonogram
+                    name={formData.name || '?'}
+                    className="size-12 text-lg"
+                  />
                   <div className="min-w-0 flex-1">
-                    <h3 className="truncate font-semibold text-gray-900">
+                    <h3 className="text-foreground truncate text-base font-semibold tracking-[-0.01em]">
                       {formData.name || t.previewTitle}
                     </h3>
-                    <p className="truncate text-xs text-gray-500">
-                      {formData.name
-                        ? formData.name
-                          .toLowerCase()
-                          .replace(/[^a-z0-9]+/g, '-')
-                          .replace(/(^-|-$)/g, '') + '.bunnatic.com'
-                        : t.previewUrl}
-                    </p>
+                    {formData.category ? (
+                      <Badge variant="secondary" className="mt-1">
+                        {formData.category}
+                      </Badge>
+                    ) : null}
                   </div>
                 </div>
 
-                {formData.category && (
-                  <div className="mb-3">
-                    <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                      {formData.category}
-                    </span>
+                {formData.description ? (
+                  <p className="text-muted-foreground mt-5 text-sm leading-6 break-words">
+                    {formData.description}
+                  </p>
+                ) : (
+                  <div className="mt-5 space-y-2.5" aria-hidden="true">
+                    <div className="bg-muted h-2.5 w-11/12 rounded-full" />
+                    <div className="bg-muted h-2.5 w-full rounded-full" />
+                    <div className="bg-muted h-2.5 w-2/3 rounded-full" />
                   </div>
                 )}
 
-                {formData.description && (
-                  <p className="text-sm leading-relaxed text-gray-600">
-                    {formData.description}
-                  </p>
-                )}
-
-                {!formData.name &&
-                  !formData.category &&
-                  !formData.description && (
-                    <div className="space-y-3">
-                      <div className="h-3 w-3/4 rounded bg-gray-100"></div>
-                      <div className="h-3 w-full rounded bg-gray-100"></div>
-                      <div className="h-3 w-5/6 rounded bg-gray-100"></div>
-                    </div>
-                  )}
+                <div
+                  className="mt-6 flex items-center gap-2"
+                  aria-hidden="true"
+                >
+                  <span
+                    className={
+                      isPreviewEmpty
+                        ? 'bg-muted h-8 w-24 rounded-lg'
+                        : 'bg-primary text-primary-foreground flex h-8 items-center rounded-lg px-3.5 text-xs font-medium'
+                    }
+                  >
+                    {isPreviewEmpty ? null : t.previewCta}
+                  </span>
+                  <span className="bg-muted h-8 w-20 rounded-lg" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   )

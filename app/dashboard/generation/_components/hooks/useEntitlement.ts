@@ -3,33 +3,33 @@ import { getGenerationEntitlement } from '@/lib/supabase/actions'
 import type { GenerationEntitlement } from '@/lib/businessSourceGeneration'
 
 export function useEntitlement() {
-    const [entitlement, setEntitlement] = useState<GenerationEntitlement | null>(
-        null
-    )
+  const [entitlement, setEntitlement] = useState<GenerationEntitlement | null>(
+    null
+  )
 
-    const loadEntitlement = async () => {
-        const result = await getGenerationEntitlement()
-        if ('error' in result) return
-        setEntitlement(result.entitlement)
-    }
+  const loadEntitlement = async () => {
+    const result = await getGenerationEntitlement()
+    if ('error' in result) return
+    setEntitlement(result.entitlement)
+  }
 
-    useEffect(() => {
-        void loadEntitlement()
-    }, [])
+  useEffect(() => {
+    void loadEntitlement()
+  }, [])
 
-    const isLimitReached = Boolean(
-        entitlement?.isLimited && (entitlement.remaining ?? 0) <= 0
-    )
+  const isLimitReached = Boolean(
+    entitlement?.isLimited && (entitlement.remaining ?? 0) <= 0
+  )
 
-    const quotaLabel = entitlement?.isLimited
-        ? `${entitlement.usedThisMonth}/${entitlement.monthlyLimit}`
-        : null
+  const quotaLabel = entitlement?.isLimited
+    ? `${entitlement.usedThisMonth}/${entitlement.monthlyLimit}`
+    : null
 
-    return {
-        entitlement,
-        isLimitReached,
-        quotaLabel,
-        loadEntitlement,
-        setEntitlement,
-    }
+  return {
+    entitlement,
+    isLimitReached,
+    quotaLabel,
+    loadEntitlement,
+    setEntitlement,
+  }
 }

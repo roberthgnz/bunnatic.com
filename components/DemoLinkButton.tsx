@@ -2,20 +2,25 @@
 
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { trackFunnelEvent } from '@/lib/funnelEvents'
 
 type DemoLinkButtonProps = {
   className?: string
   label?: string
+  /** Optional decorative element rendered after the label (e.g. an arrow icon). */
+  icon?: ReactNode
 }
 
 export default function DemoLinkButton(props: DemoLinkButtonProps) {
   return (
     <Suspense
       fallback={
-        <span className={cn(props.className)}>{props.label ?? ''}</span>
+        <span className={cn(props.className)}>
+          {props.label ?? ''}
+          {props.icon}
+        </span>
       }
     >
       <DemoLinkButtonContent {...props} />
@@ -23,7 +28,7 @@ export default function DemoLinkButton(props: DemoLinkButtonProps) {
   )
 }
 
-function DemoLinkButtonContent({ className, label }: DemoLinkButtonProps) {
+function DemoLinkButtonContent({ className, label, icon }: DemoLinkButtonProps) {
   const pathname = usePathname() ?? '/'
   const searchParams = useSearchParams()
   const paramsText = searchParams.toString()
@@ -50,6 +55,7 @@ function DemoLinkButtonContent({ className, label }: DemoLinkButtonProps) {
       className={cn(className)}
     >
       {label ?? defaultLabel}
+      {icon}
     </Link>
   )
 }

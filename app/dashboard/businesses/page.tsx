@@ -1,12 +1,10 @@
-import { getBusinesses } from '@/lib/supabase/actions'
+import { getBusinesses } from '@/lib/backoffice/queries'
 import { Button } from '@/components/ui/button'
 import { Building2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { EmptyState, PageHeader } from '@/components/dashboard/page-header'
-import {
-  BusinessCard,
-  getPlatformHost,
-} from '@/components/dashboard/business-card'
+import BusinessDirectory from '@/components/dashboard/BusinessDirectory'
+import { getPlatformHost } from '@/lib/backoffice/platform'
 
 export default async function BusinessesPage() {
   const businesses = await getBusinesses()
@@ -44,26 +42,10 @@ export default async function BusinessesPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {businesses.map((business) => (
-            <BusinessCard
-              key={business.id}
-              business={business}
-              platformHost={platformHost}
-              dateLabel="Creado el"
-              date={business.created_at}
-            />
-          ))}
-          <Link
-            href="/dashboard/new"
-            className="border-border text-muted-foreground hover:border-ring/50 hover:bg-card hover:text-foreground focus-visible:ring-ring flex min-h-56 flex-col items-center justify-center gap-3 rounded-xl border border-dashed transition-colors focus-visible:ring-2 focus-visible:outline-none"
-          >
-            <span className="bg-secondary text-secondary-foreground flex size-10 items-center justify-center rounded-xl">
-              <Plus className="size-5" aria-hidden="true" />
-            </span>
-            <span className="text-sm font-medium">Añadir otro negocio</span>
-          </Link>
-        </div>
+        <BusinessDirectory
+          businesses={businesses}
+          platformHost={platformHost}
+        />
       )}
     </div>
   )

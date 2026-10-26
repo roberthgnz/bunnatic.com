@@ -25,10 +25,10 @@ export const legalContent: Record<
   es: {
     'aviso-legal': {
       title: 'Aviso legal',
-      lastUpdatedLabel: 'Ultima actualizacion',
+      lastUpdatedLabel: 'Última actualización',
       lastUpdatedDate: '10 de marzo de 2026',
       intro:
-        'Este sitio web pertenece a Bunnatic y regula el acceso y uso de nuestra plataforma para crear paginas web con ayuda de inteligencia artificial.',
+        'Este sitio web pertenece a Bunnatic y regula el acceso y uso de nuestra plataforma para crear páginas web con ayuda de inteligencia artificial.',
       sections: [
         {
           title: '1. Titular del sitio',
@@ -41,48 +41,48 @@ export const legalContent: Record<
         {
           title: '2. Objeto',
           paragraphs: [
-            'El presente aviso legal regula el acceso, navegacion y uso de este sitio web, asi como las responsabilidades derivadas de la utilizacion de sus contenidos y servicios.',
+            'El presente aviso legal regula el acceso, navegación y uso de este sitio web, así como las responsabilidades derivadas de la utilización de sus contenidos y servicios.',
           ],
         },
         {
           title: '3. Condiciones de uso',
           paragraphs: [
-            'El usuario se compromete a utilizar el sitio de forma licita, diligente y respetuosa con la normativa vigente.',
-            'Queda prohibido usar los servicios para actividades fraudulentas, suplantacion de identidad o cualquier uso que pueda dañar a terceros o a Bunnatic.',
+            'El usuario se compromete a utilizar el sitio de forma lícita, diligente y respetuosa con la normativa vigente.',
+            'Queda prohibido usar los servicios para actividades fraudulentas, suplantación de identidad o cualquier uso que pueda dañar a terceros o a Bunnatic.',
           ],
         },
         {
           title: '4. Propiedad intelectual e industrial',
           paragraphs: [
-            'Los textos, diseños, logotipos, codigo, interfaces, imagenes y demas elementos del sitio son titularidad de Bunnatic o de terceros autorizados.',
-            'No se permite su reproduccion, distribucion o transformacion sin autorizacion previa y expresa.',
+            'Los textos, diseños, logotipos, código, interfaces, imágenes y demás elementos del sitio son titularidad de Bunnatic o de terceros autorizados.',
+            'No se permite su reproducción, distribución o transformación sin autorización previa y expresa.',
           ],
         },
         {
           title: '5. Responsabilidad',
           paragraphs: [
-            'Bunnatic trabaja para mantener el servicio actualizado y disponible, pero no garantiza la ausencia total de interrupciones o errores tecnicos.',
-            'El usuario es responsable del uso que haga de la informacion publicada y de los contenidos que cree o publique mediante la plataforma.',
+            'Bunnatic trabaja para mantener el servicio actualizado y disponible, pero no garantiza la ausencia total de interrupciones o errores técnicos.',
+            'El usuario es responsable del uso que haga de la información publicada y de los contenidos que cree o publique mediante la plataforma.',
           ],
         },
         {
           title: '6. Enlaces externos',
           paragraphs: [
-            'Este sitio puede incluir enlaces a servicios de terceros. Bunnatic no controla ni asume responsabilidad sobre sus contenidos, politicas o disponibilidad.',
+            'Este sitio puede incluir enlaces a servicios de terceros. Bunnatic no controla ni asume responsabilidad sobre sus contenidos, políticas o disponibilidad.',
           ],
         },
         {
-          title: '7. Legislacion y jurisdiccion',
+          title: '7. Legislación y jurisdicción',
           paragraphs: [
-            'Este aviso legal se rige por la legislacion española.',
-            'Para cualquier conflicto, las partes se someteran a los juzgados y tribunales de Barcelona, salvo que la normativa de consumidores establezca otro fuero obligatorio.',
+            'Este aviso legal se rige por la legislación española.',
+            'Para cualquier conflicto, las partes se someterán a los juzgados y tribunales de Barcelona, salvo que la normativa de consumidores establezca otro fuero obligatorio.',
           ],
         },
       ],
     },
     'politica-privacidad': {
-      title: 'Politica de privacidad',
-      lastUpdatedLabel: 'Ultima actualizacion',
+      title: 'Política de privacidad',
+      lastUpdatedLabel: 'Última actualización',
       lastUpdatedDate: '10 de marzo de 2026',
       intro:
         'En Bunnatic tratamos los datos personales de forma transparente y conforme al Reglamento (UE) 2016/679 (RGPD) y la normativa aplicable.',
@@ -93,113 +93,113 @@ export const legalContent: Record<
             'Podemos tratar los siguientes datos cuando usas Bunnatic:',
           ],
           bullets: [
-            'Datos de registro: nombre, correo electronico y credenciales de acceso.',
-            'Datos de negocio: nombre comercial, direccion, telefono, horarios, categoria y contenido que el usuario aporte o confirme.',
-            'Datos tecnicos: IP, dispositivo, navegador, logs basicos y metricas de uso.',
+            'Datos de registro: nombre, correo electrónico y credenciales de acceso.',
+            'Datos de negocio: nombre comercial, dirección, teléfono, horarios, categoría y contenido que el usuario aporte o confirme.',
+            'Datos técnicos: IP, dispositivo, navegador, logs básicos y métricas de uso.',
           ],
         },
         {
           title: '2. Finalidades del tratamiento',
           paragraphs: ['Usamos los datos para:'],
           bullets: [
-            'Prestar el servicio de creacion y edicion web con IA.',
-            'Gestionar la cuenta del usuario y la autenticacion.',
+            'Prestar el servicio de creación y edición web con IA.',
+            'Gestionar la cuenta del usuario y la autenticación.',
             'Enviar comunicaciones operativas relacionadas con el servicio.',
             'Mejorar calidad, seguridad y rendimiento de la plataforma.',
           ],
         },
         {
-          title: '3. Base juridica',
+          title: '3. Base jurídica',
           paragraphs: [
-            'La base legal del tratamiento es la ejecucion del contrato de servicio, el cumplimiento de obligaciones legales y, cuando proceda, el consentimiento del usuario.',
+            'La base legal del tratamiento es la ejecución del contrato de servicio, el cumplimiento de obligaciones legales y, cuando proceda, el consentimiento del usuario.',
           ],
         },
         {
-          title: '4. Conservacion',
+          title: '4. Conservación',
           paragraphs: [
-            'Conservamos los datos mientras exista relacion contractual y durante los plazos legales exigibles para atender obligaciones administrativas, fiscales o de seguridad.',
+            'Conservamos los datos mientras exista relación contractual y durante los plazos legales exigibles para atender obligaciones administrativas, fiscales o de seguridad.',
           ],
         },
         {
           title: '5. Destinatarios y encargados',
           paragraphs: [
-            'Podemos trabajar con proveedores tecnologicos (hosting, analitica, correo, pagos o infraestructura) bajo contratos que garantizan confidencialidad y cumplimiento normativo.',
+            'Podemos trabajar con proveedores tecnológicos (hosting, analítica, correo, pagos o infraestructura) bajo contratos que garantizan confidencialidad y cumplimiento normativo.',
             'No vendemos datos personales a terceros.',
           ],
         },
         {
           title: '6. Derechos del usuario',
           paragraphs: [
-            'Puedes ejercer tus derechos de acceso, rectificacion, supresion, oposicion, limitacion y portabilidad enviando una solicitud a privacy@bunnatic.com.',
-            'Si consideras que tus derechos no se han atendido correctamente, puedes presentar una reclamacion ante la Agencia Española de Proteccion de Datos (AEPD).',
+            'Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando una solicitud a privacy@bunnatic.com.',
+            'Si consideras que tus derechos no se han atendido correctamente, puedes presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD).',
           ],
         },
         {
           title: '7. Seguridad',
           paragraphs: [
-            'Aplicamos medidas tecnicas y organizativas razonables para proteger la confidencialidad, integridad y disponibilidad de la informacion.',
+            'Aplicamos medidas técnicas y organizativas razonables para proteger la confidencialidad, integridad y disponibilidad de la información.',
           ],
         },
       ],
     },
     'politica-cookies': {
-      title: 'Politica de cookies',
-      lastUpdatedLabel: 'Ultima actualizacion',
+      title: 'Política de cookies',
+      lastUpdatedLabel: 'Última actualización',
       lastUpdatedDate: '11 de marzo de 2026',
       intro:
-        'Esta politica explica que cookies utiliza Bunnatic, con que finalidad y como puedes aceptar, rechazar o revocar su uso.',
+        'Esta política explica qué cookies utiliza Bunnatic, con qué finalidad y cómo puedes aceptar, rechazar o revocar su uso.',
       sections: [
         {
-          title: '1. Que son las cookies',
+          title: '1. Qué son las cookies',
           paragraphs: [
-            'Las cookies son pequeños archivos que se almacenan en tu dispositivo cuando visitas una web y que permiten recordar informacion sobre tu navegacion.',
+            'Las cookies son pequeños archivos que se almacenan en tu dispositivo cuando visitas una web y que permiten recordar información sobre tu navegación.',
           ],
         },
         {
           title: '2. Tipos de cookies que utilizamos',
           paragraphs: [
-            'Actualmente en Bunnatic utilizamos o podemos utilizar las siguientes categorias de cookies:',
+            'Actualmente en Bunnatic utilizamos o podemos utilizar las siguientes categorías de cookies:',
           ],
           bullets: [
-            'Cookies tecnicas o estrictamente necesarias: permiten funciones esenciales como la navegacion, la seguridad, el acceso a areas autenticadas y el funcionamiento basico del sitio.',
+            'Cookies técnicas o estrictamente necesarias: permiten funciones esenciales como la navegación, la seguridad, el acceso a áreas autenticadas y el funcionamiento básico del sitio.',
             'Cookies de preferencias: recuerdan determinadas elecciones del usuario, como el idioma o algunos ajustes de interfaz.',
-            'Cookies de consentimiento: guardan tu decision sobre el uso de cookies para no volver a mostrarte el banner en cada visita.',
-            'Cookies analiticas: solo se activan si las aceptas y nos ayudan a medir el uso del sitio para mejorarlo.',
+            'Cookies de consentimiento: guardan tu decisión sobre el uso de cookies para no volver a mostrarte el banner en cada visita.',
+            'Cookies analíticas: solo se activan si las aceptas y nos ayudan a medir el uso del sitio para mejorarlo.',
           ],
         },
         {
           title: '3. Base legal',
           paragraphs: [
-            'Las cookies tecnicas y las cookies necesarias para recordar tu decision sobre el consentimiento se utilizan porque son necesarias para prestar el servicio y gestionar el cumplimiento normativo.',
-            'Las cookies analiticas y cualquier otra cookie no necesaria solo se activaran si prestas tu consentimiento previo, libre, especifico e informado.',
+            'Las cookies técnicas y las cookies necesarias para recordar tu decisión sobre el consentimiento se utilizan porque son necesarias para prestar el servicio y gestionar el cumplimiento normativo.',
+            'Las cookies analíticas y cualquier otra cookie no necesaria solo se activarán si prestas tu consentimiento previo, libre, específico e informado.',
           ],
         },
         {
-          title: '4. Cookies analiticas de terceros',
+          title: '4. Cookies analíticas de terceros',
           paragraphs: [
-            'Si aceptas las cookies analiticas, Bunnatic puede utilizar Google Analytics, un servicio prestado por Google, para obtener estadisticas agregadas sobre navegacion, uso de paginas y rendimiento del sitio.',
-            'Estas cookies pueden recoger informacion como paginas visitadas, tiempo de permanencia, navegador, dispositivo y direcciones IP tratadas conforme a la configuracion aplicada por el servicio.',
+            'Si aceptas las cookies analíticas, Bunnatic puede utilizar Google Analytics, un servicio prestado por Google, para obtener estadísticas agregadas sobre navegación, uso de páginas y rendimiento del sitio.',
+            'Estas cookies pueden recoger información como páginas visitadas, tiempo de permanencia, navegador, dispositivo y direcciones IP tratadas conforme a la configuración aplicada por el servicio.',
           ],
         },
         {
-          title: '5. Conservacion',
+          title: '5. Conservación',
           paragraphs: [
-            'La cookie que recuerda tu eleccion de consentimiento se conserva durante un plazo limitado, actualmente de hasta 180 dias, salvo que la elimines antes desde tu navegador.',
-            'La duracion concreta de las cookies de terceros, como las de Google Analytics, depende de la configuracion del proveedor y puede variar con el tiempo.',
+            'La cookie que recuerda tu elección de consentimiento se conserva durante un plazo limitado, actualmente de hasta 180 días, salvo que la elimines antes desde tu navegador.',
+            'La duración concreta de las cookies de terceros, como las de Google Analytics, depende de la configuración del proveedor y puede variar con el tiempo.',
           ],
         },
         {
-          title: '6. Configuracion y revocacion',
+          title: '6. Configuración y revocación',
           paragraphs: [
-            'Puedes aceptar, rechazar o configurar el uso de cookies desde el banner de consentimiento del sitio. Tambien puedes volver a cambiar tu decision en cualquier momento desde la opcion de configuracion de cookies disponible en la web.',
-            'Ademas, puedes eliminar cookies o bloquearlas desde la configuracion de tu navegador. La desactivacion de cookies tecnicas puede afectar al correcto funcionamiento de determinadas funcionalidades.',
+            'Puedes aceptar, rechazar o configurar el uso de cookies desde el banner de consentimiento del sitio. También puedes volver a cambiar tu decisión en cualquier momento desde la opción de configuración de cookies disponible en la web.',
+            'Además, puedes eliminar cookies o bloquearlas desde la configuración de tu navegador. La desactivación de cookies técnicas puede afectar al correcto funcionamiento de determinadas funcionalidades.',
           ],
         },
         {
-          title: '7. Mas informacion y contacto',
+          title: '7. Más información y contacto',
           paragraphs: [
-            'Si tienes dudas sobre esta politica, puedes escribir a privacy@bunnatic.com.',
-            'Para obtener mas informacion sobre el tratamiento de datos personales relacionado con el uso de cookies, puedes consultar tambien nuestra Politica de Privacidad.',
+            'Si tienes dudas sobre esta política, puedes escribir a privacy@bunnatic.com.',
+            'Para obtener más información sobre el tratamiento de datos personales relacionado con el uso de cookies, puedes consultar también nuestra Política de Privacidad.',
           ],
         },
       ],

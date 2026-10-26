@@ -3,6 +3,8 @@ import { cn } from '@/lib/utils'
 
 interface FormFieldProps {
   label: string
+  /** id of the control, so the label is associated with it. */
+  htmlFor?: string
   error?: string
   hint?: string
   required?: boolean
@@ -12,6 +14,7 @@ interface FormFieldProps {
 
 export function FormField({
   label,
+  htmlFor,
   error,
   hint,
   required,
@@ -20,14 +23,28 @@ export function FormField({
 }: FormFieldProps) {
   return (
     <div className={cn('space-y-1.5', className)}>
-      <label className="block text-sm font-medium text-slate-700">
+      <label
+        htmlFor={htmlFor}
+        className="text-foreground block text-sm font-medium"
+      >
         {label}
-        {required && <span className="ml-0.5 text-red-400">*</span>}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </label>
       {children}
-      {hint && !error && <p className="text-xs text-slate-400">{hint}</p>}
+      {hint && !error && (
+        <p
+          id={htmlFor ? `${htmlFor}-hint` : undefined}
+          className="text-muted-foreground text-xs"
+        >
+          {hint}
+        </p>
+      )}
       {error && (
-        <p className="text-destructive flex items-center gap-1 text-xs font-medium">
+        <p
+          id={htmlFor ? `${htmlFor}-error` : undefined}
+          role="alert"
+          className="text-destructive flex items-center gap-1 text-xs font-medium"
+        >
           <svg
             className="h-3 w-3 shrink-0"
             viewBox="0 0 16 16"

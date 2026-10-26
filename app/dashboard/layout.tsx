@@ -1,5 +1,8 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import {
+  getBackofficeSession,
+  getBackofficeProfile,
+} from '@/lib/backoffice/session'
 import DashboardShell from './_components/DashboardShell'
 
 export default async function DashboardLayout({
@@ -7,20 +10,13 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getBackofficeSession()
 
   if (!user) {
     redirect(`/signin?next=${encodeURIComponent(`/dashboard`)}`)
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('onboarding_completed')
-    .eq('id', user.id)
-    .maybeSingle()
+  const profile = await getBackofficeProfile()
 
   if (!profile?.onboarding_completed) {
     redirect(`/onboarding?step=checkout`)

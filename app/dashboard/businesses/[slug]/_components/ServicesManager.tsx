@@ -4,14 +4,26 @@ import { useState, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { createService, deleteService } from '@/lib/supabase/actions'
+import {
+  createService,
+  deleteService,
+  updateService,
+} from '@/lib/backoffice/actions/services'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { EmptyState } from '@/components/dashboard/page-header'
 import { toast } from 'sonner'
-import { AlertCircle, Briefcase, Loader2, Plus, Trash2 } from 'lucide-react'
+import {
+  AlertCircle,
+  Briefcase,
+  Loader2,
+  Pencil,
+  Plus,
+  Trash2,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 
 const schema = z.object({
@@ -113,12 +125,15 @@ function Field({
 
 export default function ServicesManager({
   businessId,
+  readOnly = false,
   initialServices,
 }: {
   businessId: string
+  readOnly?: boolean
   initialServices: Service[]
 }) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const router = useRouter()
 
   const t = {
@@ -136,6 +151,12 @@ export default function ServicesManager({
     descriptionPlaceholder: 'Qué incluye, para quién es…',
     descHint: 'Opcional · máx. 300 caracteres',
     add: 'Añadir servicio',
+    editTitle: 'Editar servicio',
+    editDescription: 'Los cambios se publican al guardar.',
+    save: 'Guardar cambios',
+    cancel: 'Cancelar',
+    edit: 'Editar',
+    updated: 'Servicio actualizado',
     delete: 'Eliminar',
     confirmDelete: '¿Eliminar este servicio?',
     noServices: 'Aún no tienes servicios',
@@ -163,6 +184,32 @@ export default function ServicesManager({
     defaultValues: { name: '', price: '', duration: '', description: '' },
   })
 
+  const emptyValues: FormValues = {
+    name: '',
+    price: '',
+    duration: '',
+    description: '',
+  }
+
+  function startEditing(service: Service) {
+    setEditingId(service.id)
+    reset({
+      name: service.name,
+      price:
+        service.price === null || service.price === undefined
+          ? ''
+          : String(service.price),
+      duration: service.duration ? String(service.duration) : '',
+      description: service.description ?? '',
+    })
+    document.getElementById('service-name')?.focus()
+  }
+
+  function stopEditing() {
+    setEditingId(null)
+    reset(emptyValues)
+  }
+
   async function onSubmit(values: FormValues) {
     const formData = new FormData()
     formData.set('name', values.name)
@@ -170,12 +217,15 @@ export default function ServicesManager({
     if (values.duration) formData.set('duration', values.duration)
     if (values.description) formData.set('description', values.description)
 
-    const res = await createService(businessId, formData)
+    const res = editingId
+      ? await updateService(editingId, formData)
+      : await createService(businessId, formData)
     if (res?.error) {
       toast.error(res.error)
     } else {
-      toast.success(t.added)
-      reset()
+      toast.success(editingId ? t.updated : t.added)
+      setEditingId(null)
+      reset(emptyValues)
       router.refresh()
     }
   }
@@ -187,6 +237,7 @@ export default function ServicesManager({
     if (res?.error) {
       toast.error(res.error)
     } else {
+      if (editingId === id) stopEditing()
       toast.success(t.removed)
       router.refresh()
     }
@@ -196,271 +247,321 @@ export default function ServicesManager({
   const count = initialServices.length
 
   return (
-    <div className="space-y-5 pb-10">
-      <div>
-        <h2 className="text-foreground text-base font-semibold tracking-[-0.01em]">
-          {t.title}
-        </h2>
-        <p className="text-muted-foreground mt-1 text-sm">{t.description}</p>
-      </div>
+    <fieldset disabled={readOnly} className="min-w-0 space-y-3">
+      {readOnly ? (
+        <p role="status" className="text-muted-foreground text-sm">
+          Puedes consultar esta sección. Solo el propietario puede modificar el
+          contenido.
+        </p>
+      ) : null}
+      <div className="space-y-5 pb-10">
+        <div>
+          <h2 className="text-foreground text-base font-semibold tracking-[-0.01em]">
+            {t.title}
+          </h2>
+          <p className="text-muted-foreground mt-1 text-sm">{t.description}</p>
+        </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
-        {/* Services list */}
-        <section aria-labelledby="services-list-title" className="min-w-0">
-          <h3 id="services-list-title" className="sr-only">
-            {t.listTitle}
-          </h3>
-          {count === 0 ? (
-            <EmptyState
-              icon={Briefcase}
-              title={t.noServices}
-              description={t.noServicesHint}
-            />
-          ) : (
-            <div className={`${surface} overflow-hidden`}>
-              <div className="border-border flex items-center justify-between gap-3 border-b px-5 py-3.5">
-                <p className="text-foreground text-sm font-medium">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+          {/* Services list */}
+          <section aria-labelledby="services-list-title" className="min-w-0">
+            {count === 0 ? (
+              <>
+                <h3 id="services-list-title" className="sr-only">
                   {t.listTitle}
-                </p>
-                <p className="text-muted-foreground text-xs tabular-nums">
-                  {count} {count === 1 ? 'servicio' : 'servicios'}
+                </h3>
+                <EmptyState
+                  icon={Briefcase}
+                  title={t.noServices}
+                  description={t.noServicesHint}
+                />
+              </>
+            ) : (
+              <div className={`${surface} overflow-hidden`}>
+                <div className="border-border flex items-center justify-between gap-3 border-b px-5 py-3.5">
+                  <h3
+                    id="services-list-title"
+                    className="text-foreground text-sm font-medium"
+                  >
+                    {t.listTitle}
+                  </h3>
+                  <p className="text-muted-foreground text-xs tabular-nums">
+                    {count} {count === 1 ? 'servicio' : 'servicios'}
+                  </p>
+                </div>
+                <table className="w-full text-sm">
+                  <thead className="sr-only sm:not-sr-only">
+                    <tr className="text-muted-foreground border-border border-b text-left text-[11px] font-semibold tracking-[0.14em] uppercase">
+                      <th scope="col" className="px-5 py-2.5 font-semibold">
+                        Servicio
+                      </th>
+                      <th
+                        scope="col"
+                        className="hidden w-28 px-3 py-2.5 text-right font-semibold sm:table-cell"
+                      >
+                        Duración
+                      </th>
+                      <th
+                        scope="col"
+                        className="hidden w-28 px-3 py-2.5 text-right font-semibold sm:table-cell"
+                      >
+                        Precio
+                      </th>
+                      <th scope="col" className="w-24 py-2.5 pr-4">
+                        <span className="sr-only">Acciones</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-border divide-y">
+                    {initialServices.map((service) => {
+                      const price = formatPrice(service.price)
+                      const duration = formatDuration(service.duration)
+                      const isDeleting = deletingId === service.id
+                      return (
+                        <tr
+                          key={service.id}
+                          className={cn(
+                            'hover:bg-muted/50 align-middle transition-colors',
+                            editingId === service.id && 'bg-accent/50'
+                          )}
+                        >
+                          <td className="min-w-0 px-5 py-3.5">
+                            <p className="text-foreground font-medium break-words">
+                              {service.name}
+                            </p>
+                            {service.description ? (
+                              <p className="text-muted-foreground mt-0.5 line-clamp-2 text-xs leading-5">
+                                {service.description}
+                              </p>
+                            ) : null}
+                            {/* Compact meta on small screens */}
+                            {price || duration ? (
+                              <p className="text-muted-foreground mt-1 flex gap-2 text-xs tabular-nums sm:hidden">
+                                {duration ? <span>{duration}</span> : null}
+                                {duration && price ? (
+                                  <span aria-hidden="true">·</span>
+                                ) : null}
+                                {price ? (
+                                  <span className="text-foreground font-medium">
+                                    {price}
+                                  </span>
+                                ) : null}
+                              </p>
+                            ) : null}
+                          </td>
+                          <td className="text-muted-foreground hidden px-3 py-3.5 text-right whitespace-nowrap tabular-nums sm:table-cell">
+                            {duration ?? (
+                              <span className="text-muted-foreground/60">
+                                —
+                              </span>
+                            )}
+                          </td>
+                          <td className="text-foreground hidden px-3 py-3.5 text-right font-medium whitespace-nowrap tabular-nums sm:table-cell">
+                            {price ?? (
+                              <span className="text-muted-foreground/60 font-normal">
+                                —
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3.5 pr-4 text-right whitespace-nowrap">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => startEditing(service)}
+                              aria-label={`${t.edit} ${service.name}`}
+                              aria-pressed={editingId === service.id}
+                              className="text-muted-foreground hover:text-foreground"
+                            >
+                              <Pencil aria-hidden="true" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleDelete(service.id)}
+                              disabled={isDeleting}
+                              aria-label={`${t.delete} ${service.name}`}
+                              className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                            >
+                              {isDeleting ? (
+                                <Loader2
+                                  className="animate-spin"
+                                  aria-hidden="true"
+                                />
+                              ) : (
+                                <Trash2 aria-hidden="true" />
+                              )}
+                            </Button>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+
+          {/* Add form */}
+          <section
+            aria-labelledby="add-service-title"
+            className={`${surface} p-5 lg:sticky lg:top-6`}
+          >
+            <div className="flex items-start gap-3">
+              <span className="bg-secondary text-secondary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
+                {editingId ? (
+                  <Pencil className="size-4" aria-hidden="true" />
+                ) : (
+                  <Plus className="size-4" aria-hidden="true" />
+                )}
+              </span>
+              <div>
+                <h3
+                  id="add-service-title"
+                  className="text-foreground text-sm font-semibold"
+                >
+                  {editingId ? t.editTitle : t.addTitle}
+                </h3>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  {editingId ? t.editDescription : t.addDescription}
                 </p>
               </div>
-              <table className="w-full text-sm">
-                <thead className="sr-only sm:not-sr-only">
-                  <tr className="text-muted-foreground border-border border-b text-left text-[11px] font-semibold tracking-[0.14em] uppercase">
-                    <th scope="col" className="px-5 py-2.5 font-semibold">
-                      Servicio
-                    </th>
-                    <th
-                      scope="col"
-                      className="hidden w-28 px-3 py-2.5 text-right font-semibold sm:table-cell"
-                    >
-                      Duración
-                    </th>
-                    <th
-                      scope="col"
-                      className="hidden w-28 px-3 py-2.5 text-right font-semibold sm:table-cell"
-                    >
-                      Precio
-                    </th>
-                    <th scope="col" className="w-14 py-2.5 pr-4">
-                      <span className="sr-only">Acciones</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-border divide-y">
-                  {initialServices.map((service) => {
-                    const price = formatPrice(service.price)
-                    const duration = formatDuration(service.duration)
-                    const isDeleting = deletingId === service.id
-                    return (
-                      <tr
-                        key={service.id}
-                        className="hover:bg-muted/50 align-middle transition-colors"
-                      >
-                        <td className="min-w-0 px-5 py-3.5">
-                          <p className="text-foreground font-medium break-words">
-                            {service.name}
-                          </p>
-                          {service.description ? (
-                            <p className="text-muted-foreground mt-0.5 line-clamp-2 text-xs leading-5">
-                              {service.description}
-                            </p>
-                          ) : null}
-                          {/* Compact meta on small screens */}
-                          {price || duration ? (
-                            <p className="text-muted-foreground mt-1 flex gap-2 text-xs tabular-nums sm:hidden">
-                              {duration ? <span>{duration}</span> : null}
-                              {duration && price ? (
-                                <span aria-hidden="true">·</span>
-                              ) : null}
-                              {price ? (
-                                <span className="text-foreground font-medium">
-                                  {price}
-                                </span>
-                              ) : null}
-                            </p>
-                          ) : null}
-                        </td>
-                        <td className="text-muted-foreground hidden px-3 py-3.5 text-right whitespace-nowrap tabular-nums sm:table-cell">
-                          {duration ?? (
-                            <span className="text-muted-foreground/60">—</span>
-                          )}
-                        </td>
-                        <td className="text-foreground hidden px-3 py-3.5 text-right font-medium whitespace-nowrap tabular-nums sm:table-cell">
-                          {price ?? (
-                            <span className="text-muted-foreground/60 font-normal">
-                              —
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3.5 pr-4 text-right">
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => handleDelete(service.id)}
-                            disabled={isDeleting}
-                            aria-label={`${t.delete} ${service.name}`}
-                            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                          >
-                            {isDeleting ? (
-                              <Loader2
-                                className="animate-spin"
-                                aria-hidden="true"
-                              />
-                            ) : (
-                              <Trash2 aria-hidden="true" />
-                            )}
-                          </Button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
             </div>
-          )}
-        </section>
 
-        {/* Add form */}
-        <section
-          aria-labelledby="add-service-title"
-          className={`${surface} p-5 lg:sticky lg:top-6`}
-        >
-          <div className="flex items-start gap-3">
-            <span className="bg-secondary text-secondary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
-              <Plus className="size-4" aria-hidden="true" />
-            </span>
-            <div>
-              <h3
-                id="add-service-title"
-                className="text-foreground text-sm font-semibold"
-              >
-                {t.addTitle}
-              </h3>
-              <p className="text-muted-foreground mt-0.5 text-xs">
-                {t.addDescription}
-              </p>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-5 space-y-4">
-            <Field
-              id="service-name"
-              label={t.name}
-              required
-              error={errors.name ? err(errors.name.message!) : undefined}
-            >
-              <Input
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-5 space-y-4">
+              <Field
                 id="service-name"
-                {...register('name')}
-                placeholder={t.namePlaceholder}
-                autoComplete="off"
-                aria-required="true"
-                aria-invalid={!!errors.name}
-                aria-describedby={errors.name ? 'service-name-error' : undefined}
-              />
-            </Field>
-
-            <div className="grid grid-cols-2 gap-3">
-              <Field
-                id="service-price"
-                label={t.price}
-                srLabel=" en euros"
-                error={errors.price ? err(errors.price.message!) : undefined}
+                label={t.name}
+                required
+                error={errors.name ? err(errors.name.message!) : undefined}
               >
-                <div className="relative">
-                  <Input
-                    id="service-price"
-                    {...register('price')}
-                    type="number"
-                    inputMode="decimal"
-                    step="0.01"
-                    min="0"
-                    placeholder="0"
-                    aria-invalid={!!errors.price}
-                    aria-describedby={
-                      errors.price ? 'service-price-error' : undefined
-                    }
-                    className="pr-8 tabular-nums"
-                  />
-                  <span
-                    className="text-muted-foreground pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm"
-                    aria-hidden="true"
-                  >
-                    €
-                  </span>
-                </div>
+                <Input
+                  id="service-name"
+                  {...register('name')}
+                  placeholder={t.namePlaceholder}
+                  autoComplete="off"
+                  aria-required="true"
+                  aria-invalid={!!errors.name}
+                  aria-describedby={
+                    errors.name ? 'service-name-error' : undefined
+                  }
+                />
               </Field>
-              <Field
-                id="service-duration"
-                label={t.duration}
-                srLabel=" en minutos"
-                error={
-                  errors.duration ? err(errors.duration.message!) : undefined
-                }
-              >
-                <div className="relative">
-                  <Input
-                    id="service-duration"
-                    {...register('duration')}
-                    type="number"
-                    inputMode="numeric"
-                    min="1"
-                    placeholder="30"
-                    aria-invalid={!!errors.duration}
-                    aria-describedby={
-                      errors.duration ? 'service-duration-error' : undefined
-                    }
-                    className="pr-11 tabular-nums"
-                  />
-                  <span
-                    className="text-muted-foreground pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm"
-                    aria-hidden="true"
-                  >
-                    min
-                  </span>
-                </div>
-              </Field>
-            </div>
 
-            <Field
-              id="service-description"
-              label={t.descriptionField}
-              hint={t.descHint}
-              error={
-                errors.description
-                  ? err(errors.description.message!)
-                  : undefined
-              }
-            >
-              <Textarea
+              <div className="grid grid-cols-2 gap-3">
+                <Field
+                  id="service-price"
+                  label={t.price}
+                  srLabel=" en euros"
+                  error={errors.price ? err(errors.price.message!) : undefined}
+                >
+                  <div className="relative">
+                    <Input
+                      id="service-price"
+                      {...register('price')}
+                      type="number"
+                      inputMode="decimal"
+                      step="0.01"
+                      min="0"
+                      placeholder="0"
+                      aria-invalid={!!errors.price}
+                      aria-describedby={
+                        errors.price ? 'service-price-error' : undefined
+                      }
+                      className="pr-8 tabular-nums"
+                    />
+                    <span
+                      className="text-muted-foreground pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm"
+                      aria-hidden="true"
+                    >
+                      €
+                    </span>
+                  </div>
+                </Field>
+                <Field
+                  id="service-duration"
+                  label={t.duration}
+                  srLabel=" en minutos"
+                  error={
+                    errors.duration ? err(errors.duration.message!) : undefined
+                  }
+                >
+                  <div className="relative">
+                    <Input
+                      id="service-duration"
+                      {...register('duration')}
+                      type="number"
+                      inputMode="numeric"
+                      min="1"
+                      placeholder="30"
+                      aria-invalid={!!errors.duration}
+                      aria-describedby={
+                        errors.duration ? 'service-duration-error' : undefined
+                      }
+                      className="pr-11 tabular-nums"
+                    />
+                    <span
+                      className="text-muted-foreground pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm"
+                      aria-hidden="true"
+                    >
+                      min
+                    </span>
+                  </div>
+                </Field>
+              </div>
+
+              <Field
                 id="service-description"
-                {...register('description')}
-                rows={3}
-                placeholder={t.descriptionPlaceholder}
-                aria-invalid={!!errors.description}
-                aria-describedby={
+                label={t.descriptionField}
+                hint={t.descHint}
+                error={
                   errors.description
-                    ? 'service-description-error'
-                    : 'service-description-hint'
+                    ? err(errors.description.message!)
+                    : undefined
                 }
-                className="resize-none"
-              />
-            </Field>
+              >
+                <Textarea
+                  id="service-description"
+                  {...register('description')}
+                  rows={3}
+                  placeholder={t.descriptionPlaceholder}
+                  aria-invalid={!!errors.description}
+                  aria-describedby={
+                    errors.description
+                      ? 'service-description-error'
+                      : 'service-description-hint'
+                  }
+                  className="resize-none"
+                />
+              </Field>
 
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? (
-                <Loader2 className="animate-spin" aria-hidden="true" />
-              ) : (
-                <Plus aria-hidden="true" />
-              )}
-              {t.add}
-            </Button>
-          </form>
-        </section>
+              <div className="flex gap-2">
+                {editingId ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={stopEditing}
+                    disabled={isSubmitting}
+                  >
+                    {t.cancel}
+                  </Button>
+                ) : null}
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="animate-spin" aria-hidden="true" />
+                  ) : editingId ? null : (
+                    <Plus aria-hidden="true" />
+                  )}
+                  {editingId ? t.save : t.add}
+                </Button>
+              </div>
+            </form>
+          </section>
+        </div>
       </div>
-    </div>
+    </fieldset>
   )
 }

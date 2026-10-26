@@ -1,13 +1,6 @@
 import { notFound } from 'next/navigation'
-import {
-  getBusinessBySlug,
-  getBusinessDomainByBusinessId,
-  getSections,
-  getWorkingHours,
-  getServices,
-} from '@/lib/supabase/actions'
+import { getBusinessWorkspace } from '@/lib/backoffice/queries'
 import BusinessSectionNav from './_components/BusinessSectionNav'
-import { BusinessProvider } from './_components/BusinessContext'
 import BusinessHeader from './_components/BusinessHeader'
 
 export default async function BusinessDetailLayout({
@@ -18,32 +11,25 @@ export default async function BusinessDetailLayout({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const business = await getBusinessBySlug(slug)
+  const workspace = await getBusinessWorkspace(slug)
 
-  if (!business) {
+  if (!workspace) {
     notFound()
   }
 
-  const [services, workingHours, sections] = await Promise.all([
-    getServices(business.id),
-    getWorkingHours(business.id),
-    getSections(business.id),
-  ])
-  const businessDomain = await getBusinessDomainByBusinessId(business.id)
-
   return (
-    <BusinessProvider
-      business={business}
-      services={services}
-      workingHours={workingHours}
-      sections={sections}
-      businessDomain={businessDomain}
-    >
-      <div className="space-y-6">
-        <BusinessHeader />
-        <BusinessSectionNav slug={slug} />
-        <div className="min-w-0 pt-2">{children}</div>
-      </div>
-    </BusinessProvider>
+    <div className="space-y-6">
+      <BusinessHeader
+        business={workspace.business}
+        businessDomain={workspace.businessDomain}
+        isPublished={workspace.sections.some(
+          (section) => section.status === 'published'
+        )}
+        setupCompletion={workspace.setupCompletion}
+        role={workspace.role}
+      />
+      <BusinessSectionNav slug={slug} role={workspace.role} />
+      <div className="min-w-0 pt-2">{children}</div>
+    </div>
   )
 }

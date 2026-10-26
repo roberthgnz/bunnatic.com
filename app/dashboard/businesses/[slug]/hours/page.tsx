@@ -1,6 +1,8 @@
+import { findBusinessAccessBySlug } from '@/lib/backoffice/access'
+import { hasBusinessPermission } from '@/lib/backoffice/policy'
 import { notFound } from 'next/navigation'
 import HoursManager from '../_components/HoursManager'
-import { getBusinessBySlug, getWorkingHours } from '@/lib/supabase/actions'
+import { getWorkingHours } from '@/lib/backoffice/queries'
 
 export default async function BusinessHoursPage({
   params,
@@ -8,9 +10,10 @@ export default async function BusinessHoursPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const business = await getBusinessBySlug(slug)
+  const access = await findBusinessAccessBySlug(slug)
+  const business = access?.business
 
-  if (!business) {
+  if (!business || !access) {
     notFound()
   }
 
@@ -18,9 +21,9 @@ export default async function BusinessHoursPage({
 
   return (
     <HoursManager
+      readOnly={!hasBusinessPermission(access.role, 'content.write')}
       businessId={business.id}
       initialHours={hours}
-      
     />
   )
 }

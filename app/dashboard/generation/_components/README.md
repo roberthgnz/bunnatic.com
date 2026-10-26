@@ -32,33 +32,41 @@ _components/
 ## 🎯 Design Principles
 
 ### 1. Separation of Concerns
+
 - **Hooks**: Business logic, API calls, state management
 - **UI Components**: Pure presentation, no business logic
 - **Utils**: Pure functions, no side effects
 - **Types**: Centralized type definitions
 
 ### 2. Single Responsibility
+
 Each file has one clear purpose:
+
 - `useGoogleSearch` → Only handles Google Places search
 - `GoogleSearchForm` → Only renders search UI
 - `translations.ts` → Only contains i18n strings
 
 ### 3. Composition over Inheritance
+
 Components are composed together in the main file, making the data flow explicit and easy to follow.
 
 ### 4. Custom Hooks Pattern
+
 Business logic is extracted into reusable hooks:
+
 ```tsx
 const googleSearch = useGoogleSearch(locale, t.errorSearch)
 // Returns: { form, isSearching, googleResults, handleSearch, setGoogleResults }
 ```
 
 ### 5. Prop Drilling Minimization
+
 Each component receives only the props it needs, with clear interfaces.
 
 ## 🔧 Key Improvements
 
 ### Before (Monolithic)
+
 - ❌ 1000+ lines in one file
 - ❌ Mixed concerns (UI + logic + state)
 - ❌ Hard to test individual pieces
@@ -67,6 +75,7 @@ Each component receives only the props it needs, with clear interfaces.
 - ❌ State cleanup only in Redis, not local state
 
 ### After (Modular)
+
 - ✅ ~200 lines per file (max)
 - ✅ Clear separation of concerns
 - ✅ Each piece is independently testable
@@ -77,14 +86,18 @@ Each component receives only the props it needs, with clear interfaces.
 - ✅ Complete state cleanup (Redis + local state) on success
 
 ### State Management
+
 The component now properly cleans up ALL state when:
+
 - ✅ User creates a new business from preview
 - ✅ User applies changes to an existing business
 - ✅ Clears both Redis persistence AND local component state
 - ✅ Resets to initial state for next generation
 
 ### Quota Management
+
 Generation quota is now consumed at preview time:
+
 - ✅ Quota consumed when building preview (Google search or URL crawl)
 - ✅ Quota check happens BEFORE generating preview
 - ✅ User sees updated quota immediately after preview generation
@@ -154,9 +167,11 @@ test('renders search form', () => {
 The original file is preserved as `GlobalGenerationPanel.old.tsx` for reference. The new implementation maintains 100% feature parity with the original.
 
 ### Breaking Changes
+
 None - the public API remains identical.
 
 ### Performance Improvements
+
 - Better code splitting potential
 - Smaller bundle sizes per chunk
 - Improved tree-shaking
@@ -164,6 +179,7 @@ None - the public API remains identical.
 ## 🚀 Future Enhancements
 
 With this new structure, it's now easy to:
+
 1. Add new source types (e.g., Yelp, TripAdvisor)
 2. Create new UI variants
 3. Add comprehensive tests
@@ -174,6 +190,7 @@ With this new structure, it's now easy to:
 ## 📖 Related Patterns
 
 This refactoring follows these modern React patterns:
+
 - **Custom Hooks Pattern**: Logic extraction
 - **Compound Components**: Flexible composition
 - **Controlled Components**: Explicit state management

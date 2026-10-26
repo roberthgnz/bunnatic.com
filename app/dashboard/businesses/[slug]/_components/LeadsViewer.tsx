@@ -130,7 +130,10 @@ export default function LeadsViewer({ leads }: { leads: Lead[] }) {
                         href={`mailto:${lead.email}`}
                         className="hover:text-foreground focus-visible:ring-ring inline-flex min-w-0 items-center gap-1.5 rounded-sm underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:outline-none"
                       >
-                        <Mail className="size-3.5 shrink-0" aria-hidden="true" />
+                        <Mail
+                          className="size-3.5 shrink-0"
+                          aria-hidden="true"
+                        />
                         <span className="truncate">{lead.email}</span>
                       </a>
                       {lead.phone ? (

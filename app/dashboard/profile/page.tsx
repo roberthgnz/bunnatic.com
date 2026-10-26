@@ -63,7 +63,7 @@ export default async function ProfilePage({
       save: 'Desar canvis',
       email: "Email d'accés",
       emailHint: "És l'email amb què inicies sessió.",
-      errorTitle: "No hem pogut carregar el teu perfil",
+      errorTitle: 'No hem pogut carregar el teu perfil',
       errorDescription:
         'Torna a carregar la pàgina. Si el problema continua, tanca la sessió i torna a entrar.',
     },

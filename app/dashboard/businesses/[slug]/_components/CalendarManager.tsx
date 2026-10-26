@@ -4,7 +4,7 @@ import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { createCalendarEvent } from '@/lib/supabase/actions'
+import { createCalendarEvent } from '@/lib/backoffice/actions/calendar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -84,10 +84,12 @@ function Field({
 
 export default function CalendarManager({
   businessId,
+  readOnly = false,
   events,
   locale,
 }: {
   businessId: string
+  readOnly?: boolean
   events: CalendarEvent[]
   locale: string
 }) {
@@ -325,103 +327,116 @@ export default function CalendarManager({
           )}
 
           {/* Add event form */}
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            aria-labelledby="calendar-add-title"
-            className="border-border bg-muted/30 border-t px-5 py-5"
-          >
-            <h4
-              id="calendar-add-title"
-              className="text-muted-foreground mb-4 text-[11px] font-semibold tracking-[0.14em] uppercase"
+          <fieldset disabled={readOnly}>
+            {readOnly ? (
+              <p className="text-muted-foreground px-6 pt-4 text-sm">
+                Tu acceso al calendario es de solo lectura.
+              </p>
+            ) : null}
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              aria-labelledby="calendar-add-title"
+              className="border-border bg-muted/30 border-t px-5 py-5"
             >
-              {t.addTitle}
-            </h4>
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_160px_112px_112px]">
-              <Field
-                id="event-title"
-                label={t.eventTitle}
-                required
-                error={errors.title ? err(errors.title.message!) : undefined}
+              <h4
+                id="calendar-add-title"
+                className="text-muted-foreground mb-4 text-[11px] font-semibold tracking-[0.14em] uppercase"
               >
-                <Input
+                {t.addTitle}
+              </h4>
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_160px_112px_112px]">
+                <Field
                   id="event-title"
-                  {...register('title')}
-                  placeholder={t.eventTitlePlaceholder}
-                  autoComplete="off"
-                  aria-required="true"
-                  aria-invalid={!!errors.title}
-                  aria-describedby={errors.title ? 'event-title-error' : undefined}
-                />
-              </Field>
-              <Field
-                id="event-type"
-                label={t.eventType}
-                required
-                error={errors.type ? err(errors.type.message!) : undefined}
-              >
-                <Input
+                  label={t.eventTitle}
+                  required
+                  error={errors.title ? err(errors.title.message!) : undefined}
+                >
+                  <Input
+                    id="event-title"
+                    {...register('title')}
+                    placeholder={t.eventTitlePlaceholder}
+                    autoComplete="off"
+                    aria-required="true"
+                    aria-invalid={!!errors.title}
+                    aria-describedby={
+                      errors.title ? 'event-title-error' : undefined
+                    }
+                  />
+                </Field>
+                <Field
                   id="event-type"
-                  {...register('type')}
-                  list="event-type-suggestions"
-                  autoComplete="off"
-                  aria-required="true"
-                  aria-invalid={!!errors.type}
-                  aria-describedby={errors.type ? 'event-type-error' : undefined}
-                />
-                <datalist id="event-type-suggestions">
-                  {t.typeSuggestions.map((option) => (
-                    <option key={option} value={option} />
-                  ))}
-                </datalist>
-              </Field>
-              <Field
-                id="event-start"
-                label={t.start}
-                error={
-                  errors.startTime ? err(errors.startTime.message!) : undefined
-                }
-              >
-                <Input
+                  label={t.eventType}
+                  required
+                  error={errors.type ? err(errors.type.message!) : undefined}
+                >
+                  <Input
+                    id="event-type"
+                    {...register('type')}
+                    list="event-type-suggestions"
+                    autoComplete="off"
+                    aria-required="true"
+                    aria-invalid={!!errors.type}
+                    aria-describedby={
+                      errors.type ? 'event-type-error' : undefined
+                    }
+                  />
+                  <datalist id="event-type-suggestions">
+                    {t.typeSuggestions.map((option) => (
+                      <option key={option} value={option} />
+                    ))}
+                  </datalist>
+                </Field>
+                <Field
                   id="event-start"
-                  {...register('startTime')}
-                  type="time"
-                  aria-invalid={!!errors.startTime}
-                  aria-describedby={
-                    errors.startTime ? 'event-start-error' : undefined
+                  label={t.start}
+                  error={
+                    errors.startTime
+                      ? err(errors.startTime.message!)
+                      : undefined
                   }
-                  className="tabular-nums"
-                />
-              </Field>
-              <Field
-                id="event-end"
-                label={t.end}
-                error={
-                  errors.endTime ? err(errors.endTime.message!) : undefined
-                }
-              >
-                <Input
+                >
+                  <Input
+                    id="event-start"
+                    {...register('startTime')}
+                    type="time"
+                    aria-invalid={!!errors.startTime}
+                    aria-describedby={
+                      errors.startTime ? 'event-start-error' : undefined
+                    }
+                    className="tabular-nums"
+                  />
+                </Field>
+                <Field
                   id="event-end"
-                  {...register('endTime')}
-                  type="time"
-                  aria-invalid={!!errors.endTime}
-                  aria-describedby={
-                    errors.endTime ? 'event-end-error' : undefined
+                  label={t.end}
+                  error={
+                    errors.endTime ? err(errors.endTime.message!) : undefined
                   }
-                  className="tabular-nums"
-                />
-              </Field>
-            </div>
-            <div className="mt-4 flex justify-end">
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <Loader2 className="animate-spin" aria-hidden="true" />
-                ) : (
-                  <Plus aria-hidden="true" />
-                )}
-                {t.add}
-              </Button>
-            </div>
-          </form>
+                >
+                  <Input
+                    id="event-end"
+                    {...register('endTime')}
+                    type="time"
+                    aria-invalid={!!errors.endTime}
+                    aria-describedby={
+                      errors.endTime ? 'event-end-error' : undefined
+                    }
+                    className="tabular-nums"
+                  />
+                </Field>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Plus aria-hidden="true" />
+                  )}
+                  {t.add}
+                </Button>
+              </div>
+            </form>
+          </fieldset>
         </section>
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { z } from 'zod'
-import { saveWorkingHours } from '@/lib/supabase/actions'
+import { saveWorkingHours } from '@/lib/backoffice/actions/hours'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -43,9 +43,11 @@ const displayOrder = [1, 2, 3, 4, 5, 6, 0]
 
 export default function HoursManager({
   businessId,
+  readOnly = false,
   initialHours,
 }: {
   businessId: string
+  readOnly?: boolean
   initialHours: HoursRow[]
 }) {
   const [loading, setLoading] = useState(false)
@@ -139,171 +141,187 @@ export default function HoursManager({
   const openDays = hoursState.filter((day) => !day.is_closed).length
 
   return (
-    <div className="max-w-3xl space-y-5 pb-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 className="text-foreground text-base font-semibold tracking-[-0.01em]">
-            {t.title}
-          </h2>
-          <p className="text-muted-foreground mt-1 text-sm">{t.description}</p>
-        </div>
-        <Button onClick={handleSave} disabled={loading} className="shrink-0">
-          {loading ? (
-            <Loader2 className="animate-spin" aria-hidden="true" />
-          ) : (
-            <Save aria-hidden="true" />
-          )}
-          {t.save}
-        </Button>
-      </div>
-
-      <section
-        aria-labelledby="hours-week-title"
-        className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
-      >
-        <div className="border-border flex items-center justify-between gap-3 border-b px-5 py-3.5">
-          <h3
-            id="hours-week-title"
-            className="text-foreground text-sm font-medium"
-          >
-            Semana tipo
-          </h3>
-          <p className="text-muted-foreground text-xs">
-            <span className="text-foreground font-semibold tabular-nums">
-              {openDays}
-            </span>{' '}
-            de 7 días abiertos
-          </p>
-        </div>
-
-        <ul className="divide-border divide-y">
-          {displayOrder.map((index) => {
-            const day = hoursState[index]
-            const dayName = t.days[day.day_of_week]
-            const dayLower = dayName.toLowerCase()
-            const hasError = !!validationErrors[index]
-            const errorId = `hours-error-${day.day_of_week}`
-            const switchId = `hours-open-${day.day_of_week}`
-
-            return (
-              <li
-                key={day.day_of_week}
-                className={cn(
-                  'grid items-center gap-x-4 gap-y-3 px-5 py-3.5 transition-colors sm:grid-cols-[132px_120px_minmax(0,1fr)]',
-                  hasError && 'bg-destructive/5'
-                )}
-              >
-                {/* Day */}
-                <div className="flex items-center gap-2.5">
-                  <span
-                    className={cn(
-                      'size-2 shrink-0 rounded-full transition-colors',
-                      day.is_closed ? 'bg-muted-foreground/30' : 'bg-success'
-                    )}
-                    aria-hidden="true"
-                  />
-                  <span
-                    className={cn(
-                      'text-sm font-medium',
-                      day.is_closed ? 'text-muted-foreground' : 'text-foreground'
-                    )}
-                  >
-                    {dayName}
-                  </span>
-                </div>
-
-                {/* Open / closed toggle */}
-                <div className="flex items-center gap-2.5">
-                  <Switch
-                    id={switchId}
-                    checked={!day.is_closed}
-                    onCheckedChange={(checked) =>
-                      updateDay(index, 'is_closed', !checked)
-                    }
-                    aria-label={`Abierto el ${dayLower}`}
-                  />
-                  <Label
-                    htmlFor={switchId}
-                    aria-hidden="true"
-                    className={cn(
-                      'cursor-pointer text-sm font-normal',
-                      day.is_closed ? 'text-muted-foreground' : 'text-foreground'
-                    )}
-                  >
-                    {day.is_closed ? t.closed : t.open}
-                  </Label>
-                </div>
-
-                {/* Times */}
-                {day.is_closed ? (
-                  <p className="text-muted-foreground/80 text-sm">
-                    {t.closedAllDay}
-                  </p>
-                ) : (
-                  <div className="space-y-1.5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Input
-                        type="time"
-                        value={day.open_time}
-                        onChange={(e) =>
-                          updateDay(index, 'open_time', e.target.value)
-                        }
-                        aria-label={`${t.from} del ${dayLower}`}
-                        aria-invalid={hasError}
-                        aria-describedby={hasError ? errorId : undefined}
-                        className="h-8 w-[7.5rem] tabular-nums"
-                      />
-                      <span
-                        className="text-muted-foreground text-sm"
-                        aria-hidden="true"
-                      >
-                        a
-                      </span>
-                      <Input
-                        type="time"
-                        value={day.close_time}
-                        onChange={(e) =>
-                          updateDay(index, 'close_time', e.target.value)
-                        }
-                        aria-label={`${t.to} del ${dayLower}`}
-                        aria-invalid={hasError}
-                        aria-describedby={hasError ? errorId : undefined}
-                        className="h-8 w-[7.5rem] tabular-nums"
-                      />
-                    </div>
-                    {hasError && (
-                      <p
-                        id={errorId}
-                        className="text-destructive flex items-center gap-1 text-xs font-medium"
-                      >
-                        <AlertCircle
-                          className="size-3 shrink-0"
-                          aria-hidden="true"
-                        />
-                        {validationErrors[index]}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </li>
-            )
-          })}
-        </ul>
-
-        <div className="border-border bg-muted/40 border-t px-5 py-3">
-          <p
-            className={cn(
-              'flex items-center gap-1.5 text-xs',
-              hasErrors ? 'text-destructive font-medium' : 'text-muted-foreground'
+    <fieldset disabled={readOnly} className="min-w-0 space-y-3">
+      {readOnly ? (
+        <p role="status" className="text-muted-foreground text-sm">
+          Puedes consultar esta sección. Solo el propietario puede modificar el
+          contenido.
+        </p>
+      ) : null}
+      <div className="max-w-3xl space-y-5 pb-10">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-foreground text-base font-semibold tracking-[-0.01em]">
+              {t.title}
+            </h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {t.description}
+            </p>
+          </div>
+          <Button onClick={handleSave} disabled={loading} className="shrink-0">
+            {loading ? (
+              <Loader2 className="animate-spin" aria-hidden="true" />
+            ) : (
+              <Save aria-hidden="true" />
             )}
-          >
-            {hasErrors ? (
-              <AlertCircle className="size-3.5 shrink-0" aria-hidden="true" />
-            ) : null}
-            {hasErrors ? t.pendingErrors : t.footerHint}
-          </p>
+            {t.save}
+          </Button>
         </div>
-      </section>
-    </div>
+
+        <section
+          aria-labelledby="hours-week-title"
+          className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+        >
+          <div className="border-border flex items-center justify-between gap-3 border-b px-5 py-3.5">
+            <h3
+              id="hours-week-title"
+              className="text-foreground text-sm font-medium"
+            >
+              Semana tipo
+            </h3>
+            <p className="text-muted-foreground text-xs">
+              <span className="text-foreground font-semibold tabular-nums">
+                {openDays}
+              </span>{' '}
+              de 7 días abiertos
+            </p>
+          </div>
+
+          <ul className="divide-border divide-y">
+            {displayOrder.map((index) => {
+              const day = hoursState[index]
+              const dayName = t.days[day.day_of_week]
+              const dayLower = dayName.toLowerCase()
+              const hasError = !!validationErrors[index]
+              const errorId = `hours-error-${day.day_of_week}`
+              const switchId = `hours-open-${day.day_of_week}`
+
+              return (
+                <li
+                  key={day.day_of_week}
+                  className={cn(
+                    'grid items-center gap-x-4 gap-y-3 px-5 py-3.5 transition-colors sm:grid-cols-[132px_120px_minmax(0,1fr)]',
+                    hasError && 'bg-destructive/5'
+                  )}
+                >
+                  {/* Day */}
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className={cn(
+                        'size-2 shrink-0 rounded-full transition-colors',
+                        day.is_closed ? 'bg-muted-foreground/30' : 'bg-success'
+                      )}
+                      aria-hidden="true"
+                    />
+                    <span
+                      className={cn(
+                        'text-sm font-medium',
+                        day.is_closed
+                          ? 'text-muted-foreground'
+                          : 'text-foreground'
+                      )}
+                    >
+                      {dayName}
+                    </span>
+                  </div>
+
+                  {/* Open / closed toggle */}
+                  <div className="flex items-center gap-2.5">
+                    <Switch
+                      id={switchId}
+                      checked={!day.is_closed}
+                      onCheckedChange={(checked) =>
+                        updateDay(index, 'is_closed', !checked)
+                      }
+                      aria-label={`Abierto el ${dayLower}`}
+                    />
+                    <Label
+                      htmlFor={switchId}
+                      aria-hidden="true"
+                      className={cn(
+                        'cursor-pointer text-sm font-normal',
+                        day.is_closed
+                          ? 'text-muted-foreground'
+                          : 'text-foreground'
+                      )}
+                    >
+                      {day.is_closed ? t.closed : t.open}
+                    </Label>
+                  </div>
+
+                  {/* Times */}
+                  {day.is_closed ? (
+                    <p className="text-muted-foreground/80 text-sm">
+                      {t.closedAllDay}
+                    </p>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Input
+                          type="time"
+                          value={day.open_time}
+                          onChange={(e) =>
+                            updateDay(index, 'open_time', e.target.value)
+                          }
+                          aria-label={`${t.from} del ${dayLower}`}
+                          aria-invalid={hasError}
+                          aria-describedby={hasError ? errorId : undefined}
+                          className="h-8 w-[7.5rem] tabular-nums"
+                        />
+                        <span
+                          className="text-muted-foreground text-sm"
+                          aria-hidden="true"
+                        >
+                          a
+                        </span>
+                        <Input
+                          type="time"
+                          value={day.close_time}
+                          onChange={(e) =>
+                            updateDay(index, 'close_time', e.target.value)
+                          }
+                          aria-label={`${t.to} del ${dayLower}`}
+                          aria-invalid={hasError}
+                          aria-describedby={hasError ? errorId : undefined}
+                          className="h-8 w-[7.5rem] tabular-nums"
+                        />
+                      </div>
+                      {hasError && (
+                        <p
+                          id={errorId}
+                          className="text-destructive flex items-center gap-1 text-xs font-medium"
+                        >
+                          <AlertCircle
+                            className="size-3 shrink-0"
+                            aria-hidden="true"
+                          />
+                          {validationErrors[index]}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+
+          <div className="border-border bg-muted/40 border-t px-5 py-3">
+            <p
+              className={cn(
+                'flex items-center gap-1.5 text-xs',
+                hasErrors
+                  ? 'text-destructive font-medium'
+                  : 'text-muted-foreground'
+              )}
+            >
+              {hasErrors ? (
+                <AlertCircle className="size-3.5 shrink-0" aria-hidden="true" />
+              ) : null}
+              {hasErrors ? t.pendingErrors : t.footerHint}
+            </p>
+          </div>
+        </section>
+      </div>
+    </fieldset>
   )
 }

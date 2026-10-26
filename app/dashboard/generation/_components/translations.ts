@@ -12,9 +12,11 @@ export const translations = {
     stepOf: 'Paso',
     sourceLabel: '¿De dónde sacamos la información?',
     sourceGoogle: 'Google Maps',
-    sourceGoogleDesc: 'Tu ficha de empresa en Google: horario, contacto y reseñas.',
+    sourceGoogleDesc:
+      'Tu ficha de empresa en Google: horario, contacto y reseñas.',
     sourceUrl: 'Tu web actual',
-    sourceUrlDesc: 'Leemos tu página y extraemos servicios y datos de contacto.',
+    sourceUrlDesc:
+      'Leemos tu página y extraemos servicios y datos de contacto.',
     quotaUnlimited: 'Generaciones ilimitadas',
     quotaLimited: 'Generaciones este mes',
     searchLabel: 'Nombre del negocio y ciudad',
@@ -33,7 +35,8 @@ export const translations = {
     urlHint: 'Incluye https:// al principio. Tardamos unos segundos en leerla.',
     crawlButton: 'Analizar web',
     crawling: 'Analizando…',
-    urlInvalid: 'Introduce una dirección web válida, por ejemplo https://tu-negocio.com.',
+    urlInvalid:
+      'Introduce una dirección web válida, por ejemplo https://tu-negocio.com.',
     previewTitle: 'Esto es lo que hemos encontrado',
     previewSubtitle:
       'Marca los bloques que quieres importar. Podrás editarlo todo después.',
@@ -120,16 +123,19 @@ export const translations = {
     stepOf: 'Pas',
     sourceLabel: "D'on traiem la informació?",
     sourceGoogle: 'Google Maps',
-    sourceGoogleDesc: "La teva fitxa d'empresa a Google: horari, contacte i ressenyes.",
+    sourceGoogleDesc:
+      "La teva fitxa d'empresa a Google: horari, contacte i ressenyes.",
     sourceUrl: 'El teu web actual',
-    sourceUrlDesc: 'Llegim la teva pàgina i extraiem serveis i dades de contacte.',
+    sourceUrlDesc:
+      'Llegim la teva pàgina i extraiem serveis i dades de contacte.',
     quotaUnlimited: 'Generacions il·limitades',
     quotaLimited: 'Generacions aquest mes',
     searchLabel: 'Nom del negoci i ciutat',
     searchPlaceholder: 'Ex.: Restaurant Casa Pepe, Barcelona',
     searchButton: 'Cercar',
     searching: 'Cercant…',
-    searchHint: 'Escriu el nom tal com apareix a Google, juntament amb la ciutat.',
+    searchHint:
+      'Escriu el nom tal com apareix a Google, juntament amb la ciutat.',
     searchRequired: 'Escriu el nom del teu negoci per cercar-lo.',
     resultsTitle: 'Tria el teu negoci',
     resultsCount: 'resultats',
@@ -140,7 +146,8 @@ export const translations = {
     urlHint: 'Inclou https:// al principi. Trigarem uns segons a llegir-la.',
     crawlButton: 'Analitzar web',
     crawling: 'Analitzant…',
-    urlInvalid: 'Introdueix una adreça web vàlida, per exemple https://el-teu-negoci.com.',
+    urlInvalid:
+      'Introdueix una adreça web vàlida, per exemple https://el-teu-negoci.com.',
     previewTitle: 'Això és el que hem trobat',
     previewSubtitle:
       'Marca els blocs que vols importar. Podràs editar-ho tot després.',
@@ -190,8 +197,8 @@ export const translations = {
     statusClosedTemporarily: 'Tancat temporalment',
     statusClosedPermanently: 'Tancat definitivament',
     noPreview: 'Encara no hi ha cap vista prèvia.',
-    noServices: "No hem trobat serveis a la font.",
-    noHours: "No hem trobat horaris a la font.",
+    noServices: 'No hem trobat serveis a la font.',
+    noHours: 'No hem trobat horaris a la font.',
     summaryTitle: "S'aplicarà",
     summaryNew: 'Crearem un negoci nou amb totes les dades detectades.',
     noBlocksSelected:
@@ -204,10 +211,10 @@ export const translations = {
     creating: 'Creant negoci…',
     limitReached: 'Has arribat al límit mensual de generacions.',
     limitReachedHint: 'Millora el teu pla per generar sense límits.',
-    errorSearch: "No hem pogut cercar a Google. Torna-ho a provar.",
-    errorDetails: "No hem pogut carregar els detalls del negoci.",
-    errorCrawl: "No hem pogut analitzar aquest web.",
-    errorPreview: "No hem pogut preparar la vista prèvia.",
+    errorSearch: 'No hem pogut cercar a Google. Torna-ho a provar.',
+    errorDetails: 'No hem pogut carregar els detalls del negoci.',
+    errorCrawl: 'No hem pogut analitzar aquest web.',
+    errorPreview: 'No hem pogut preparar la vista prèvia.',
     success: 'Informació actualitzada correctament.',
     noBusinesses: 'Encara no tens negocis',
     createBusinessFirst:

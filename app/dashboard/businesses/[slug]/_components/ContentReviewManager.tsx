@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateSectionStatus } from '@/lib/supabase/actions'
+import { updateSectionStatus } from '@/lib/backoffice/actions/content'
 import {
   Select,
   SelectContent,
@@ -10,26 +10,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { FileText, Loader2, LayoutGrid } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const statusConfig = {
   published: {
     label_es: 'Publicado',
     label_ca: 'Publicat',
-    cls: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+    variant: 'success',
+    dot: 'bg-success',
   },
   review: {
     label_es: 'En revisión',
     label_ca: 'En revisió',
-    cls: 'bg-amber-50 text-amber-700 ring-amber-200',
+    variant: 'warning',
+    dot: 'bg-warning',
   },
   draft: {
     label_es: 'Borrador',
     label_ca: 'Esborrany',
-    cls: 'bg-slate-50 text-slate-600 ring-slate-200',
+    variant: 'outline',
+    dot: 'bg-muted-foreground/60',
   },
-}
+} as const
 
 type ReviewSection = {
   id: string
@@ -49,27 +54,51 @@ export default function ContentReviewManager({
 }) {
   const t = {
     es: {
-      title: 'Revisiones de contenido',
+      title: 'Revisión de contenido',
       description:
-        'Gestiona el estado y aprobación de las secciones de tu web.',
+        'Decide qué bloques de tu web están en borrador, en revisión o publicados.',
       status: {
         draft: 'Borrador',
         review: 'En revisión',
         published: 'Publicado',
       },
-      noSections: 'No hay secciones disponibles para revisar.',
+      sectionTypes: {
+        hero: 'Portada',
+        about: 'Sobre nosotros',
+        services: 'Servicios',
+        contact: 'Contacto',
+        reviews: 'Reseñas',
+        team: 'Equipo',
+      } as Record<string, string>,
+      changeStatus: 'Cambiar estado de',
+      untitled: 'Sin título',
+      noSections: 'Todavía no hay bloques que revisar',
+      noSectionsHint:
+        'Cuando generes el contenido de tu web, sus bloques aparecerán aquí.',
       saved: 'Estado actualizado',
     },
     ca: {
-      title: 'Revisions de contingut',
+      title: 'Revisió de contingut',
       description:
-        "Gestiona l'estat i aprovació de les seccions de la teva web.",
+        'Decideix quins blocs del teu web estan en esborrany, en revisió o publicats.',
       status: {
         draft: 'Esborrany',
         review: 'En revisió',
         published: 'Publicat',
       },
-      noSections: 'No hi ha seccions disponibles per revisar.',
+      sectionTypes: {
+        hero: 'Portada',
+        about: 'Qui som',
+        services: 'Serveis',
+        contact: 'Contacte',
+        reviews: 'Ressenyes',
+        team: 'Equip',
+      } as Record<string, string>,
+      changeStatus: "Canviar l'estat de",
+      untitled: 'Sense títol',
+      noSections: 'Encara no hi ha blocs per revisar',
+      noSectionsHint:
+        'Quan generis el contingut del teu web, els seus blocs apareixeran aquí.',
       saved: 'Estat actualitzat',
     },
   }[locale === 'ca' ? 'ca' : 'es']
@@ -90,86 +119,135 @@ export default function ContentReviewManager({
     setUpdatingId(null)
   }
 
+  const publishedCount = sections.filter((s) => s.status === 'published').length
+
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      {/* Header */}
-      <div className="border-b border-slate-100 bg-slate-50/60 px-6 py-4">
-        <h3 className="text-sm font-semibold text-slate-900">{t.title}</h3>
-        <p className="mt-0.5 text-xs text-slate-500">{t.description}</p>
+    <section
+      aria-labelledby="content-review-title"
+      className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+    >
+      <div className="border-border flex items-start justify-between gap-3 border-b px-5 py-4 sm:px-6">
+        <div>
+          <h2
+            id="content-review-title"
+            className="text-foreground text-base font-semibold tracking-[-0.01em]"
+          >
+            {t.title}
+          </h2>
+          <p className="text-muted-foreground mt-0.5 text-sm">
+            {t.description}
+          </p>
+        </div>
+        {sections.length > 0 ? (
+          <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
+            {publishedCount}/{sections.length}{' '}
+            {t.status.published.toLowerCase()}
+          </span>
+        ) : null}
       </div>
 
       {sections.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 py-14 text-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
-            <LayoutGrid className="h-5 w-5 text-slate-400" />
-          </div>
-          <p className="text-sm text-slate-500">{t.noSections}</p>
+        <div className="flex flex-col items-center px-6 py-14 text-center">
+          <span className="bg-secondary text-secondary-foreground ring-border mb-3 flex size-10 items-center justify-center rounded-xl ring-1">
+            <LayoutGrid className="size-5" aria-hidden="true" />
+          </span>
+          <p className="text-foreground text-sm font-medium">{t.noSections}</p>
+          <p className="text-muted-foreground mt-1 max-w-xs text-xs leading-5">
+            {t.noSectionsHint}
+          </p>
         </div>
       ) : (
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-border divide-y">
           {sections.map((section) => {
             const status = section.status as keyof typeof statusConfig
             const cfg = statusConfig[status] ?? statusConfig.draft
             const statusLabel = isCa ? cfg.label_ca : cfg.label_es
+            const typeLabel = t.sectionTypes[section.type] ?? section.type
+            const isUpdating = updatingId === section.id
 
             return (
               <li
                 key={section.id}
-                className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-slate-50/50"
+                className="hover:bg-muted/50 flex items-center justify-between gap-4 px-5 py-3.5 transition-colors sm:px-6"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                    <FileText className="h-4 w-4 text-slate-500" />
-                  </div>
+                  <span className="bg-secondary text-secondary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
+                    <FileText className="size-4" aria-hidden="true" />
+                  </span>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 capitalize">
-                      {section.type}
+                    <p className="text-foreground text-sm font-medium first-letter:uppercase">
+                      {typeLabel}
                     </p>
-                    <p className="max-w-[260px] truncate text-xs text-slate-400">
-                      {section.content?.title || '—'}
+                    <p className="text-muted-foreground max-w-[280px] truncate text-xs">
+                      {section.content?.title || t.untitled}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex shrink-0 items-center gap-3">
-                  <span
-                    className={`hidden items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 sm:inline-flex ${cfg.cls}`}
+                  <Badge
+                    variant={cfg.variant}
+                    className="hidden sm:inline-flex"
                   >
                     {statusLabel}
-                  </span>
+                  </Badge>
 
                   <div className="relative">
-                    {updatingId === section.id && (
-                      <Loader2 className="pointer-events-none absolute top-1/2 left-2 z-10 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-slate-400" />
+                    {isUpdating && (
+                      <Loader2
+                        className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 z-10 size-3.5 -translate-y-1/2 animate-spin"
+                        aria-hidden="true"
+                      />
                     )}
                     <Select
                       defaultValue={section.status}
                       onValueChange={(val) =>
                         handleStatusChange(section.id, val)
                       }
-                      disabled={updatingId === section.id}
+                      disabled={isUpdating}
                     >
                       <SelectTrigger
-                        className={`h-8 w-36 text-xs ${updatingId === section.id ? 'pl-7' : ''}`}
+                        size="sm"
+                        aria-label={`${t.changeStatus} ${typeLabel}`}
+                        aria-busy={isUpdating}
+                        className={cn('w-36 text-xs', isUpdating && 'pl-8')}
                       >
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="draft">
                           <span className="flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                            <span
+                              aria-hidden="true"
+                              className={cn(
+                                'size-1.5 rounded-full',
+                                statusConfig.draft.dot
+                              )}
+                            />
                             {t.status.draft}
                           </span>
                         </SelectItem>
                         <SelectItem value="review">
                           <span className="flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                            <span
+                              aria-hidden="true"
+                              className={cn(
+                                'size-1.5 rounded-full',
+                                statusConfig.review.dot
+                              )}
+                            />
                             {t.status.review}
                           </span>
                         </SelectItem>
                         <SelectItem value="published">
                           <span className="flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            <span
+                              aria-hidden="true"
+                              className={cn(
+                                'size-1.5 rounded-full',
+                                statusConfig.published.dot
+                              )}
+                            />
                             {t.status.published}
                           </span>
                         </SelectItem>
@@ -182,6 +260,6 @@ export default function ContentReviewManager({
           })}
         </ul>
       )}
-    </div>
+    </section>
   )
 }

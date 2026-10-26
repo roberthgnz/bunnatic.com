@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation'
 import AnalyticsViewer from '../_components/AnalyticsViewer'
-import { getBusinessBySlug } from '@/lib/supabase/actions'
+import {
+  getBusinessBySlug,
+  getAnalyticsSummary,
+} from '@/lib/backoffice/queries'
 
 export default async function BusinessAnalyticsPage({
   params,
@@ -14,5 +17,6 @@ export default async function BusinessAnalyticsPage({
     notFound()
   }
 
-  return <AnalyticsViewer businessId={business.id} locale="es" />
+  const summary = await getAnalyticsSummary(business.id)
+  return <AnalyticsViewer summary={summary} />
 }

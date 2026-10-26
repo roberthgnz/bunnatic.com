@@ -33,9 +33,12 @@ import { TeamSwitcher } from '@/components/team-switcher'
 import { NavUser } from '@/components/nav-user'
 import { SidebarMainItems, SidebarTopItems } from './SidebarNav'
 import { DashboardBreadcrumbs } from './DashboardBreadcrumbs'
-import { createClient } from '@/lib/supabase/server'
+import { getBackofficeProfile } from '@/lib/backoffice/session'
+import { getBusinesses } from '@/lib/backoffice/queries'
 import { mapStripePriceIdToGenerationPlan } from '@/lib/businessSourceGeneration'
 import { dashboardContent } from './dashboard-constants'
+import DashboardCommandMenu from './DashboardCommandMenu'
+import { businessRoleLabels } from '@/lib/backoffice/policy'
 
 export default async function DashboardShell({
   children,
@@ -45,44 +48,15 @@ export default async function DashboardShell({
   const t = dashboardContent
   const localePrefix = ''
 
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  let userProfile = null
-  let businesses: { id: string; name: string; slug: string }[] = []
-
-  if (user) {
-    const [profileRes, businessesRes] = await Promise.all([
-      supabase
-        .from('profiles')
-        .select('full_name, avatar_url, stripe_price_id')
-        .eq('id', user.id)
-        .maybeSingle(),
-      supabase
-        .from('businesses')
-        .select('id, name, slug')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false }),
-    ])
-
-    const profileData = profileRes.data
-    const businessesData = businessesRes.data || []
-
-    const plan = mapStripePriceIdToGenerationPlan(
-      profileData?.stripe_price_id ?? null
-    )
-
-    userProfile = {
-      full_name:
-        profileData?.full_name || user?.user_metadata?.full_name || null,
-      email: user.email,
-      avatar_url: profileData?.avatar_url || null,
-      plan,
-    }
-
-    businesses = businessesData
+  const [profile, businesses] = await Promise.all([
+    getBackofficeProfile(),
+    getBusinesses(),
+  ])
+  const userProfile = {
+    full_name: profile?.full_name,
+    email: profile?.email,
+    avatar_url: profile?.avatar_url,
+    plan: mapStripePriceIdToGenerationPlan(profile?.stripe_price_id ?? null),
   }
 
   const getPlanName = (planKey: string | undefined) => {
@@ -94,7 +68,10 @@ export default async function DashboardShell({
     businesses.length > 0
       ? businesses.map((business) => ({
           name: business.name,
-          plan: getPlanName(userProfile?.plan),
+          plan:
+            business.role === 'owner'
+              ? getPlanName(userProfile?.plan)
+              : `Compartido · ${businessRoleLabels[business.role]}`,
           href: `${localePrefix}/dashboard/businesses/${business.slug}`,
         }))
       : [
@@ -190,7 +167,7 @@ export default async function DashboardShell({
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>
-      <SidebarInset className="bg-background">
+      <SidebarInset className="bg-background min-w-0">
         <header className="bg-background/80 supports-[backdrop-filter]:bg-background/70 sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-2 border-b px-4 backdrop-blur-md md:px-6">
           <div className="flex min-w-0 items-center gap-2">
             <SidebarTrigger className="text-muted-foreground -ml-1.5" />
@@ -198,9 +175,23 @@ export default async function DashboardShell({
               orientation="vertical"
               className="mr-1.5 data-[orientation=vertical]:h-4"
             />
-            <DashboardBreadcrumbs t={t} />
+            <DashboardBreadcrumbs
+              t={t}
+              businesses={businesses.map(({ name, slug }) => ({ name, slug }))}
+            />
           </div>
           <div className="flex items-center gap-1.5">
+            <DashboardCommandMenu
+              businesses={businesses.map(
+                ({ id, name, slug, category, role }) => ({
+                  id,
+                  name,
+                  slug,
+                  category,
+                  role,
+                })
+              )}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

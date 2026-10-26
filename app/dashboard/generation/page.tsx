@@ -1,4 +1,5 @@
-import { getBusinesses } from '@/lib/supabase/actions'
+import { getBusinesses } from '@/lib/backoffice/queries'
+import { PageHeader } from '@/components/dashboard/page-header'
 import GlobalGenerationPanel from './_components/GlobalGenerationPanel'
 
 export default async function GlobalGenerationPage() {
@@ -6,17 +7,18 @@ export default async function GlobalGenerationPage() {
   const locale = 'es' // Default locale, could be fetched from params or user preferences if available
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-          Generación IA
-        </h1>
-        <p className="text-slate-500">
-          Utiliza la inteligencia artificial para extraer y generar contenido para tus negocios.
-        </p>
-      </div>
+    <div className="max-w-4xl space-y-8 pb-10">
+      <PageHeader
+        eyebrow="Generación con IA"
+        title="Importa tu negocio"
+        accent="en un minuto"
+        description="Busca tu ficha de Google o indica tu web actual. Extraemos perfil, servicios y horario para que no tengas que escribirlos a mano."
+      />
 
-      <GlobalGenerationPanel businesses={businesses} locale={locale} />
+      <GlobalGenerationPanel
+        businesses={businesses.filter((business) => business.role === 'owner')}
+        locale={locale}
+      />
     </div>
   )
 }

@@ -1,6 +1,8 @@
+import { findBusinessAccessBySlug } from '@/lib/backoffice/access'
+import { hasBusinessPermission } from '@/lib/backoffice/policy'
 import { notFound } from 'next/navigation'
 import TeamManager from '../_components/TeamManager'
-import { getBusinessBySlug, getPublicTeamMembers } from '@/lib/supabase/actions'
+import { getPublicTeamMembers } from '@/lib/supabase/actions'
 
 export default async function BusinessTeamPage({
   params,
@@ -8,9 +10,10 @@ export default async function BusinessTeamPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const business = await getBusinessBySlug(slug)
+  const access = await findBusinessAccessBySlug(slug)
+  const business = access?.business
 
-  if (!business) {
+  if (!business || !access) {
     notFound()
   }
 
@@ -18,6 +21,7 @@ export default async function BusinessTeamPage({
 
   return (
     <TeamManager
+      readOnly={!hasBusinessPermission(access.role, 'content.write')}
       businessId={business.id}
       initialTeam={members}
     />

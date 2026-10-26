@@ -1,5 +1,4 @@
-'use client'
-
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowRight,
@@ -16,13 +15,19 @@ import {
 import { Button } from '@/components/ui/button'
 import { StatCard } from '@/components/dashboard/page-header'
 import { cn } from '@/lib/utils'
-import { useBusiness } from '../_components/BusinessContext'
+import { getBusinessWorkspace } from '@/lib/backoffice/queries'
 
 function EmptyValue() {
   return <span className="text-muted-foreground/70 italic">Sin definir</span>
 }
 
-export default function BusinessOverviewPage() {
+export default async function BusinessOverviewPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const workspace = await getBusinessWorkspace((await params).slug)
+  if (!workspace) notFound()
   const {
     business,
     services,
@@ -31,7 +36,7 @@ export default function BusinessOverviewPage() {
     setupChecklist,
     setupCompletedCount,
     setupCompletion,
-  } = useBusiness()
+  } = workspace
   const base = `/dashboard/businesses/${business.slug}`
 
   const [
@@ -198,9 +203,7 @@ export default function BusinessOverviewPage() {
                     <span
                       className={cn(
                         'block text-sm font-medium',
-                        task.done
-                          ? 'text-muted-foreground line-through decoration-1'
-                          : 'text-foreground'
+                        task.done ? 'text-muted-foreground' : 'text-foreground'
                       )}
                     >
                       {task.label}

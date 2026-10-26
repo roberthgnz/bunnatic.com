@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import type { ComponentType } from 'react'
 import {
   BarChart3,
   Briefcase,
@@ -14,58 +13,35 @@ import {
   Users,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getBusinessNavigation } from '@/lib/backoffice/navigation'
+import type { BusinessRole } from '@/lib/backoffice/policy'
+import { Sparkles } from 'lucide-react'
 
-type NavItem = {
-  key: string
-  href: string
-  label: string
-  icon: ComponentType<{ className?: string }>
-}
-
-export default function BusinessSectionNav({ slug }: { slug: string }) {
+export default function BusinessSectionNav({
+  slug,
+  role,
+}: {
+  slug: string
+  role: BusinessRole
+}) {
   const pathname = usePathname() ?? ''
   const base = `/dashboard/businesses/${slug}`
 
-  const items: NavItem[] = [
-    {
-      key: 'overview',
-      href: `${base}/overview`,
-      label: 'Resumen',
-      icon: LayoutGrid,
-    },
-    {
-      key: 'services',
-      href: `${base}/services`,
-      label: 'Servicios',
-      icon: Briefcase,
-    },
-    { key: 'hours', href: `${base}/hours`, label: 'Horario', icon: Clock },
-    {
-      key: 'leads',
-      href: `${base}/leads`,
-      label: 'Mensajes',
-      icon: MessageSquare,
-    },
-    {
-      key: 'analytics',
-      href: `${base}/analytics`,
-      label: 'Analítica',
-      icon: BarChart3,
-    },
-    {
-      key: 'calendar',
-      href: `${base}/calendar`,
-      label: 'Calendario',
-      icon: CalendarIcon,
-    },
-    { key: 'team', href: `${base}/team`, label: 'Equipo', icon: Users },
-    {
-      key: 'settings',
-      href: `${base}/settings`,
-      label: 'Configuración',
-      icon: Settings,
-    },
-  ]
+  const icons = {
+    overview: LayoutGrid,
+    services: Briefcase,
+    hours: Clock,
+    leads: MessageSquare,
+    analytics: BarChart3,
+    calendar: CalendarIcon,
+    team: Users,
+    settings: Settings,
+    generation: Sparkles,
+  }
+  const items = getBusinessNavigation(slug, role).map((item) => ({
+    ...item,
+    icon: icons[item.key],
+  }))
 
   return (
     <nav

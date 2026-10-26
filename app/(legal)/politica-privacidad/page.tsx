@@ -3,7 +3,6 @@ import LegalPage from '@/components/legal/LegalPage'
 import { legalContent, type LegalLocale } from '@/lib/legalContent'
 import { getLegalSlug } from '@/lib/pageSlugs'
 import { buildPageMetadata } from '@/lib/seo'
-import { notFound } from 'next/navigation'
 
 type LegalRouteProps = {
   params: Promise<{ locale: string }>
@@ -24,7 +23,7 @@ export async function generateMetadata({
     title: `${legalContent[safeLocale]['politica-privacidad'].title} | Bunnatic`,
     description:
       safeLocale === 'ca'
-        ? "Coneix com Bunnatic tracta les teves dades personals, els teus drets de privacitat i com exercir-los segons el RGPD."
+        ? 'Coneix com Bunnatic tracta les teves dades personals, els teus drets de privacitat i com exercir-los segons el RGPD.'
         : 'Conoce cómo Bunnatic trata tus datos personales, tus derechos de privacidad y cómo ejercerlos según el RGPD.',
     esPath: `/${getLegalSlug('politica-privacidad', 'es')}`,
     caPath: `/${getLegalSlug('politica-privacidad', 'ca')}`,
@@ -35,11 +34,9 @@ export async function generateMetadata({
 export default async function PoliticaPrivacidadPage({
   params,
 }: LegalRouteProps) {
-  const { locale } = await params
-
-  if (!isLegalLocale(locale)) {
-    notFound()
-  }
+  const { locale: rawLocale } = await params
+  // Routes have no locale segment; Spanish is the default.
+  const locale: LegalLocale = isLegalLocale(rawLocale) ? rawLocale : 'es'
 
   return <LegalPage locale={locale} pageKey="politica-privacidad" />
 }

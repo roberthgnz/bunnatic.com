@@ -72,11 +72,30 @@ export default async function middleware(request: NextRequest) {
   supabaseResponse.headers.set('X-DNS-Prefetch-Control', 'on')
   supabaseResponse.headers.set('X-Frame-Options', 'SAMEORIGIN')
   supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff')
-  supabaseResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-
-  const guestOnlyAuthPagesMatch = pathname.match(
-    /^\/(signin|signup)(?:\/|$)/
+  supabaseResponse.headers.set(
+    'Referrer-Policy',
+    'strict-origin-when-cross-origin'
   )
+
+  // Preserve the requested backoffice location before layouts or pages render.
+  if (!user && /^\/dashboard(?:\/|$)/.test(pathname)) {
+    const url = new URL('/signin', request.url)
+    url.searchParams.set('next', `${pathname}${request.nextUrl.search}`)
+    const response = NextResponse.redirect(url)
+    copyResponseCookies(supabaseResponse, response)
+    for (const name of [
+      'X-DNS-Prefetch-Control',
+      'X-Frame-Options',
+      'X-Content-Type-Options',
+      'Referrer-Policy',
+    ]) {
+      const value = supabaseResponse.headers.get(name)
+      if (value) response.headers.set(name, value)
+    }
+    return response
+  }
+
+  const guestOnlyAuthPagesMatch = pathname.match(/^\/(signin|signup)(?:\/|$)/)
   if (guestOnlyAuthPagesMatch && user) {
     const url = new URL(request.url)
     if (onboardingCompleted) {

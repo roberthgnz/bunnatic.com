@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ComponentType } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -21,23 +21,30 @@ import type {
 import { trackFunnelEvent } from '@/lib/funnelEvents'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 import {
+  AlertCircle,
+  AlertTriangle,
+  AlignLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Briefcase,
+  Check,
+  Clock,
+  Globe,
   Loader2,
   MapPin,
+  MessageSquare,
+  Navigation,
+  PhoneCall,
   Search,
   Sparkles,
-  Globe,
-  Clock,
-  Briefcase,
-  User,
-  CheckSquare,
-  Square,
-  Wand2,
-  PhoneCall,
-  Tag,
-  AlignLeft,
-  Navigation,
   Star,
+  Tag,
+  User,
+  Wand2,
 } from 'lucide-react'
 
 type PlaceSearchResult = {
@@ -78,6 +85,57 @@ function getDefaultSelectedBlocks(
   return next
 }
 
+const sectionLabelClass =
+  'text-muted-foreground text-[11px] font-semibold tracking-[0.14em] uppercase'
+
+function StepHeading({
+  number,
+  title,
+  description,
+  id,
+}: {
+  number: number
+  title: string
+  description?: string
+  id?: string
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <span
+        aria-hidden="true"
+        className="bg-secondary text-secondary-foreground flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums"
+      >
+        {number}
+      </span>
+      <div className="min-w-0">
+        <h3
+          id={id}
+          className="text-foreground text-sm font-semibold tracking-[-0.01em]"
+        >
+          {title}
+        </h3>
+        {description ? (
+          <p className="text-muted-foreground mt-0.5 text-xs leading-5">
+            {description}
+          </p>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
+function FieldError({ id, message }: { id: string; message: string }) {
+  return (
+    <p
+      id={id}
+      className="text-destructive flex items-center gap-1 text-xs font-medium"
+    >
+      <AlertCircle className="size-3.5 shrink-0" aria-hidden="true" />
+      {message}
+    </p>
+  )
+}
+
 export default function SourceGenerationPanel({
   businessId,
   locale,
@@ -115,103 +173,173 @@ export default function SourceGenerationPanel({
     () =>
       ({
         es: {
-          title: 'Generar desde fuente',
+          title: 'Importa los datos de tu negocio',
           subtitle:
-            'Usa los datos reales de tu negocio desde Google My Business o desde tu web para regenerar información.',
-          sourceLabel: 'Fuente de datos',
-          sourceGoogle: 'Google My Business',
-          sourceUrl: 'URL del sitio',
-          quotaUnlimited: 'Generaciones ilimitadas en tu plan',
-          quotaLimited: 'Generaciones usadas este mes',
-          searchPlaceholder: 'Ej: Restaurante Casa Pepe Madrid',
+            'Toma la información real de tu ficha de Google o de tu web actual y elige qué quieres aplicar a tu perfil.',
+          sourceLabel: 'Elige la fuente',
+          sourceDesc: '¿De dónde sacamos la información?',
+          sourceGoogle: 'Ficha de Google',
+          sourceUrl: 'Tu web actual',
+          quotaUnlimited: 'Generaciones ilimitadas',
+          quotaLimited: 'Generaciones este mes',
+          findGoogleTitle: 'Busca tu negocio',
+          findGoogleDesc:
+            'Escribe el nombre y la ciudad, y selecciona tu negocio en los resultados.',
+          findUrlTitle: 'Indica la dirección de tu web',
+          findUrlDesc:
+            'Analizaremos la página para extraer tus datos. Puede tardar hasta un minuto y medio.',
+          searchLabel: 'Nombre del negocio y ciudad',
+          searchPlaceholder: 'Ej.: Restaurante Casa Pepe Madrid',
           searchButton: 'Buscar',
-          searching: 'Buscando...',
+          searching: 'Buscando…',
+          resultsLabel: 'Resultados de la búsqueda',
           selectBusiness:
-            'Busca tu negocio en Google para generar un preview automático.',
+            'Los resultados aparecerán aquí. Elige el tuyo para generar la vista previa.',
+          urlLabel: 'URL de tu web',
           urlPlaceholder: 'https://tu-negocio.com',
-          crawlButton: 'Analizar URL',
-          crawling: 'Analizando...',
-          previewTitle: 'Preview generado',
-          generatingPreview: 'Generando preview...',
+          crawlButton: 'Analizar web',
+          crawling: 'Analizando…',
+          previewTitle: 'Revisa y aplica',
+          previewDesc:
+            'Esto es lo que hemos encontrado. Marca los bloques que quieres aplicar a tu negocio.',
           generatingMessages: [
-            'Analizando fuente de datos...',
-            'Extrayendo información del negocio...',
-            'Generando vista previa...',
-            'Esto puede tardar unos segundos...',
+            'Analizando la fuente de datos…',
+            'Extrayendo la información del negocio…',
+            'Preparando la vista previa…',
+            'Esto puede tardar unos segundos…',
           ],
-          blocksTitle: 'Elige qué aplicar',
+          blocksTitle: 'Bloques a aplicar',
           blockProfile: 'Perfil',
           blockProfileDesc: 'Nombre, categoría, descripción y contacto',
           blockServices: 'Servicios',
           blockServicesDesc: 'Catálogo de servicios detectados',
-          blockHours: 'Horarios',
+          blockHours: 'Horario',
           blockHoursDesc: 'Horario de apertura semanal',
+          blockUnavailable: 'Sin datos en la fuente',
           ratingLabel: 'Valoración',
-          reviewsLabel: 'Reseñas',
+          reviewsLabel: 'reseñas',
+          categoryLabel: 'Categoría',
+          descriptionLabel: 'Descripción',
+          addressLabel: 'Dirección',
+          phoneLabel: 'Teléfono',
+          websiteLabel: 'Web',
           priceLabel: 'Precio',
           statusLabel: 'Estado',
-          mapsLabel: 'Google Maps',
-          noPreview: 'Aún no hay preview generado.',
-          noServices: 'No se detectaron servicios en la fuente.',
-          noHours: 'No se detectaron horarios en la fuente.',
+          mapsLabel: 'Ver en Google Maps',
+          closed: 'Cerrado',
+          days: [
+            'Domingo',
+            'Lunes',
+            'Martes',
+            'Miércoles',
+            'Jueves',
+            'Viernes',
+            'Sábado',
+          ],
+          noPreview: 'Aún no hay vista previa',
+          noPreviewHint:
+            'Cuando selecciones tu negocio o analices tu web, verás aquí los datos encontrados.',
+          noServices: 'No se han encontrado servicios en la fuente.',
+          noHours: 'No se ha encontrado el horario en la fuente.',
+          selectedCount: (n: number) =>
+            n === 1 ? '1 bloque seleccionado' : `${n} bloques seleccionados`,
+          applyHint:
+            'Los bloques marcados sustituirán los datos actuales de tu negocio.',
           applyButton: 'Aplicar selección',
-          applying: 'Aplicando...',
+          applying: 'Aplicando…',
           limitReached: 'Has alcanzado el límite mensual de tu plan Starter.',
-          limitReachedHint: 'Sube de plan para generación ilimitada.',
-          errorSearch: 'No se pudo buscar en Google.',
-          errorDetails: 'No se pudieron cargar los detalles del negocio.',
-          errorCrawl: 'No se pudo analizar la URL indicada.',
-          errorPreview: 'No se pudo construir el preview.',
+          limitReachedHint: 'Mejora tu plan para generar sin límites.',
+          queryRequired: 'Escribe el nombre de tu negocio.',
+          urlInvalid: 'Introduce una URL válida, incluyendo https://',
+          errorSearch: 'No se ha podido buscar en Google.',
+          errorDetails: 'No se han podido cargar los detalles del negocio.',
+          errorCrawl: 'No se ha podido analizar la URL indicada.',
+          errorPreview: 'No se ha podido generar la vista previa.',
           success: 'Información actualizada correctamente.',
         },
         ca: {
-          title: 'Generar des de font',
+          title: 'Importa les dades del teu negoci',
           subtitle:
-            'Fes servir les dades reals del teu negoci des de Google My Business o des del teu web per regenerar informació.',
-          sourceLabel: 'Font de dades',
-          sourceGoogle: 'Google My Business',
-          sourceUrl: 'URL del lloc',
-          quotaUnlimited: 'Generacions il·limitades al teu pla',
-          quotaLimited: 'Generacions usades aquest mes',
-          searchPlaceholder: 'Ex: Restaurant Casa Pepe Barcelona',
+            'Agafa la informació real de la teva fitxa de Google o del teu web actual i tria què vols aplicar al teu perfil.',
+          sourceLabel: 'Tria la font',
+          sourceDesc: "D'on traiem la informació?",
+          sourceGoogle: 'Fitxa de Google',
+          sourceUrl: 'El teu web actual',
+          quotaUnlimited: 'Generacions il·limitades',
+          quotaLimited: 'Generacions aquest mes',
+          findGoogleTitle: 'Cerca el teu negoci',
+          findGoogleDesc:
+            'Escriu el nom i la ciutat, i selecciona el teu negoci als resultats.',
+          findUrlTitle: "Indica l'adreça del teu web",
+          findUrlDesc:
+            'Analitzarem la pàgina per extreure les teves dades. Pot trigar fins a un minut i mig.',
+          searchLabel: 'Nom del negoci i ciutat',
+          searchPlaceholder: 'Ex.: Restaurant Casa Pepe Barcelona',
           searchButton: 'Cercar',
-          searching: 'Cercant...',
+          searching: 'Cercant…',
+          resultsLabel: 'Resultats de la cerca',
           selectBusiness:
-            'Cerca el teu negoci a Google per generar una vista prèvia automàtica.',
+            'Els resultats apareixeran aquí. Tria el teu per generar la vista prèvia.',
+          urlLabel: 'URL del teu web',
           urlPlaceholder: 'https://el-teu-negoci.com',
-          crawlButton: 'Analitzar URL',
-          crawling: 'Analitzant...',
-          previewTitle: 'Vista prèvia generada',
-          generatingPreview: 'Generant vista prèvia...',
+          crawlButton: 'Analitzar web',
+          crawling: 'Analitzant…',
+          previewTitle: 'Revisa i aplica',
+          previewDesc:
+            'Això és el que hem trobat. Marca els blocs que vols aplicar al teu negoci.',
           generatingMessages: [
-            'Analitzant font de dades...',
-            'Extraient informació del negoci...',
-            'Generant vista prèvia...',
-            'Això pot trigar uns segons...',
+            'Analitzant la font de dades…',
+            'Extraient la informació del negoci…',
+            'Preparant la vista prèvia…',
+            'Això pot trigar uns segons…',
           ],
-          blocksTitle: 'Tria què aplicar',
+          blocksTitle: 'Blocs a aplicar',
           blockProfile: 'Perfil',
           blockProfileDesc: 'Nom, categoria, descripció i contacte',
           blockServices: 'Serveis',
           blockServicesDesc: 'Catàleg de serveis detectats',
-          blockHours: 'Horaris',
+          blockHours: 'Horari',
           blockHoursDesc: "Horari d'obertura setmanal",
+          blockUnavailable: 'Sense dades a la font',
           ratingLabel: 'Valoració',
-          reviewsLabel: 'Ressenyes',
+          reviewsLabel: 'ressenyes',
+          categoryLabel: 'Categoria',
+          descriptionLabel: 'Descripció',
+          addressLabel: 'Adreça',
+          phoneLabel: 'Telèfon',
+          websiteLabel: 'Web',
           priceLabel: 'Preu',
           statusLabel: 'Estat',
-          mapsLabel: 'Google Maps',
-          noPreview: 'Encara no hi ha vista prèvia generada.',
-          noServices: "No s'han detectat serveis a la font.",
-          noHours: "No s'han detectat horaris a la font.",
+          mapsLabel: 'Veure a Google Maps',
+          closed: 'Tancat',
+          days: [
+            'Diumenge',
+            'Dilluns',
+            'Dimarts',
+            'Dimecres',
+            'Dijous',
+            'Divendres',
+            'Dissabte',
+          ],
+          noPreview: 'Encara no hi ha vista prèvia',
+          noPreviewHint:
+            'Quan seleccionis el teu negoci o analitzis el teu web, veuràs aquí les dades trobades.',
+          noServices: "No s'han trobat serveis a la font.",
+          noHours: "No s'ha trobat l'horari a la font.",
+          selectedCount: (n: number) =>
+            n === 1 ? '1 bloc seleccionat' : `${n} blocs seleccionats`,
+          applyHint:
+            'Els blocs marcats substituiran les dades actuals del teu negoci.',
           applyButton: 'Aplicar selecció',
-          applying: 'Aplicant...',
+          applying: 'Aplicant…',
           limitReached: 'Has arribat al límit mensual del teu pla Starter.',
-          limitReachedHint: 'Canvia de pla per generar sense límits.',
+          limitReachedHint: 'Millora el teu pla per generar sense límits.',
+          queryRequired: 'Escriu el nom del teu negoci.',
+          urlInvalid: 'Introdueix una URL vàlida, incloent-hi https://',
           errorSearch: "No s'ha pogut cercar a Google.",
           errorDetails: "No s'han pogut carregar els detalls del negoci.",
           errorCrawl: "No s'ha pogut analitzar la URL indicada.",
-          errorPreview: "No s'ha pogut construir la vista prèvia.",
+          errorPreview: "No s'ha pogut generar la vista prèvia.",
           success: 'Informació actualitzada correctament.',
         },
       })[safeLocale],
@@ -428,7 +556,8 @@ export default function SourceGenerationPanel({
         locale: safeLocale,
         blocks_count: blocks.length,
       })
-      if ('entitlement' in result && result.entitlement) setEntitlement(result.entitlement)
+      if ('entitlement' in result && result.entitlement)
+        setEntitlement(result.entitlement)
       else await loadEntitlement()
       router.refresh()
     } catch (error) {
@@ -445,29 +574,29 @@ export default function SourceGenerationPanel({
 
   const blockDefs: {
     key: SourceBlock
-    icon: React.ReactNode
+    icon: ComponentType<{ className?: string }>
     label: string
     desc: string
   }[] = [
-      {
-        key: 'profile',
-        icon: <User className="h-4 w-4" />,
-        label: t.blockProfile,
-        desc: t.blockProfileDesc,
-      },
-      {
-        key: 'services',
-        icon: <Briefcase className="h-4 w-4" />,
-        label: t.blockServices,
-        desc: t.blockServicesDesc,
-      },
-      {
-        key: 'hours',
-        icon: <Clock className="h-4 w-4" />,
-        label: t.blockHours,
-        desc: t.blockHoursDesc,
-      },
-    ]
+    {
+      key: 'profile',
+      icon: User,
+      label: t.blockProfile,
+      desc: t.blockProfileDesc,
+    },
+    {
+      key: 'services',
+      icon: Briefcase,
+      label: t.blockServices,
+      desc: t.blockServicesDesc,
+    },
+    {
+      key: 'hours',
+      icon: Clock,
+      label: t.blockHours,
+      desc: t.blockHoursDesc,
+    },
+  ]
 
   const isBlockDisabled = (key: SourceBlock) => {
     if (!preview) return true
@@ -477,482 +606,650 @@ export default function SourceGenerationPanel({
     return false
   }
 
+  const sourceOptions: {
+    key: SourceType
+    label: string
+    icon: ComponentType<{ className?: string }>
+  }[] = [
+    { key: 'google', label: t.sourceGoogle, icon: MapPin },
+    { key: 'url', label: t.sourceUrl, icon: Globe },
+  ]
+
+  const isBusy = isBuildingPreview || isCrawling
+  const queryError = googleSearchForm.formState.errors.query
+  const urlError = urlCrawlForm.formState.errors.url
+
+  const formatBusinessStatus = (status: string) => {
+    const normalized = status.toLowerCase()
+    if (safeLocale === 'es') {
+      if (normalized.includes('temporar')) return 'Cerrado temporalmente'
+      if (normalized.includes('permanent')) return 'Cerrado definitivamente'
+      if (normalized.includes('operational')) return 'Abierto'
+    }
+    return status
+  }
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <section
+      aria-labelledby="source-generation-title"
+      className="bg-card ring-border overflow-hidden rounded-xl shadow-[0_1px_2px_rgba(31,42,28,0.04)] ring-1"
+    >
       {/* Header */}
-      <div className="flex flex-col justify-between gap-3 bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-5 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/20 ring-1 ring-blue-400/30">
-            <Wand2 className="h-4.5 w-4.5 text-blue-300" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-white">{t.title}</h3>
-            <p className="max-w-sm text-xs leading-relaxed text-slate-400">
+      <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between sm:p-6">
+        <div className="flex items-start gap-3">
+          <span className="bg-secondary text-secondary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
+            <Wand2 className="size-4" aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <h2
+              id="source-generation-title"
+              className="text-foreground text-base font-semibold tracking-[-0.01em]"
+            >
+              {t.title}
+            </h2>
+            <p className="text-muted-foreground mt-0.5 max-w-xl text-sm leading-6">
               {t.subtitle}
             </p>
           </div>
         </div>
-        {/* Quota badge */}
-        <div className="shrink-0">
-          {entitlement?.isLimited ? (
-            <div
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 ${isLimitReached ? 'bg-red-900/40 text-red-300 ring-red-700/40' : 'bg-blue-900/30 text-blue-300 ring-blue-700/30'}`}
-            >
-              <Sparkles className="h-3 w-3" />
-              {t.quotaLimited}: {quotaLabel}
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-900/30 px-3 py-1 text-xs font-medium text-emerald-300 ring-1 ring-emerald-700/30">
-              <Sparkles className="h-3 w-3" />
-              {quotaLabel}
-            </div>
-          )}
-        </div>
+        {entitlement ? (
+          <Badge
+            variant={
+              !entitlement.isLimited
+                ? 'success'
+                : isLimitReached
+                  ? 'destructive'
+                  : 'secondary'
+            }
+            className="h-6 shrink-0 px-2.5"
+          >
+            <Sparkles aria-hidden="true" />
+            {entitlement.isLimited ? (
+              <>
+                {t.quotaLimited}:{' '}
+                <span className="tabular-nums">{quotaLabel}</span>
+              </>
+            ) : (
+              quotaLabel
+            )}
+          </Badge>
+        ) : null}
       </div>
 
       {/* Limit warning */}
       {isLimitReached && (
-        <div className="flex items-start gap-3 border-b border-amber-200 bg-amber-50 px-6 py-3">
-          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-          <p className="text-sm text-amber-800">
+        <div
+          role="status"
+          className="border-warning/25 bg-warning/10 flex items-start gap-3 border-y px-5 py-3 sm:px-6"
+        >
+          <AlertTriangle
+            className="text-warning mt-0.5 size-4 shrink-0"
+            aria-hidden="true"
+          />
+          <p className="text-foreground text-sm">
             {t.limitReached}{' '}
             <span className="font-medium">{t.limitReachedHint}</span>
           </p>
         </div>
       )}
 
-      <div className="space-y-6 p-6">
-        {/* Source toggle */}
-        <div className="space-y-2">
-          <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
-            {t.sourceLabel}
-          </p>
-          <div className="inline-flex gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
-            <button
-              type="button"
-              onClick={() => handleSourceChange('google')}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${sourceType === 'google'
-                ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                : 'text-slate-500 hover:text-slate-700'
-                }`}
-            >
-              <MapPin className="h-3.5 w-3.5" />
-              {t.sourceGoogle}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSourceChange('url')}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${sourceType === 'url'
-                ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                : 'text-slate-500 hover:text-slate-700'
-                }`}
-            >
-              <Globe className="h-3.5 w-3.5" />
-              {t.sourceUrl}
-            </button>
-          </div>
+      {/* Step 1: source */}
+      <div className="border-border space-y-4 border-t p-5 sm:p-6">
+        <StepHeading
+          number={1}
+          id="source-step-title"
+          title={t.sourceLabel}
+          description={t.sourceDesc}
+        />
+        <div
+          role="group"
+          aria-labelledby="source-step-title"
+          className="bg-muted ring-border grid w-full grid-cols-2 gap-1 rounded-lg p-1 ring-1 sm:inline-grid sm:w-auto"
+        >
+          {sourceOptions.map(({ key, label, icon: Icon }) => {
+            const active = sourceType === key
+            return (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={active}
+                onClick={() => handleSourceChange(key)}
+                className={cn(
+                  'focus-visible:ring-ring/50 flex items-center justify-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3',
+                  active
+                    ? 'bg-card text-foreground ring-border shadow-[0_1px_2px_rgba(31,42,28,0.08)] ring-1'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Icon
+                  className={cn('size-4', active && 'text-primary')}
+                  aria-hidden="true"
+                />
+                {label}
+              </button>
+            )
+          })}
         </div>
+      </div>
 
-        {/* Search / URL input */}
+      {/* Step 2: find */}
+      <div className="border-border space-y-4 border-t p-5 sm:p-6">
         {sourceType === 'google' ? (
-          <div className="space-y-3">
+          <>
+            <StepHeading
+              number={2}
+              title={t.findGoogleTitle}
+              description={t.findGoogleDesc}
+            />
             <form
               onSubmit={googleSearchForm.handleSubmit(handleGoogleSearch)}
-              className="flex flex-col gap-2 sm:flex-row"
+              className="space-y-1.5"
             >
-              <div className="relative flex-1 space-y-1.5">
-                <div className="relative">
-                  <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Label htmlFor="source-google-query" className="sr-only">
+                {t.searchLabel}
+              </Label>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <div className="relative flex-1">
+                  <Search
+                    className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
                   <Input
+                    id="source-google-query"
                     {...googleSearchForm.register('query')}
                     placeholder={t.searchPlaceholder}
-                    aria-invalid={!!googleSearchForm.formState.errors.query}
-                    className="h-10 border-slate-200 bg-white pl-9 text-sm focus-visible:ring-blue-500/30"
+                    aria-invalid={!!queryError}
+                    aria-describedby={
+                      queryError ? 'source-google-query-error' : undefined
+                    }
+                    className="pl-9"
                   />
                 </div>
-                {googleSearchForm.formState.errors.query && (
-                  <p className="text-destructive flex items-center gap-1 text-xs font-medium">
-                    <svg
-                      className="h-3 w-3 shrink-0"
-                      viewBox="0 0 16 16"
-                      fill="currentColor"
-                      aria-hidden
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.75a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 1.5 0v-3.5zM8 11a.875.875 0 1 0 0-1.75A.875.875 0 0 0 8 11z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    {t.errorSearch}
-                  </p>
-                )}
+                <Button
+                  type="submit"
+                  disabled={isSearching || isBuildingPreview}
+                >
+                  {isSearching ? (
+                    <Loader2 className="animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Search aria-hidden="true" />
+                  )}
+                  {isSearching ? t.searching : t.searchButton}
+                </Button>
               </div>
-              <Button type="submit" disabled={isSearching || isBuildingPreview}>
-                {isSearching ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t.searching}
-                  </>
-                ) : (
-                  <>
-                    <Search className="mr-2 h-4 w-4" />
-                    {t.searchButton}
-                  </>
-                )}
-              </Button>
+              {queryError && (
+                <FieldError
+                  id="source-google-query-error"
+                  message={t.queryRequired}
+                />
+              )}
             </form>
 
             {/* Search results */}
             {googleResults.length > 0 && (
-              <div className="animate-in fade-in slide-in-from-top-2 space-y-1 rounded-xl border border-slate-200 bg-slate-50/80 p-2 duration-200">
-                {googleResults.map((result) => (
-                  <button
-                    key={result.place_id}
-                    type="button"
-                    className="group flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-left transition-all hover:border-blue-200 hover:bg-blue-50/50 disabled:opacity-50"
-                    onClick={() => handleSelectGoogleResult(result)}
-                    disabled={isBuildingPreview}
-                  >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 ring-1 ring-blue-100 transition-colors group-hover:bg-blue-100">
-                      <MapPin className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-slate-900">
-                        {result.name}
-                      </p>
-                      <p className="truncate text-xs text-slate-500">
-                        {result.formatted_address}
-                      </p>
-                    </div>
-                    <Search className="h-3.5 w-3.5 shrink-0 text-slate-300 transition-colors group-hover:text-blue-400" />
-                  </button>
-                ))}
+              <div className="space-y-2">
+                <p className={sectionLabelClass} id="source-results-label">
+                  {t.resultsLabel}
+                </p>
+                <ul
+                  aria-labelledby="source-results-label"
+                  className="ring-border divide-border divide-y overflow-hidden rounded-lg ring-1"
+                >
+                  {googleResults.map((result) => (
+                    <li key={result.place_id}>
+                      <button
+                        type="button"
+                        className="group hover:bg-muted/50 focus-visible:bg-muted/60 flex w-full items-center gap-3 px-4 py-3 text-left transition-colors outline-none disabled:pointer-events-none disabled:opacity-50"
+                        onClick={() => handleSelectGoogleResult(result)}
+                        disabled={isBuildingPreview}
+                      >
+                        <span className="bg-secondary text-secondary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg">
+                          <MapPin className="size-4" aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="text-foreground block truncate text-sm font-medium">
+                            {result.name}
+                          </span>
+                          <span className="text-muted-foreground block truncate text-xs">
+                            {result.formatted_address}
+                          </span>
+                        </span>
+                        <ArrowRight
+                          className="text-muted-foreground/60 group-hover:text-primary size-4 shrink-0 transition-[color,transform] group-hover:translate-x-0.5"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 
-            {googleResults.length === 0 && !isSearching && (
-              <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 py-10 text-center">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200">
-                  <Search className="h-5 w-5 text-slate-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-600">
-                    {t.sourceGoogle}
-                  </p>
-                  <p className="mt-0.5 max-w-xs text-xs text-slate-400">
-                    {t.selectBusiness}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+            {googleResults.length === 0 &&
+              !isSearching &&
+              !preview &&
+              !isBusy && (
+                <p className="border-border text-muted-foreground flex items-center gap-2 rounded-lg border border-dashed px-4 py-3 text-xs">
+                  <Search className="size-3.5 shrink-0" aria-hidden="true" />
+                  {t.selectBusiness}
+                </p>
+              )}
+          </>
         ) : (
-          <form
-            onSubmit={urlCrawlForm.handleSubmit(handleCrawlUrl)}
-            className="flex flex-col gap-2 sm:flex-row"
-          >
-            <div className="relative flex-1 space-y-1.5">
-              <div className="relative">
-                <Globe className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Input
-                  {...urlCrawlForm.register('url')}
-                  placeholder={t.urlPlaceholder}
-                  aria-invalid={!!urlCrawlForm.formState.errors.url}
-                  className="h-10 border-slate-200 bg-white pl-9 text-sm focus-visible:ring-blue-500/30"
-                />
-              </div>
-              {urlCrawlForm.formState.errors.url && (
-                <p className="text-destructive flex items-center gap-1 text-xs font-medium">
-                  <svg
-                    className="h-3 w-3 shrink-0"
-                    viewBox="0 0 16 16"
-                    fill="currentColor"
-                    aria-hidden
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.75a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 1.5 0v-3.5zM8 11a.875.875 0 1 0 0-1.75A.875.875 0 0 0 8 11z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  {t.errorCrawl}
-                </p>
-              )}
-            </div>
-            <Button type="submit" disabled={isCrawling || isBuildingPreview}>
-              {isCrawling ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t.crawling}
-                </>
-              ) : (
-                <>
-                  <Globe className="mr-2 h-4 w-4" />
-                  {t.crawlButton}
-                </>
-              )}
-            </Button>
-          </form>
-        )}
-
-        {/* Building preview loader */}
-        {(isBuildingPreview || isCrawling) && (
-          <div className="animate-in fade-in flex items-center justify-center gap-3 rounded-xl border border-blue-100 bg-blue-50 py-10 duration-300">
-            <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-            <RotatingLoaderText messages={t.generatingMessages} />
-          </div>
-        )}
-
-        {/* Preview section */}
-        {!isBuildingPreview && !isCrawling && (
           <>
-            {preview ? (
-              <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5 duration-300">
-                {/* Block selector */}
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
-                    {t.blocksTitle}
-                  </p>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                    {blockDefs.map(({ key, icon, label, desc }) => {
-                      const isSelected = selectedBlocks.has(key)
-                      const disabled = isBlockDisabled(key)
-                      return (
-                        <button
-                          key={key}
-                          type="button"
-                          disabled={disabled}
-                          onClick={() => toggleBlock(key)}
-                          className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${disabled
-                            ? 'cursor-not-allowed border-slate-200 bg-slate-50 opacity-40'
-                            : isSelected
-                              ? 'border-blue-300 bg-blue-50 ring-1 ring-blue-200'
-                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                            }`}
-                        >
-                          <div
-                            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${isSelected && !disabled ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}`}
-                          >
-                            {icon}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p
-                              className={`text-sm font-semibold ${isSelected && !disabled ? 'text-blue-800' : 'text-slate-800'}`}
-                            >
-                              {label}
-                            </p>
-                            <p className="text-xs leading-relaxed text-slate-500">
-                              {desc}
-                            </p>
-                          </div>
-                          <div
-                            className={`mt-0.5 shrink-0 ${isSelected && !disabled ? 'text-blue-500' : 'text-slate-300'}`}
-                          >
-                            {isSelected && !disabled ? (
-                              <CheckSquare className="h-4 w-4" />
-                            ) : (
-                              <Square className="h-4 w-4" />
-                            )}
-                          </div>
-                        </button>
-                      )
-                    })}
-                  </div>
+            <StepHeading
+              number={2}
+              title={t.findUrlTitle}
+              description={t.findUrlDesc}
+            />
+            <form
+              onSubmit={urlCrawlForm.handleSubmit(handleCrawlUrl)}
+              className="space-y-1.5"
+            >
+              <Label htmlFor="source-url" className="sr-only">
+                {t.urlLabel}
+              </Label>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <div className="relative flex-1">
+                  <Globe
+                    className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
+                  <Input
+                    id="source-url"
+                    type="url"
+                    inputMode="url"
+                    autoComplete="url"
+                    spellCheck={false}
+                    {...urlCrawlForm.register('url')}
+                    placeholder={t.urlPlaceholder}
+                    aria-invalid={!!urlError}
+                    aria-describedby={urlError ? 'source-url-error' : undefined}
+                    className="pl-9"
+                  />
                 </div>
-
-                {/* Preview data */}
-                <div className="grid gap-4 md:grid-cols-2">
-                  {/* Profile card */}
-                  <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-slate-500" />
-                      <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
-                        {t.blockProfile}
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm font-bold text-slate-900">
-                        {preview.profile.name || '—'}
-                      </p>
-                      {typeof preview.profile.rating === 'number' && (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                          <Star className="h-3 w-3 text-amber-500" />
-                          {t.ratingLabel}: {preview.profile.rating.toFixed(1)} /
-                          5
-                        </div>
-                      )}
-                      {typeof preview.profile.reviewCount === 'number' && (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                          <Sparkles className="h-3 w-3" />
-                          {t.reviewsLabel}: {preview.profile.reviewCount}
-                        </div>
-                      )}
-                      {typeof preview.profile.priceLevel === 'number' &&
-                        preview.profile.priceLevel > 0 && (
-                          <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                            <Tag className="h-3 w-3" />
-                            {t.priceLabel}:{' '}
-                            {'€'.repeat(preview.profile.priceLevel)}
-                          </div>
-                        )}
-                      {preview.profile.businessStatus && (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                          <Tag className="h-3 w-3" />
-                          {t.statusLabel}: {preview.profile.businessStatus}
-                        </div>
-                      )}
-                      {preview.profile.category && (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                          <Tag className="h-3 w-3" />
-                          {preview.profile.category}
-                        </div>
-                      )}
-                      {preview.profile.description && (
-                        <div className="flex items-start gap-1.5 text-xs text-slate-600">
-                          <AlignLeft className="mt-0.5 h-3 w-3 shrink-0" />
-                          <span className="line-clamp-3">
-                            {preview.profile.description}
-                          </span>
-                        </div>
-                      )}
-                      {preview.profile.address && (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                          <Navigation className="h-3 w-3" />
-                          {preview.profile.address}
-                        </div>
-                      )}
-                      {preview.profile.phone && (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                          <PhoneCall className="h-3 w-3" />
-                          {preview.profile.phone}
-                        </div>
-                      )}
-                      {preview.profile.website && (
-                        <div className="flex items-center gap-1.5 truncate text-xs text-slate-500">
-                          <Globe className="h-3 w-3 shrink-0" />
-                          <span className="truncate">
-                            {preview.profile.website}
-                          </span>
-                        </div>
-                      )}
-                      {preview.profile.mapsUrl && (
-                        <div className="flex items-center gap-1.5 truncate text-xs text-slate-500">
-                          <MapPin className="h-3 w-3 shrink-0" />
-                          <span className="truncate">
-                            {t.mapsLabel}: {preview.profile.mapsUrl}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    {/* Services card */}
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                      <div className="mb-3 flex items-center gap-2">
-                        <Briefcase className="h-4 w-4 text-slate-500" />
-                        <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
-                          {t.blockServices}
-                        </p>
-                      </div>
-                      {preview.services.length > 0 ? (
-                        <ul className="space-y-1">
-                          {preview.services.map((service) => (
-                            <li
-                              key={service.name}
-                              className="flex items-center gap-2 text-xs text-slate-700"
-                            >
-                              <span className="h-1 w-1 shrink-0 rounded-full bg-blue-400" />
-                              {service.name}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-xs text-slate-400 italic">
-                          {t.noServices}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Hours card */}
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                      <div className="mb-3 flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-slate-500" />
-                        <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
-                          {t.blockHours}
-                        </p>
-                      </div>
-                      {preview.hours.length > 0 ? (
-                        <ul className="space-y-1">
-                          {preview.hours.map((hour) => (
-                            <li
-                              key={`${hour.day_of_week}-${hour.open_time}-${hour.close_time}`}
-                              className="flex items-center justify-between text-xs text-slate-700"
-                            >
-                              <span className="font-medium text-slate-600">
-                                {hour.day_of_week}
-                              </span>
-                              <span
-                                className={
-                                  hour.is_closed
-                                    ? 'text-slate-400 italic'
-                                    : 'text-slate-800'
-                                }
-                              >
-                                {hour.is_closed
-                                  ? '—'
-                                  : `${hour.open_time ?? '—'} · ${hour.close_time ?? '—'}`}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-xs text-slate-400 italic">
-                          {t.noHours}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Apply button */}
-                <div className="pt-1">
-                  <Button
-                    type="button"
-                    onClick={handleApply}
-                    disabled={
-                      isApplying || !hasSelectableBlocks || isLimitReached
-                    }
-                    className="h-1 w-full"
-                  >
-                    {isApplying ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t.applying}
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        {t.applyButton}
-                      </>
-                    )}
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  disabled={isCrawling || isBuildingPreview}
+                >
+                  {isCrawling ? (
+                    <Loader2 className="animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Globe aria-hidden="true" />
+                  )}
+                  {isCrawling ? t.crawling : t.crawlButton}
+                </Button>
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 py-12 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-50 ring-1 ring-blue-100">
-                  <Sparkles className="h-6 w-6 text-blue-400" />
-                </div>
-                <p className="text-sm font-medium text-slate-500">
-                  {t.noPreview}
-                </p>
-              </div>
-            )}
+              {urlError && (
+                <FieldError id="source-url-error" message={t.urlInvalid} />
+              )}
+            </form>
           </>
         )}
       </div>
-    </div>
+
+      {/* Step 3: review + apply */}
+      <div className="border-border space-y-4 border-t p-5 sm:p-6">
+        <StepHeading
+          number={3}
+          title={t.previewTitle}
+          description={preview && !isBusy ? t.previewDesc : undefined}
+        />
+
+        {isBusy ? (
+          <div
+            role="status"
+            aria-live="polite"
+            className="bg-muted/40 ring-border flex flex-col items-center justify-center gap-2 rounded-lg py-10 ring-1"
+          >
+            <Loader2
+              className="text-primary size-5 animate-spin"
+              aria-hidden="true"
+            />
+            <RotatingLoaderText messages={t.generatingMessages} />
+          </div>
+        ) : preview ? (
+          <div className="space-y-5">
+            {/* Block selector */}
+            <fieldset className="space-y-2">
+              <legend className={cn(sectionLabelClass, 'mb-2')}>
+                {t.blocksTitle}
+              </legend>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {blockDefs.map(({ key, icon: Icon, label, desc }) => {
+                  const disabled = isBlockDisabled(key)
+                  const isSelected = selectedBlocks.has(key) && !disabled
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      role="checkbox"
+                      aria-checked={isSelected}
+                      disabled={disabled}
+                      onClick={() => toggleBlock(key)}
+                      className={cn(
+                        'focus-visible:ring-ring/50 flex items-start gap-3 rounded-lg p-3.5 text-left ring-1 transition-colors outline-none focus-visible:ring-3',
+                        disabled
+                          ? 'bg-muted/40 ring-border cursor-not-allowed opacity-60'
+                          : isSelected
+                            ? 'bg-accent/50 ring-primary/60'
+                            : 'bg-card ring-border hover:bg-muted/50'
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'flex size-8 shrink-0 items-center justify-center rounded-lg',
+                          isSelected
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-secondary text-secondary-foreground'
+                        )}
+                      >
+                        <Icon className="size-4" aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="text-foreground block text-sm font-medium">
+                          {label}
+                        </span>
+                        <span className="text-muted-foreground block text-xs leading-5">
+                          {disabled ? t.blockUnavailable : desc}
+                        </span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[5px] ring-1',
+                          isSelected
+                            ? 'bg-primary text-primary-foreground ring-primary'
+                            : 'bg-card ring-border text-transparent'
+                        )}
+                      >
+                        <Check className="size-3" />
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </fieldset>
+
+            {/* Preview data */}
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Profile */}
+              <div className="ring-border rounded-lg p-4 ring-1">
+                <div className="flex items-center gap-2">
+                  <User
+                    className="text-muted-foreground size-4"
+                    aria-hidden="true"
+                  />
+                  <p className={sectionLabelClass}>{t.blockProfile}</p>
+                </div>
+                <p className="text-foreground mt-3 text-base font-semibold tracking-[-0.01em]">
+                  {preview.profile.name || '—'}
+                </p>
+                {(typeof preview.profile.rating === 'number' ||
+                  typeof preview.profile.reviewCount === 'number' ||
+                  (typeof preview.profile.priceLevel === 'number' &&
+                    preview.profile.priceLevel > 0)) && (
+                  <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                    {typeof preview.profile.rating === 'number' && (
+                      <span className="flex items-center gap-1">
+                        <Star
+                          className="text-warning size-3.5 fill-current"
+                          aria-hidden="true"
+                        />
+                        <span className="sr-only">{t.ratingLabel}: </span>
+                        <span className="text-foreground font-medium tabular-nums">
+                          {preview.profile.rating.toFixed(1)}
+                        </span>
+                        /5
+                      </span>
+                    )}
+                    {typeof preview.profile.reviewCount === 'number' && (
+                      <span className="flex items-center gap-1">
+                        <MessageSquare
+                          className="size-3.5"
+                          aria-hidden="true"
+                        />
+                        <span className="tabular-nums">
+                          {preview.profile.reviewCount}
+                        </span>{' '}
+                        {t.reviewsLabel}
+                      </span>
+                    )}
+                    {typeof preview.profile.priceLevel === 'number' &&
+                      preview.profile.priceLevel > 0 && (
+                        <span>
+                          <span className="sr-only">{t.priceLabel}: </span>
+                          {'€'.repeat(preview.profile.priceLevel)}
+                        </span>
+                      )}
+                  </div>
+                )}
+
+                <dl className="mt-4 space-y-2.5 text-sm">
+                  {preview.profile.category && (
+                    <div className="flex items-start gap-2.5">
+                      <dt>
+                        <Tag
+                          className="text-muted-foreground mt-0.5 size-4"
+                          aria-hidden="true"
+                        />
+                        <span className="sr-only">{t.categoryLabel}</span>
+                      </dt>
+                      <dd className="text-foreground">
+                        {preview.profile.category}
+                      </dd>
+                    </div>
+                  )}
+                  {preview.profile.businessStatus && (
+                    <div className="flex items-start gap-2.5">
+                      <dt>
+                        <Sparkles
+                          className="text-muted-foreground mt-0.5 size-4"
+                          aria-hidden="true"
+                        />
+                        <span className="sr-only">{t.statusLabel}</span>
+                      </dt>
+                      <dd className="text-foreground">
+                        {formatBusinessStatus(preview.profile.businessStatus)}
+                      </dd>
+                    </div>
+                  )}
+                  {preview.profile.description && (
+                    <div className="flex items-start gap-2.5">
+                      <dt>
+                        <AlignLeft
+                          className="text-muted-foreground mt-0.5 size-4"
+                          aria-hidden="true"
+                        />
+                        <span className="sr-only">{t.descriptionLabel}</span>
+                      </dt>
+                      <dd className="text-muted-foreground line-clamp-4 leading-6">
+                        {preview.profile.description}
+                      </dd>
+                    </div>
+                  )}
+                  {preview.profile.address && (
+                    <div className="flex items-start gap-2.5">
+                      <dt>
+                        <Navigation
+                          className="text-muted-foreground mt-0.5 size-4"
+                          aria-hidden="true"
+                        />
+                        <span className="sr-only">{t.addressLabel}</span>
+                      </dt>
+                      <dd className="text-foreground">
+                        {preview.profile.address}
+                      </dd>
+                    </div>
+                  )}
+                  {preview.profile.phone && (
+                    <div className="flex items-start gap-2.5">
+                      <dt>
+                        <PhoneCall
+                          className="text-muted-foreground mt-0.5 size-4"
+                          aria-hidden="true"
+                        />
+                        <span className="sr-only">{t.phoneLabel}</span>
+                      </dt>
+                      <dd className="text-foreground tabular-nums">
+                        {preview.profile.phone}
+                      </dd>
+                    </div>
+                  )}
+                  {preview.profile.website && (
+                    <div className="flex min-w-0 items-start gap-2.5">
+                      <dt>
+                        <Globe
+                          className="text-muted-foreground mt-0.5 size-4"
+                          aria-hidden="true"
+                        />
+                        <span className="sr-only">{t.websiteLabel}</span>
+                      </dt>
+                      <dd className="text-foreground min-w-0 truncate">
+                        {preview.profile.website}
+                      </dd>
+                    </div>
+                  )}
+                  {preview.profile.mapsUrl && (
+                    <div className="flex items-start gap-2.5">
+                      <dt>
+                        <MapPin
+                          className="text-muted-foreground mt-0.5 size-4"
+                          aria-hidden="true"
+                        />
+                        <span className="sr-only">Google Maps</span>
+                      </dt>
+                      <dd>
+                        <a
+                          href={preview.profile.mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary inline-flex items-center gap-1 font-medium underline-offset-4 hover:underline"
+                        >
+                          {t.mapsLabel}
+                          <ArrowUpRight
+                            className="size-3.5"
+                            aria-hidden="true"
+                          />
+                        </a>
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+
+              <div className="space-y-4">
+                {/* Services */}
+                <div className="ring-border rounded-lg p-4 ring-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Briefcase
+                        className="text-muted-foreground size-4"
+                        aria-hidden="true"
+                      />
+                      <p className={sectionLabelClass}>{t.blockServices}</p>
+                    </div>
+                    {preview.services.length > 0 ? (
+                      <span className="text-muted-foreground text-xs tabular-nums">
+                        {preview.services.length}
+                      </span>
+                    ) : null}
+                  </div>
+                  {preview.services.length > 0 ? (
+                    <ul className="mt-3 flex flex-wrap gap-1.5">
+                      {preview.services.map((service) => (
+                        <li key={service.name}>
+                          <Badge variant="secondary">{service.name}</Badge>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-muted-foreground mt-3 text-xs">
+                      {t.noServices}
+                    </p>
+                  )}
+                </div>
+
+                {/* Hours */}
+                <div className="ring-border rounded-lg p-4 ring-1">
+                  <div className="flex items-center gap-2">
+                    <Clock
+                      className="text-muted-foreground size-4"
+                      aria-hidden="true"
+                    />
+                    <p className={sectionLabelClass}>{t.blockHours}</p>
+                  </div>
+                  {preview.hours.length > 0 ? (
+                    <dl className="divide-border mt-2 divide-y text-sm">
+                      {preview.hours.map((hour) => (
+                        <div
+                          key={`${hour.day_of_week}-${hour.open_time}-${hour.close_time}`}
+                          className="flex items-center justify-between gap-3 py-1.5"
+                        >
+                          <dt className="text-muted-foreground">
+                            {t.days[hour.day_of_week] ?? hour.day_of_week}
+                          </dt>
+                          <dd
+                            className={cn(
+                              'tabular-nums',
+                              hour.is_closed
+                                ? 'text-muted-foreground'
+                                : 'text-foreground font-medium'
+                            )}
+                          >
+                            {hour.is_closed
+                              ? t.closed
+                              : `${hour.open_time ?? '—'} – ${hour.close_time ?? '—'}`}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : (
+                    <p className="text-muted-foreground mt-3 text-xs">
+                      {t.noHours}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="border-border flex flex-col items-center justify-center rounded-lg border border-dashed px-6 py-10 text-center">
+            <span className="bg-secondary text-secondary-foreground ring-border mb-3 flex size-10 items-center justify-center rounded-xl ring-1">
+              <Sparkles className="size-5" aria-hidden="true" />
+            </span>
+            <p className="text-foreground text-sm font-medium">{t.noPreview}</p>
+            <p className="text-muted-foreground mt-1 max-w-sm text-xs leading-5">
+              {t.noPreviewHint}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Footer: apply */}
+      {preview && !isBusy ? (
+        <div className="bg-muted/40 border-border flex flex-col gap-3 border-t px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="text-xs leading-5">
+            <p className="text-foreground font-medium" aria-live="polite">
+              {t.selectedCount(selectedBlocks.size)}
+            </p>
+            <p className="text-muted-foreground">{t.applyHint}</p>
+          </div>
+          <Button
+            type="button"
+            onClick={handleApply}
+            disabled={isApplying || !hasSelectableBlocks || isLimitReached}
+            className="shrink-0"
+          >
+            {isApplying ? (
+              <Loader2 className="animate-spin" aria-hidden="true" />
+            ) : (
+              <Sparkles aria-hidden="true" />
+            )}
+            {isApplying ? t.applying : t.applyButton}
+          </Button>
+        </div>
+      ) : null}
+    </section>
   )
 }

@@ -1,83 +1,106 @@
 import { Suspense } from 'react'
-import { Mail, ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Inbox, MailCheck } from 'lucide-react'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { FlowShell } from '@/components/auth/FlowShell'
+
+const nextSteps = [
+  {
+    title: 'Abre el correo de Bunnatic',
+    text: 'Lo acabamos de enviar a la dirección con la que te has registrado.',
+  },
+  {
+    title: 'Pulsa el enlace de confirmación',
+    text: 'Así verificamos que el correo es tuyo y activamos tu cuenta.',
+  },
+  {
+    title: 'Sigue donde lo dejaste',
+    text: 'Te llevaremos de vuelta para terminar de configurar tu web.',
+  },
+]
 
 export default function CheckEmailPage() {
-    return (
-        <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
-            <CheckEmailContent />
-        </Suspense>
-    )
+  return (
+    <Suspense fallback={<div className="bg-background min-h-svh" />}>
+      <CheckEmailContent />
+    </Suspense>
+  )
 }
 
 function CheckEmailContent() {
-    return (
-        <div className="flex min-h-screen flex-col bg-slate-50">
-            {/* Header */}
-            <header className="border-b border-slate-200 bg-white">
-                <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                    <Link
-                        href="/"
-                        className="text-xl font-bold text-emerald-700"
-                    >
-                        Bunnatic
-                    </Link>
+  return (
+    <FlowShell>
+      <div className="mx-auto flex w-full max-w-md flex-col px-4 py-12 sm:py-20">
+        <div className="bg-card ring-border rounded-2xl p-6 shadow-[0_1px_2px_rgba(31,42,28,0.04),0_12px_32px_-16px_rgba(31,42,28,0.12)] ring-1 sm:p-8">
+          <span
+            className="bg-accent text-primary ring-primary/10 flex size-12 items-center justify-center rounded-xl ring-1"
+            aria-hidden="true"
+          >
+            <MailCheck className="size-6" />
+          </span>
+
+          <h1 className="mt-6 text-[1.75rem] leading-tight font-semibold tracking-[-0.04em]">
+            Revisa tu{' '}
+            <span className="font-serif font-normal text-[#52734a] italic">
+              correo
+            </span>
+          </h1>
+          <p className="text-muted-foreground mt-2 text-sm leading-6">
+            Te hemos enviado un enlace para confirmar tu cuenta. Solo te llevará
+            un momento.
+          </p>
+
+          <ol className="mt-6 space-y-4">
+            {nextSteps.map((step, index) => (
+              <li key={step.title} className="flex gap-3">
+                <span
+                  className="border-border bg-background text-foreground flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold tabular-nums"
+                  aria-hidden="true"
+                >
+                  {index + 1}
+                </span>
+                <div>
+                  <p className="text-sm font-medium">{step.title}</p>
+                  <p className="text-muted-foreground mt-0.5 text-xs leading-5">
+                    {step.text}
+                  </p>
                 </div>
-            </header>
+              </li>
+            ))}
+          </ol>
 
-            {/* Main Content */}
-            <main className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-                <div className="w-full max-w-md">
-                    <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-                        {/* Icon */}
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-                            <Mail className="h-8 w-8 text-emerald-700" />
-                        </div>
+          <div className="bg-muted mt-6 flex gap-3 rounded-xl p-4">
+            <Inbox
+              className="text-muted-foreground mt-0.5 size-4 shrink-0"
+              aria-hidden="true"
+            />
+            <p className="text-muted-foreground text-xs leading-5">
+              <strong className="text-foreground font-medium">
+                ¿No lo encuentras?
+              </strong>{' '}
+              Mira en la carpeta de spam o promociones. A veces tarda unos
+              minutos en llegar.
+            </p>
+          </div>
 
-                        {/* Title */}
-                        <h1 className="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900">
-                            Confirma tu correo electrónico
-                        </h1>
-
-                        {/* Description */}
-                        <p className="mt-3 text-center text-sm text-gray-600">
-                            Te hemos enviado un correo electrónico con un enlace de confirmación.
-                            Por favor, revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.
-                        </p>
-
-                        {/* Additional Info */}
-                        <div className="mt-6 rounded-lg bg-slate-50 p-4">
-                            <p className="text-xs text-gray-600">
-                                <strong className="font-semibold text-gray-900">¿No ves el correo?</strong>
-                                <br />
-                                Revisa tu carpeta de spam o correo no deseado. El correo puede tardar unos minutos en llegar.
-                            </p>
-                        </div>
-
-                        {/* Back to Sign In */}
-                        <div className="mt-6">
-                            <Link
-                                href="/signin"
-                                className="flex items-center justify-center gap-2 text-sm font-medium text-emerald-700 transition-colors hover:text-emerald-800"
-                            >
-                                <ArrowLeft className="h-4 w-4" />
-                                Volver al inicio de sesión
-                            </Link>
-                        </div>
-                    </div>
-
-                    {/* Help Text */}
-                    <p className="mt-6 text-center text-xs text-gray-500">
-                        ¿Necesitas ayuda?{' '}
-                        <a
-                            href="mailto:hello@bunnatic.com"
-                            className="font-medium text-emerald-700 hover:text-emerald-800"
-                        >
-                            Contacta con soporte
-                        </a>
-                    </p>
-                </div>
-            </main>
+          <Button asChild variant="outline" size="lg" className="mt-6 w-full">
+            <Link href="/signin">
+              <ArrowLeft aria-hidden="true" />
+              Volver a iniciar sesión
+            </Link>
+          </Button>
         </div>
-    )
+
+        <p className="text-muted-foreground mt-6 text-center text-xs">
+          ¿Necesitas ayuda?{' '}
+          <a
+            href="mailto:hello@bunnatic.com"
+            className="text-foreground font-medium underline-offset-4 hover:underline"
+          >
+            Escribe a soporte
+          </a>
+        </p>
+      </div>
+    </FlowShell>
+  )
 }

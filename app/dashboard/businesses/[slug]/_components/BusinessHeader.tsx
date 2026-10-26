@@ -1,14 +1,27 @@
-'use client'
-
 import Link from 'next/link'
 import { ArrowUpRight, Globe2, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { BusinessMonogram } from '@/components/dashboard/page-header'
-import { useBusiness } from './BusinessContext'
+import type { BusinessProfile } from '@/lib/backoffice/types'
+import {
+  businessRoleLabels,
+  hasBusinessPermission,
+  type BusinessRole,
+} from '@/lib/backoffice/policy'
 
-export default function BusinessHeader() {
-  const { business, businessDomain, sections, setupCompletion } = useBusiness()
-  const isPublished = sections.some((section) => section.status === 'published')
+export default function BusinessHeader({
+  business,
+  businessDomain,
+  isPublished,
+  setupCompletion,
+  role,
+}: {
+  business: BusinessProfile
+  businessDomain: { hostname: string; status: string } | null
+  isPublished: boolean
+  setupCompletion: number
+  role: BusinessRole
+}) {
   const slug = business.slug
 
   const hasLiveDomain = businessDomain?.status === 'active'
@@ -29,6 +42,9 @@ export default function BusinessHeader() {
             <h1 className="text-foreground truncate text-2xl font-semibold tracking-[-0.035em]">
               {business.name}
             </h1>
+            <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">
+              {businessRoleLabels[role]}
+            </span>
             {isPublished ? (
               <span className="bg-success/10 text-success inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium">
                 <span className="relative flex size-1.5">
@@ -82,12 +98,14 @@ export default function BusinessHeader() {
             <ArrowUpRight aria-hidden="true" />
           </a>
         </Button>
-        <Button asChild>
-          <Link href={`/dashboard/businesses/${slug}/generation`}>
-            <Sparkles aria-hidden="true" />
-            Generar con IA
-          </Link>
-        </Button>
+        {hasBusinessPermission(role, 'content.write') ? (
+          <Button asChild>
+            <Link href={`/dashboard/businesses/${slug}/generation`}>
+              <Sparkles aria-hidden="true" />
+              Generar con IA
+            </Link>
+          </Button>
+        ) : null}
       </div>
     </div>
   )

@@ -147,11 +147,7 @@ function CopyButton({
       aria-label={copied ? 'Copiado' : `Copiar ${label}`}
       className={cn('w-full sm:w-24', copied && 'text-success')}
     >
-      {copied ? (
-        <Check aria-hidden="true" />
-      ) : (
-        <Copy aria-hidden="true" />
-      )}
+      {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
       {copied ? 'Copiado' : 'Copiar'}
     </Button>
   )
@@ -266,7 +262,12 @@ export default function DomainSettingsCard({
     noDomain:
       'Todavía no has conectado ningún dominio. Tu web sigue disponible en su dirección de Bunnatic.',
     progressLabel: 'Progreso de la conexión',
-    progressSteps: ['Dominio añadido', 'DNS verificado', 'SSL emitido', 'Activo'],
+    progressSteps: [
+      'Dominio añadido',
+      'DNS verificado',
+      'SSL emitido',
+      'Activo',
+    ],
     dnsTitle: 'Configura estos registros DNS',
     dnsSubtitle:
       'Entra en el panel DNS de tu proveedor y crea los siguientes registros copiando los valores exactamente.',
@@ -750,7 +751,11 @@ export default function DomainSettingsCard({
                               className="ring-border space-y-2.5 rounded-lg p-3 ring-1"
                             >
                               <p className="text-muted-foreground text-[11px] font-semibold tracking-[0.14em] uppercase">
-                                {hasTxt ? t.sslTxt : hasHttp ? t.sslHttp : 'TXT'}
+                                {hasTxt
+                                  ? t.sslTxt
+                                  : hasHttp
+                                    ? t.sslHttp
+                                    : 'TXT'}
                                 {sslValidationRecords.length > 1 ? (
                                   <span className="tabular-nums">
                                     {' '}
@@ -839,7 +844,10 @@ export default function DomainSettingsCard({
             ) : (
               <div className="border-border border-t px-5 py-4 sm:px-6">
                 <p className="text-success flex items-center gap-2 text-sm">
-                  <CheckCircle2 className="size-4 shrink-0" aria-hidden="true" />
+                  <CheckCircle2
+                    className="size-4 shrink-0"
+                    aria-hidden="true"
+                  />
                   {t.activeDnsInfo}
                 </p>
               </div>

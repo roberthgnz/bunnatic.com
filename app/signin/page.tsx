@@ -198,7 +198,7 @@ function SignInContent() {
           <div className="flex items-center justify-between gap-3">
             <Label htmlFor="password">{t.signin.passwordLabel}</Label>
             <a
-              href="#"
+              href="/forgot-password"
               className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 rounded-sm text-xs font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-3"
             >
               {t.signin.forgotPassword}

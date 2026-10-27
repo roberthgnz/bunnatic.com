@@ -1,5 +1,8 @@
 const highlights = [
-  { value: '5 min', label: 'para tener la primera propuesta de tu web' },
+  {
+    value: 'Con IA',
+    label: 'una propuesta que puedes revisar y adaptar a tu negocio',
+  },
   { value: '14 días', label: 'de prueba gratis en cualquier plan' },
   { value: '0 €', label: 'para empezar, sin tarjeta de crédito' },
 ]

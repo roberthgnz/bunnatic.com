@@ -10,6 +10,9 @@ import HowItWorks from '@/components/HowItWorks'
 import Pricing from '@/components/Pricing'
 import Footer from '@/components/Footer'
 import { buildPageMetadata } from '@/lib/seo'
+import { GuideCards } from '@/components/seo/GuideCards'
+import { StructuredData } from '@/components/seo/StructuredData'
+import { getProductSchema } from '@/lib/structured-data'
 
 // Lazy load components below the fold
 const FAQ = dynamic(() => import('@/components/FAQ'), {
@@ -22,7 +25,7 @@ const FinalCTA = dynamic(() => import('@/components/FinalCTA'), {
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     locale: 'es',
-    title: 'Locavo | Crea tu Web con IA en 5 Minutos - SEO Local Incluido',
+    title: 'Crear páginas web para negocios locales con IA',
     description:
       'Crea una web profesional para tu negocio local con IA en minutos. Optimizada para SEO local, con formularios de contacto y WhatsApp. Convierte visitas en clientes. Prueba gratis sin tarjeta.',
     esPath: '/',
@@ -48,12 +51,14 @@ export default function Home() {
       </a>
       <Navbar />
       <main id="contenido">
+        <StructuredData data={getProductSchema()} />
         <Hero />
         <Highlights />
         <Features />
         <TemplateShowcase />
         <Examples />
         <HowItWorks />
+        <GuideCards />
         <Pricing />
         <FAQ />
         <FinalCTA />

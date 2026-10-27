@@ -11,8 +11,7 @@ function normalizeBaseUrl(value: string): string | null {
       return null
     }
 
-    // Remove trailing slash to avoid double slashes
-    return url.toString().replace(/\/$/, '')
+    return url.origin
   } catch {
     return null
   }
@@ -39,24 +38,12 @@ export function getBaseUrl(): string {
   return DEFAULT_BASE_URL
 }
 
-function withLocalePath(pathname: string, locale: SeoLocale): string {
-  if (locale === 'es') {
-    return pathname
-  }
-
-  return pathname === '/' ? '/ca' : `/ca${pathname}`
-}
-
-function absoluteUrl(pathname: string, locale: SeoLocale): string {
-  return new URL(withLocalePath(pathname, locale), getBaseUrl()).toString()
-}
-
 type BuildPageMetadataInput = {
   locale: SeoLocale
   title: string
   description: string
   esPath: string
-  caPath: string
+  caPath?: string
   keywords?: string[]
   noindex?: boolean
   image?: string
@@ -64,45 +51,41 @@ type BuildPageMetadataInput = {
 }
 
 export function buildPageMetadata({
-  locale,
   title,
   description,
   esPath,
-  caPath,
   keywords,
   noindex = false,
   image,
   imageAlt,
 }: BuildPageMetadataInput): Metadata {
-  const canonicalPath = locale === 'ca' ? caPath : esPath
-  const canonicalUrl = absoluteUrl(canonicalPath, locale)
+  // Only Spanish routes are published. Do not advertise nonexistent translations.
+  const canonicalUrl = new URL(esPath, getBaseUrl()).toString()
   const baseUrl = getBaseUrl()
+  const brandedTitle = `${title.replace(/^Locavo\s*[|–—-]\s*/i, '').replace(/(?:\s*[|–—-]\s*Locavo)+$/i, '')} | Locavo`
 
   // Default OG image if not provided
-  const ogImage = image || `${baseUrl}/og-image.png`
-  const ogImageAlt = imageAlt || 'Locavo - Crea tu web con IA para captar clientes locales'
+  const ogImage = image || `${baseUrl}/social/locavo.png`
+  const ogImageAlt =
+    imageAlt || 'Locavo - Crea tu web con IA para captar clientes locales'
 
   return {
     metadataBase: new URL(baseUrl),
-    title,
+    title: { absolute: brandedTitle },
     description,
     keywords,
-    authors: [{ name: 'Locavo' }],
+    authors: [{ name: 'Locavo', url: `${baseUrl}/sobre-locavo` }],
     creator: 'Locavo',
     publisher: 'Locavo',
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        es: absoluteUrl(esPath, 'es'),
-        ca: absoluteUrl(caPath, 'ca'),
-      },
     },
     openGraph: {
-      title,
+      title: brandedTitle,
       description,
       url: canonicalUrl,
       siteName: 'Locavo',
-      locale: locale === 'ca' ? 'ca_ES' : 'es_ES',
+      locale: 'es_ES',
       type: 'website',
       images: [
         {
@@ -115,11 +98,9 @@ export function buildPageMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: brandedTitle,
       description,
       images: [ogImage],
-      creator: '@locavo',
-      site: '@locavo',
     },
     robots: {
       index: !noindex,

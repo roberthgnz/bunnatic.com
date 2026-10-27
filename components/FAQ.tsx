@@ -1,13 +1,5 @@
-'use client'
-
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
 
 const questions = [
   {
@@ -56,26 +48,18 @@ export default function FAQ() {
             <ArrowUpRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
-        <Accordion
-          type="single"
-          collapsible
-          className="border-t border-black/15"
-        >
-          {questions.map(({ q, a }, index) => (
-            <AccordionItem
-              key={q}
-              value={`question-${index}`}
-              className="border-black/15 last:border-b"
-            >
-              <AccordionTrigger className="rounded-none py-7 text-left text-lg font-medium tracking-[-0.01em] hover:no-underline **:data-[slot=accordion-trigger-icon]:size-5 **:data-[slot=accordion-trigger-icon]:text-black sm:text-xl">
+        <div className="border-t border-black/15">
+          {questions.map(({ q, a }) => (
+            <details key={q} className="border-b border-black/15">
+              <summary className="cursor-pointer py-7 text-left text-lg font-medium tracking-[-0.01em] sm:text-xl">
                 {q}
-              </AccordionTrigger>
-              <AccordionContent className="max-w-2xl pb-7 text-base leading-relaxed text-(--home-muted)">
+              </summary>
+              <p className="max-w-2xl pb-7 text-base leading-relaxed text-(--home-muted)">
                 {a}
-              </AccordionContent>
-            </AccordionItem>
+              </p>
+            </details>
           ))}
-        </Accordion>
+        </div>
       </div>
     </section>
   )

@@ -1,5 +1,8 @@
 import dynamic from 'next/dynamic'
 import { Building2, Check } from 'lucide-react'
+import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
+import { GuideCards } from '@/components/seo/GuideCards'
+import { sectorChecklists } from '@/lib/sectorContent'
 import LandingHeroPreview from '@/components/landing/LandingHeroPreview'
 import {
   BenefitGrid,
@@ -67,6 +70,15 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
 
   return (
     <LandingShell>
+      <div className="landing-container pt-8">
+        <Breadcrumbs
+          items={[
+            { name: 'Inicio', path: '/' },
+            { name: 'Sectores', path: '/negocio' },
+            { name: t.title, path: `/negocio/${slug}` },
+          ]}
+        />
+      </div>
       <SeoHero
         badge={t.badge}
         title={t.title}
@@ -102,6 +114,52 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
         steps={t.process}
       />
 
+      <section className="landing-section" aria-labelledby="sector-checklist">
+        <div className="landing-container">
+          <h2 id="sector-checklist" className="landing-title">
+            Qué preparar antes de publicar
+          </h2>
+          <p className="mt-5 max-w-3xl text-lg leading-relaxed text-(--home-muted)">
+            Una propuesta generada con IA necesita los datos reales de tu
+            negocio. Revisa estos contenidos y prueba el contacto antes de
+            compartir la web. Una solicitud recibida no equivale a una cita
+            confirmada.
+          </p>
+          <div
+            className="mt-8 overflow-x-auto rounded-2xl border border-(--home-line)"
+            tabIndex={0}
+            role="region"
+            aria-label="Contenido del sector"
+          >
+            <table className="w-full min-w-[500px] text-left leading-relaxed">
+              <caption className="p-5 text-left font-medium">
+                Contenido que conviene comprobar en este sector
+              </caption>
+              <thead className="bg-(--home-soft)">
+                <tr>
+                  <th scope="col" className="p-5">
+                    Área
+                  </th>
+                  <th scope="col" className="p-5">
+                    Qué revisar
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {(sectorChecklists[slug] ?? []).map(([area, detail]) => (
+                  <tr key={area} className="border-t border-(--home-line)">
+                    <th scope="row" className="p-5 align-top font-medium">
+                      {area}
+                    </th>
+                    <td className="p-5 text-(--home-muted)">{detail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <ProofAndPlanSection
         proofTitle={t.proofTitle}
         testimonials={t.testimonials}
@@ -112,6 +170,7 @@ export default function BusinessLanding({ slug, copy }: BusinessLandingProps) {
       />
 
       <FAQ />
+      <GuideCards />
 
       <FinalCtaSection
         title={t.finalTitle}

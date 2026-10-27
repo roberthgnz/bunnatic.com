@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import BusinessLanding from '../_components/BusinessLanding'
 import {
   getBusinessLandingBySlug,
@@ -58,6 +58,7 @@ export default async function NegocioLandingPage({ params }: BusinessParams) {
   }
 
   const localizedSlug = getBusinessSlugByLocale(entry, 'es')
+  if (slug !== localizedSlug) permanentRedirect(`/negocio/${localizedSlug}`)
 
   return <BusinessLanding slug={localizedSlug} copy={{ es: entry.copy }} />
 }

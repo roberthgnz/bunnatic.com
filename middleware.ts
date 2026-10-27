@@ -4,7 +4,7 @@ import { env } from 'cloudflare:workers'
 import { isPlatformHost } from '@/lib/domains/config'
 import { normalizeHostname } from '@/lib/domains/hostname'
 
-function secure(response: NextResponse) {
+function securityHeaders(response: NextResponse) {
   response.headers.set('X-DNS-Prefetch-Control', 'on')
   response.headers.set('X-Frame-Options', 'SAMEORIGIN')
   response.headers.set('X-Content-Type-Options', 'nosniff')
@@ -14,6 +14,16 @@ function secure(response: NextResponse) {
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const secure = (response: NextResponse) => {
+    if (
+      /^\/(api|auth|signin|signup|dashboard|onboarding|checkout|forgot-password|reset-password|verify-email)(?:\/|$)/.test(
+        pathname
+      )
+    ) {
+      response.headers.set('X-Robots-Tag', 'noindex, nofollow')
+    }
+    return securityHeaders(response)
+  }
   const host = normalizeHostname(
     (request.headers.get('host') || '').replace(/:\d+$/, '')
   )

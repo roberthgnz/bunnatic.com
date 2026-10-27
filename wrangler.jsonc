@@ -1,17 +1,30 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "locavo",
+  "account_id": "002953406418b41e22aa2d7ec02b1845",
   "main": "vinext/server/app-router-entry",
   "compatibility_date": "2026-10-26",
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "not_found_handling": "none" },
   "observability": { "enabled": true, "traces": { "enabled": true } },
+  "workers_dev": true,
+  "vars": {
+    "APP_URL": "https://locavo.reliutg.workers.dev",
+    "AUTH_URL": "https://locavo.reliutg.workers.dev",
+    "NEXT_PUBLIC_SITE_URL": "https://locavo.reliutg.workers.dev",
+    "PLATFORM_HOSTS": "locavo.reliutg.workers.dev",
+    "PLATFORM_ROOT_DOMAIN": "",
+    "PLATFORM_DEFAULT_LOCALE": "es",
+  },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "locavo",
+      "database_id": "a0613752-c376-4245-a364-9c8c5dfb6ebd",
       "migrations_dir": "migrations",
     },
   ],
-  "kv_namespaces": [{ "binding": "GENERATION_STATE" }],
+  "kv_namespaces": [
+    { "binding": "GENERATION_STATE", "id": "0f96bc8c0a6c4ab5a21264dbd1701a28" },
+  ],
 }

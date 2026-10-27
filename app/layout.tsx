@@ -20,7 +20,7 @@ const gaTrackingId = process.env.NEXT_PUBLIC_GA_TRACKING_ID
 
 export const metadata: Metadata = {
   title: {
-    default: 'Locavo - Crea tu Web con IA en 5 Minutos',
+    default: 'Crear páginas web para negocios locales | Locavo',
     template: '%s | Locavo',
   },
   description:
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'es_ES',
     siteName: 'Locavo',
-    title: 'Locavo - Crea tu Web con IA en 5 Minutos',
+    title: 'Crear páginas web para negocios locales | Locavo',
     description:
       'Crea una web profesional para tu negocio local con IA en minutos. Optimizada para SEO local y captación de clientes.',
   },
@@ -59,8 +59,6 @@ export const metadata: Metadata = {
     title: 'Locavo - Crea tu Web con IA',
     description:
       'Crea una web profesional con IA en minutos. Optimizada para SEO local y captación de clientes.',
-    creator: '@locavo',
-    site: '@locavo',
   },
 }
 
@@ -83,13 +81,13 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema),
+            __html: JSON.stringify(organizationSchema).replace(/</g, '\\u003c'),
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteSchema),
+            __html: JSON.stringify(websiteSchema).replace(/</g, '\\u003c'),
           }}
         />
       </head>

@@ -1,5 +1,19 @@
 # Migración de Locavo a Cloudflare
 
+## Despliegue actual
+
+Publicado el 27 de octubre de 2026 en **https://locavo.reliutg.workers.dev**.
+
+- Worker: `locavo`.
+- D1: `locavo`, con el esquema aplicado y sin usuarios ni negocios importados.
+- KV: `locavo-generation-state`.
+- Las direcciones de aplicación y autenticación apuntan al host publicado.
+- El secreto de NextAuth es exclusivo de este despliegue y está almacenado como secreto de Workers.
+
+La portada, acceso, registro, sesión anónima, CSRF, cookies seguras y protección del panel se verifican con `node scripts/check-deployment.mjs`. Esa comprobación es de lectura y no crea usuarios ni envía correos.
+
+Falta configurar las credenciales propias de Google OAuth, Google Places, Resend y su remitente verificado, Gemini, Firecrawl y Stripe. Hasta entonces, las funciones que dependen de esas integraciones no están operativas. También queda conectar un dominio propio si se desea sustituir la dirección workers.dev.
+
 ## Infraestructura
 
 El Worker **locavo** ejecuta vinext con el plugin oficial de Cloudflare para Vite. Los bindings `DB` (D1) y `GENERATION_STATE` (KV) se definen en `wrangler.jsonc`. NextAuth usa el adaptador D1 y sesiones JWT. Los permisos de acceso a los datos se aplican en `lib/db/query.ts`; D1 no ejecuta las antiguas políticas PostgreSQL RLS.
@@ -9,7 +23,7 @@ La carpeta `supabase/migrations` se conserva como historial del esquema anterior
 ## Preparación del entorno remoto
 
 1. Selecciona la cuenta de Cloudflare correcta con `pnpm exec wrangler whoami`.
-2. Crea recursos exclusivos de Locavo con `pnpm exec wrangler d1 create locavo` y `pnpm exec wrangler kv namespace create GENERATION_STATE`. Añade `database_id` e `id` de los recursos creados a sus bindings de `wrangler.jsonc`. El identificador de cuenta se puede especificar en esa configuración si hay varias cuentas.
+2. Los recursos del despliegue actual ya están creados y vinculados en `wrangler.jsonc`. Para otro entorno, crea una base y un namespace distintos y configura sus identificadores; no reutilices los de producción para pruebas.
 3. Configura las variables públicas de `.env.example` antes de compilar. El dominio definitivo debe quedar en `NEXT_PUBLIC_SITE_URL`.
 4. Añade los valores de `.dev.vars.example` al entorno remoto mediante `pnpm exec wrangler secret put NOMBRE`. `AUTH_SECRET` debe generarse para este entorno y conservarse entre despliegues. `APP_URL` y `AUTH_URL` deben usar el origen HTTPS definitivo. Incluye ese host en `PLATFORM_HOSTS`.
 5. Configura el callback de Google `/api/auth/callback/google`, el remitente verificado de Resend y el webhook de Stripe `/api/stripe/webhook`.

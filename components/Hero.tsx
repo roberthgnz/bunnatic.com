@@ -29,15 +29,18 @@ export default function Hero() {
 
       <div className="home-container pt-32 pb-14 sm:pb-20 lg:pb-24">
         <h1 className="max-w-5xl text-[clamp(52px,8.6vw,132px)] leading-[0.92] font-medium tracking-[-0.055em]">
-          Una web hace
+          Crea la web
           <br />
-          tu negocio real.
+          de tu negocio.
         </h1>
         <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="max-w-xl">
             <p className="text-lg leading-relaxed text-white/80 sm:text-xl">
-              Tú pones el negocio. La IA pone la web. Crea tu espacio online en
-              minutos y haz que más clientes te encuentren.
+              Locavo te ayuda a crear una página web para tu negocio local con
+              inteligencia artificial. Reúne tus servicios, horarios y datos de
+              contacto en un sitio que puedas actualizar. Revisa la propuesta,
+              adapta los textos a lo que ofreces y facilita que tus clientes
+              sepan dónde encontrarte y cómo contactar contigo.
             </p>
             <form
               action="/crear-pagina-web-negocio"

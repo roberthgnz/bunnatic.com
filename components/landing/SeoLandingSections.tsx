@@ -1,15 +1,9 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ArrowUpRight, Check, Quote } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Check } from 'lucide-react'
 import DemoLinkButton from '@/components/DemoLinkButton'
 import Footer from '@/components/Footer'
 import Navbar from '@/components/Navbar'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
 import { content } from '@/lib/content'
 
 /*
@@ -341,26 +335,18 @@ export function FaqSection({ title, items }: { title: string; items: Faq[] }) {
           title={title}
           description="Dar el salto es más fácil cuando sabes qué esperar."
         />
-        <Accordion
-          type="single"
-          collapsible
-          className="border-t border-black/15"
-        >
-          {items.map(({ q, a }, index) => (
-            <AccordionItem
-              key={q}
-              value={`question-${index}`}
-              className="border-black/15 last:border-b"
-            >
-              <AccordionTrigger className="rounded-none py-7 text-left text-lg font-medium tracking-[-0.01em] hover:no-underline **:data-[slot=accordion-trigger-icon]:size-5 **:data-[slot=accordion-trigger-icon]:text-black sm:text-xl">
+        <div className="border-t border-black/15">
+          {items.map(({ q, a }) => (
+            <details key={q} className="border-b border-black/15">
+              <summary className="cursor-pointer py-7 text-left text-lg font-medium tracking-[-0.01em] sm:text-xl">
                 {q}
-              </AccordionTrigger>
-              <AccordionContent className="max-w-2xl pb-7 text-base leading-relaxed text-(--home-muted)">
+              </summary>
+              <p className="max-w-2xl pb-7 text-base leading-relaxed text-(--home-muted)">
                 {a}
-              </AccordionContent>
-            </AccordionItem>
+              </p>
+            </details>
           ))}
-        </Accordion>
+        </div>
       </div>
     </section>
   )
@@ -371,8 +357,6 @@ const recommendedTier = content.pricing.tiers.find(
 )
 
 export function ProofAndPlanSection({
-  proofTitle,
-  testimonials,
   planTitle,
   planPrice,
   planItems,
@@ -388,36 +372,33 @@ export function ProofAndPlanSection({
   return (
     <section
       className="landing-section border-t border-(--home-line)"
-      aria-labelledby="experiencias-title"
+      aria-labelledby="revision-title"
     >
       <div className="landing-container grid gap-12 lg:grid-cols-[1.35fr_0.65fr] lg:items-start lg:gap-16">
         <div className="min-w-0">
           <SectionHeader
-            id="experiencias-title"
-            eyebrow="Experiencias"
-            title={proofTitle}
+            id="revision-title"
+            eyebrow="Antes de empezar"
+            title="Una propuesta que debes revisar con los datos de tu negocio"
           />
-          <div className="mt-12 grid gap-5 sm:grid-cols-2">
-            {testimonials.map((item) => (
-              <figure
-                key={item.author}
-                className="flex flex-col rounded-3xl bg-(--home-soft) p-8"
-              >
-                <Quote className="size-6 text-black" aria-hidden="true" />
-                <blockquote className="mt-5 flex-1 text-xl leading-snug font-medium tracking-[-0.02em]">
-                  «{item.quote}»
-                </blockquote>
-                <figcaption className="mt-8 border-t border-black/10 pt-4">
-                  <span className="block text-sm font-medium">
-                    {item.author}
-                  </span>
-                  <span className="mt-0.5 block text-sm text-(--home-muted)">
-                    {item.role}
-                  </span>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+          <ul className="mt-10 space-y-5 text-lg leading-relaxed text-(--home-muted)">
+            <li>
+              Confirma los servicios, horarios y condiciones antes de publicar.
+            </li>
+            <li>
+              Prueba el teléfono y los canales de contacto desde un móvil.
+            </li>
+            <li>
+              Comprueba la disponibilidad de las funciones e integraciones que
+              necesitas.
+            </li>
+          </ul>
+          <Link
+            href="/blog/como-crear-web-negocio-local"
+            className="mt-8 inline-flex min-h-11 items-center font-medium underline underline-offset-4"
+          >
+            Ver la guía de preparación
+          </Link>
         </div>
 
         <aside

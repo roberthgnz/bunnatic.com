@@ -41,6 +41,14 @@ export default function Footer() {
         href: `/alternativa/${getAlternativeSlug(competitor.id, 'es')}`,
       })),
     },
+    {
+      title: 'Recursos',
+      links: [
+        { label: 'Guías para tu negocio', href: '/blog' },
+        { label: 'Webs por sector', href: '/negocio' },
+        { label: 'Sobre Locavo', href: '/sobre-locavo' },
+      ],
+    },
     { title: 'Legal', links: legalLinks },
   ]
 
@@ -60,7 +68,7 @@ export default function Footer() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-12 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid grid-cols-1 gap-10 py-16 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
           <div className="flex flex-col gap-5">
             <Link href="/" className="flex w-fit items-center gap-2">
               <span className="flex size-8 items-center justify-center rounded-lg bg-white">
@@ -99,8 +107,7 @@ export default function Footer() {
 
         <div className="flex flex-col items-start justify-between gap-4 border-t border-white/15 pt-8 sm:flex-row sm:items-center">
           <p className="text-sm text-white/50">
-            © {new Date().getFullYear()} Locavo · Hecho con cariño en
-            Barcelona
+            © {new Date().getFullYear()} Locavo · Hecho con cariño en Barcelona
           </p>
           <CookiePreferencesButton />
         </div>

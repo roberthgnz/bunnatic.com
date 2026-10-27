@@ -3,19 +3,17 @@ import { content } from '@/lib/content'
 import { getBaseUrl } from '@/lib/seo'
 import { getAlternativeSlug, getFeatureSlug } from '@/lib/pageSlugs'
 import { businessLandingEntries } from '@/lib/businessLandingData'
+import { guides } from '@/lib/blog'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = getBaseUrl()
-  const lastModified = new Date()
 
   const routes = [
     '',
     '/crear-pagina-web-negocio',
-    '/signin',
-    '/signup',
-    '/aviso-legal',
-    '/politica-privacidad',
-    '/politica-cookies',
+    '/blog',
+    '/negocio',
+    '/sobre-locavo',
   ]
 
   // Add feature pages
@@ -30,13 +28,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Add business landing pages
   businessLandingEntries.forEach((entry) => {
-    routes.push(`/negocio/${entry.slug}`)
+    routes.push(`/negocio/${entry.legacySlug}`)
   })
 
-  return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified,
-    changeFrequency: 'weekly',
-    priority: route === '' ? 1 : 0.8,
-  }))
+  return [
+    ...Array.from(new Set(routes)).map((route) => ({
+      url: new URL(route || '/', baseUrl).toString(),
+    })),
+    ...guides.map((guide) => ({
+      url: `${baseUrl}/blog/${guide.slug}`,
+      lastModified: guide.updatedAt,
+    })),
+  ]
 }

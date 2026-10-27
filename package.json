@@ -17,7 +17,8 @@
     "cf:typegen": "wrangler types --include-runtime false",
     "db:migrate:local": "wrangler d1 migrations apply locavo --local",
     "db:migrate:remote": "wrangler d1 migrations apply locavo --remote",
-    "check:cloudflare": "vinext check"
+    "check:cloudflare": "vinext check",
+    "check:seo": "tsx scripts/check-seo.ts"
   },
   "dependencies": {
     "@auth/d1-adapter": "^1.11.3",

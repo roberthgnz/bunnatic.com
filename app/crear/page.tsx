@@ -1,1 +1,14 @@
-export { default } from '../crear-pagina-web-negocio/page'
+import { permanentRedirect } from 'next/navigation'
+
+export default async function CreateAlias({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const query = new URLSearchParams()
+  for (const [key, value] of Object.entries(await searchParams)) {
+    if (Array.isArray(value)) value.forEach((item) => query.append(key, item))
+    else if (value !== undefined) query.set(key, value)
+  }
+  permanentRedirect(`/crear-pagina-web-negocio${query.size ? `?${query}` : ''}`)
+}

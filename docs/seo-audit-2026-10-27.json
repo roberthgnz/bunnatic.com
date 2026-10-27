@@ -1,0 +1,200 @@
+{
+  "date": "2026-10-27",
+  "site": "https://locavo.reliutg.workers.dev",
+  "scope": "11 HTTP URLs plus source inspection; reference project spicy-chat-platform read-only. Not a complete crawl or a ranking study.",
+  "method": "Each of 20 applicable checks weighs 5. Values 0, 0.5, 1 are observed; U is unverified. Score=100*earned/verified weight; coverage=verified/applicable weight.",
+  "checks": [
+    {
+      "dimension": "access",
+      "check": "HTTP/CDN",
+      "value": 1,
+      "evidence": "Sample public pages return 200; absent routes return 404."
+    },
+    {
+      "dimension": "access",
+      "check": "Search robots",
+      "value": 1,
+      "evidence": "robots.txt allows public pages, advertises sitemap."
+    },
+    {
+      "dimension": "access",
+      "check": "Indexability/canonical",
+      "value": 0.5,
+      "evidence": "Home canonical correct; restaurant missing canonical, onboarding indexable, nonexistent ca alternate."
+    },
+    {
+      "dimension": "access",
+      "check": "Sitemap/links",
+      "value": 0,
+      "evidence": "Auth URLs included, lastmod changes on every request, sector duplicates."
+    },
+    {
+      "dimension": "access",
+      "check": "Initial HTML",
+      "value": 1,
+      "evidence": "Headings and commercial copy rendered in HTTP response."
+    },
+    {
+      "dimension": "access",
+      "check": "AI retrieval controls",
+      "value": "U",
+      "evidence": "No verified bot logs, WAF audit, provider settings or live citation tests."
+    },
+    {
+      "dimension": "entity",
+      "check": "Organization identity",
+      "value": 0.5,
+      "evidence": "Consistent Locavo name; guessed social profiles and logo URL in schema."
+    },
+    {
+      "dimension": "entity",
+      "check": "SoftwareApplication",
+      "value": 0,
+      "evidence": "No product schema on homepage."
+    },
+    {
+      "dimension": "entity",
+      "check": "Authorship",
+      "value": 0.5,
+      "evidence": "Brand metadata author exists; no linked editorial policy or organization profile."
+    },
+    {
+      "dimension": "entity",
+      "check": "Schema coherence",
+      "value": 0.5,
+      "evidence": "Parseable Organization and WebSite; unsupported SearchAction and social identities."
+    },
+    {
+      "dimension": "extractability",
+      "check": "Direct opening answer",
+      "value": 0.5,
+      "evidence": "Home heading vague; sector pages identify audience."
+    },
+    {
+      "dimension": "extractability",
+      "check": "Self-contained blocks/tables",
+      "value": 0.5,
+      "evidence": "Commercial lists exist; FAQ closed content absent from initial HTML, no practical guides."
+    },
+    {
+      "dimension": "extractability",
+      "check": "Traceable evidence",
+      "value": 0,
+      "evidence": "Named testimonials and outcome claims have no supporting provenance in repository."
+    },
+    {
+      "dimension": "extractability",
+      "check": "Authorship/original evidence",
+      "value": 0,
+      "evidence": "No product study, real customer case or editorial attribution supplied."
+    },
+    {
+      "dimension": "clusters",
+      "check": "Buyer problem coverage",
+      "value": 0.5,
+      "evidence": "Features, alternatives and ten sectors; /blog returns 404."
+    },
+    {
+      "dimension": "clusters",
+      "check": "Intent/URL fit",
+      "value": 0.5,
+      "evidence": "Dedicated sector copy but short static and verbose dynamic URLs duplicate intent."
+    },
+    {
+      "dimension": "clusters",
+      "check": "Internal links/overlap",
+      "value": 0.5,
+      "evidence": "Feature/alternative footer links; no sector hub or guide relationships."
+    },
+    {
+      "dimension": "clusters",
+      "check": "Differentiation/gaps",
+      "value": 0,
+      "evidence": "No sourced practical editorial content; proposed demand is a hypothesis, no query volumes available."
+    },
+    {
+      "dimension": "offsite",
+      "check": "Profile identity",
+      "value": "U",
+      "evidence": "No verified external Locavo profiles supplied or confirmed."
+    },
+    {
+      "dimension": "offsite",
+      "check": "Independent mentions",
+      "value": "U",
+      "evidence": "Not measured; absence is not asserted."
+    }
+  ],
+  "baseline": {
+    "earnedWeight": 37.5,
+    "verifiedWeight": 85,
+    "applicableWeight": 100,
+    "unknownWeight": 15,
+    "provisionalScore": 44,
+    "coveragePercent": 85,
+    "possibleRange": [37.5, 52.5]
+  },
+  "blockers": "No complete public crawl block observed. Technical inconsistencies and unsupported claims are P1; no claim about actual Google indexing.",
+  "priorities": [
+    {
+      "priority": "P1",
+      "action": "Unify canonical URLs, remove nonexistent languages and duplicate brand titles; exclude auth URLs from sitemap and noindex private routes.",
+      "verify": "HTTP regression crawl; every sitemap URL 200 and self-canonical."
+    },
+    {
+      "priority": "P1",
+      "action": "Remove unverified public testimonials and guessed social identities.",
+      "verify": "Inspect rendered HTML and parsed JSON-LD."
+    },
+    {
+      "priority": "P1",
+      "action": "Create linked practical guides, sector hub, organization/editorial profile.",
+      "verify": "Initial HTML, sources, article/breadcrumb schema, table semantics and internal links."
+    },
+    {
+      "priority": "P2",
+      "action": "Measure query, indexing and conversion baseline in verified Search Console property once access exists.",
+      "verify": "Actual export, not estimated rankings or traffic."
+    }
+  ],
+  "clusterMap": [
+    {
+      "url": "/blog/como-crear-web-negocio-local",
+      "intent": "Planning a business website",
+      "stage": "consideration",
+      "links": [
+        "/negocio",
+        "/blog/seo-local-para-negocios",
+        "/blog/web-o-redes-sociales-negocio"
+      ]
+    },
+    {
+      "url": "/blog/seo-local-para-negocios",
+      "intent": "Practical local discoverability checklist",
+      "stage": "education",
+      "links": [
+        "/caracteristicas/seo-local",
+        "/blog/como-crear-web-negocio-local"
+      ]
+    },
+    {
+      "url": "/blog/web-o-redes-sociales-negocio",
+      "intent": "Choose website, business profile and social channel roles",
+      "stage": "consideration",
+      "links": ["/blog/como-crear-web-negocio-local", "/negocio"]
+    }
+  ],
+  "unverified": [
+    "Search Console rankings, clicks, indexing and conversions",
+    "Independent mentions",
+    "Live citations in ChatGPT, Perplexity, Gemini or AI Overviews",
+    "Effective AI-specific WAF controls",
+    "Causality of reference project ranking"
+  ],
+  "aiAccessMatrix": {
+    "search": "Public HTTP/robots observed; actual Googlebot logs unverified",
+    "retrieval": "Public HTML accessible; provider-specific access unverified",
+    "training": "No preference changes made",
+    "citations": "Not tested"
+  }
+}
